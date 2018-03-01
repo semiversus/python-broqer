@@ -1,6 +1,6 @@
-from broqer.broker import Broker
+from broqer.broker import TopicCollection
 
-broker=Broker()
+broker=TopicCollection()
 
 def print_cb1(msg):
   print('Subscriber1 got a new message: "%s"'%msg)
