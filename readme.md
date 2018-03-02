@@ -3,6 +3,6 @@ See examples for usage
 
 # Naming
 * hub/Hub/Dispatcher
-* Publisher/Server/Oberservable
-* Subscriber/Client/Observer
+* Publisher/Server/Oberservable/Emitter
+* Subscriber/Client/Observer/Sink
 * Topic/Channel/Stream/Signal
