@@ -59,10 +59,14 @@ class Topic:
   @property
   def name(self):
     return self._name
+
+  @property
+  def path(self):
+    return self._hub._prefix()+self._name
   
   @property
   def meta(self):
-    return MappingProxyType(self._meta)
+    return MappingProxyType(self._meta_dict)
 
 class Hub:
   def __init__(self, parent_hub:Optional['Hub']=None, name:str=''):
@@ -78,6 +82,37 @@ class Hub:
   @property
   def topics(self, topic_name) -> dict:
     return MappingProxyType(self._topics)
+
+  @property
+  def parent_hub(self):
+    return self._parent_hub
+  
+  @property
+  def name(self):
+    return self._name
+  
+  @property
+  def path(self):
+    if self._parent_hub:
+      return self.parent_hub._prefix() + self._name
+    elif self._name:
+      return self._name
+    else:
+      return ''
+  
+  def _prefix(self):
+    if self._parent_hub:
+      return self._parent_hub._prefix()+self._name+SEP
+    elif self._name:
+      return self._name+SEP
+    else:
+      return ''
+  
+  def __iter__(self):
+    for topic in self._topics.values():
+      yield topic.path
+    for hub in self._hubs.values():
+      yield from iter(hub)
 
   def __getitem__(self, topic_name:str) -> Union[Topic, 'Hub']:
     if SEP in topic_name:

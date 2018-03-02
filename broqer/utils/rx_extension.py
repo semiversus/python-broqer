@@ -24,7 +24,7 @@ def publish_topic(self, topic):
 
 @extensionmethod(Observable)
 def dis(self):
-   
+
     source = self
     
     def subscribe(observer):
