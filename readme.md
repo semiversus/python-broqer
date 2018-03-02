@@ -2,7 +2,7 @@
 See examples for usage
 
 # Naming
-* Broker/Hub/Dispatcher
+* hub/Hub/Dispatcher
 * Publisher/Server/Oberservable
 * Subscriber/Client/Observer
 * Topic/Channel/Stream/Signal

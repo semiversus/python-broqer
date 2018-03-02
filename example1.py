@@ -1,27 +1,29 @@
-from broqer.broker import TopicCollection
+# showing simple subscription to topics and proposing of topics
 
-broker=TopicCollection()
+from broqer.hub import Hub
+
+hub=Hub()
 
 def print_cb(msg):
   print('Got a new message: "%s"'%msg)
 
 def example_propose_subscribe():
-  message=broker['message']
+  message=hub['message']
 
   message.propose() # client1 is proposing a new channel
   message.subscribe(print_cb) # client2 is subscribing (returns a disposable - here not used)
   message.publish('Example doing propose and then subscribe') # client1 is publishing a new value
 
-  broker.unsubscribe_all() # reset broker (clear all topics)
+  hub.unsubscribe_all() # reset hub (clear all topics)
 
 def example_subscribe_propose():
-  message=broker['message']
+  message=hub['a.b.message']
 
   message.subscribe(print_cb) # client2 is subscribing (returns a disposable - here not used)
   message.propose() # client1 is proposing a new channel
   message.publish('Example doing subscribe and then propose') # client1 is publishing a new value
 
-  broker.unsubscribe_all() # reset broker (clear all topics)
+  hub.unsubscribe_all() # reset hub (clear all topics)
 
 example_propose_subscribe()
 example_subscribe_propose()
