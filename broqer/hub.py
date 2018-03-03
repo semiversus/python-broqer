@@ -1,57 +1,16 @@
-from broqer.disposable import Disposable
+from broqer.stream import Stream
 from collections import defaultdict
-from typing import Callable, Any, Optional, Union
+from typing import Optional, Union
 from types import MappingProxyType
-from functools import partial
 
 SEP='.' # separator used for hierarchy
 
-class TopicDisposable(Disposable):
-  def __init__(self, topic: 'Topic', callback: Callable[[Any], None]) -> None:
-    self._topic=topic
-    self._callback=callback
-
-  def dispose(self) -> None:
-    self._topic.unsubscribe(self._callback)
-
-class Topic:
+class AssignedStream(Stream):
   def __init__(self, hub:'Hub', name:str):
+    Stream.__init__(self)
     self._hub=hub
     self._name=name
 
-    self._subscriptions=set()
-    self._meta_dict=dict()
-    self._subscription_callback=None
-
-  def propose(self, meta_dict: Optional[dict]=None, subscription_callback:Optional[Callable[['Topic', bool],None]]=None) -> 'Topic':
-    if meta_dict:
-      self._meta_dict.update(meta_dict)
-    self._subscription_callback=subscription_callback
-    if self._subscription_callback and self._subscriptions:
-      self._subscription_callback(self, True)
-    return self
-
-  def subscribe(self, callback:Callable[[Any],None]) -> TopicDisposable:
-    self._subscriptions.add(callback)
-    if self._subscription_callback and len(self._subscriptions)==1:
-      self._subscription_callback(self, True)
-    return TopicDisposable(self, callback)
-
-  def unsubscribe(self, callback:Callable[[Any],None]) -> None:
-    self._subscriptions.remove(callback)
-    if self._subscription_callback and not self._subscriptions:
-      self._subscription_callback(self, False)
-  
-  def unsubscribe_all(self) -> None:
-    if self._subscription_callback and self._subscriptions:
-      self._subscription_callback(self, False)
-    self._subscriptions.clear()
-
-  def publish(self, msg_data:Any) -> None:
-    for cb in self._subscriptions:
-      # TODO: critical place to think about handling exceptions
-      cb(msg_data)
-  
   @property
   def hub(self):
     return self._hub
@@ -63,16 +22,12 @@ class Topic:
   @property
   def path(self):
     return self._hub._prefix()+self._name
-  
-  @property
-  def meta(self):
-    return MappingProxyType(self._meta_dict)
-
+ 
 class Hub:
   def __init__(self, parent_hub:Optional['Hub']=None, name:str=''):
     self._name=name
     self._parent_hub=parent_hub
-    self._topics=dict()
+    self._streams=dict()
     self._hubs=dict()
   
   @property
@@ -80,8 +35,8 @@ class Hub:
     return MappingProxyType(self._hubs)
   
   @property
-  def topics(self, topic_name) -> dict:
-    return MappingProxyType(self._topics)
+  def streams(self, stream_name) -> dict:
+    return MappingProxyType(self._streams)
 
   @property
   def parent_hub(self):
@@ -109,30 +64,30 @@ class Hub:
       return ''
   
   def __iter__(self):
-    for topic in self._topics.values():
-      yield topic.path
+    for stream in self._streams.values():
+      yield stream.path
     for hub in self._hubs.values():
       yield from iter(hub)
 
-  def __getitem__(self, topic_name:str) -> Union[Topic, 'Hub']:
-    if SEP in topic_name:
+  def __getitem__(self, stream_name:str) -> Union[AssignedStream, 'Hub']:
+    if SEP in stream_name:
       # if SEP is found get the Hub and do __getitem__ there
-      hub_name, topic_path=topic_name.split(sep=SEP, maxsplit=1)
-      assert hub_name not in self._topics, 'Could not access as Hub as %r is used for a Topic'%hub_name
+      hub_name, stream_path=stream_name.split(sep=SEP, maxsplit=1)
+      assert hub_name not in self._streams, 'Could not access as Hub as %r is used for a Stream'%hub_name
       if hub_name not in self._hubs:
         self._hubs[hub_name]=Hub(parent_hub=self, name=hub_name)
-      return self._hubs[hub_name][topic_path]
-    elif topic_name in self._hubs: # if it's a topic hub
-      return self._hubs[topic_name]
+      return self._hubs[hub_name][stream_path]
+    elif stream_name in self._hubs: # if it's a stream hub
+      return self._hubs[stream_name]
     else:
-      if topic_name not in self._topics:
-        self._topics[topic_name]=Topic(self, topic_name)
-      return self._topics[topic_name]
+      if stream_name not in self._streams:
+        self._streams[stream_name]=AssignedStream(self, stream_name)
+      return self._streams[stream_name]
 
   def unsubscribe_all(self) -> None:
-    for topic in self._topics.values():
-      topic.unsubscribe_all()
+    for stream in self._streams.values():
+      stream.unsubscribe_all()
     for hub in self._hubs.values():
       hub.unsubscribe_all()
     self._hubs.clear()
-    self._topics.clear()
+    self._streams.clear()

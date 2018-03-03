@@ -2,20 +2,20 @@ from rx.internal import extensionclassmethod, extensionmethod
 from rx.core import Observable, AnonymousObservable
 
 @extensionclassmethod(Observable)
-def from_topic(self, topic):
+def from_stream(self, stream):
     def subscribe(observer):
         def next_cb(msg):
             observer.on_next(msg)
-        disposable=topic.subscribe(next_cb)
+        disposable=stream.subscribe(next_cb)
         return disposable.dispose
     return AnonymousObservable(subscribe)
 
 @extensionmethod(Observable)
-def publish_topic(self, topic):
+def emit_stream(self, stream):
     source=self
     def subscribe(observer):
         def on_next(msg):
-            topic.publish(msg)
+            stream.emit(msg)
             observer.on_next(msg)
 
         return source.subscribe(on_next)

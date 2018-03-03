@@ -1,5 +1,5 @@
 class PersistanceMgr:
-  def add_topic(self, topic):
+  def add_stream(self, stream):
     pass
 
   def purge(self):

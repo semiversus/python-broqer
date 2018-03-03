@@ -5,4 +5,4 @@ See examples for usage
 * hub/Hub/Dispatcher
 * Publisher/Server/Oberservable/Emitter
 * Subscriber/Client/Observer/Sink
-* Topic/Channel/Stream/Signal
+* Stream/Channel/Stream/Signal
