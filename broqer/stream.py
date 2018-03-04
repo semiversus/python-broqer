@@ -40,7 +40,7 @@ class Stream:
   @meta.setter
   def meta(self, meta_dict:dict):
     assert not self._meta_dict, 'Meta dict already set'
-    self._meta_dict.udate(meta_dict)
+    self._meta_dict.update(meta_dict)
   
   @classmethod
   def register_operator(cls, operator_cls, name):
@@ -48,49 +48,4 @@ class Stream:
       return operator_cls(source_stream, *args, **kwargs)
     setattr(cls, name, _)
 
-class Operator(Stream):
-  def __init__(self, *source_streams:List[Stream]):
-    self._source_streams=source_streams
-    Stream.__init__(self)
-
-  def subscribe(self, stream:'Stream') -> StreamDisposable:
-    if not self._subscriptions:
-      for _stream in self._source_streams:
-        _stream.subscribe(self)
-    return Stream.subscribe(self, stream)
-  
-  def unsubscribe(self, stream:'Stream') -> None:
-    Stream.unsubscribe(self, stream)
-    if not self._subscriptions:
-      for _stream in self._source_streams:
-        _stream.unsubscribe(self)
-
-  def unsubscribe_all(self) -> None:
-    Stream.unsubscribe_all(self)
-    for _stream in self._source_streams:
-        _stream.unsubscribe(self)
-
-class Map(Operator):
-  def __init__(self, source_stream, map_func):
-    Operator.__init__(self, source_stream)
-    self._map_func=map_func
-
-  def emit(self, msg_data:Any, who:Stream):
-    self._emit(self._map_func(msg_data))
-
-Stream.register_operator(Map, 'map')
-
-class Sink(Stream):
-  def __init__(self, source_stream, sink_function):
-    Stream.__init__(self)
-    self._sink_function=sink_function
-    self._disposable=source_stream.subscribe(self)
-  
-  def emit(self, msg_data:Any, who:Stream):
-    self._sink_function(msg_data)
-    self._emit(msg_data)
-  
-  def dispose(self):
-    self._disposable.dispose()
-
-Stream.register_operator(Sink, 'sink')
+import broqer._operators

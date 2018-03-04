@@ -1,18 +1,24 @@
+# using rxpy Observable from stream
+# note: .emit is used without .propose
+
 from broqer.hub import Hub
+from rx import Observable
 
 hub=Hub()
 
-hub['a'] # produce stream 'a'
-hub['b.c'] # produce stream 'c' in hub 'b'
-hub['b']['d'] # produce stream 'd' in hub 'b'
-hub['b.e.f'] # produce stream 'f' in hub 'b.e'
+def on_result_change(msg):
+    print('Stream "result" changed: %s'%msg)
 
-# iterating over all stream paths (including recursives)
-print('Listing all stream paths:')
+hub['result'].sink(on_result_change)
 
-for stream_path in hub:
-  print(stream_path)
+message_observable=Observable.from_stream(hub['message'])
+message_observable \
+    .combine_latest(Observable.from_stream(hub['value']), lambda m,v:m+' '+str(v)) \
+    .do_after_next(print) \
+    .emit_stream(hub['result']) \
+    .subscribe()
 
-print('Listing all stream paths from b.e:')
-for stream_path in hub['b.e']:
-  print(stream_path)
+hub['message'].emit('The value is')
+hub['value'].emit(5)
+hub['value'].emit(7)
+hub['message'].emit('So ya see')

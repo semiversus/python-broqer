@@ -1,24 +1,14 @@
-# using rxpy Observable from stream
-# note: .emit is used without .propose
+from broqer.stream import Stream
+import asyncio
 
-from broqer.hub import Hub
-from rx import Observable
+adc_raw=Stream()
 
-hub=Hub()
+voltage=adc_raw.map(lambda d:d*5+3).sample(0.3).sink(print)
 
-def on_result_change(msg):
-    print('Stream "result" changed: %s'%msg)
+async def main():
+    await asyncio.sleep(0.5)
+    adc_raw.emit(50)
+    await asyncio.sleep(2)
 
-hub['result'].subscribe(on_result_change)
-
-message_observable=Observable.from_stream(hub['message'])
-message_observable \
-    .combine_latest(Observable.from_stream(hub['value']), lambda m,v:m+' '+str(v)) \
-    .do_after_next(print) \
-    .emit_stream(hub['result']) \
-    .subscribe()
-
-hub['message'].emit('The value is')
-hub['value'].emit(5)
-hub['value'].emit(7)
-hub['message'].emit('So ya see')
+loop=asyncio.get_event_loop()
+loop.run_until_complete(main())
