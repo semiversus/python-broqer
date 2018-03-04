@@ -1,53 +1,96 @@
 from broqer.disposable import Disposable
-from typing import Callable, Any, Optional
+from typing import Callable, Any, Optional, List
 from types import MappingProxyType
 
 class StreamDisposable(Disposable):
-  def __init__(self, stream: 'Stream', callback: Callable[[Any], None]) -> None:
-    self._stream=stream
-    self._callback=callback
+  def __init__(self, source_stream: 'Stream', sink_stream:'Stream') -> None:
+    self._source_stream=source_stream
+    self._sink_stream=sink_stream
 
   def dispose(self) -> None:
-    self._stream.unsubscribe(self._callback)
+    self._source_stream.unsubscribe(self._sink_stream)
 
 class Stream:
   def __init__(self):
     self._subscriptions=set()
     self._meta_dict=dict()
-    self._subscription_callback=None
 
-  def propose(self, meta_dict: Optional[dict]=None, subscription_callback:Optional[Callable[['Stream', bool],None]]=None) -> 'Stream':
-    assert not self._meta_dict, '_meta_dict is populated -> is this stream already proposed?'
-    assert not self._subscription_callback, '_subscription_callback is set -> is this stream already proposed?'
+  def subscribe(self, stream:'Stream') -> StreamDisposable:
+    self._subscriptions.add(stream)
+    return StreamDisposable(self, stream)
 
-    if meta_dict:
-      self._meta_dict.update(meta_dict)
-    self._subscription_callback=subscription_callback
-    if self._subscription_callback and self._subscriptions:
-      self._subscription_callback(self, True)
-    return self
-
-  def subscribe(self, callback:Callable[[Any],None]) -> StreamDisposable:
-    self._subscriptions.add(callback)
-    if self._subscription_callback and len(self._subscriptions)==1:
-      self._subscription_callback(self, True)
-    return StreamDisposable(self, callback)
-
-  def unsubscribe(self, callback:Callable[[Any],None]) -> None:
-    self._subscriptions.remove(callback)
-    if self._subscription_callback and not self._subscriptions:
-      self._subscription_callback(self, False)
+  def unsubscribe(self, stream:'Stream') -> None:
+    self._subscriptions.remove(stream)
   
   def unsubscribe_all(self) -> None:
-    if self._subscription_callback and self._subscriptions:
-      self._subscription_callback(self, False)
     self._subscriptions.clear()
 
-  def emit(self, msg_data:Any) -> None:
-    for cb in self._subscriptions:
+  def _emit(self, msg_data:Any) -> None:
+    for stream in self._subscriptions:
       # TODO: critical place to think about handling exceptions
-      cb(msg_data)
+      stream.emit(msg_data, self)
+
+  def emit(self, msg_data:Any, who:Optional['Stream']=None) -> None:
+      self._emit(msg_data)
  
   @property
   def meta(self):
     return MappingProxyType(self._meta_dict)
+  
+  @meta.setter
+  def meta(self, meta_dict:dict):
+    assert not self._meta_dict, 'Meta dict already set'
+    self._meta_dict.udate(meta_dict)
+  
+  @classmethod
+  def register_operator(cls, operator_cls, name):
+    def _(source_stream, *args, **kwargs):
+      return operator_cls(source_stream, *args, **kwargs)
+    setattr(cls, name, _)
+
+class Operator(Stream):
+  def __init__(self, *source_streams:List[Stream]):
+    self._source_streams=source_streams
+    Stream.__init__(self)
+
+  def subscribe(self, stream:'Stream') -> StreamDisposable:
+    if not self._subscriptions:
+      for _stream in self._source_streams:
+        _stream.subscribe(self)
+    return Stream.subscribe(self, stream)
+  
+  def unsubscribe(self, stream:'Stream') -> None:
+    Stream.unsubscribe(self, stream)
+    if not self._subscriptions:
+      for _stream in self._source_streams:
+        _stream.unsubscribe(self)
+
+  def unsubscribe_all(self) -> None:
+    Stream.unsubscribe_all(self)
+    for _stream in self._source_streams:
+        _stream.unsubscribe(self)
+
+class Map(Operator):
+  def __init__(self, source_stream, map_func):
+    Operator.__init__(self, source_stream)
+    self._map_func=map_func
+
+  def emit(self, msg_data:Any, who:Stream):
+    self._emit(self._map_func(msg_data))
+
+Stream.register_operator(Map, 'map')
+
+class Sink(Stream):
+  def __init__(self, source_stream, sink_function):
+    Stream.__init__(self)
+    self._sink_function=sink_function
+    self._disposable=source_stream.subscribe(self)
+  
+  def emit(self, msg_data:Any, who:Stream):
+    self._sink_function(msg_data)
+    self._emit(msg_data)
+  
+  def dispose(self):
+    self._disposable.dispose()
+
+Stream.register_operator(Sink, 'sink')

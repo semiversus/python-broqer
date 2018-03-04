@@ -10,8 +10,7 @@ def print_cb(msg):
 def example_propose_subscribe():
   message=hub['message']
 
-  message.propose() # client1 is proposing a new channel
-  message.subscribe(print_cb) # client2 is subscribing (returns a disposable - here not used)
+  message.sink(print_cb) # client2 is subscribing (returns a disposable - here not used)
   message.emit('Example doing propose and then subscribe') # client1 is emiting a new value
 
   hub.unsubscribe_all() # reset hub (clear all streams)
@@ -19,8 +18,7 @@ def example_propose_subscribe():
 def example_subscribe_propose():
   message=hub['a.b.message']
 
-  message.subscribe(print_cb) # client2 is subscribing (returns a disposable - here not used)
-  message.propose() # client1 is proposing a new channel
+  message.sink(print_cb) # client2 is subscribing (returns a disposable - here not used)
   message.emit('Example doing subscribe and then propose') # client1 is emiting a new value
 
   hub.unsubscribe_all() # reset hub (clear all streams)

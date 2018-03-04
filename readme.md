@@ -2,7 +2,15 @@
 See examples for usage
 
 # Naming
-* hub/Hub/Dispatcher
+* Broker/Hub/Dispatcher
 * Publisher/Server/Oberservable/Emitter
 * Subscriber/Client/Observer/Sink
-* Stream/Channel/Stream/Signal
+* Topic/Channel/Stream/Signal
+* subscribe/register/connect
+
+# Clues
+* `stream.meta` can be cached and populated afterwards, as it stays the same dict
+* `_subscription_callback` is removed - inherit from Stream and overload `subscribe`
+
+# Discussion
+* should meta dict be part of AssignedStream?
