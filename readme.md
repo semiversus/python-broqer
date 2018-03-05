@@ -14,3 +14,5 @@ See examples for usage
 
 # Discussion
 * should meta dict be part of AssignedStream?
+* configurator could use root hub and search for streams marked as CONFIG in their metadata
+* define protocol for TCP socket to hub - subscribe, emit
