@@ -95,6 +95,61 @@ class Sample(Operator):
 
 Stream.register_operator(Sample, 'sample')
 
+class GetAsync(Stream):
+  def __init__(self, source_stream, timeout=None):
+    Stream.__init__(self)
+    self._disposable=source_stream.subscribe(self)
+
+    loop=asyncio.get_event_loop()
+    self._future=loop.create_future()
+    self._future.add_done_callback(self._future_done)
+    
+    if timeout is not None:
+      self._timeout_handle=loop.call_later(timeout, self._timeout)
+    else:
+      self._timeout_handle=None
+      
+  def _timeout(self):
+    self._future.set_exception(asyncio.TimeoutError)
+  
+  def _future_done(self, future):
+    self._disposable.dispose()
+    if self._timeout_handle is not None:
+      self._timeout_handle.cancel()
+
+  def __await__(self):
+    return self._future.__await__()
+
+  def emit(self, msg_data:Any, who:Stream):
+    self._future.set_result(msg_data)
+ 
+Stream.register_operator(GetAsync, 'get_async')
+
+class MapAsync(Operator):
+  def __init__(self, source_stream, async_func):
+    # TODO: supporting various modes when coroutine is running while next value is emitted
+    # concurrent - just run coroutines concurrent
+    # replace - cancel running and call for new value
+    # queue - queue the value(s) and call after coroutine is finished
+    # last - use last emitted value after coroutine is finished
+    # skip - skip values emitted during coroutine is running
+    Operator.__init__(self, source_stream)
+    self._async_func=async_func
+    self._future=None
+  
+  def emit(self, msg_data:Any, who:Stream):
+    self._future=asyncio.ensure_future(self._async_func(msg_data))
+    self._future.add_done_callback(self._future_done)
+  
+  def _future_done(self, future):
+    if future.done():
+      self._emit(future.result())
+    else:
+      #TODO how to handle an exception?
+      pass
+
+Stream.register_operator(MapAsync, 'map_async')
+
 # TODO operators
 # accumulate(func, start_state) -> value
 # filter(cond)
