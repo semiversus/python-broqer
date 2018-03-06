@@ -34,6 +34,7 @@ class Stream:
   
   def unsubscribe_all(self) -> None:
     # why not simple clear subscriptions set? -> .unsubscribe could be overwritten
+    # copy subscriptions set into a tuple, because subscription set will be changed while iterating over it
     for stream in tuple(self._subscriptions):
       self.unsubscribe(stream)
 
