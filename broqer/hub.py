@@ -6,8 +6,8 @@ from types import MappingProxyType
 SEP='.' # separator used for hierarchy
 
 class AssignedStream(Stream):
-  def __init__(self, hub:'Hub', name:str):
-    Stream.__init__(self)
+  def __init__(self, hub:'Hub', name:str, meta:Optional[dict]=None, retain:Any=None):
+    Stream.__init__(self, meta, retain)
     self._hub=hub
     self._name=name
 
