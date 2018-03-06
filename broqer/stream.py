@@ -33,7 +33,9 @@ class Stream:
     self._subscriptions.remove(stream)
   
   def unsubscribe_all(self) -> None:
-    self._subscriptions.clear()
+    # why not simple clear subscriptions set? -> .unsubscribe could be overwritten
+    for stream in tuple(self._subscriptions):
+      self.unsubscribe(stream)
 
   def _emit(self, msg_data:Any) -> None:
     if self._retain is not None:
