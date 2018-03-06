@@ -11,12 +11,22 @@ class StreamDisposable(Disposable):
     self._source_stream.unsubscribe(self._sink_stream)
 
 class Stream:
-  def __init__(self):
+  def __init__(self, meta:Optional[dict]=None, retain:Any=None):
     self._subscriptions=set()
     self._meta_dict=dict()
+    self.setup(meta=meta, retain=retain)
+
+  def setup(self, meta:Optional[dict]=None, retain:Any=None):
+    if meta is not None:
+      self.meta=meta
+    
+    self._retain=retain
+    return self
 
   def subscribe(self, stream:'Stream') -> StreamDisposable:
     self._subscriptions.add(stream)
+    if self._retain is not None:
+      stream.emit(self._retain, self)
     return StreamDisposable(self, stream)
 
   def unsubscribe(self, stream:'Stream') -> None:
@@ -26,6 +36,8 @@ class Stream:
     self._subscriptions.clear()
 
   def _emit(self, msg_data:Any) -> None:
+    if self._retain is not None:
+      self._retain=msg_data
     for stream in self._subscriptions:
       # TODO: critical place to think about handling exceptions
       stream.emit(msg_data, self)
@@ -33,6 +45,10 @@ class Stream:
   def emit(self, msg_data:Any, who:Optional['Stream']=None) -> None:
       self._emit(msg_data)
  
+  @property
+  def retain(self):
+    return self._retain
+
   @property
   def meta(self):
     return MappingProxyType(self._meta_dict)
