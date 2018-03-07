@@ -67,11 +67,11 @@ class Stream:
       return operator_cls(source_stream, *args, **kwargs)
     setattr(cls, name, _)
   
-  def __or__(self, sink:Union['Stream', Callable]):
+  def __or__(self, sink:Union['Stream', Callable[['Stream'], 'Stream']]) -> 'Stream':
     if isinstance(sink, Stream):
       return sink.subscribe(self)
     else:
       return sink(self)
 
-from broqer.op import GetAsync
-Stream.register_operator(GetAsync, 'get_async')
+from broqer.op import AsFuture
+Stream.register_operator(AsFuture, 'as_future')

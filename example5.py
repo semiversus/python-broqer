@@ -4,7 +4,7 @@ import asyncio
 value=Stream()
 
 async def main():
-    print('Value:', await value.get_async() )
+    print('Value:', await value.as_future() )
     print(value._subscriptions)
 
 loop=asyncio.get_event_loop()

@@ -102,7 +102,7 @@ class Sample(Operator):
 
 sample=build_stream_operator(Sample)
 
-class GetAsync(Stream):
+class AsFuture(Stream):
   def __init__(self, source_stream, timeout=None):
     Stream.__init__(self)
     self._disposable=source_stream.subscribe(self)
@@ -130,7 +130,7 @@ class GetAsync(Stream):
   def emit(self, msg_data:Any, who:Stream):
     self._future.set_result(msg_data)
  
-get_async=build_stream_operator(GetAsync)
+as_future=build_stream_operator(AsFuture)
 
 class MapAsync(Operator):
   def __init__(self, source_stream, async_func):
