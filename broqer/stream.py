@@ -1,5 +1,5 @@
 from broqer.disposable import Disposable
-from typing import Callable, Any, Optional, List
+from typing import Callable, Any, Optional, List, Union
 from types import MappingProxyType
 
 class StreamDisposable(Disposable):
@@ -11,10 +11,10 @@ class StreamDisposable(Disposable):
     self._source_stream.unsubscribe(self._sink_stream)
 
 class Stream:
-  def __init__(self, meta:Optional[dict]=None, retain:Any=None):
+  def __init__(self):
     self._subscriptions=set()
     self._meta_dict=dict()
-    self.setup(meta=meta, retain=retain)
+    self._retain=None
 
   def setup(self, meta:Optional[dict]=None, retain:Any=None):
     if meta is not None:
@@ -66,5 +66,12 @@ class Stream:
     def _(source_stream, *args, **kwargs):
       return operator_cls(source_stream, *args, **kwargs)
     setattr(cls, name, _)
+  
+  def __or__(self, sink:Union['Stream', Callable]):
+    if isinstance(sink, Stream):
+      return sink.subscribe(self)
+    else:
+      return sink(self)
 
-import broqer._operators
+from broqer.op import GetAsync
+Stream.register_operator(GetAsync, 'get_async')

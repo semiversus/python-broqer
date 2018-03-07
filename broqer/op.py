@@ -2,6 +2,13 @@ from broqer.stream import Stream, StreamDisposable
 from typing import Callable, Any, Optional, List
 import asyncio
 
+def build_stream_operator(operator_cls):
+  def _op(*args, **kwargs):
+    def _build(source_stream):
+      return operator_cls(source_stream, *args, **kwargs)
+    return _build
+  return _op
+
 class Operator(Stream):
   def __init__(self, *source_streams:List[Stream]):
     self._source_streams=source_streams
@@ -32,7 +39,7 @@ class Map(Operator):
   def emit(self, msg_data:Any, who:Stream):
     self._emit(self._map_func(msg_data))
 
-Stream.register_operator(Map, 'map')
+map=build_stream_operator(Map)
 
 class Sink(Stream):
   def __init__(self, source_stream, sink_function):
@@ -47,7 +54,7 @@ class Sink(Stream):
   def dispose(self):
     self._disposable.dispose()
 
-Stream.register_operator(Sink, 'sink')
+sink=build_stream_operator(Sink)
 
 class Distinct(Operator):
   def __init__(self, source_stream):
@@ -59,7 +66,7 @@ class Distinct(Operator):
       self._last_msg=msg_data
       self._emit(msg_data)
 
-Stream.register_operator(Distinct, 'distinct')
+distinct=build_stream_operator
 
 class CombineLatest(Operator):
   def __init__(self, *source_streams):
@@ -75,7 +82,7 @@ class CombineLatest(Operator):
     if not self._missing:
       self._emit(tuple(self._last))
 
-Stream.register_operator(CombineLatest, 'combine_latest')
+combine_latest=build_stream_operator(CombineLatest)
 
 class Sample(Operator):
   def __init__(self, source_stream, interval):
@@ -93,7 +100,7 @@ class Sample(Operator):
   def emit(self, msg_data:Any, who:Stream):
     self._last_msg=msg_data
 
-Stream.register_operator(Sample, 'sample')
+sample=build_stream_operator(Sample)
 
 class GetAsync(Stream):
   def __init__(self, source_stream, timeout=None):
@@ -123,7 +130,7 @@ class GetAsync(Stream):
   def emit(self, msg_data:Any, who:Stream):
     self._future.set_result(msg_data)
  
-Stream.register_operator(GetAsync, 'get_async')
+get_async=build_stream_operator(GetAsync)
 
 class MapAsync(Operator):
   def __init__(self, source_stream, async_func):
@@ -148,7 +155,7 @@ class MapAsync(Operator):
       #TODO how to handle an exception?
       pass
 
-Stream.register_operator(MapAsync, 'map_async')
+map_async=build_stream_operator(MapAsync)
 
 # TODO operators
 # accumulate(func, start_state) -> value

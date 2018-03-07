@@ -2,6 +2,7 @@
 # note: .emit is used without .propose
 
 from broqer.hub import Hub
+from broqer import op
 from rx import Observable
 
 hub=Hub()
@@ -9,7 +10,7 @@ hub=Hub()
 def on_result_change(msg):
     print('Stream "result" changed: %s'%msg)
 
-hub['result'].sink(on_result_change)
+hub['result'] | op.sink(on_result_change)
 
 message_observable=Observable.from_stream(hub['message'])
 message_observable \
