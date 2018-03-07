@@ -4,11 +4,12 @@ import asyncio
 
 adc_raw=Stream()
 
-voltage=( adc_raw 
-          | op.map(lambda d:d*5+3)
-          | op.sample(0.3)
-          | op.sink(print)
-        )
+( adc_raw 
+  | op.map(lambda d:d*5+3)
+  | op.sample(0.3)
+  | op.sink(print)
+)
+        
 
 async def main():
   await asyncio.sleep(0.5)
