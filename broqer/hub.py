@@ -1,6 +1,6 @@
 from broqer.stream import Stream
 from collections import defaultdict
-from typing import Optional, Union
+from typing import Optional, Union, Any
 from types import MappingProxyType
 
 SEP='.' # separator used for hierarchy
