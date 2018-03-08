@@ -16,17 +16,18 @@ class Stream:
     self._meta_dict=dict()
     self._retain=None
 
-  def setup(self, meta:Optional[dict]=None, retain:Any=None):
+  def setup(self, *retain:Any, meta:Optional[dict]=None) -> 'Stream':
     if meta is not None:
       self.meta=meta
     
-    self._retain=retain
+    if retain:
+      self._retain=retain
     return self
 
   def subscribe(self, stream:'Stream') -> StreamDisposable:
     self._subscriptions.add(stream)
     if self._retain is not None:
-      stream.emit(self._retain, self)
+      stream.emit(*self._retain, who=self)
     return StreamDisposable(self, stream)
 
   def unsubscribe(self, stream:'Stream') -> None:
@@ -38,15 +39,15 @@ class Stream:
     for stream in tuple(self._subscriptions):
       self.unsubscribe(stream)
 
-  def _emit(self, msg_data:Any) -> None:
+  def _emit(self, *args:Any) -> None:
     if self._retain is not None:
-      self._retain=msg_data
+      self._retain=args
     for stream in self._subscriptions:
       # TODO: critical place to think about handling exceptions
-      stream.emit(msg_data, self)
+      stream.emit(*args, who=self)
 
-  def emit(self, msg_data:Any, who:Optional['Stream']=None) -> None:
-      self._emit(msg_data)
+  def emit(self, *args:Any, who:Optional['Stream']=None) -> None:
+      self._emit(*args)
  
   @property
   def retain(self):

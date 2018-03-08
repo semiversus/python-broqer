@@ -7,8 +7,9 @@ from typing import Any, Optional
 def from_stream(self, stream):
   def subscribe(observer):
     class RxStream(Stream):
-      def emit(self, msg_data:Any, who:Optional['Stream']=None) -> None:
-        observer.on_next(msg_data)
+      def emit(self, *args:Any, who:Optional['Stream']=None) -> None:
+        if len(args)=
+        observer.on_next(args)
     disposable=stream.subscribe(RxStream())
     return disposable.dispose
   return AnonymousObservable(subscribe)
@@ -17,8 +18,8 @@ def from_stream(self, stream):
 def emit_stream(self, stream):
   source=self
   def subscribe(observer):
-    def on_next(msg):
-      stream.emit(msg)
-      observer.on_next(msg)
+    def on_next(args):
+      stream.emit(*args)
+      observer.on_next(args)
     return source.subscribe(on_next)
   return AnonymousObservable(subscribe)

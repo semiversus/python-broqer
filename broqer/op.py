@@ -36,8 +36,8 @@ class Map(Operator):
     Operator.__init__(self, source_stream)
     self._map_func=map_func
 
-  def emit(self, msg_data:Any, who:Stream):
-    self._emit(self._map_func(msg_data))
+  def emit(self, *args:Any, who:Stream):
+    self._emit(*self._map_func(*args))
 
 map=build_stream_operator(Map)
 
@@ -47,9 +47,9 @@ class Sink(Stream):
     self._sink_function=sink_function
     self._disposable=source_stream.subscribe(self)
   
-  def emit(self, msg_data:Any, who:Stream):
-    self._sink_function(msg_data)
-    self._emit(msg_data)
+  def emit(self, *args:Any, who:Stream):
+    self._sink_function(*args)
+    self._emit(*args)
   
   def dispose(self):
     self._disposable.dispose()
@@ -61,10 +61,10 @@ class Distinct(Operator):
     Operator.__init__(self, source_stream)
     self._last_msg=None
 
-  def emit(self, msg_data:Any, who:Stream):
-    if msg_data!=self._last_msg:
-      self._last_msg=msg_data
-      self._emit(msg_data)
+  def emit(self, *args:Any, who:Stream):
+    if args!=self._last_msg:
+      self._last_msg=args
+      self._emit(*args)
 
 distinct=build_stream_operator
 
@@ -75,12 +75,12 @@ class CombineLatest(Operator):
     self._missing=set(source_streams)
     # TODO: additional keyword to decide if emit undefined values
   
-  def emit(self, msg_data:Any, who:Stream):
+  def emit(self, *args:Any, who:Stream):
     if self._missing and who in self._missing:
       self._missing.remove(who)
-    self._last[self._source_streams.index(who)]=msg_data
+    self._last[self._source_streams.index(who)]=args
     if not self._missing:
-      self._emit(tuple(self._last))
+      self._emit(*self._last)
 
 combine_latest=build_stream_operator(CombineLatest)
 
@@ -94,11 +94,11 @@ class Sample(Operator):
 
   def _periodic_callback(self, interval):
     if self._last_msg is not None:
-      self._emit(self._last_msg)
+      self._emit(*self._last_msg)
     self._loop.call_later(interval, self._periodic_callback, interval)
 
-  def emit(self, msg_data:Any, who:Stream):
-    self._last_msg=msg_data
+  def emit(self, *args:Any, who:Stream):
+    self._last_msg=args
 
 sample=build_stream_operator(Sample)
 
@@ -127,8 +127,8 @@ class AsFuture(Stream):
   def __await__(self):
     return self._future.__await__()
 
-  def emit(self, msg_data:Any, who:Stream):
-    self._future.set_result(msg_data)
+  def emit(self, *args:Any, who:Stream):
+    self._future.set_result(args)
  
 as_future=build_stream_operator(AsFuture)
 
@@ -144,13 +144,13 @@ class MapAsync(Operator):
     self._async_func=async_func
     self._future=None
   
-  def emit(self, msg_data:Any, who:Stream):
-    self._future=asyncio.ensure_future(self._async_func(msg_data))
+  def emit(self, *args:Any, who:Stream):
+    self._future=asyncio.ensure_future(self._async_func(*args))
     self._future.add_done_callback(self._future_done)
   
   def _future_done(self, future):
     if future.done():
-      self._emit(future.result())
+      self._emit(*future.result())
     else:
       #TODO how to handle an exception?
       pass

@@ -10,7 +10,7 @@ def log(prefix):
     print('%s: "%s"'%(prefix, msg))
   return _
 
-message=hub['a.b.message'].setup(retain='Start')
+message=hub['a.b.message'].setup('Start')
 
 message|op.sink(log('Sink1')) # client2 is subscribing (returns a disposable - here not used)
 message.emit('Example doing subscribe and then propose') # client1 is emiting a new value
