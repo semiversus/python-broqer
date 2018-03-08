@@ -37,7 +37,8 @@ class Map(Operator):
     self._map_func=map_func
 
   def emit(self, *args:Any, who:Stream):
-    self._emit(*self._map_func(*args))
+    arg, *args,=self._map_func(*args), None
+    self._emit(arg, *args[:-1])
 
 map=build_stream_operator(Map)
 
@@ -128,7 +129,10 @@ class AsFuture(Stream):
     return self._future.__await__()
 
   def emit(self, *args:Any, who:Stream):
-    self._future.set_result(args)
+    if len(args)==1:
+      self._future.set_result(args[0])
+    else:
+      self._future.set_result(args)
  
 as_future=build_stream_operator(AsFuture)
 
@@ -150,7 +154,8 @@ class MapAsync(Operator):
   
   def _future_done(self, future):
     if future.done():
-      self._emit(*future.result())
+      arg, *args=future.result(), None
+      self._emit(arg, *args[:-1])
     else:
       #TODO how to handle an exception?
       pass

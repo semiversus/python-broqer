@@ -16,7 +16,7 @@ message_observable=Observable.from_stream(hub['message'])
 message_observable \
     .combine_latest(Observable.from_stream(hub['value']), lambda m,v:m+' '+str(v)) \
     .do_after_next(print) \
-    .emit_stream(hub['result']) \
+    .emit_stream(hub['result'], unpack=False) \
     .subscribe()
 
 hub['message'].emit('The value is')

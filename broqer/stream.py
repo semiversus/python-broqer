@@ -42,7 +42,7 @@ class Stream:
   def _emit(self, *args:Any) -> None:
     if self._retain is not None:
       self._retain=args
-    for stream in self._subscriptions:
+    for stream in tuple(self._subscriptions):
       # TODO: critical place to think about handling exceptions
       stream.emit(*args, who=self)
 
