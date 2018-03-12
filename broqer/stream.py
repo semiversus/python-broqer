@@ -62,6 +62,9 @@ class Stream:
     assert not self._meta_dict, 'Meta dict already set'
     self._meta_dict.update(meta_dict)
   
+  def __await__(self):
+    return AsFuture(self).__await__()
+  
   @classmethod
   def register_operator(cls, operator_cls, name):
     def _(source_stream, *args, **kwargs):
