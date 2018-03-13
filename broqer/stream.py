@@ -73,7 +73,7 @@ class Stream:
   
   def __or__(self, sink:Union['Stream', Callable[['Stream'], 'Stream']]) -> 'Stream':
     if isinstance(sink, Stream):
-      return sink.subscribe(self)
+      return self.subscribe(sink)
     else:
       return sink(self)
 
