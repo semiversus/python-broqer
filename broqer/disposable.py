@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-class Disposable:
+class Disposable(metaclass=ABCMeta):
   @abstractmethod
   def dispose(self):
     return NotImplemented
