@@ -32,13 +32,16 @@ class AccountDict(collections.MutableMapping):
   def __len__(self):
     return len(self._item_list)
   
+  def key_to_revision(self, key):
+    return self._revision_list[self._key_to_index[key]]
+    
   def from_revision(self, revision:int=0):
     start_index=bisect.bisect(self._revision_list, revision)
     return dict(self._item_list[start_index:])
   
   def __repr__(self):
     return repr(dict(self))
-    
+
   @property
   def revision(self):
     return self._actual_revision
