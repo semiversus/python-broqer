@@ -5,10 +5,10 @@ import asyncio
 value=Stream()
 
 async def main():
-    print('Value:', await (value|op.as_future()) )
-    print('Value:', await value.as_future() )
-    print('Value:', await value )
-    print(value._subscriptions)
+  print('Value:', await (value|op.as_future()) )
+  print('Value:', await value.as_future() )
+  print('Value:', await value )
+  print(value._subscriptions)
 
 loop=asyncio.get_event_loop()
 
