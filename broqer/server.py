@@ -24,7 +24,6 @@ class BroqerProtocol(asyncio.Protocol):
     # sub:stream
     # unsub:stream
     # lw:stream:value
-    # throttle:interval
     # dis
     command, *args=data.decode().strip().split(':')
 

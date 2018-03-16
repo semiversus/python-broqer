@@ -4,7 +4,7 @@ import asyncio
 
 adc_raw=Stream()
 
-( adc_raw 
+( adc_raw  
   | op.map(lambda d:d*5+3)
   | op.sample(0.3)
   | op.sink(print)
