@@ -48,9 +48,11 @@ class RevisionDict(collections.MutableMapping):
     return len(self._items)
   
   def key_to_timestamp(self, key):
+    """ get timestamp when this key was updated last time """
     return self._items[self._key_to_index[key]].timestamp
     
   def checkout(self, start=None):
+    """ Get a dict() with all changes from timestamp `start` on """
     if start is not None:
       start_index=bisect.bisect(self._items, _Item(None, None, start))
     else:
@@ -62,4 +64,5 @@ class RevisionDict(collections.MutableMapping):
 
   @property
   def timestamp(self):
+    """ get latest timestamp """
     return self._items[-1].timestamp
