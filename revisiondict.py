@@ -1,4 +1,4 @@
-"""Provides a way to get dictionary changes since a given timestamp."""
+"""Provides a way to get dictionary changes since a given revision."""
 
 __author__="Günther Jena"
 
@@ -6,31 +6,28 @@ import collections
 import bisect
 import itertools
 
-class _Item(collections.namedtuple('_Item', 'key value timestamp')):
-  """ _Item representing a key:value pair with information about the timestamp
+class _Item(collections.namedtuple('_Item', 'key value revision')):
+  """ _Item representing a key:value pair with information about the revision
   this update was done.
   """
 
   def __lt__(self, other):
     """__lt__ method is used for bisect"""
-    return self.timestamp<other.timestamp
+    return self.revision<other.revision
 
 class RevisionDict(collections.MutableMapping):
-  def __init__(self, timestamp_cb=None):
-    self._items=list() # keeping _Item objects, guaranteed sorted by timestamp
+  def __init__(self):
+    self._items=list() # keeping _Item objects, guaranteed sorted by revision
     self._key_to_index=dict() # dict indexing position of key in self._items
-    if timestamp_cb is None:
-      # if no timestamp_cb is given use a count generator starting at 1
-      self._timestamp_cb=itertools.count(start=1).__next__
-    else:
-      self._timestamp_cb=timestamp_cb
+    self._actual_revision=1
     
   def __setitem__(self, key, value):
     if key in self._key_to_index:
       # if this key already available remove entry from self._items
       del self[key]
     self._key_to_index[key]=len(self._items) # indexing the end of self._items
-    self._items.append(_Item(key, value, self._timestamp_cb()))
+    self._items.append(_Item(key, value, self._actual_revision))
+    self._actual_revision+=1
     
   def __getitem__(self, key):
     return self._items[self._key_to_index[key]].value
@@ -47,12 +44,12 @@ class RevisionDict(collections.MutableMapping):
   def __len__(self):
     return len(self._items)
   
-  def key_to_timestamp(self, key):
-    """ get timestamp when this key was updated last time """
-    return self._items[self._key_to_index[key]].timestamp
+  def key_to_revision(self, key):
+    """ get revision when this key was updated last time """
+    return self._items[self._key_to_index[key]].revision
     
   def checkout(self, start=None):
-    """ Get a dict() with all changes from timestamp `start` on """
+    """ Get a dict() with all changes from revision `start` on """
     if start is not None:
       start_index=bisect.bisect(self._items, _Item(None, None, start))
     else:
@@ -63,6 +60,6 @@ class RevisionDict(collections.MutableMapping):
     return '%s(%r)'%(self.__class__.__name__, self._items)
 
   @property
-  def timestamp(self):
-    """ get latest timestamp """
-    return self._items[-1].timestamp
+  def revision(self):
+    """ get latest revision """
+    return self._actual_revision
