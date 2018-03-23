@@ -17,7 +17,7 @@ Adding new items:
 3
 
 Inspecting content of RevisionDict:
->>> d.checkout()=={'c': 2, 'b': 1, 'a': 0} # get a dictionary with all changes
+>>> d.checkout()=={'a': 0, 'b': 1, 'c': 2} # get a dictionary with all changes
 True
 >>> d.checkout(2)                 # get all changes starting with rev. 2
 {'c': 2}
