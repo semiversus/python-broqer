@@ -1,7 +1,7 @@
 from broqer.stream import Stream
 from typing import Callable, Any, Optional
 from .operator import build_stream_operator
-from broqer.disposable import Disposable
+from broqer.base import Disposable
 
 class Sink(Stream, Disposable):
   def __init__(self, source_stream:Stream, sink_function:Callable[[Any], None]):

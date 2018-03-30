@@ -1,16 +1,16 @@
-from broqer.disposable import Disposable
+from broqer.base import Disposable, Publisher, Subscriber
 from typing import Callable, Any, Optional, List, Union
 from types import MappingProxyType
 
 class StreamDisposable(Disposable):
-  def __init__(self, source_stream: 'Stream', sink_stream:'Stream') -> None:
+  def __init__(self, source_stream:'Stream', sink_stream:'Stream') -> None:
     self._source_stream=source_stream
     self._sink_stream=sink_stream
 
   def dispose(self) -> None:
     self._source_stream.unsubscribe(self._sink_stream)
 
-class Stream:
+class Stream(Publisher, Subscriber):
   def __init__(self):
     self._subscriptions=set()
     self._meta_dict=dict()
