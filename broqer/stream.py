@@ -14,20 +14,22 @@ class Stream(Publisher, Subscriber):
   def __init__(self):
     self._subscriptions=set()
     self._meta_dict=dict()
-    self._retain=None
+    self._cache=None
 
-  def setup(self, *retain:Any, meta:Optional[dict]=None) -> 'Stream':
+  ### publisher functionality
+  
+  def setup(self, *cache:Any, meta:Optional[dict]=None) -> 'Stream':
     if meta is not None:
       self.meta=meta
     
-    if retain:
-      self._retain=retain
+    if cache:
+      self._cache=cache
     return self
 
   def subscribe(self, stream:'Stream') -> StreamDisposable:
     self._subscriptions.add(stream)
-    if self._retain is not None:
-      stream.emit(*self._retain, who=self)
+    if self._cache is not None:
+      stream.emit(*self._cache, who=self)
     return StreamDisposable(self, stream)
 
   def unsubscribe(self, stream:'Stream') -> None:
@@ -38,20 +40,10 @@ class Stream(Publisher, Subscriber):
     # copy subscriptions set into a tuple, because subscription set will be changed while iterating over it
     for stream in tuple(self._subscriptions):
       self.unsubscribe(stream)
-
-  def _emit(self, *args:Any) -> None:
-    if self._retain is not None:
-      self._retain=args
-    for stream in tuple(self._subscriptions):
-      # TODO: critical place to think about handling exceptions
-      stream.emit(*args, who=self)
-
-  def emit(self, *args:Any, who:Optional['Stream']=None) -> None:
-      self._emit(*args)
- 
+  
   @property
-  def retain(self):
-    return self._retain
+  def cache(self):
+    return self._cache
 
   @property
   def meta(self):
@@ -61,6 +53,21 @@ class Stream(Publisher, Subscriber):
   def meta(self, meta_dict:dict):
     assert not self._meta_dict, 'Meta dict already set'
     self._meta_dict.update(meta_dict)
+
+  ### subscribe functionality
+
+  def emit(self, *args:Any, who:Optional['Stream']=None) -> None:
+      self._emit(*args)
+  
+  def _emit(self, *args:Any) -> None:
+    if self._cache is not None:
+      self._cache=args
+    for stream in tuple(self._subscriptions):
+      # TODO: critical place to think about handling exceptions
+      stream.emit(*args, who=self)
+
+  def emit(self, *args:Any, who:Optional['Stream']=None) -> None:
+      self._emit(*args)
   
   def __await__(self):
     return AsFuture(self).__await__()

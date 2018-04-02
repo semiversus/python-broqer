@@ -15,7 +15,12 @@ class Disposable(metaclass=ABCMeta):
   def __exit__(self, type, value, traceback):
     self.dispose()
 
+
 class Publisher(metaclass=ABCMeta):
+  @abstractmethod
+  def setup(self, *cache:Any, meta:Optional[dict]=None) -> 'Publisher':
+    return NotImplemented
+
   @abstractmethod
   def subscribe(self, subscriber:'Subscriber'):
     return NotImplemented
@@ -26,6 +31,21 @@ class Publisher(metaclass=ABCMeta):
   
   @abstractmethod
   def unsubscribe_all(self) -> None:
+    return NotImplemented
+  
+  @property
+  @abstractmethod
+  def cache(self):
+    return NotImplemented
+
+  @property
+  @abstractmethod
+  def meta(self):
+    return NotImplemented
+  
+  @meta.setter
+  @abstractmethod
+  def meta(self, meta_dict:dict):
     return NotImplemented
 
 class Subscriber(metaclass=ABCMeta):
