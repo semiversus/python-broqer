@@ -18,7 +18,7 @@ class Stream(Publisher, Subscriber):
 
   ### publisher functionality
   
-  def setup(self, *cache:Any, meta:Optional[dict]=None) -> 'Stream':
+  def setup(self, *cache:Any, meta:Optional[dict]=None) -> 'Publisher':
     if meta is not None:
       self.meta=meta
     
@@ -26,13 +26,13 @@ class Stream(Publisher, Subscriber):
       self._cache=cache
     return self
 
-  def subscribe(self, stream:'Stream') -> StreamDisposable:
+  def subscribe(self, stream:'Subscriber') -> StreamDisposable:
     self._subscriptions.add(stream)
     if self._cache is not None:
       stream.emit(*self._cache, who=self)
     return StreamDisposable(self, stream)
 
-  def unsubscribe(self, stream:'Stream') -> None:
+  def unsubscribe(self, stream:'Subscriber') -> None:
     self._subscriptions.remove(stream)
   
   def unsubscribe_all(self) -> None:
@@ -56,7 +56,7 @@ class Stream(Publisher, Subscriber):
 
   ### subscribe functionality
 
-  def emit(self, *args:Any, who:Optional['Stream']=None) -> None:
+  def emit(self, *args:Any, who:Optional['Publisher']=None) -> None:
       self._emit(*args)
   
   def _emit(self, *args:Any) -> None:
@@ -66,23 +66,8 @@ class Stream(Publisher, Subscriber):
       # TODO: critical place to think about handling exceptions
       stream.emit(*args, who=self)
 
-  def emit(self, *args:Any, who:Optional['Stream']=None) -> None:
-      self._emit(*args)
-  
   def __await__(self):
     return AsFuture(self).__await__()
-  
-  @classmethod
-  def register_operator(cls, operator_cls, name):
-    def _(source_stream, *args, **kwargs):
-      return operator_cls(source_stream, *args, **kwargs)
-    setattr(cls, name, _)
-  
-  def __or__(self, sink:Union['Stream', Callable[['Stream'], 'Stream']]) -> 'Stream':
-    if isinstance(sink, Stream):
-      return self.subscribe(sink)
-    else:
-      return sink(self)
 
 from broqer.op import AsFuture
 Stream.register_operator(AsFuture, 'as_future')
