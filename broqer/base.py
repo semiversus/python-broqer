@@ -16,31 +16,41 @@ class Disposable(metaclass=ABCMeta):
     self.dispose()
 
 
-class Publisher(metaclass=ABCMeta):
+class SubscriptionDisposable(Disposable):
+  def __init__(self, publisher:'Publisher', subscriber:'Subscriber') -> None:
+    self._publisher=publisher
+    self._subscriber=subscriber
+
+  def dispose(self) -> None:
+    self._publisher.unsubscribe(self._subscriber)
+
+
+class Publisher():
+  def __init__(self):
+    self._subscriptions=set()
+    self._cache=None
+    
   def setup(self, *cache:Any, meta:Optional[dict]=None) -> 'Publisher':
     self._cache=cache
     self._meta=meta
     return self
 
-  @abstractmethod
   def subscribe(self, subscriber:'Subscriber'):
-    return NotImplemented
+    self._subscriptions.add(subscriber)
+    if self._cache is not None:
+      subscriber.emit(*self._cache, who=self)
+    return SubscriptionDisposable(self, subscriber)
 
-  @abstractmethod
   def unsubscribe(self, subscriber:'Subscriber') -> None:
-    return NotImplemented
-  
-  @abstractmethod
-  def unsubscribe_all(self) -> None:
-    return NotImplemented
-  
+    self._subscriptions.remove(subscriber)
+
   @property
   def cache(self):
     return self._cache
 
   @property
   def meta(self):
-    return self._meta
+    return getattr(self, '_meta', None)
   
   @meta.setter
   def meta(self, meta_dict:dict):
@@ -59,6 +69,7 @@ class Publisher(metaclass=ABCMeta):
       return self.subscribe(sink)
     else:
       return sink(self)
+
 
 class Subscriber(metaclass=ABCMeta):
   @abstractmethod
