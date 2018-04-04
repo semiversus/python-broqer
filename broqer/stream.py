@@ -1,14 +1,13 @@
 from broqer.base import Disposable, Publisher, Subscriber
 from typing import Callable, Any, Optional, List, Union
-from types import MappingProxyType
 
-class StreamDisposable(Disposable):
-  def __init__(self, source_stream:'Stream', sink_stream:'Stream') -> None:
-    self._source_stream=source_stream
-    self._sink_stream=sink_stream
+class SubscriptionDisposable(Disposable):
+  def __init__(self, publisher:'Publisher', subscriber:'Subscriber') -> None:
+    self._publisher=publisher
+    self._subscriber=subscriber
 
   def dispose(self) -> None:
-    self._source_stream.unsubscribe(self._sink_stream)
+    self._publisher.unsubscribe(self._subscriber)
 
 class Stream(Publisher, Subscriber):
   def __init__(self):
@@ -34,12 +33,6 @@ class Stream(Publisher, Subscriber):
 
   def unsubscribe(self, stream:'Subscriber') -> None:
     self._subscriptions.remove(stream)
-  
-  def unsubscribe_all(self) -> None:
-    # why not simple clear subscriptions set? -> .unsubscribe could be overwritten
-    # copy subscriptions set into a tuple, because subscription set will be changed while iterating over it
-    for stream in tuple(self._subscriptions):
-      self.unsubscribe(stream)
   
   @property
   def cache(self):
