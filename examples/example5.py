@@ -1,12 +1,12 @@
-from broqer.stream import Stream
+from broqer.subject import Subject
 from broqer import op
 import asyncio
 
-value=Stream()
+value=Subject()
 
 async def main():
-  print('Value:', await (value|op.as_future()) )
-  print('Value:', await value.as_future() )
+  print('Value:', await (value|op.to_future()) )
+  print('Value:', await value.to_future() )
   print('Value:', await value )
   print(value._subscriptions)
 

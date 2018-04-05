@@ -1,8 +1,8 @@
-from broqer.stream import Stream
+from broqer.subject import Subject
 from broqer import op
 import asyncio
 
-adc_raw=Stream()
+adc_raw=Subject().setup(0)
 
 ( adc_raw  
   | op.map(lambda d:d*5+3)

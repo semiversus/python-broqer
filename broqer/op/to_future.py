@@ -1,14 +1,17 @@
-from broqer.stream import Stream
-from typing import Any
-from .operator import build_stream_operator, Operator
 import asyncio
+from typing import Any, Optional
 
-class AsFuture(Stream):
-  def __init__(self, source_stream, timeout=None):
-    Stream.__init__(self)
-    self._disposable=source_stream.subscribe(self)
+from broqer.base import Subscriber
 
-    loop=asyncio.get_event_loop()
+from ._build_operator import build_operator
+
+class ToFuture(Subscriber):
+  def __init__(self, publisher, timeout=None, loop=None):
+    self._disposable=publisher.subscribe(self)
+
+    if loop is None:
+      loop=asyncio.get_event_loop()
+
     self._future=loop.create_future()
     self._future.add_done_callback(self._future_done)
     
@@ -28,10 +31,10 @@ class AsFuture(Stream):
   def __await__(self):
     return self._future.__await__()
 
-  def emit(self, *args:Any, who:Stream):
+  def emit(self, *args:Any, who:Optional['Publisher']=None) -> None:
     if len(args)==1:
       self._future.set_result(args[0])
     else:
       self._future.set_result(args)
  
-as_future=build_stream_operator(AsFuture)
+to_future=build_operator(ToFuture)

@@ -1,18 +1,19 @@
-from broqer.stream import Stream
-from typing import Callable, Any, Optional
-from .operator import build_stream_operator
-from broqer.base import Disposable
+from typing import Any, Callable, Optional
 
-class Sink(Stream, Disposable):
-  def __init__(self, source_stream:Stream, sink_function:Callable[[Any], None]):
-    Stream.__init__(self)
+from broqer.base import Disposable, Publisher, Subscriber
+
+from ._build_operator import build_operator
+
+
+class Sink(Subscriber, Disposable):
+  def __init__(self, publisher:Publisher, sink_function:Callable[[Any], None]):
     self._sink_function=sink_function
-    self._disposable=source_stream.subscribe(self)
+    self._disposable=publisher.subscribe(self)
   
-  def emit(self, *args:Any, who:Optional[Stream]=None):
+  def emit(self, *args:Any, who:Optional[Publisher]=None):
     self._sink_function(*args)
   
   def dispose(self):
     self._disposable.dispose()
 
-sink=build_stream_operator(Sink)
+sink=build_operator(Sink)

@@ -1,29 +1,6 @@
-from abc import ABCMeta, abstractmethod
-from typing import Any, Optional, Callable, Union
+from typing import Any, Callable, Optional, Union
 
-class Disposable(metaclass=ABCMeta):
-  """ Implementation of the disposable pattern. Call .dispose() to free
-      resource.
-  """
-  @abstractmethod
-  def dispose(self):
-    return NotImplemented
-
-  def __enter__(self):
-    pass
-
-  def __exit__(self, type, value, traceback):
-    self.dispose()
-
-
-class SubscriptionDisposable(Disposable):
-  def __init__(self, publisher:'Publisher', subscriber:'Subscriber') -> None:
-    self._publisher=publisher
-    self._subscriber=subscriber
-
-  def dispose(self) -> None:
-    self._publisher.unsubscribe(self._subscriber)
-
+from broqer.base import Subscriber, SubscriptionDisposable
 
 class Publisher():
   def __init__(self):
@@ -35,7 +12,7 @@ class Publisher():
     self._meta=meta
     return self
 
-  def subscribe(self, subscriber:'Subscriber'):
+  def subscribe(self, subscriber:'Subscriber') -> SubscriptionDisposable:
     self._subscriptions.add(subscriber)
     if self._cache is not None:
       subscriber.emit(*self._cache, who=self)
@@ -69,9 +46,7 @@ class Publisher():
       return self.subscribe(sink)
     else:
       return sink(self)
-
-
-class Subscriber(metaclass=ABCMeta):
-  @abstractmethod
-  def emit(self, *args:Any, who:Optional[Publisher]=None) -> None:
-    return NotImplemented
+  
+  def __await__(self):
+    from broqer.op.to_future import ToFuture
+    return ToFuture(self).__await__()
