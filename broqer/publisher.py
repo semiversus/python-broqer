@@ -1,39 +1,34 @@
 from typing import Any, Callable, Optional, Union
+from types import MappingProxyType
 
-from broqer.base import Subscriber, SubscriptionDisposable
+from broqer import Subscriber, SubscriptionDisposable
 
 class Publisher():
-  def __init__(self):
+  def __init__(self, meta:Optional[dict]=None):
     self._subscriptions=set()
-    self._cache=None
-    
-  def setup(self, *cache:Any, meta:Optional[dict]=None) -> 'Publisher':
-    self._cache=cache
-    self._meta=meta
-    return self
+    if meta is not None:
+      self._meta=MappingProxyType(meta)
 
   def subscribe(self, subscriber:'Subscriber') -> SubscriptionDisposable:
+    if subscriber in self._subscriptions:
+      raise ValueError('Subscriber already registred')
+
     self._subscriptions.add(subscriber)
-    if self._cache is not None:
-      subscriber.emit(*self._cache, who=self)
     return SubscriptionDisposable(self, subscriber)
 
   def unsubscribe(self, subscriber:'Subscriber') -> None:
-    self._subscriptions.remove(subscriber)
-
-  @property
-  def cache(self):
-    return self._cache
+    try:
+      self._subscriptions.remove(subscriber)
+    except KeyError:
+      raise ValueError('Subscriber is not registred (anymore)')
+  
+  def __len__(self):
+    """ number of subscriptions """
+    return len(self._subscriptions)
 
   @property
   def meta(self):
     return getattr(self, '_meta', None)
-  
-  @meta.setter
-  def meta(self, meta_dict:dict):
-    if hasattr(self, '_meta'):
-      raise ValueError('Publisher setup already done')
-    self._meta=meta_dict
   
   @classmethod
   def register_operator(cls, operator_cls, name):

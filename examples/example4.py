@@ -2,10 +2,11 @@ from broqer.subject import Subject
 from broqer import op
 import asyncio
 
-adc_raw=Subject().setup(0)
+adc_raw=Subject()
 
-( adc_raw  
-  | op.map(lambda d:d*5+3)
+( adc_raw 
+  | op.cache(0) 
+  #| op.map(lambda d:d*5+3)
   | op.sample(0.3)
   | op.sink(print)
 )

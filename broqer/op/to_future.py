@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any, Optional
 
-from broqer.base import Subscriber
+from broqer import Subscriber
 
 from ._build_operator import build_operator
 

@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any, List
 
-from broqer.base import Publisher, Subscriber, SubscriptionDisposable
+from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 
 class Operator(Publisher, Subscriber):
@@ -10,10 +10,11 @@ class Operator(Publisher, Subscriber):
     self._publishers=publishers
 
   def subscribe(self, subscriber:'Subscriber') -> SubscriptionDisposable:
+    disposable=Publisher.subscribe(self, subscriber)
     if not self._subscriptions:
       for _publisher in self._publishers:
         _publisher.subscribe(self)
-    return Publisher.subscribe(self, subscriber)
+    return disposable
   
   def unsubscribe(self, subscriber:'Subscriber') -> None:
     Publisher.unsubscribe(self, subscriber)
@@ -22,8 +23,6 @@ class Operator(Publisher, Subscriber):
         _publisher.unsubscribe(self)
   
   def _emit(self, *args:Any) -> None:
-    if self._cache is not None:
-      self._cache=args
     for subscriber in tuple(self._subscriptions):
       # TODO: critical place to think about handling exceptions
       subscriber.emit(*args, who=self)

@@ -1,7 +1,7 @@
 from broqer.stream import Stream
 from typing import Any, Optional
 from .operator import build_stream_operator
-from broqer.base import Disposable
+from broqer import Disposable
 
 class UpdateDict(Stream, Disposable):
   def __init__(self, source_stream:Stream, d:dict, key:Optional[str]=None):

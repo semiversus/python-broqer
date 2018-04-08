@@ -1,6 +1,6 @@
 from typing import Any, Callable, Optional
 
-from broqer.base import Disposable, Publisher, Subscriber
+from broqer import Disposable, Publisher, Subscriber
 
 from ._build_operator import build_operator
 
