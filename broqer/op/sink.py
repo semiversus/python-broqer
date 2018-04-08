@@ -9,8 +9,10 @@ class Sink(Subscriber, Disposable):
   def __init__(self, publisher:Publisher, sink_function:Callable[[Any], None]):
     self._sink_function=sink_function
     self._disposable=publisher.subscribe(self)
+    print('sink:init')
   
   def emit(self, *args:Any, who:Optional[Publisher]=None):
+    print('sink:emit', args)
     self._sink_function(*args)
   
   def dispose(self):

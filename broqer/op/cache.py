@@ -6,18 +6,16 @@ from ._build_operator import build_operator
 
 
 class Cache(Publisher, Subscriber):
-  def __init__(self, publisher:Publisher, *start_values:Any, meta=None):
-    Publisher.__init__(self, meta=meta)
+  def __init__(self, publisher:Publisher, *start_values:Any):
+    Publisher.__init__(self)
     publisher.subscribe(self)
     self._cache=start_values
 
   def subscribe(self, subscriber:'Subscriber') -> SubscriptionDisposable:
-    print('cache: ', self._cache)
     subscriber.emit(*self._cache, who=self)
     return super().subscribe(subscriber)
 
   def emit(self, *args:Any, who:Publisher) -> None:
-    print('emit', args)
     for subscription in tuple(self._subscriptions):
       # TODO: critical place to think about handling exceptions
       subscription.emit(*args, who=self)

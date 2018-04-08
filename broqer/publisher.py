@@ -4,11 +4,9 @@ from types import MappingProxyType
 from broqer import Subscriber, SubscriptionDisposable
 
 class Publisher():
-  def __init__(self, meta:Optional[dict]=None):
+  def __init__(self):
     self._subscriptions=set()
-    if meta is not None:
-      self._meta=MappingProxyType(meta)
-
+   
   def subscribe(self, subscriber:'Subscriber') -> SubscriptionDisposable:
     if subscriber in self._subscriptions:
       raise ValueError('Subscriber already registred')
@@ -26,10 +24,6 @@ class Publisher():
     """ number of subscriptions """
     return len(self._subscriptions)
 
-  @property
-  def meta(self):
-    return getattr(self, '_meta', None)
-  
   @classmethod
   def register_operator(cls, operator_cls, name):
     def op(source_stream, *args, **kwargs):
