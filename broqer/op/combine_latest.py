@@ -2,10 +2,10 @@ from typing import Any
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
-from ._operator import Operator, build_operator
+from ._operator import MultiOperator, build_operator
 
 
-class CombineLatest(Operator):
+class CombineLatest(MultiOperator):
   def __init__(self, *publishers:Publisher):
     Operator.__init__(self, *publisher)
     self._cache=[None for _ in publishers]
