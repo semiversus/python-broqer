@@ -9,7 +9,7 @@ class Publisher():
    
   def subscribe(self, subscriber:'Subscriber') -> SubscriptionDisposable:
     if subscriber in self._subscriptions:
-      raise ValueError('Subscriber already registred')
+      raise ValueError('Subscriber already registered')
 
     self._subscriptions.add(subscriber)
     return SubscriptionDisposable(self, subscriber)
@@ -18,7 +18,7 @@ class Publisher():
     try:
       self._subscriptions.remove(subscriber)
     except KeyError:
-      raise ValueError('Subscriber is not registred (anymore)')
+      raise ValueError('Subscriber is not registered (anymore)')
   
   def _emit(self, *args:Any) -> None:
     """ emit to all subscriptions """
