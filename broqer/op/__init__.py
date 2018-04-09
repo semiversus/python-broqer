@@ -1,5 +1,6 @@
 from .cache import Cache, cache
 from .combine_latest import CombineLatest, combine_latest
+from .delay import Delay, delay
 from .distinct import Distinct, distinct
 from .map import Map, map
 from .map_async import MapAsync, map_async
