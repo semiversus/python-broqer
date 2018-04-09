@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Coroutine, Optional
+from typing import Any, Optional
 
 from broqer import Publisher
 
@@ -7,7 +7,7 @@ from ._operator import Operator, build_operator
 
 
 class MapAsync(Operator):
-  def __init__(self, publisher:Publisher, map_coro:Coroutine):
+  def __init__(self, publisher:Publisher, map_coro):
     # TODO: supporting various modes when coroutine is running while next value is emitted
     # concurrent - just run coroutines concurrent
     # replace - cancel running and call for new value
