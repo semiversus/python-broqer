@@ -21,10 +21,6 @@ class Operator(Publisher, Subscriber):
     if not self._subscriptions:
       for _publisher in self._publishers:
         _publisher.unsubscribe(self)
-  
-  def _emit(self, *args:Any) -> None:
-    for subscriber in tuple(self._subscriptions):
-      subscriber.emit(*args, who=self)
 
 def build_operator(operator_cls):
   def _op(*args, **kwargs):

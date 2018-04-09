@@ -1,6 +1,7 @@
 import pytest
 from broqer import Publisher
 from broqer.subject import Subject
+import mock
 
 @pytest.mark.parametrize('cls', [Publisher])
 def test_subscribe(cls):
@@ -38,5 +39,20 @@ def test_subscribe(cls):
   with pytest.raises(ValueError):
     d2.dispose()
 
+@pytest.mark.parametrize('cls', [Publisher])
+def test_chaining_operator(cls):
+  publisher=cls()
 
+  build_cb=mock.Mock()
+  publisher|build_cb
+
+  build_cb.assert_called_with(publisher)
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('cls', [Publisher])
+async def test_chaining_operator(cls, event_loop):
+  publisher=cls()
+
+  event_loop.call_soon(publisher._emit, 1)
+  assert await publisher==1
   

@@ -20,15 +20,18 @@ class Publisher():
     except KeyError:
       raise ValueError('Subscriber is not registred (anymore)')
   
+  def _emit(self, *args:Any) -> None:
+    """ emit to all subscriptions """
+    for subscriber in tuple(self._subscriptions):
+      subscriber.emit(*args, who=self)
+
   def __len__(self):
     """ number of subscriptions """
     return len(self._subscriptions)
   
-  def __or__(self, sink:Union['Subscriber', Callable[['Publisher'], 'Publisher']]) -> 'Publisher':
-    if isinstance(sink, Subscriber):
-      return self.subscribe(sink)
-    else:
-      return sink(self)
+  def __or__(self, build_subscriber:Callable[['Publisher'], 'Publisher']) -> 'Publisher':
+    # build_subscriber is called with `self` and returns a new publisher
+    return build_subscriber(self)
 
   def __await__(self):
     from broqer.op import ToFuture # lazy import due circular dependency
