@@ -1,6 +1,7 @@
 from broqer.subject import Subject
 from broqer import op
 import asyncio
+import statistics
 
 adc_raw=Subject()
 
@@ -8,11 +9,13 @@ adc_raw=Subject()
   | op.cache(0) 
   | op.map(lambda d:d*5+3)
   | op.sample(0.3)
+  | op.sliding_window(5)
+  | op.map(statistics.mean)
   | op.sink(print)
 )
         
 async def main():
-  await asyncio.sleep(0.5)
+  await asyncio.sleep(2)
   adc_raw.emit(50)
   await asyncio.sleep(2)
 
