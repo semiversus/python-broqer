@@ -22,7 +22,7 @@ class CombineLatest(MultiOperator):
       self._missing.remove(who)
     self._cache[self._publishers.index(who)]=args
     if not self._missing:
-      self._emit(*self._cache)
+      self._emit(self._cache)
   
   @property
   def cache(self):
