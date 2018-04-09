@@ -24,7 +24,6 @@ class Operator(Publisher, Subscriber):
   
   def _emit(self, *args:Any) -> None:
     for subscriber in tuple(self._subscriptions):
-      # TODO: critical place to think about handling exceptions
       subscriber.emit(*args, who=self)
 
 def build_operator(operator_cls):
