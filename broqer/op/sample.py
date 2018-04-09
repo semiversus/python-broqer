@@ -3,11 +3,10 @@ from typing import Any, Optional
 
 from broqer import Publisher, Subscriber, Disposable
 
-from ._build_operator import build_operator
-from ._operator import Operator
+from ._operator import Operator, build_operator
 
 
-class Sample(Operator, Disposable):
+class Sample(Operator):
   def __init__(self, publisher:Publisher, interval:float):
     assert interval>0, 'interval has to be positive'
 
@@ -16,25 +15,20 @@ class Sample(Operator, Disposable):
     self._interval=interval
     self._call_later_handle=None
     self._loop=asyncio.get_event_loop()
-    print('sample:init')
 
   def _periodic_callback(self):
-    print('sample:periodic', self._cache, len(self))
-    for subscription in tuple(self._subscriptions):
-      # TODO: critical place to think about handling exceptions
-      subscription.emit(*self._cache, who=self)
+    """ will be started on first emit """
+    self._emit(*self._cache) # emit to all subscribers
 
-    if self._subscriptions:
+    if self._subscriptions: # if there are still subscriptions register next _periodic callback
       self._call_later_handle=self._loop.call_later(self._interval, self._periodic_callback)
+    else:
+      self._call_later_handle=None
 
   def emit(self, *args:Any, who:Optional['Publisher']=None) -> None:
-    print("sample:emit", args)
     self._cache=args
 
     if self._call_later_handle is None:
       self._periodic_callback()
-  
-  def dispose(self):
-    self._disposable.dispose()
 
 sample=build_operator(Sample)

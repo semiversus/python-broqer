@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 from broqer import Subscriber
 
-from ._build_operator import build_operator
+from ._operator import build_operator
 
 class ToFuture(Subscriber):
   def __init__(self, publisher, timeout=None, loop=None):

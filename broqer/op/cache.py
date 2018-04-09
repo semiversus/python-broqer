@@ -2,28 +2,25 @@ from typing import Any
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
-from ._build_operator import build_operator
+from ._operator import Operator, build_operator
 
 
-class Cache(Publisher, Subscriber):
+class Cache(Operator):
   def __init__(self, publisher:Publisher, *start_values:Any):
-    Publisher.__init__(self)
-    publisher.subscribe(self)
+    Operator.__init__(self, publisher)
     self._cache=start_values
 
-  def subscribe(self, subscriber:'Subscriber') -> SubscriptionDisposable:
+  def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
+    disposable=Operator.subscribe(self, subscriber)
     subscriber.emit(*self._cache, who=self)
-    return super().subscribe(subscriber)
+    return disposable
 
   def emit(self, *args:Any, who:Publisher) -> None:
-    for subscription in tuple(self._subscriptions):
-      # TODO: critical place to think about handling exceptions
-      subscription.emit(*args, who=self)
-
     self._cache=args
+    self._emit(*args)
   
   @property
-  def value(self):
+  def cache(self):
     return self._cache
 
 cache=build_operator(Cache)

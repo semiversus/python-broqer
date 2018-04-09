@@ -23,19 +23,13 @@ class Publisher():
   def __len__(self):
     """ number of subscriptions """
     return len(self._subscriptions)
-
-  @classmethod
-  def register_operator(cls, operator_cls, name):
-    def op(source_stream, *args, **kwargs):
-      return operator_cls(source_stream, *args, **kwargs)
-    setattr(cls, name, op)
   
   def __or__(self, sink:Union['Subscriber', Callable[['Publisher'], 'Publisher']]) -> 'Publisher':
     if isinstance(sink, Subscriber):
       return self.subscribe(sink)
     else:
       return sink(self)
-  
+
   def __await__(self):
-    from broqer.op.to_future import ToFuture
+    from broqer.op import ToFuture
     return ToFuture(self).__await__()

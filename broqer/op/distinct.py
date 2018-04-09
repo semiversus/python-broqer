@@ -1,15 +1,17 @@
-from broqer.stream import Stream
 from typing import Any
-from .operator import build_stream_operator, Operator
+
+from broqer import Publisher, Subscriber, SubscriptionDisposable
+
+from ._operator import Operator, build_operator
 
 class Distinct(Operator):
-  def __init__(self, source_stream:Stream):
-    Operator.__init__(self, source_stream)
-    self._last_msg=None
-
-  def emit(self, *args:Any, who:Stream):
-    if args!=self._last_msg:
-      self._last_msg=args
+  def emit(self, *args:Any, who:Publisher) -> None:
+    if args!=getattr(self, '_cache', None):
+      self._cache=args
       self._emit(*args)
+  
+  @property
+  def cache(self):
+    return self._cache
 
-distinct=build_stream_operator
+distinct=build_operator(Distinct)

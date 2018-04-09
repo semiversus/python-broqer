@@ -1,19 +1,16 @@
-from broqer.stream import Stream
-from typing import Any, Optional
-from .operator import build_stream_operator
-from broqer import Disposable
+from typing import Any, Callable, Optional
 
-class UpdateDict(Stream, Disposable):
-  def __init__(self, source_stream:Stream, d:dict, key:Optional[str]=None):
-    Stream.__init__(self)
-    if key is not None:
-      self._key=key
-    else:
-      self._key=source_stream.path # TODO: this is a hack! Only AssignedStreams has path attribute
+from broqer import Disposable, Publisher, Subscriber
+
+from ._build_operator import build_operator
+
+class UpdateDict(Subscriber, Disposable):
+  def __init__(self, publisher:Publisher, d:dict, key:str):
+    self._key=key
     self._dict=d
-    self._disposable=source_stream.subscribe(self)
+    self._disposable=publisher.subscribe(self)
   
-  def emit(self, *args:Any, who:Optional[Stream]=None):
+  def emit(self, *args:Any, who:Optional[Publisher]=None):
     if len(args)==1:
       args=args[0]
     self._dict[self._key]=args

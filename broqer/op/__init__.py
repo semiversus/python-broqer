@@ -1,8 +1,8 @@
 from .to_future import to_future, ToFuture
 from .cache import cache, Cache
-#from .combine_latest import combine_latest, CombineLatest
-#from .distinct import distinct, Distinct
-#from .map_async import map_async, MapAsync
+from .combine_latest import combine_latest, CombineLatest
+from .distinct import distinct, Distinct
+from .map_async import map_async, MapAsync
 from .map import map, Map
 from .sample import sample, Sample
 from .sink import sink, Sink

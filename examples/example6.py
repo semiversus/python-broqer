@@ -1,4 +1,4 @@
-from broqer.stream import Stream
+from broqer.subject import Subject
 from broqer import op
 import asyncio
 from functools import partial
@@ -7,7 +7,7 @@ async def delay_coro(value):
   await asyncio.sleep(1)
   return value
 
-value=Stream()
+value=Subject()
 value | op.sink(print)
 value | op.map_async(delay_coro) | op.sink(lambda v:print('Delayed:',v))
 

@@ -1,19 +1,31 @@
-from broqer.stream import Stream
-from typing import Any, List
-from .operator import build_stream_operator, Operator
+from typing import Any
+
+from broqer import Publisher, Subscriber, SubscriptionDisposable
+
+from ._operator import Operator, build_operator
+
 
 class CombineLatest(Operator):
-  def __init__(self, *source_streams:List[Stream]):
-    Operator.__init__(self, *source_streams)
-    self._last_msg=[None for _ in source_streams]
-    self._missing=set(source_streams)
-    # TODO: additional keyword to decide if emit undefined values
-  
-  def emit(self, *args:Any, who:Stream):
+  def __init__(self, *publishers:Publisher):
+    Operator.__init__(self, *publisher)
+    self._cache=[None for _ in publishers]
+    self._missing=set(publishers)
+    
+  def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
+    disposable=Operator.subscribe(self, subscriber)
+    if not self._missing:
+      subscriber.emit(*self._cache, who=self)
+    return disposable
+
+  def emit(self, *args:Any, who:Publisher) -> None:
     if self._missing and who in self._missing:
       self._missing.remove(who)
-    self._last_msg[self._source_streams.index(who)]=args
+    self._cache[self._publishers.index(who)]=args
     if not self._missing:
-      self._emit(*self._last_msg)
+      self._emit(*self._cache)
+  
+  @property
+  def cache(self):
+    return self._cache
 
-combine_latest=build_stream_operator(CombineLatest)
+combine_latest=build_operator(CombineLatest)

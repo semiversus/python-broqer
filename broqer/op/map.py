@@ -2,8 +2,7 @@ from typing import Any, Callable, Optional
 
 from broqer import Publisher
 
-from ._build_operator import build_operator
-from ._operator import Operator
+from ._operator import Operator, build_operator
 
 
 class Map(Operator):
