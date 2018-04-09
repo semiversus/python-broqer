@@ -31,5 +31,5 @@ class Publisher():
       return sink(self)
 
   def __await__(self):
-    from broqer.op import ToFuture
+    from broqer.op import ToFuture # lazy import due circular dependency
     return ToFuture(self).__await__()
