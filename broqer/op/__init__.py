@@ -15,7 +15,6 @@ from .update_dict import UpdateDict, update_dict
 # filter(cond)
 # debounce and throttle - see https://css-tricks.com/debouncing-throttling-explained-examples/
 # pluck - choose element
-# switch - select stream
 # timeout - emit (a value) when timeout on source has passed
 # debug
 # reduce

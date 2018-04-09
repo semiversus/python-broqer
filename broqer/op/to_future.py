@@ -1,9 +1,10 @@
 import asyncio
-from typing import Any, Optional
+from typing import Any
 
-from broqer import Subscriber
+from broqer import Subscriber, Publisher
 
 from ._operator import build_operator
+
 
 class ToFuture(Subscriber):
   def __init__(self, publisher, timeout=None, loop=None):
@@ -31,7 +32,7 @@ class ToFuture(Subscriber):
   def __await__(self):
     return self._future.__await__()
 
-  def emit(self, *args:Any, who:Optional['Publisher']=None) -> None:
+  def emit(self, *args:Any, who:Publisher) -> None:
     if len(args)==1:
       self._future.set_result(args[0])
     else:
