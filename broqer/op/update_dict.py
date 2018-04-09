@@ -2,7 +2,8 @@ from typing import Any, Callable, Optional
 
 from broqer import Disposable, Publisher, Subscriber
 
-from ._build_operator import build_operator
+from ._operator import build_operator
+
 
 class UpdateDict(Subscriber, Disposable):
   def __init__(self, publisher:Publisher, d:dict, key:str):
@@ -18,4 +19,4 @@ class UpdateDict(Subscriber, Disposable):
   def dispose(self):
     self._disposable.dispose()
 
-update_dict=build_stream_operator(UpdateDict)
+update_dict=build_operator(UpdateDict)

@@ -6,7 +6,7 @@ from .map_async import map_async, MapAsync
 from .map import map, Map
 from .sample import sample, Sample
 from .sink import sink, Sink
-#from .update_dict import update_dict, UpdateDict
+from .update_dict import update_dict, UpdateDict
 
 # TODO operators
 # accumulate(func, start_state) -> value
