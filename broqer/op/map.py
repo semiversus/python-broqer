@@ -1,4 +1,5 @@
 from typing import Any, Callable
+from functools import partial
 
 from broqer import Publisher
 
@@ -6,7 +7,7 @@ from ._operator import Operator, build_operator
 
 
 class Map(Operator):
-  def __init__(self, publisher:Publisher, map_func:Callable[[Any], Any]):
+  def __init__(self, publisher:Publisher, map_func:Callable[[Any], Any], *args, **kwargs):
     """ special care for return values:
         * return `None` (or nothing) if you don't want to return a result
         * return `None,` if you want to return `None`
@@ -16,7 +17,10 @@ class Map(Operator):
  
     Operator.__init__(self, publisher)
 
-    self._map_func=map_func
+    if args or kwargs:
+        self._map_func=partial(map_func, *args, **kwargs)
+    else:
+        self._map_func=map_func
 
   def emit(self, *args:Any, who:Publisher) -> None:
     *args,_=self._map_func(*args),None
