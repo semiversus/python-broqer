@@ -6,7 +6,7 @@ from .delay import Delay, delay
 from .distinct import Distinct, distinct
 from .filter import Filter, filter
 from .map import Map, map
-from .map_async import MapAsync, map_async
+from .map_async import MapAsync, map_async, Mode
 from .pluck import Pluck, pluck
 from .reduce import Reduce, reduce
 from .sample import Sample, sample
