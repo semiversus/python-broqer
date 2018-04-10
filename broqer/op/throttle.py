@@ -20,7 +20,7 @@ class Throttle(Operator):
   def emit(self, *args:Any, who:Publisher) -> None:
     self._cache=args
     if self._wait_future is None or self._wait_future.done():
-      self._wait_future=asyncio.sleep(self._duration)
+      self._wait_future=asyncio.ensure_future(asyncio.sleep(self._duration))
       self._wait_future.add_done_callback(self._wait_done_cb)
 
   def _wait_done_cb(self, f):
