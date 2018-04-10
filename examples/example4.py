@@ -11,6 +11,8 @@ adc_raw=Subject()
   | op.sample(0.3)
   | op.sliding_window(5)
   | op.map(statistics.mean)
+  | op.distinct()
+  | op.debounce(0.5)
   | op.sink(print)
 )
         
