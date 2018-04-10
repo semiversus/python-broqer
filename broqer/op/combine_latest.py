@@ -10,6 +10,7 @@ class CombineLatest(MultiOperator):
     Operator.__init__(self, *publisher)
     self._cache=[None for _ in publishers]
     self._missing=set(publishers)
+    self._index={p:i for i,p in enumerate(publishers)}
     
   def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
     disposable=Operator.subscribe(self, subscriber)
@@ -20,7 +21,9 @@ class CombineLatest(MultiOperator):
   def emit(self, *args:Any, who:Publisher) -> None:
     if self._missing and who in self._missing:
       self._missing.remove(who)
-    self._cache[self._publishers.index(who)]=args
+    if len(args)==1:
+      args=args[0]
+    self._cache[self._index[who]]=args
     if not self._missing:
       self._emit(self._cache)
   
