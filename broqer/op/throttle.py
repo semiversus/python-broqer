@@ -14,17 +14,24 @@ class Throttle(Operator):
 
     self._duration=duration
     self._loop=loop or asyncio.get_event_loop()
-    self._wait_future=None
+    self._call_later_handler=None
     self._cache=None
 
   def emit(self, *args:Any, who:Publisher) -> None:
-    self._cache=args
-    if self._wait_future is None or self._wait_future.done():
-      self._wait_future=asyncio.ensure_future(asyncio.sleep(self._duration))
-      self._wait_future.add_done_callback(self._wait_done_cb)
+    if self._call_later_handler is None:
+      self._emit(*args)
+      self._cache=None
+      self._call_later_handler=self._loop.call_later(self._duration, self._wait_done_cb)
+    else:
+      self._cache=args
 
-  def _wait_done_cb(self, f):
-    self._emit(*self._cache)
+  def _wait_done_cb(self):
+    if self._cache is not None:
+      self._emit(*self._cache)
+      self._cache=None
+      self._call_later_handler=self._loop.call_later(self._duration, self._wait_done_cb)
+    else:
+      self._call_later_handler=None
 
 
 throttle=build_operator(Throttle)
