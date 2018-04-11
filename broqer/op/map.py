@@ -18,17 +18,16 @@ class Map(Operator):
     Operator.__init__(self, publisher)
 
     if args or kwargs:
-        self._map_func=partial(map_func, *args, **kwargs)
+      self._map_func=partial(map_func, *args, **kwargs)
     else:
-        self._map_func=map_func
+      self._map_func=map_func
 
   def emit(self, *args:Any, who:Publisher) -> None:
-    *args,_=self._map_func(*args),None
-    try:
-        *args,=args[0]
-    except TypeError:
-        if args[0] is None:
-            args=()
-    self._emit(*args)
+    result=self._map_func(*args)
+    if result is None:
+      result=()
+    elif not isinstance(result, tuple):
+      result=(result,)
+    self._emit(*result)
 
 map=build_operator(Map)

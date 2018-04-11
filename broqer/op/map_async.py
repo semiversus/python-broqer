@@ -44,19 +44,18 @@ class MapAsync(Operator):
 
   def _future_done(self, future):
     try:
-      *args,_=future.result(),None
+      result=future.result()
     except asyncio.CancelledError:
       pass
     except Exception as e:
       if self._error_callback is not None:
         self._error_callback(e)
     else:
-      try:
-          *args,=args[0]
-      except TypeError:
-          if args[0] is None:
-              args=()
-      self._emit(*args)
+      if result is None:
+        result=()
+      elif not isinstance(result, tuple):
+        result=(result,)
+      self._emit(*result)
     
     if self._queue:
       self._future=asyncio.ensure_future(self._map_coro(self._queue.popleft()))
