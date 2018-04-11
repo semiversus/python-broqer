@@ -25,14 +25,10 @@ class MapAsync(Operator):
     self._error_callback=error_callback
     self._future=None
 
-    if mode==Mode.QUEUE:
-      maxlen=None
-    elif mode==Mode.LAST:
-      maxlen=1
+    if mode in (Mode.QUEUE, Mode.LAST):
+      self._queue=deque(maxlen=(None if mode==Mode.QUEUE else 1) )
     else: # no queue for CONCURRENT, INTERRUPT and SKIP
-      maxlen=0
-
-    self._queue=deque(maxlen=maxlen)
+      self._queue=None
   
   def emit(self, *args:Any, who:Publisher) -> None:
     if self._mode==Mode.INTERRUPT and self._future is not None:
@@ -43,7 +39,7 @@ class MapAsync(Operator):
             or self._future.done() ):
       self._future=asyncio.ensure_future(self._map_coro(*args))
       self._future.add_done_callback(self._future_done)
-    else:
+    elif self._mode in (Mode.QUEUE, Mode.LAST):
       self._queue.append(args)
 
   def _future_done(self, future):
