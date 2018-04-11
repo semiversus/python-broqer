@@ -17,7 +17,6 @@ from .sliding_window import SlidingWindow, sliding_window
 from .switch import Switch, switch
 from .throttle import Throttle, throttle
 from .to_future import ToFuture, to_future
-from .update_dict import UpdateDict, update_dict
 
 # TODO operators
 # timeout - emit (a value) when timeout on source has passed
