@@ -1,5 +1,5 @@
-from typing import Any, Callable
 from functools import partial
+from typing import Any, Callable
 
 from broqer import Publisher
 

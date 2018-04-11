@@ -9,7 +9,7 @@ async def delay_coro(value):
 
 value=Subject()
 value | op.sink(print)
-value | op.map_async(delay_coro) | op.sink(lambda v:print('Delayed:',v))
+value | op.map_async(delay_coro) | op.sink(print, 'Delayed:')
 
 async def main():
   for i in range(10):
