@@ -5,6 +5,8 @@ from .debounce import Debounce, debounce
 from .delay import Delay, delay
 from .distinct import Distinct, distinct
 from .filter import Filter, filter
+from .from_iterable import FromIterable
+from .from_polling import FromPolling
 from .map import Map, map
 from .map_async import MapAsync, map_async, Mode
 from .pluck import Pluck, pluck

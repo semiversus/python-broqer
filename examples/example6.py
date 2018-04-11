@@ -1,21 +1,14 @@
 from broqer.subject import Subject
 from broqer import op
 import asyncio
-from functools import partial
+import subprocess
 
-async def delay_coro(value):
-  await asyncio.sleep(1)
-  return value
-
-value=Subject()
-value | op.sink(print)
-value | op.map_async(delay_coro) | op.sink(print, 'Delayed:')
-
-async def main():
-  for i in range(10):
-    value.emit(i)
-    await asyncio.sleep(0.3)
-  await asyncio.sleep(1.5)
+( op.FromPolling(1, subprocess.check_output, 'uptime')
+  |op.map(str, encoding='utf-8')
+  |op.map(str.split, sep=',')
+  |op.pluck(0)
+  |op.sink(print)
+)
 
 loop=asyncio.get_event_loop()
-loop.run_until_complete(main())
+loop.run_until_complete(asyncio.sleep(10))
