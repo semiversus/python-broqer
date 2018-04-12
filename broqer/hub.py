@@ -25,16 +25,13 @@ class ProxyPublisher(Publisher, Subscriber):
       super().unsubscribe(subscriber)
 
   def __call__(self, publisher:Publisher) -> 'ProxyPublisher':
-    self.assign(publisher)
-    return self
-
-  def assign(self, publisher:Publisher) -> None:
     if self._publisher is not None:
       raise ValueError('ProxyPublisher is already assigned')
     self._publisher=publisher
     for subscriber in self._subscriptions:
       self._publisher.subscribe(subscriber)
     self._subscriptions.clear()
+    return self
   
   @property
   def assigned(self):
@@ -58,8 +55,9 @@ class Hub:
   def __getitem__(self, path:str) -> ProxyPublisher:
     return self._proxies[path]
   
-  def __setitem__(self, path:str, publisher:Publisher) -> None:
-    self._proxies[path].assign(publisher)
+  def publish(self, path:str, meta:dict):
+    self[path].meta=meta
+    return self[path]
 
 class SubordinateHub:
   def __init__(self, hub, prefix):
