@@ -11,7 +11,7 @@ class Cache(Operator):
     self._cache=start_values
 
   def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
-    disposable=Operator.subscribe(self, subscriber)
+    disposable=super().subscribe(subscriber)
     subscriber.emit(*self._cache, who=self)
     return disposable
 
@@ -24,3 +24,5 @@ class Cache(Operator):
     return self._cache
 
 cache=build_operator(Cache)
+
+#TODO: make a CacheBase with .cache property
