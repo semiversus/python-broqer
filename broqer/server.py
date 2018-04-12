@@ -1,7 +1,7 @@
 import asyncio
 from broqer.op import Sink
 
-def buildBroqerProtocol(hub):
+def build_broqer_protocol(hub):
   def _():
     return BroqerProtocol(hub)
   return _
@@ -19,11 +19,11 @@ class BroqerProtocol(asyncio.Protocol):
       disposable.dispose()
     
   def data_received(self, data):
-    # available commands
-    # emit:stream:arg[:arg2:arg3]
-    # sub:stream
-    # unsub:stream
-    # lw:stream:value
+    # available commands:
+    # emit:publisher:arg[:arg2:arg3]
+    # sub:publisher
+    # unsub:publisher
+    # lw:publisher:value
     # dis
     command, *args=data.decode().strip().split(':')
 

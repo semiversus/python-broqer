@@ -47,10 +47,5 @@ class SubordinateHub:
     self._hub=hub
     self._prefix=prefix
   
-  def __setitem__(self, path:str, publisher:Publisher):
-    if self.prefix+path in self._hub._publishers:
-      raise KeyError('A publisher already assigned to %r'%path)
-    self._publishers[self._prefix+path].assign(publisher)
-  
   def __getitem__(self, path:str) -> ProxyPublisher:
     return self._publishers[self._prefix+path]
