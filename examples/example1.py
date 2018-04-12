@@ -5,19 +5,14 @@ from broqer import op, Subject
 
 hub=Hub()
 
-message=hub['a.b.message']
+hub['message']|op.sink(print, 'Sink:')
+
+print(hub['message'].assigned, hub['message'].meta)
+
 s=Subject()
+s|hub.publish('message', {'minimum':0}) # or: s|hub['message'] and then hub['message'].meta={...}
 
-message.emit('First Emit')
-message|op.sink(print, 'Sink1')
-message.emit('Second Emit')
-message|op.sink(print, 'Sink2')
-message.emit('Third Emit')
+hub['message'].emit('Test1')
+s.emit('Test2')
 
-print(message.assigned)
-s|message
-s.emit('Test')
-print(message.assigned)
-
-for p,s in hub:
-  print(p,s)
+print(message.assigned, message.meta)
