@@ -8,6 +8,7 @@ class Subject(Publisher, Subscriber):
 
 class Value(Publisher, Subscriber):
   def __init__(self, *start_values):
+    super().__init__()
     self._cache=start_values
     
   def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
