@@ -55,7 +55,7 @@ class Hub:
   def __getitem__(self, path:str) -> ProxyPublisher:
     return self._proxies[path]
   
-  def publish(self, path:str, meta:dict):
+  def publish(self, path:str, meta:dict) -> ProxyPublisher:
     self[path].meta=meta
     return self[path]
 
@@ -66,3 +66,9 @@ class SubordinateHub:
   
   def __getitem__(self, path:str) -> ProxyPublisher:
     return self._proxies[self._prefix+path]
+  
+  def publish(self, path:str, meta:dict) -> ProxyPublisher:
+    return self._hub.publish(self._prefix+path, meta)
+  
+  def resolve(self, path:str) -> str:
+    return self._prefix+path
