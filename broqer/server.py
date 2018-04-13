@@ -1,10 +1,12 @@
 import asyncio
-from broqer.op import Sink
+import json
+
 
 def build_broqer_protocol(hub):
   def _():
     return BroqerProtocol(hub)
   return _
+
 
 class BroqerProtocol(asyncio.Protocol):
   def __init__(self, hub):
@@ -20,34 +22,49 @@ class BroqerProtocol(asyncio.Protocol):
     
   def data_received(self, data):
     # available commands:
-    # emit:publisher:arg[:arg2:arg3]
-    # sub:publisher
-    # unsub:publisher
-    # lw:publisher:value
-    # dis
-    command, *args=data.decode().strip().split(':')
+    # {"cmd":"emit", "path":"...", "args":[...]}
+    # {"cmd":"subscribe", "path":"..."}
+    # {"cmd":"unsubscribe", "path":"..."}
+    # {"cmd":"last_will", "path":"...", "args":[...]}
+    # {"cmd":"disconnect"}
+    try:
+      request=data.decode()
+      request_json=json.loads(request)
+    except json.JSONDecodeError:
+      self._send_json(error='SYNTAX', request=request)
+      return
 
     try:
-      method=getattr(self, 'process_'+command)
+      method=getattr(self, 'process_'+request_json['cmd'])
     except AttributeError:
-      self._transport.write(b'# Unknown command\r\n')
+      self._send_json(error='UNKNOWN_CMD', request=request_json)
     else:
-      method(*args)
+      method(**request_json)
   
-  def process_emit(self, stream:str, *args:str):
-    self._hub[stream].emit(*args)
+  def _send_json(self, **data):
+    self._transport.write(json.dumps(data).encode())
+
+  def process_emit(self, path, args, **kwargs):
+    if args
+    try:
+      self._hub[path].emit(*args) # TODO: handle exception
+    except Exception as e:
+      self._send_json(error='EMIT_EXCEPTION', path=path, value=value, exception=str(e))
   
-  def process_sub(self, stream:str):
-    if stream in self._subscriptions:
-      self._transport.write(b'# Already subscripted\r\n')
+  def process_subscribe(self, path, **kwargs):
+    if path in self._subscriptions:
+      self._send_json(error='ALREADY_SUBSCRIPTED', path=path)
     else:
       def _emit(*args):
-        self._transport.write(b'!'+stream.encode()+b':'+b':'.join([str(arg).encode() for arg in args])+b'\r\n')
-      self._subscriptions[stream]=Sink(self._hub[stream], _emit)
+        self._send_json(cmd='emit', path=path, args=args)
+      self._subscriptions[path]=Sink(self._hub[path], _emit)
   
-  def process_unsub(self, stream:str):
-    if stream in self._subscriptions:
-      self._subscriptions[stream].dispose()
-      del self._subscriptions[stream]
+  def process_unsubscribe(self, path, **kwargs):
+    if path in self._subscriptions:
+      self._subscriptions[path].dispose()
+      del self._subscriptions[path]
     else:
-      self._transport.write(b'# Not subscripted\r\n')
+      self._send_json(error='NOT_SUBSCRIPTED', path=path)
+  
+  def process_last_will(self, path, value, **kwargs):
+    pass
