@@ -22,6 +22,7 @@ Inspired by:
 * aioreactive_: Async/Await reactive tools for Python (by Dag Brattli)
 * streamz_: build pipelines to manage continous streams of data (by Matthew Rocklin)
 * MQTT_: M2M connectivity protocol
+* Florian Feurstein: spending hours of discussion, coming up with great ideas and help me understand the concepts! 
 
 
 .. _RxPY: https://github.com/ReactiveX/RxPY
