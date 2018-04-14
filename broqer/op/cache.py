@@ -12,8 +12,12 @@ class Cache(Operator):
     self._cache=start_values
 
   def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
+    cache=self._cache # replace self._cache temporary with None
+    self._cache=None
     disposable=super().subscribe(subscriber)
-    subscriber.emit(*self._cache, who=self)
+    if self._cache is None: # if subscriber was not emitting on subscription
+      self._cache=cache # set self._cache back
+      subscriber.emit(*self._cache, who=self) # and emit actual cache
     return disposable
 
   def emit(self, *args:Any, who:Publisher) -> None:
