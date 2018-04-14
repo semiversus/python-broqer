@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any, Optional
 
-from broqer import Publisher, Subscriber, Disposable
+from broqer import Publisher, Subscriber, Disposable, SubscriptionDisposable
 
 from ._operator import Operator, build_operator
 
@@ -15,6 +15,13 @@ class Sample(Operator):
     self._interval=interval
     self._call_later_handle=None
     self._loop=asyncio.get_event_loop()
+    self._cache=None
+
+  def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
+    disposable=super().subscribe(subscriber)
+    if self._cache is not None:
+      subscriber.emit(*self._cache, who=self)
+    return disposable
 
   def _periodic_callback(self):
     """ will be started on first emit """
@@ -23,6 +30,7 @@ class Sample(Operator):
     if self._subscriptions: # if there are still subscriptions register next _periodic callback
       self._call_later_handle=self._loop.call_later(self._interval, self._periodic_callback)
     else:
+      self._cache=None
       self._call_later_handle=None
 
   def emit(self, *args:Any, who:Optional['Publisher']=None) -> None:
@@ -30,5 +38,14 @@ class Sample(Operator):
 
     if self._call_later_handle is None:
       self._periodic_callback()
+  
+  @property
+  def cache(self):
+    if self._cache is None:
+      return None
+    if len(self._cache)==1:
+      return self._cache[0]
+    else:
+      return self._cache
 
 sample=build_operator(Sample)
