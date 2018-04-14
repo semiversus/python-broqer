@@ -22,6 +22,7 @@ class SlidingWindow(Operator):
     return disposable
 
   def emit(self, *args:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     self._cache.append(*args)
     if len(self._cache)==self._cache.maxlen or self._emit_partial:
       self._emit(self._cache)

@@ -33,6 +33,8 @@ class ToFuture(Subscriber):
     return self._future.__await__()
 
   def emit(self, *args:Any, who:Publisher) -> None:
+    # handle special case: _disposable is set after publisher.subscribe(self) in __init__
+    assert not hasattr(self, '_disposable') or who==self._disposable._publisher, 'emit comming from non assigned publisher'
     if len(args)==1:
       self._future.set_result(args[0])
     else:

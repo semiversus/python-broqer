@@ -15,6 +15,7 @@ class Accumulate(Operator):
     self._state=initializer
     
   def emit(self, arg:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     self._state, result=self._acc_func(self._state, arg)
     self._emit(result)
 

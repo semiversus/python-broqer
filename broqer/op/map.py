@@ -23,6 +23,7 @@ class Map(Operator):
       self._map_func=map_func
 
   def emit(self, *args:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     result=self._map_func(*args)
     if result is None:
       result=()

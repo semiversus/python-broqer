@@ -22,6 +22,7 @@ class Distinct(Operator):
     return disposable
 
   def emit(self, *args:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     assert len(args)>=1, 'need at least one argument for distinct'
     if args!=self._cache:
       self._cache=args

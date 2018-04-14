@@ -17,6 +17,7 @@ class Debounce(Operator):
     self._call_later_handler=None
 
   def emit(self, *args:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     if self._call_later_handler:
       self._call_later_handler.cancel()
     self._call_later_handler=self._loop.call_later(self._duetime, self._emit, *args)

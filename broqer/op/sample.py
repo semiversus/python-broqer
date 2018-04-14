@@ -33,7 +33,8 @@ class Sample(Operator):
       self._cache=None
       self._call_later_handle=None
 
-  def emit(self, *args:Any, who:Optional['Publisher']=None) -> None:
+  def emit(self, *args:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     self._cache=args
 
     if self._call_later_handle is None:

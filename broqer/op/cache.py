@@ -21,6 +21,7 @@ class Cache(Operator):
     return disposable
 
   def emit(self, *args:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     self._cache=args
     self._emit(*args)
   

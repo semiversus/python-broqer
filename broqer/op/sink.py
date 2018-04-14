@@ -15,7 +15,9 @@ class Sink(Subscriber, Disposable):
 
     self._disposable=publisher.subscribe(self)
   
-  def emit(self, *args:Any, who:Optional[Publisher]=None):
+  def emit(self, *args:Any, who:Publisher):
+    # handle special case: _disposable is set after publisher.subscribe(self) in __init__
+    assert not hasattr(self, '_disposable') or who==self._disposable._publisher, 'emit comming from non assigned publisher'
     self._sink_function(*args)
   
   def dispose(self):

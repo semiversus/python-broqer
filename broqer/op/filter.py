@@ -13,6 +13,7 @@ class Filter(Operator):
     self._predicate=predicate
 
   def emit(self, *args:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     if self._predicate(*args):
       self._emit(*args)
 

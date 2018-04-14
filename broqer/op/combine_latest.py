@@ -19,6 +19,7 @@ class CombineLatest(MultiOperator):
     return disposable
 
   def emit(self, *args:Any, who:Publisher) -> None:
+    assert who in self._publishers, 'emit comming from non assigned publisher'
     if self._missing and who in self._missing:
       self._missing.remove(who)
     if len(args)==1:

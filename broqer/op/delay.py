@@ -16,6 +16,7 @@ class Delay(Operator):
     self._loop=loop or asyncio.get_event_loop()
 
   def emit(self, *args:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     self._loop.call_later(self._delay, self._emit, *args)
 
 delay=build_operator(Delay)

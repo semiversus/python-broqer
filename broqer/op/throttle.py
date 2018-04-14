@@ -18,6 +18,7 @@ class Throttle(Operator):
     self._cache=None
 
   def emit(self, *args:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     if self._call_later_handler is None:
       self._emit(*args)
       self._cache=None

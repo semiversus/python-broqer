@@ -13,6 +13,7 @@ class Reduce(Operator):
     self._reduce_func=func
 
   def emit(self, arg:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     if self._cache is not None:
       self._cache=self._reduce_func(self._cache, arg)
       self._emit(self._cache)

@@ -31,6 +31,7 @@ class MapAsync(Operator):
       self._queue=None
   
   def emit(self, *args:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     if self._mode==Mode.INTERRUPT and self._future is not None:
       self._future.cancel()
 

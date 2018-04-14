@@ -13,6 +13,7 @@ class Pluck(Operator):
     self._pick=pick
 
   def emit(self, arg:Any, who:Publisher) -> None:
+    assert who==self._publisher, 'emit comming from non assigned publisher'
     self._emit(getitem(arg, self._pick))
 
 pluck=build_operator(Pluck)
