@@ -1,6 +1,6 @@
 import pytest
 import mock
-from broqer import Disposable
+from broqer import Disposable, SubscriptionDisposable
 from broqer.op import Sink, sink, cache
 from broqer.subject import Subject
 

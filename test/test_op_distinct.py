@@ -1,5 +1,5 @@
 import pytest
-from broqer import Publisher, Subject
+from broqer import Publisher, Subject, SubscriptionDisposable
 from broqer.op import distinct, sink, cache
 import mock
 
