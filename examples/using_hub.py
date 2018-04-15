@@ -1,7 +1,7 @@
 # showing simple subscription to streams
 
 from broqer.hub import Hub
-from broqer import op, Value
+from broqer import op, Value, Subject
 
 hub=Hub()
 
