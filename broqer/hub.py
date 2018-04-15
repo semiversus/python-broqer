@@ -2,39 +2,44 @@ from collections import defaultdict
 from typing import Any, Optional
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
+from broqer.op._operator import Operator
 
 
 class ProxySubject(Publisher, Subscriber):
   def __init__(self):
-    Publisher.__init__(self)
+    super().__init__()
     self._subject=None
-
-  def emit(self, *args:Any) -> None:
-    # method will be replaced by .__call__
-    raise TypeError('No subject is assigned to this ProxySubject')
   
   def subscribe(self, subscriber:'Subscriber') -> SubscriptionDisposable:
-    if self._subject:
-      return self._subject.subscribe(subscriber)
-    else:
-      return super().subscribe(subscriber)
+    disposable=Publisher.subscribe(self, subscriber)
+    if len(self._subscriptions)==1 and self._subject is not None: # if this was the first subscription 
+      self._subject.subscribe(self)
+    return disposable
   
   def unsubscribe(self, subscriber:'Subscriber') -> None:
-    if self._subject:
-      self._subject.unsubscribe(subscriber)
-    else:
-      super().unsubscribe(subscriber)
+    Publisher.unsubscribe(self, subscriber)
+    if not self._subscriptions and self._subject is not None:
+      self._subject.unsubscribe(self)
+
+  def emit(self, *args:Any, who:Optional[Publisher]=None) -> None:
+    if self._subject is None:
+      # method will be replaced by .__call__
+      raise TypeError('No subject is assigned to this ProxySubject')
+    elif who==self._subject:
+      self._emit(*args)
+    elif who!=self._subject:
+      self._subject.emit(*args)
 
   def __call__(self, publisher:Publisher) -> 'ProxySubject':
     # used for pipeline style assignment 
     if self._subject is not None:
       raise ValueError('ProxySubject is already assigned')
-    self._subject=publisher
-    if isinstance(self._subject, Subscriber):
-      self.emit=self._subject.emit
-    for subscriber in self._subscriptions:
-      self._subject.subscribe(subscriber)
-    self._subscriptions.clear()
+    else:
+      self._subject=publisher
+    
+    if len(self._subscriptions):
+      self._subject.subscribe(self)
+
     return self
   
   @property
@@ -70,7 +75,7 @@ class SubordinateHub:
     self._prefix=prefix
   
   def __getitem__(self, path:str) -> ProxySubject:
-    return self._proxies[self._prefix+path]
+    return self._hub._proxies[self._prefix+path]
   
   def publish(self, path:str, meta:dict) -> ProxySubject:
     return self._hub.publish(self._prefix+path, meta)

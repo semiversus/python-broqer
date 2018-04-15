@@ -5,11 +5,13 @@ from broqer import op, Value
 
 hub=Hub()
 
-hub['message']|op.sink(print, 'Sink:')
-
-print(hub['message'].assigned, hub['message'].meta)
+print(hub['message'].assigned, hub['message'].meta,)
 
 s=Value('nop')
+
+s|op.sink(print, 'Sink2:')
+hub['message']|op.sink(print, 'Sink1:')
+
 s|hub.publish('message', {'minimum':0}) # or: s|hub['message'] and then hub['message'].meta={...}
 
 hub['message'].emit('Test1')
