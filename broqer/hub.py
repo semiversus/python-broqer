@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any, Optional, Callable
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 from broqer.op._operator import Operator
@@ -29,19 +29,10 @@ class ProxySubject(Publisher, Subscriber):
       self._emit(*args)
     elif who!=self._subject:
       self._subject.emit(*args)
-
-  def __call__(self, publisher:Publisher) -> 'ProxySubject':
-    # used for pipeline style assignment 
-    if self._subject is not None:
-      raise ValueError('ProxySubject is already assigned')
-    else:
-      self._subject=publisher
-    
-    if len(self._subscriptions):
-      self._subject.subscribe(self)
-
-    return self
   
+  def __call__(self, *args, **kwargs) -> None:
+    raise TypeError('ProxySubject is not callable (for use in a pipeline). Use |hub.publish(path, meta) instead.')
+
   @property
   def assigned(self):
     return self._subject is not None
@@ -64,10 +55,24 @@ class Hub:
   def __getitem__(self, path:str) -> ProxySubject:
     return self._proxies[path]
   
-  def publish(self, path:str, meta:dict) -> ProxySubject:
-    self[path].meta=meta
-    return self[path]
+  def publish(self, path:str, meta:Optional[dict]=None) -> Callable[[Publisher], Publisher]:
+    proxy=self[path]
+    if meta:
+      proxy.meta=meta
 
+    def _build(publisher):
+      # used for pipeline style assignment 
+      if proxy._subject is not None:
+        raise ValueError('ProxySubject is already assigned')
+      else:
+        proxy._subject=publisher
+      
+      if len(proxy._subscriptions):
+        proxy._subject.subscribe(proxy)
+
+      return proxy
+    return _build
+  
 
 class SubordinateHub:
   def __init__(self, hub, prefix):
