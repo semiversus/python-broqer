@@ -28,7 +28,7 @@ API
 Sources
 -------
 
-Sources are based on ``Publisher_``.
+Sources are based on Publisher_.
 
 +--------------------------+--------------------------------------------------------------+
 | Subject_ ()              | Source with ``.emit(*args)`` method to publish a new message |
@@ -68,7 +68,7 @@ Operators
 +----------------------------------+-----------------------------------------------------------------------------+
 | partition_ (size)                | Group ``size`` emits into one emit as tuple                                 |
 +----------------------------------+-----------------------------------------------------------------------------+
-| pluck_ (*picks)                  | Apply sequence of picks via ``getitem`` (``value[pick]``) to emitted values |
+| pluck_ (*picks)                  | Apply sequence of picks via ``getitem`` to emitted values                   |
 +----------------------------------+-----------------------------------------------------------------------------+
 | reduce_ (func, init)             | Apply ``func`` to the current emitted value and the last result of ``func`` |
 +----------------------------------+-----------------------------------------------------------------------------+
@@ -96,7 +96,7 @@ Using ``asyncio`` event loop:
 Sinks
 -----
 
-Sinks are based on ``Subscriber_``.
+Sinks are based on Subscriber_.
 
 +-----------------------------+--------------------------------------------------------------+
 | sink_ (func, *args, **kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
