@@ -23,7 +23,11 @@ class SlidingWindow(Operator):
 
   def emit(self, *args:Any, who:Publisher) -> None:
     assert who==self._publisher, 'emit comming from non assigned publisher'
-    self._cache.append(*args)
+    assert len(args)>=1, 'need at least one argument for sliding window'
+    if len(args)==1:
+      self._cache.append(args[0])
+    else:
+      self._cache.append(args)
     if len(self._cache)==self._cache.maxlen or self._emit_partial:
       self._emit(self._cache)
   
