@@ -28,24 +28,24 @@ API
 Sources
 -------
 
-+---------------+--------------------------------------------------------------+
-| Subject_()    | Source with ``.emit(*args)`` method to publish a new message |
-+---------------+--------------------------------------------------------------+
-| Value_(*init) | Source with a state (initialized via ``init``)               |
-+---------------+--------------------------------------------------------------+
++----------------+--------------------------------------------------------------+
+| Subject_ ()    | Source with ``.emit(*args)`` method to publish a new message |
++----------------+--------------------------------------------------------------+
+| Value_ (*init) | Source with a state (initialized via ``init``)               |
++----------------+--------------------------------------------------------------+
 
 Operators
 ---------
 
-+-------------------------------+-----------------------------------------------------------------------------+
-| accumulate_(func, init)       | Apply ``func(value, state)`` which is returning new state and value to emit |
-+-------------------------------+-----------------------------------------------------------------------------+
-| cache_(*init)                 | Caching the emitted values to access it via ``.cache`` property             |
-+-------------------------------+-----------------------------------------------------------------------------+
-| catch_exception_(*exceptions) | Catching exceptions of following operators in the pipelines                 |
-+-------------------------------+-----------------------------------------------------------------------------+
-| combine_latest_(*publishers)  | Combine the latest emit of multiple publishers and emit the combination     |
-+-------------------------------+-----------------------------------------------------------------------------+
++--------------------------------+-----------------------------------------------------------------------------+
+| accumulate_ (func, init)       | Apply ``func(value, state)`` which is returning new state and value to emit |
++--------------------------------+-----------------------------------------------------------------------------+
+| cache_ (*init)                 | Caching the emitted values to access it via ``.cache`` property             |
++--------------------------------+-----------------------------------------------------------------------------+
+| catch_exception_ (*exceptions) | Catching exceptions of following operators in the pipelines                 |
++--------------------------------+-----------------------------------------------------------------------------+
+| combine_latest_ (*publishers)  | Combine the latest emit of multiple publishers and emit the combination     |
++--------------------------------+-----------------------------------------------------------------------------+
 
 Sinks
 -----
