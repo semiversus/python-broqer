@@ -6,9 +6,9 @@ from ._operator import Operator, build_operator
 
 
 class Reduce(Operator):
-  def __init__(self, publisher:Publisher, func:Callable[[Any], Any], start_value=None):
+  def __init__(self, publisher:Publisher, func:Callable[[Any], Any], init=None):
     Operator.__init__(self, publisher)
-    self._cache=start_value
+    self._cache=init
 
     self._reduce_func=func
 
