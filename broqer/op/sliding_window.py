@@ -7,13 +7,14 @@ from ._operator import Operator, build_operator
 
 
 class SlidingWindow(Operator):
-  def __init__(self, publisher:Publisher, size, emit_partial=False):
+  def __init__(self, publisher:Publisher, size, emit_partial=False, packed=True):
     assert size>0, 'size has to be positive'
 
     Operator.__init__(self, publisher)
 
     self._cache=deque(maxlen=size)
     self._emit_partial=emit_partial
+    self._packed=packed
 
   def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
     disposable=Operator.subscribe(self, subscriber)
@@ -29,13 +30,17 @@ class SlidingWindow(Operator):
     else:
       self._cache.append(args)
     if len(self._cache)==self._cache.maxlen or self._emit_partial:
-      self._emit(self._cache)
+      if self._packed:
+        self._emit(self._cache)
+      else:
+        self._emit(*self._cache)
   
   def flush(self):
     self._cache.clear()
-    
+
   @property
   def cache(self):
     return self._cache
+
 
 sliding_window=build_operator(SlidingWindow)
