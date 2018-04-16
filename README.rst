@@ -11,12 +11,14 @@ Synopsis
 ========
 
 * Pure python implementation with no dependencies (Python 3.5+)
-* Operators known from ReactiveX (like `distinct`, `combine_latest`, ...)
+* Operators known from ReactiveX (like ``distinct``, ``combine_latest``, ...)
 * Supporting `asyncio` for time depended operations and using coroutines (e.g. `map_async`)
 * Supporting broker functionality
 * Under MIT license (2018 Günther Jena)
 
 Installing via
+
+.. code-block:: python
 
     pip install broqer
 
@@ -26,11 +28,11 @@ API
 Sources
 -------
 
-+---------------------------+------------------------------------------------------------+
-| **Subject_()**            | Source with `.emit(*args)` method to publish a new message |
-+---------------------------+------------------------------------------------------------+
-| **Value_(*start_values)** | Source with a state (initialized via `start_values`)       |
-+---------------------------+------------------------------------------------------------+
++----------------------------+--------------------------------------------------------------+
+| **Subject_ ()**            | Source with ``.emit(*args)`` method to publish a new message |
++----------------------------+--------------------------------------------------------------+
+| **Value_ (*start_values)** | Source with a state (initialized via ``start_values``)       |
++----------------------------+--------------------------------------------------------------+
 
 Operators
 ---------
