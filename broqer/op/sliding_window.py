@@ -31,6 +31,9 @@ class SlidingWindow(Operator):
     if len(self._cache)==self._cache.maxlen or self._emit_partial:
       self._emit(self._cache)
   
+  def flush(self):
+    self._cache.clear()
+    
   @property
   def cache(self):
     return self._cache
