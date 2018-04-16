@@ -7,13 +7,13 @@ from ._operator import MultiOperator, build_operator
 
 class CombineLatest(MultiOperator):
   def __init__(self, *publishers:Publisher):
-    Operator.__init__(self, *publisher)
+    MultiOperator.__init__(self, *publishers)
     self._cache=[None for _ in publishers]
     self._missing=set(publishers)
     self._index={p:i for i,p in enumerate(publishers)}
     
   def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
-    disposable=Operator.subscribe(self, subscriber)
+    disposable=MultiOperator.subscribe(self, subscriber)
     if not self._missing:
       subscriber.emit(*self._cache, who=self)
     return disposable
