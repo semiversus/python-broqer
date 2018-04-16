@@ -6,13 +6,13 @@ from ._operator import Operator, build_operator
 
 
 class Accumulate(Operator):
-  def __init__(self, publisher:Publisher, func:Callable[[Any], Any], initializer):
+  def __init__(self, publisher:Publisher, func:Callable[[Any], Any], init):
     Operator.__init__(self, publisher)
     self._acc_func=func
-    self._state=initializer
+    self._state=init
 
-  def reset(self, initializer):
-    self._state=initializer
+  def reset(self, init):
+    self._state=init
     
   def emit(self, arg:Any, who:Publisher) -> None:
     assert who==self._publisher, 'emit comming from non assigned publisher'

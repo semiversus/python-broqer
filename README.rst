@@ -28,14 +28,24 @@ API
 Sources
 -------
 
-+------------------------+--------------------------------------------------------------+
-| Subject_ ()            | Source with ``.emit(*args)`` method to publish a new message |
-+------------------------+--------------------------------------------------------------+
-| Value_ (*start_values) | Source with a state (initialized via ``start_values``)       |
-+------------------------+--------------------------------------------------------------+
++-----------------------+--------------------------------------------------------------+
+| Subject_()            | Source with ``.emit(*args)`` method to publish a new message |
++-----------------------+--------------------------------------------------------------+
+| Value_(*init) | Source with a state (initialized via ``init``)       |
++-----------------------+--------------------------------------------------------------+
 
 Operators
 ---------
+
++------------------------------+-----------------------------------------------------------------------------+
+| accumulate_(func, init)      | Apply ``func(value, state)`` which is returning new state and value to emit |
++------------------------------+-----------------------------------------------------------------------------+
+| cache_(*init)                 | Caching the emitted values to access it via ``.cache`` property             |
++------------------------------+-----------------------------------------------------------------------------+
+| catch_exception_(*exceptions) | Catching exceptions of following operators in the pipelines                 |
++------------------------------+-----------------------------------------------------------------------------+
+| combine_latest_(*publishers)  | Combine the latest emit of multiple publishers and emit the combination     |
++------------------------------+-----------------------------------------------------------------------------+
 
 Sinks
 -----
@@ -57,3 +67,7 @@ Broqer was inspired by:
 .. _MQTT: http://mqtt.org/
 .. _Subject: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Value: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
+.. _accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
+.. _cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
+.. _catch_exception: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
+.. _combine_latest: https://github.com/semiversus/python-broqer/blob/master/broqer/op/combine_latest.py

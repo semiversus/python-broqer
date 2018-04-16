@@ -5,12 +5,12 @@ from broqer import Publisher, Subscriber, SubscriptionDisposable
 from ._operator import Operator, build_operator
 
 class Distinct(Operator):
-  def __init__(self, publisher:Publisher, *start_values:Any):
+  def __init__(self, publisher:Publisher, *init:Any):
     Operator.__init__(self, publisher)
-    if not start_values:
+    if not init:
       self._cache=None
     else:
-      self._cache=start_values
+      self._cache=init
 
   def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
     cache=self._cache # replace self._cache temporary with None

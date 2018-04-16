@@ -6,10 +6,10 @@ from ._operator import Operator, build_operator
 
 
 class Cache(Operator):
-  def __init__(self, publisher:Publisher, *start_values:Any):
+  def __init__(self, publisher:Publisher, *init:Any):
     Operator.__init__(self, publisher)
-    assert len(start_values)>=1, 'need at least one argument for cache start_values'
-    self._cache=start_values
+    assert len(init)>=1, 'need at least one argument for cache init'
+    self._cache=init
 
   def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
     cache=self._cache # replace self._cache temporary with None
