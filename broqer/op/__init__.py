@@ -30,9 +30,7 @@ else:
   from .to_future import ToFuture, to_future
 
 # TODO operators
-# timeout - emit (a value) when timeout on source has passed -> this is debounce!
 # debug
 # timestamp, elapsed
 # flatten
 # zip, zip_latest
-# catch_exception

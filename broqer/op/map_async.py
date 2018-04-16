@@ -10,7 +10,7 @@ from ._operator import Operator, build_operator
 Mode=Enum('Mode', 'CONCURRENT INTERRUPT QUEUE LAST SKIP')
 
 class MapAsync(Operator):
-  def __init__(self, publisher:Publisher, map_coro, mode=Mode.CONCURRENT, error_callback=None):
+  def __init__(self, publisher:Publisher, map_coro, *args, mode=Mode.CONCURRENT, error_callback=None, **kwargs):
     """
     mode uses one of the following enumerations:
       * CONCURRENT - just run coroutines concurrent
@@ -21,6 +21,8 @@ class MapAsync(Operator):
     """
     Operator.__init__(self, publisher)
     self._map_coro=map_coro
+    self._args=args
+    self._kwargs=kwargs
     self._mode=mode
     self._error_callback=error_callback
     self._future=None
@@ -38,7 +40,7 @@ class MapAsync(Operator):
     if (self._mode in (Mode.INTERRUPT, Mode.CONCURRENT)
             or self._future is None
             or self._future.done() ):
-      self._future=asyncio.ensure_future(self._map_coro(*args))
+      self._future=asyncio.ensure_future(self._map_coro(*args, *self._args, **self._kwargs))
       self._future.add_done_callback(self._future_done)
     elif self._mode in (Mode.QUEUE, Mode.LAST):
       self._queue.append(args)
@@ -59,7 +61,7 @@ class MapAsync(Operator):
       self._emit(*result)
     
     if self._queue:
-      self._future=asyncio.ensure_future(self._map_coro(self._queue.popleft()))
+      self._future=asyncio.ensure_future(self._map_coro(*self._queue.popleft()), *self._args, **self._kwargs)
       self._future.add_done_callback(self._future_done)
 
 map_async=build_operator(MapAsync)
