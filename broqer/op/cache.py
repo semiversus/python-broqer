@@ -35,4 +35,5 @@ class Cache(Operator):
 
 cache=build_operator(Cache)
 
-#TODO: make a CacheBase with .cache property
+# TODO: make a CacheBase with .cache property
+# TODO: should operators with .cache check for len(args) on new emits?
