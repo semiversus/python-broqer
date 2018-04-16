@@ -13,4 +13,5 @@ class Merge(MultiOperator):
     assert who in self._publishers, 'emit comming from non assigned publisher'
     self._emit(self._cache)
 
+
 merge=build_operator(Merge)

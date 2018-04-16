@@ -49,4 +49,5 @@ class Sample(Operator):
     else:
       return self._cache
 
+
 sample=build_operator(Sample)

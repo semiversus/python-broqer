@@ -17,4 +17,5 @@ class Filter(Operator):
     if self._predicate(*args):
       self._emit(*args)
 
+
 filter=build_operator(Filter)

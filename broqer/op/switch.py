@@ -23,4 +23,5 @@ class Switch(Operator):
       assert who==self._mapping[self._selected_publisher], 'emit from not selected publisher'
       self._emit(*args)
 
+
 switch=build_operator(Switch)

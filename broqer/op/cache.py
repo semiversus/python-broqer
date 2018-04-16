@@ -32,6 +32,7 @@ class Cache(Operator):
     else:
       return self._cache
 
+
 cache=build_operator(Cache)
 
 #TODO: make a CacheBase with .cache property

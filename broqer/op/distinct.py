@@ -37,4 +37,5 @@ class Distinct(Operator):
     else:
       return self._cache
 
+
 distinct=build_operator(Distinct)

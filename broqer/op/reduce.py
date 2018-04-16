@@ -24,4 +24,5 @@ class Reduce(Operator):
   def cache(self):
     return self._cache
     
+
 reduce=build_operator(Reduce)

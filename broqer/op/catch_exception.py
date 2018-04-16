@@ -17,4 +17,5 @@ class CatchException(Operator):
     except self._exceptions:
       pass
 
+
 catch_exception=build_operator(CatchException)

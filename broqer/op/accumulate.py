@@ -19,4 +19,5 @@ class Accumulate(Operator):
     self._state, result=self._acc_func(self._state, arg)
     self._emit(result)
 
+
 accumulate=build_operator(Accumulate)

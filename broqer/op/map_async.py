@@ -64,4 +64,5 @@ class MapAsync(Operator):
       self._future=asyncio.ensure_future(self._map_coro(*self._queue.popleft()), *self._args, **self._kwargs)
       self._future.add_done_callback(self._future_done)
 
+
 map_async=build_operator(MapAsync)

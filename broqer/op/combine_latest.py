@@ -32,4 +32,5 @@ class CombineLatest(MultiOperator):
   def cache(self):
     return self._cache
 
+
 combine_latest=build_operator(CombineLatest)

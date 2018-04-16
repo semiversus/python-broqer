@@ -19,4 +19,5 @@ class Pluck(Operator):
       arg=getitem(arg, pick)
     self._emit(arg)
 
+
 pluck=build_operator(Pluck)

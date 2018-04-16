@@ -31,4 +31,5 @@ class Map(Operator):
       result=(result,)
     self._emit(*result)
 
+
 map=build_operator(Map)
