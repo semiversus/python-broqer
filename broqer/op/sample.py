@@ -7,14 +7,14 @@ from ._operator import Operator, build_operator
 
 
 class Sample(Operator):
-  def __init__(self, publisher:Publisher, interval:float):
+  def __init__(self, publisher:Publisher, interval:float, loop=None):
     assert interval>0, 'interval has to be positive'
 
     Operator.__init__(self, publisher)
 
     self._interval=interval
     self._call_later_handle=None
-    self._loop=asyncio.get_event_loop()
+    self._loop=loop or asyncio.get_event_loop()
     self._cache=None
 
   def subscribe(self, subscriber:Subscriber) -> SubscriptionDisposable:
