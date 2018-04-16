@@ -105,8 +105,8 @@ Sinks are based on Subscriber_.
 +-----------------------------+--------------------------------------------------------------+
 
 
-References
-==========
+Credits
+=======
 
 Broqer was inspired by:
 
