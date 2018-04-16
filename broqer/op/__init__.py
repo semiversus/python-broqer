@@ -1,15 +1,20 @@
 from .accumulate import Accumulate, accumulate
 from .cache import Cache, cache
+from .catch_exception import CatchException, catch_exception
 from .combine_latest import CombineLatest, combine_latest
 from .distinct import Distinct, distinct
 from .filter import Filter, filter
 from .from_iterable import FromIterable
 from .map import Map, map
+from .merge import Merge, merge
+from .pack import Pack, pack
+from .partition import Partition, partition
 from .pluck import Pluck, pluck
 from .reduce import Reduce, reduce
 from .sink import Sink, sink
 from .sliding_window import SlidingWindow, sliding_window
 from .switch import Switch, switch
+from .unpack import Unpack, unpack
 
 try:
   import asyncio # load following operators only on asyncio availability
@@ -28,4 +33,6 @@ else:
 # timeout - emit (a value) when timeout on source has passed -> this is debounce!
 # debug
 # timestamp, elapsed
-# merge
+# flatten
+# zip, zip_latest
+# catch_exception
