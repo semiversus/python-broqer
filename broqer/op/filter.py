@@ -1,4 +1,5 @@
 from typing import Any, Callable
+from functools import partial
 
 from broqer import Publisher
 
@@ -6,11 +7,14 @@ from ._operator import Operator, build_operator
 
 
 class Filter(Operator):
-  def __init__(self, publisher:Publisher, predicate:Callable[[Any], bool]):
+  def __init__(self, publisher:Publisher, predicate:Callable[[Any], bool], *args, **kwargs):
  
     Operator.__init__(self, publisher)
 
-    self._predicate=predicate
+    if args or kwargs:
+      self._predicate=partial(predicate, *args, **kwargs)
+    else:
+      self._predicate=predicate
 
   def emit(self, *args:Any, who:Publisher) -> None:
     assert who==self._publisher, 'emit comming from non assigned publisher'
