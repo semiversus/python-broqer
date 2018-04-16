@@ -40,9 +40,9 @@ Sources are based on ``Publisher_``.
 
 Using ``asyncio`` event loop:
 
-+-----------------------------------------------------+-------------------------------------------------------------------------------+
-| FromPolling_ (interval, poll_func, *args, **kwargs) | Call ``poll_func(*args, **kwargs)`` periodically and emit the returned values |
-+-----------------------------------------------------+-------------------------------------------------------------------------------+
++------------------------------------+--------------------------------------------------------------------------+
+| FromPolling_ (interval, func, ...) | Call ``func(*args, **kwargs)`` periodically and emit the returned values |
++------------------------------------+--------------------------------------------------------------------------+
 
 Operators
 ---------
@@ -99,9 +99,9 @@ Sinks
 Sinks are based on ``Subscriber_``.
 
 +-----------------------------+--------------------------------------------------------------+
-| sink(func, *args, **kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
+| sink_ (func, *args, **kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
 +-----------------------------+--------------------------------------------------------------+
-| to_future(timeout=None)     | Build a future able to await for                             |
+| to_future_ (timeout=None)     | Build a future able to await for                             |
 +-----------------------------+--------------------------------------------------------------+
 
 
