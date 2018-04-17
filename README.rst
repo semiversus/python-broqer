@@ -27,23 +27,34 @@ Examples
 ========
 
 In the first example ``adc_raw`` is a Publisher_ emitting values from an analog digital converter. The value will
-be converter (scaled by factor 0.3), sampled and a moving average is applied. Filtering for values greater 10 will
+be converter (scaled by factor 0.3), sampled and a moving average is applied. Filtering for values greater 1 will
 be printed (with the prefix 'Voltage too high:')
 
 .. code-block:: python
 
     from broqer.op import sample, sliding_window, map, filter, sink
     import statistics
-    
+
     ( adc_raw 
       | map(lambda v:v*0.3) # apply a function with one argument returning to value multiplied by 0.3
       | sample(0.1) # periodically emit the actual value every 0.1 seconds
       | sliding_window(4) # append the value to a buffer with 4 elements (and drop the oldest value)
       | map(statistics.mean) # use statistics.mean_ to calulate the average over the emited sequence
-      | filter(lambda v:v>10) # emit only values greater 10
+      | filter(lambda v:v>1) # emit only values greater 1
       | sink (print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
     )
 
+.. image:: docs/example1.svg
+
+.. code-block::
+
+    Voltage too high: 1.25
+    Voltage too high: 1.5
+    Voltage too high: 1.75
+    Voltage too high: 2
+    Voltage too high: 2
+    Voltage too high: 2
+    Voltage too high: 2
 
 API
 ===
@@ -126,9 +137,6 @@ Sinks are based on Subscriber_.
 +-------------------------------+--------------------------------------------------------------+
 | to_future_ (timeout=None)     | Build a future able to await for                             |
 +-------------------------------+--------------------------------------------------------------+
-
-Hub
----
 
 Credits
 =======
