@@ -13,7 +13,7 @@ Synopsis
 * Pure python implementation without dependencies (except Python 3.5+)
 * Operators known from ReactiveX and other streaming frameworks (like ``distinct``, ``combine_latest``, ...)
 * Supporting ``asyncio`` for time depended operations and using coroutines (e.g. ``map_async``, ``debounce``, ...)
-* Publishers are ``await``able (e.g. ``await ( subject|distinct() )``)
+* Publishers are *await*able (e.g. ``await ( subject|distinct() )``)
 * Supporting broker functionality
 * Under MIT license (2018 Günther Jena)
 
@@ -59,10 +59,10 @@ be printed (with the prefix 'Voltage too high:')
 API
 ===
 
-Sources
--------
+Publisher
+---------
 
-Sources are based on Publisher_.
+Publisher_ are the sources for messages.
 
 +--------------------------+--------------------------------------------------------------+
 | Subject_ ()              | Source with ``.emit(*args)`` method to publish a new message |
@@ -127,10 +127,10 @@ Using ``asyncio`` event loop:
 | throttle_ (duration)             | Rate limit emits by the given time                                      |
 +----------------------------------+-------------------------------------------------------------------------+
 
-Sinks
------
+Subscriber
+----------
 
-Sinks are based on Subscriber_.
+Subscriber_ are the sinks for messages.
 
 +-------------------------------+--------------------------------------------------------------+
 | sink_ (func, *args, **kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
