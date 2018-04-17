@@ -10,9 +10,10 @@ Carefully crafted library to operate with continuous streams of data in a reacti
 Synopsis
 ========
 
-* Pure python implementation with no dependencies (Python 3.5+)
-* Operators known from ReactiveX (like ``distinct``, ``combine_latest``, ...)
-* Supporting `asyncio` for time depended operations and using coroutines (e.g. `map_async`)
+* Pure python implementation without dependencies (except Python 3.5+)
+* Operators known from ReactiveX and other streaming frameworks (like ``distinct``, ``combine_latest``, ...)
+* Supporting ``asyncio`` for time depended operations and using coroutines (e.g. ``map_async``, ``debounce``, ...)
+* Publishers are ``await``able (e.g. ``await ( subject|distinct() )``)
 * Supporting broker functionality
 * Under MIT license (2018 Günther Jena)
 
@@ -21,6 +22,22 @@ Installing via
 .. code-block:: python
 
     pip install broqer
+
+Examples
+========
+
+.. code-block:: python
+
+    from broqer.op import sample, sliding_window, map,
+    adc_raw | map(lambda v:v*0.3) | sample(0.1) | sliding_window(4) | map(statistics.mean) | filter(lambda v:v>10) | sink (print, 'Voltage too high:')
+
+In this example ``adc_raw`` is a Publisher_ emitting values from an analog digital converter.
+* ``map(lambda v:v*0.3)`` - apply a function with one argument returning to value multiplied by 0.3 (conversion of adc digits to voltage)
+* ``sample(0.1)`` - periodically emit the actual value every 0.1 seconds
+* ``sliding_window(4)`` - append the value to a buffer with 4 elements (and drop the oldest value)
+* ``map(statistics.mean)`` - use statistics.mean_ to calulate the average over the emited sequence
+* ``filter(lambda v:v>10)`` - emit only values greater 10
+* ``sink(print, 'Voltage too high:')`` - call ``print`` with 'Voltage too high:' as first argument and the value as second argument
 
 API
 ===
@@ -58,7 +75,7 @@ Operators
 +----------------------------------+-----------------------------------------------------------------------------+
 | distinct_ (*init)                | Only emit values which changed regarding to the cached state                |
 +----------------------------------+-----------------------------------------------------------------------------+
-| filter_ (predicate)              | Filters values based on a ``predicate`` function                            |
+| filter_ (predicate, ...)         | Filters values based on a ``predicate`` function                            |
 +----------------------------------+-----------------------------------------------------------------------------+
 | map_ (map_func, *args, **kwargs) | Apply ``map_func(*args, value, **kwargs)`` to each emitted value            |
 +----------------------------------+-----------------------------------------------------------------------------+
@@ -104,6 +121,9 @@ Sinks are based on Subscriber_.
 | to_future_ (timeout=None)     | Build a future able to await for                             |
 +-------------------------------+--------------------------------------------------------------+
 
+Hub
+---
+
 Credits
 =======
 
@@ -115,6 +135,7 @@ Broqer was inspired by:
 * MQTT_: M2M connectivity protocol
 * Florian Feurstein: spending hours of discussion, coming up with great ideas and help me understand the concepts! 
 
+.. _statstics.mean: https://docs.python.org/3/library/statistics.html#statistics.mean
 .. _RxPY: https://github.com/ReactiveX/RxPY
 .. _aioreactive: https://github.com/dbrattli/aioreactive
 .. _streamz: https://github.com/mrocklin/streamz
