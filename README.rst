@@ -23,8 +23,8 @@ Installing via
 
     pip install broqer
 
-Examples
-========
+Example
+=======
 
 In the first example ``adc_raw`` is a Publisher_ emitting values from an analog digital converter. The value will
 be converter (scaled by factor 0.3), sampled and a moving average is applied. Filtering for values greater 1 will
@@ -32,16 +32,16 @@ be printed (with the prefix 'Voltage too high:')
 
 .. code-block:: python
 
-    from broqer.op import sample, sliding_window, map, filter, sink
+    from broqer import op
     import statistics
 
     ( adc_raw 
-      | map(lambda v:v*0.3) # apply a function with one argument returning to value multiplied by 0.3
-      | sample(0.1) # periodically emit the actual value every 0.1 seconds
-      | sliding_window(4) # append the value to a buffer with 4 elements (and drop the oldest value)
-      | map(statistics.mean) # use statistics.mean_ to calulate the average over the emited sequence
-      | filter(lambda v:v>1) # emit only values greater 1
-      | sink (print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
+      | op.map(lambda v:v*0.3) # apply a function with one argument returning to value multiplied by 0.3
+      | op.sample(0.1) # periodically emit the actual value every 0.1 seconds
+      | op.sliding_window(4) # append the value to a buffer with 4 elements (and drop the oldest value)
+      | op.map(statistics.mean) # use statistics.mean_ to calulate the average over the emited sequence
+      | op.filter(lambda v:v>1) # emit only values greater 1
+      | op.sink (print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
     )
 
 .. image:: docs/example1.svg
