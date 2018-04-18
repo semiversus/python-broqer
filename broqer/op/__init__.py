@@ -16,21 +16,33 @@ from .sliding_window import SlidingWindow, sliding_window
 from .switch import Switch, switch
 from .unpack import Unpack, unpack
 
-try:
-  import asyncio # load following operators only on asyncio availability
-except:
-  pass
-else:
-  from .debounce import Debounce, debounce
-  from .delay import Delay, delay
-  from .from_polling import FromPolling
-  from .sample import Sample, sample
-  from .map_async import MapAsync, map_async, Mode
-  from .throttle import Throttle, throttle
-  from .to_future import ToFuture, to_future
+# using asyncio
+from .debounce import Debounce, debounce
+from .delay import Delay, delay
+from .from_polling import FromPolling
+from .sample import Sample, sample
+from .map_async import MapAsync, map_async, Mode
+from .throttle import Throttle, throttle
+from .to_future import ToFuture, to_future
+
+__all__ = [
+    'Accumulate', 'accumulate', 'Cache', 'cache',
+    'CatchException', 'catch_exception', 'CombineLatest', 'combine_latest',
+    'Distinct', 'distinct', 'Filter', 'filter', 'FromIterable', 'Map', 'map',
+    'Merge', 'merge', 'Pack', 'pack', 'Partition', 'partition',
+    'Pluck', 'pluck', 'Reduce', 'reduce', 'Sink', 'sink',
+    'SlidingWindow', 'sliding_window', 'Switch', 'switch', 'Unpack', 'unpack',
+    'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
+    'Sample', 'sample', 'MapAsync', 'map_async', 'Mode',
+    'Throttle', 'throttle', 'ToFuture', 'to_future'
+]
 
 # TODO operators
 # debug
 # timestamp, elapsed
+# from_callback
+# from_file
 # flatten
 # zip, zip_latest
+# replace
+# Just
