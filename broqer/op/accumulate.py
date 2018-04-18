@@ -47,7 +47,7 @@ class Accumulate(Operator):
 
     def reset(self, state):
         self._state = state
-    
+
     @property
     def state(self):
         return self._state
