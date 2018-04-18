@@ -13,8 +13,8 @@ Synopsis
 * Pure python implementation without dependencies (except Python 3.5+)
 * Operators known from ReactiveX and other streaming frameworks (like ``distinct``, ``combine_latest``, ...)
 * Supporting ``asyncio`` for time depended operations and using coroutines (e.g. ``map_async``, ``debounce``, ...)
-* Publishers are *await*able (e.g. ``await ( subject|distinct() )``)
-* Supporting broker functionality
+* Publishers are *awaitable* (e.g. ``await ( adc_raw )``)
+* Supporting broker functionality (via Hub_)
 * Under MIT license (2018 Günther Jena)
 
 Installing via
@@ -39,12 +39,14 @@ be printed (with the prefix 'Voltage too high:')
       | op.map(lambda v:v*0.3) # apply a function with one argument returning to value multiplied by 0.3
       | op.sample(0.1) # periodically emit the actual value every 0.1 seconds
       | op.sliding_window(4) # append the value to a buffer with 4 elements (and drop the oldest value)
-      | op.map(statistics.mean) # use statistics.mean_ to calulate the average over the emited sequence
+      | op.map(statistics.mean) # use statistics.mean_ to calulate the average over the emitted sequence
       | op.filter(lambda v:v>1) # emit only values greater 1
       | op.sink (print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
     )
 
 .. image:: docs/example1.svg
+
+Output of ``| op.sink(print, 'Voltage too high:')``:
 
 .. code-block::
 
@@ -158,6 +160,7 @@ Broqer was inspired by:
 .. _Value: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
 .. _Subscriber: https://github.com/semiversus/python-broqer/blob/master/broqer/subscriber.py
+.. _Hub: https://github.com/semiversus/python-broqer/blob/master/broqer/hub.py
 .. _accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
 .. _cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
 .. _catch_exception: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
