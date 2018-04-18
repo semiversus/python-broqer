@@ -7,8 +7,7 @@ Usage:
 >>> s2 = Subject()
 
 >>> combination = s1 | op.combine_latest(s2)
->>> combination | op.sink(print)
-<...>
+>>> disposable = combination | op.sink(print)
 
 CombineLatest is only emitting, when all values are collected:
 >>> s1.emit(1)
@@ -18,6 +17,7 @@ CombineLatest is only emitting, when all values are collected:
 1 3
 >>> combination.cache
 (1, 3)
+>>> disposable.dispose()
 
 Subscribing to a CombineLatest with all values available is emitting the values
 immediatly on subscribtion:
@@ -25,6 +25,7 @@ immediatly on subscribtion:
 >>> combination | op.sink(print, 'Second sink:')
 Second sink: 1 3
 <...>
+
 """
 from typing import Any, Dict, MutableSequence  # noqa: F401
 
