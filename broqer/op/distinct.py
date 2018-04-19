@@ -1,5 +1,5 @@
 """
-Only emit values which changed regarding to the cached state
+Only emit values which changed regarding to the cached state.
 
 Usage:
 >>> from broqer import Subject, op
@@ -30,7 +30,7 @@ Also working with multiple arguments in emit:
 (0, 1)
 """
 
-from typing import Any
+from typing import Any, Optional
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 

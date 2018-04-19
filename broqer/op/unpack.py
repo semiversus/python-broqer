@@ -6,9 +6,11 @@ from ._operator import Operator, build_operator
 
 
 class Unpack(Operator):
-  def emit(self, arg:Any, who:Publisher) -> None:
-    assert who==self._publisher, 'emit comming from non assigned publisher'
-    self._emit(*arg)
+    def emit(self, *args: Any, who: Publisher) -> None:
+        assert len(args) == 1, \
+            'unpack is only possible for emits with single argument'
+        assert who == self._publisher, 'emit from non assigned publisher'
+        self._emit(*args[0])
 
 
-unpack=build_operator(Unpack)
+unpack = build_operator(Unpack)

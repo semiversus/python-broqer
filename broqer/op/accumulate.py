@@ -10,7 +10,7 @@ Usage:
 ...     state=state[1:]+[value]
 ...     return state, sum(state)/len(state)
 
->>> lowpass = s | op.accumulate(moving_average, init=[0, 0, 0])
+>>> lowpass = s | op.accumulate(moving_average, init=[0]*3)
 >>> lowpass | op.sink(print)
 <...>
 >>> s.emit(3)

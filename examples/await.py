@@ -2,14 +2,15 @@ from broqer.subject import Subject
 from broqer import op
 import asyncio
 
-value=Subject()
+value = Subject()
+
 
 async def main():
-  print('Value:', await (value|op.to_future()) )
-  print('Value:', await value )
-  print('Number of subscribers: %d'%len(value))
+    print('Value: ', await (value | op.to_future()))
+    print('Value: ', await value)
+    print('Number of subscribers: %d' % len(value))
 
-loop=asyncio.get_event_loop()
+loop = asyncio.get_event_loop()
 
 loop.call_later(0.2, value.emit, 1)
 loop.call_later(0.4, value.emit, 2)
