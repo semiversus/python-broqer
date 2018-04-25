@@ -30,7 +30,7 @@ Also working with multiple arguments in emit:
 (0, 1)
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
