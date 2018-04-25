@@ -54,8 +54,6 @@ class FromPolling(Publisher):
         return disposable
 
     def _poll_callback(self):
-        import sys
-        print('POLL', self._subscriptions, file=sys.stderr)
         if self._subscriptions:
             result = self._poll_func()
             if result is None:

@@ -54,8 +54,6 @@ class Sink(Subscriber, Disposable):
             self._sink_function(*args)
 
     def dispose(self):
-        import sys
-        print('SINK DISPOSE', file=sys.stderr)
         self._disposable.dispose()
 
 
