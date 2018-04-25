@@ -1,3 +1,42 @@
+"""
+Apply sequence of picks via ``getitem`` to emitted values
+
+Usage:
+>>> from broqer import Subject, op
+>>> s = Subject()
+
+Get element n in an indexable object:
+>>> _d = s | op.pluck(0) | op.sink(print, 'Plucked:')
+>>> s.emit(['a', 'b', 'c'])
+Plucked: a
+>>> s.emit([1, 2, 3])
+Plucked: 1
+>>> _d.dispose()
+
+Get key k in an mapping object:
+>>> _d = s | op.pluck('value') | op.sink(print, 'Plucked:')
+>>> s.emit({'name':'test', 'value':5})
+Plucked: 5
+>>> s.emit({'a':0, 'b':1})
+Traceback (most recent call last):
+...
+KeyError: 'value'
+>>> _d.dispose()
+
+Get a slice:
+>>> _d = s | op.pluck(slice(0, 2)) | op.sink(print, 'Plucked:')
+>>> s.emit(['a', 'b', 'c'])
+Plucked: ['a', 'b']
+>>> s.emit([1, 2, 3])
+Plucked: [1, 2]
+>>> _d.dispose()
+
+Multiple picks:
+>>> _d = s | op.pluck(1, 'value', slice(0, 2)) | op.sink(print, 'Plucked:')
+>>> s.emit([{'value':[1, 2, 3]}, {'value':['a', 'b', 'c']}])
+Plucked: ['a', 'b']
+>>> _d.dispose()
+"""
 from typing import Any
 from operator import getitem
 
