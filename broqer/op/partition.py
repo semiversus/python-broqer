@@ -1,3 +1,22 @@
+"""
+Group ``size`` emits into one emit as tuple
+
+Usage:
+>>> from broqer import Subject, op
+>>> s = Subject()
+
+>>> partitioned_publisher = s | op.partition(3)
+>>> _d = partitioned_publisher | op.sink(print, 'Partition:')
+
+>>> s.emit(1)
+>>> s.emit(2)
+>>> s.emit(3) 
+Partition: (1, 2, 3)
+>>> s.emit(4)
+>>> s.emit(5, 6)
+>>> partitioned_publisher.flush()
+Partition: (4, (5, 6))
+"""
 from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher
@@ -22,11 +41,11 @@ class Partition(Operator):
         else:
             self._queue.append(args)
         if self._size and len(self._queue) == self._size:
-            self._emit(self._queue)
+            self._emit(tuple(self._queue))
             self._queue.clear()
 
     def flush(self):
-        self._emit(self._queue)
+        self._emit(tuple(self._queue))
         self._queue.clear()
 
 
