@@ -1,3 +1,30 @@
+"""
+Call ``func(*args, **kwargs)`` periodically and emit the returned values
+
+Usage:
+>>> import asyncio
+>>> import itertools
+>>> from broqer import op
+
+>>> _d = op.FromPolling(0.015, itertools.count().__next__) | op.sink(print)
+0
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
+1
+2
+3
+>>> _d.dispose()
+
+>>> def foo(arg):
+...   print('Foo:', arg)
+
+>>> _d = op.FromPolling(0.015, foo, 5) | op.sink()
+Foo: 5
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
+Foo: 5
+Foo: 5
+Foo: 5
+>>> _d.dispose()
+"""
 import asyncio
 from functools import partial
 from typing import Any, Callable
@@ -27,14 +54,14 @@ class FromPolling(Publisher):
         return disposable
 
     def _poll_callback(self):
-        result = self._poll_func()
-        if result is None:
-            result = ()
-        elif not isinstance(result, tuple):
-            result = (result, )
-        self._emit(*result)
-
         if self._subscriptions:
+            result = self._poll_func()
+            if result is None:
+                result = ()
+            elif not isinstance(result, tuple):
+                result = (result, )
+            self._emit(*result)
+
             self._call_later_handler = asyncio.get_event_loop().call_later(
                 self._interval, self._poll_callback)
         else:
