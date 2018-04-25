@@ -8,10 +8,10 @@ Usage:
 
 >>> _d = op.FromPolling(0.015, itertools.count().__next__) | op.sink(print)
 0
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.07))
 1
 2
-3
+...
 >>> _d.dispose()
 
 >>> def foo(arg):
@@ -21,7 +21,7 @@ Usage:
 Foo: 5
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
 Foo: 5
-Foo: 5
+...
 Foo: 5
 >>> _d.dispose()
 """
@@ -54,6 +54,8 @@ class FromPolling(Publisher):
         return disposable
 
     def _poll_callback(self):
+        import sys
+        print('POLL', self._subscriptions, file=sys.stderr)
         if self._subscriptions:
             result = self._poll_func()
             if result is None:

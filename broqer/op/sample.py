@@ -13,17 +13,17 @@ True
 
 >>> s.emit(1)
 Sample: 1
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.06))
 Sample: 1
-Sample: 1
+...
 Sample: 1
 >>> sample_publisher.cache
 1
 
 >>> s.emit(2, 3)
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.06))
 Sample: 2 3
-Sample: 2 3
+...
 Sample: 2 3
 >>> sample_publisher.cache
 (2, 3)
@@ -31,10 +31,16 @@ Sample: 2 3
 >>> _d2 = sample_publisher | op.sink(print, 'Sample 2:')
 Sample 2: 2 3
 >>> _d.dispose()
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.06))
 Sample 2: 2 3
+...
 Sample 2: 2 3
+
+>>> len(s) # how many subscriber are registred
+1
 >>> _d2.dispose()
+>>> len(s)
+0
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
 """
 import asyncio

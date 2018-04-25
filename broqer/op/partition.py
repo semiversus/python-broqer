@@ -10,7 +10,7 @@ Usage:
 
 >>> s.emit(1)
 >>> s.emit(2)
->>> s.emit(3) 
+>>> s.emit(3)
 Partition: (1, 2, 3)
 >>> s.emit(4)
 >>> s.emit(5, 6)

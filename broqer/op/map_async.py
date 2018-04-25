@@ -14,7 +14,7 @@ Usage:
 ...     return result
 
 Mode: CONCURRENT (is default)
->>> _d = s | op.map_async(delay_add) | op.sink(print)
+>>> _d = s | op.map_async(delay_add) | op.sink()
 >>> s.emit(0)
 >>> s.emit(1)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
@@ -22,8 +22,6 @@ Starting with argument 0
 Starting with argument 1
 Finished with argument 0
 Finished with argument 1
-1
-2
 >>> _d.dispose()
 
 Mode: INTERRUPT

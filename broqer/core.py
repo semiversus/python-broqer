@@ -24,6 +24,8 @@ class SubscriptionDisposable(Disposable):
         self._subscriber = subscriber
 
     def dispose(self) -> None:
+        import sys
+        print('DISPOSE', self._publisher, self._subscriber, file=sys.stderr)
         self._publisher.unsubscribe(self._subscriber)
 
 
@@ -40,6 +42,8 @@ class Publisher():
 
     def unsubscribe(self, subscriber: 'Subscriber') -> None:
         try:
+            import sys
+            print('PUB UNSUB', self._subscriptions, subscriber, file=sys.stderr)
             self._subscriptions.remove(subscriber)
         except KeyError:
             raise ValueError('Subscriber is not registered (anymore)')

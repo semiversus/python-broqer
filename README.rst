@@ -71,7 +71,7 @@ Publisher_ are the sources for messages.
 +--------------------------+--------------------------------------------------------------+
 | Value_ (*init)           | Source with a state (initialized via ``init``)               |
 +--------------------------+--------------------------------------------------------------+
-| FromIterable_ (iterable) | Use a ``iterable`` and emit each value                       |
+| FromIterable_ (iterable) | Use an ``iterable`` and emit each value                      |
 +--------------------------+--------------------------------------------------------------+
 
 Using ``asyncio`` event loop:
