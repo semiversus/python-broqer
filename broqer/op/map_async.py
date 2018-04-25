@@ -1,3 +1,100 @@
+"""
+Apply ``map_coro`` to each emitted value allowing async processing
+
+Usage:
+>>> import asyncio
+>>> from broqer import Subject, op
+>>> s = Subject()
+
+>>> async def delay_add(a):
+...     print('Starting with argument', a)
+...     await asyncio.sleep(0.015)
+...     result = a + 1
+...     print('Finished with argument', a)
+...     return result
+
+Mode: CONCURRENT (is default)
+>>> _d = s | op.map_async(delay_add) | op.sink(print)
+>>> s.emit(0)
+>>> s.emit(1)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
+Starting with argument 0
+Starting with argument 1
+Finished with argument 0
+Finished with argument 1
+1
+2
+>>> _d.dispose()
+
+Mode: INTERRUPT
+>>> _d = s | op.map_async(delay_add, mode=op.Mode.INTERRUPT) | op.sink(print)
+>>> s.emit(0)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.005))
+Starting with argument 0
+>>> s.emit(1)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
+Starting with argument 1
+Finished with argument 1
+2
+>>> _d.dispose()
+
+Mode: QUEUE
+>>> _d = s | op.map_async(delay_add, mode=op.Mode.QUEUE) | op.sink(print)
+>>> s.emit(0)
+>>> s.emit(1)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.04))
+Starting with argument 0
+Finished with argument 0
+1
+Starting with argument 1
+Finished with argument 1
+2
+>>> _d.dispose()
+
+Mode: LAST
+>>> _d = s | op.map_async(delay_add, mode=op.Mode.LAST) | op.sink(print)
+>>> s.emit(0)
+>>> s.emit(1)
+>>> s.emit(2)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.04))
+Starting with argument 0
+Finished with argument 0
+1
+Starting with argument 2
+Finished with argument 2
+3
+>>> _d.dispose()
+
+Mode: SKIP
+>>> _d = s | op.map_async(delay_add, mode=op.Mode.SKIP) | op.sink(print)
+>>> s.emit(0)
+>>> s.emit(1)
+>>> s.emit(2)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.04))
+Starting with argument 0
+Finished with argument 0
+1
+>>> _d.dispose()
+
+Using error_callback:
+>>> _d = s | op.map_async(delay_add, error_callback=print) | op.sink(print)
+>>> s.emit('abc')
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
+Starting with argument abc
+Can't convert 'int' object to str implicitly
+>>> _d.dispose()
+
+Special case if map_coro returns None:
+>>> async def foo():
+...     pass
+
+>>> _d = s | op.map_async(foo) | op.sink(print, 'EMITTED')
+>>> s.emit()
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
+EMITTED
+>>> _d.dispose()
+
+"""
 import asyncio
 from typing import Any, MutableSequence  # noqa: F401
 from enum import Enum
