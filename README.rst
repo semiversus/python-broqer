@@ -15,6 +15,8 @@ Synopsis
 * Supporting ``asyncio`` for time depended operations and using coroutines (e.g. ``map_async``, ``debounce``, ...)
 * Publishers are *awaitable* (e.g. ``await ( adc_raw )``)
 * Supporting broker functionality (via Hub_)
+* Compact library (<1000 lines of code), but well documented (>1000 lines of comments)
+* Fully unit tested (coverage towards 100%)
 * Under MIT license (2018 Günther Jena)
 
 Installing via
