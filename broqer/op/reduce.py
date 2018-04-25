@@ -1,3 +1,31 @@
+"""
+Apply ``func`` to the current emitted value and the last result of ``func``
+
+Usage:
+>>> from broqer import Subject, op
+>>> s = Subject()
+
+>>> def build_number(last_result, value):
+...     return last_result*10+value
+
+>>> reduce_publisher = s | op.reduce(build_number)
+>>> _d = reduce_publisher | op.sink(print, 'Reduce:')
+>>> s.emit(4) # without initialisation the first emit is used for this
+>>> s.emit(7)
+Reduce: 47
+>>> s.emit(8)
+Reduce: 478
+>>> s.emit(1)
+Reduce: 4781
+
+Reseting (or just setting) the state is also possible:
+
+>>> reduce_publisher.reset(123)
+>>> s.emit(4)
+Reduce: 1234
+>>> reduce_publisher.state
+1234
+"""
 from typing import Any, Callable
 
 from broqer import Publisher
@@ -13,6 +41,13 @@ class Reduce(Operator):
 
         self._reduce_func = func
 
+    def reset(self, init):
+        self._cache = init
+
+    @property
+    def state(self):
+        return self._cache
+
     def emit(self, *args: Any, who: Publisher) -> None:
         assert len(args) == 1, \
             'reduce is only possible for emits with single argument'
@@ -22,10 +57,6 @@ class Reduce(Operator):
             self._emit(self._cache)
         else:
             self._cache = args[0]
-
-    @property
-    def cache(self):
-        return self._cache
 
 
 reduce = build_operator(Reduce)
