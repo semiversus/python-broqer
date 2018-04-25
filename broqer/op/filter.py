@@ -39,7 +39,7 @@ class Filter(Operator):
 
         if args or kwargs:
             self._predicate = \
-                partial(predicate, *args, **kwargs) # type: Callable
+                partial(predicate, *args, **kwargs)  # type: Callable
         else:
             self._predicate = predicate  # type: Callable
 
