@@ -16,7 +16,7 @@ Synopsis
 * Publishers are *awaitable* (e.g. ``await ( adc_raw )``)
 * Supporting broker functionality (via Hub_)
 * Compact library (<1000 lines of code), but well documented (>1000 lines of comments)
-* Fully unit tested (coverage towards 100%)
+* Fully unit tested (coverage towards 100%), coding style checked with flake8_, static typing checked with mypy_
 * Under MIT license (2018 Günther Jena)
 
 Installing via
@@ -153,6 +153,8 @@ Broqer was inspired by:
 * MQTT_: M2M connectivity protocol
 * Florian Feurstein: spending hours of discussion, coming up with great ideas and help me understand the concepts! 
 
+.. _flake8: http://flake8.pycqa.org/en/latest/
+.. _mypy: http://mypy-lang.org/
 .. _statstics.mean: https://docs.python.org/3/library/statistics.html#statistics.mean
 .. _RxPY: https://github.com/ReactiveX/RxPY
 .. _aioreactive: https://github.com/dbrattli/aioreactive
