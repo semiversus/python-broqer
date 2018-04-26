@@ -1,6 +1,15 @@
 ===================
 Python Broqer
 ===================
+
+.. image:: https://img.shields.io/pypi/v/broqer.svg
+        :target: https://pypi.python.org/pypi/broqer
+
+.. image:: https://img.shields.io/travis/semiversus/python-broqer.svg
+        :target: https://travis-ci.org/semiversus/python-broqer
+
+.. image:: https://codecov.io/gh/semiversus/python-broqer/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/semiversus/python-broqer
         
 .. image:: https://img.shields.io/github/license/semiversus/python-broqer.svg
         :target: https://en.wikipedia.org/wiki/MIT_License
@@ -19,7 +28,8 @@ Synopsis
 * Fully unit tested (coverage towards 100%), coding style checked with flake8_, static typing checked with mypy_
 * Under MIT license (2018 Günther Jena)
 
-Installing via
+Install
+=======
 
 .. code-block:: python
 
