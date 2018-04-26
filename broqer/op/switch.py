@@ -44,11 +44,11 @@ from ._operator import Operator, build_operator
 
 
 class Switch(Operator):
-    def __init__(self, selection_publisher,
+    def __init__(self, selection_publisher: Publisher,
                  publisher_mapping: List[Publisher]) -> None:
         Operator.__init__(self, selection_publisher)
         self._selection_publisher = selection_publisher
-        self._selected_publisher = None
+        self._selected_publisher = None  # type: Publisher
         self._mapping = publisher_mapping
 
     def emit(self, *args: Any, who: Publisher) -> None:
