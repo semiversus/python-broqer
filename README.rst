@@ -81,7 +81,7 @@ Publisher_ are the sources for messages.
 +--------------------------+--------------------------------------------------------------+
 | Subject_ ()              | Source with ``.emit(*args)`` method to publish a new message |
 +--------------------------+--------------------------------------------------------------+
-| Value_ (*init)           | Source with a state (initialized via ``init``)               |
+| Value_ (\*init)          | Source with a state (initialized via ``init``)               |
 +--------------------------+--------------------------------------------------------------+
 | FromIterable_ (iterable) | Use an ``iterable`` and emit each value                      |
 +--------------------------+--------------------------------------------------------------+
@@ -95,37 +95,37 @@ Using ``asyncio`` event loop:
 Operators
 ---------
 
-+----------------------------------+-----------------------------------------------------------------------------+
-| accumulate_ (func, init)         | Apply ``func(value, state)`` which is returning new state and value to emit |
-+----------------------------------+-----------------------------------------------------------------------------+
-| cache_ (*init)                   | Caching the emitted values to access it via ``.cache`` property             |
-+----------------------------------+-----------------------------------------------------------------------------+
-| catch_exception_ (*exceptions)   | Catching exceptions of following operators in the pipelines                 |
-+----------------------------------+-----------------------------------------------------------------------------+
-| combine_latest_ (*publishers)    | Combine the latest emit of multiple publishers and emit the combination     |
-+----------------------------------+-----------------------------------------------------------------------------+
-| distinct_ (*init)                | Only emit values which changed regarding to the cached state                |
-+----------------------------------+-----------------------------------------------------------------------------+
-| filter_ (predicate, ...)         | Filters values based on a ``predicate`` function                            |
-+----------------------------------+-----------------------------------------------------------------------------+
-| map_ (map_func, *args, **kwargs) | Apply ``map_func(*args, value, **kwargs)`` to each emitted value            |
-+----------------------------------+-----------------------------------------------------------------------------+
-| merge_ (*publishers)             | Merge emits of multiple publishers into one stream                          |
-+----------------------------------+-----------------------------------------------------------------------------+
-| pack_ (*args)                    | Emit a multi-argument emit as tuple of arguments                            |
-+----------------------------------+-----------------------------------------------------------------------------+
-| partition_ (size)                | Group ``size`` emits into one emit as tuple                                 |
-+----------------------------------+-----------------------------------------------------------------------------+
-| pluck_ (*picks)                  | Apply sequence of picks via ``getitem`` to emitted values                   |
-+----------------------------------+-----------------------------------------------------------------------------+
-| reduce_ (func, init)             | Apply ``func`` to the current emitted value and the last result of ``func`` |
-+----------------------------------+-----------------------------------------------------------------------------+
-| sliding_window_ (size, ...)      | Group ``size`` emitted values overlapping                                   |
-+----------------------------------+-----------------------------------------------------------------------------+
-| switch_ (mapping)                | Emit a publisher mapped by ``mapping``                                      |
-+----------------------------------+-----------------------------------------------------------------------------+
-| unpack_ (args)                   | Unpacking a sequence of values and use it to emit as arguments              |
-+----------------------------------+-----------------------------------------------------------------------------+
++-------------------------------------+-----------------------------------------------------------------------------+
+| accumulate_ (func, init)            | Apply ``func(value, state)`` which is returning new state and value to emit |
++-------------------------------------+-----------------------------------------------------------------------------+
+| cache_ (\*init)                     | Caching the emitted values to access it via ``.cache`` property             |
++-------------------------------------+-----------------------------------------------------------------------------+
+| catch_exception_ (\*exceptions)     | Catching exceptions of following operators in the pipelines                 |
++-------------------------------------+-----------------------------------------------------------------------------+
+| combine_latest_ (\*publishers)      | Combine the latest emit of multiple publishers and emit the combination     |
++-------------------------------------+-----------------------------------------------------------------------------+
+| distinct_ (\*init)                  | Only emit values which changed regarding to the cached state                |
++-------------------------------------+-----------------------------------------------------------------------------+
+| filter_ (predicate, ...)            | Filters values based on a ``predicate`` function                            |
++-------------------------------------+-----------------------------------------------------------------------------+
+| map_ (map_func, \*args, \*\*kwargs) | Apply ``map_func(*args, value, **kwargs)`` to each emitted value            |
++-------------------------------------+-----------------------------------------------------------------------------+
+| merge_ (\*publishers)               | Merge emits of multiple publishers into one stream                          |
++-------------------------------------+-----------------------------------------------------------------------------+
+| pack_ (\*args)                      | Emit a multi-argument emit as tuple of arguments                            |
++-------------------------------------+-----------------------------------------------------------------------------+
+| partition_ (size)                   | Group ``size`` emits into one emit as tuple                                 |
++-------------------------------------+-----------------------------------------------------------------------------+
+| pluck_ (\*picks)                    | Apply sequence of picks via ``getitem`` to emitted values                   |
++-------------------------------------+-----------------------------------------------------------------------------+
+| reduce_ (func, init)                | Apply ``func`` to the current emitted value and the last result of ``func`` |
++-------------------------------------+-----------------------------------------------------------------------------+
+| sliding_window_ (size, ...)         | Group ``size`` emitted values overlapping                                   |
++-------------------------------------+-----------------------------------------------------------------------------+
+| switch_ (mapping)                   | Emit a publisher mapped by ``mapping``                                      |
++-------------------------------------+-----------------------------------------------------------------------------+
+| unpack_ (args)                      | Unpacking a sequence of values and use it to emit as arguments              |
++-------------------------------------+-----------------------------------------------------------------------------+
 
 Using ``asyncio`` event loop:
 
@@ -146,11 +146,11 @@ Subscriber
 
 Subscriber_ are the sinks for messages.
 
-+-------------------------------+--------------------------------------------------------------+
-| sink_ (func, *args, **kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
-+-------------------------------+--------------------------------------------------------------+
-| to_future_ (timeout=None)     | Build a future able to await for                             |
-+-------------------------------+--------------------------------------------------------------+
++----------------------------------+--------------------------------------------------------------+
+| sink_ (func, \*args, \*\*kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
++----------------------------------+--------------------------------------------------------------+
+| to_future_ (timeout=None)        | Build a future able to await for                             |
++----------------------------------+--------------------------------------------------------------+
  
 Credits
 =======
