@@ -75,11 +75,14 @@ Finished with argument 0
 >>> _d.dispose()
 
 Using error_callback:
->>> _d = s | op.map_async(delay_add, error_callback=print) | op.sink(print)
+>>> def cb(e):
+...     print('Got error')
+
+>>> _d = s | op.map_async(delay_add, error_callback=cb) | op.sink(print)
 >>> s.emit('abc')
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
 Starting with argument abc
-Can't convert 'int' object to str implicitly
+Got error
 >>> _d.dispose()
 
 Special case if map_coro returns None:
