@@ -13,7 +13,7 @@ Synopsis
 * Pure python implementation without dependencies (except Python 3.5+)
 * Operators known from ReactiveX and other streaming frameworks (like distinct_, combine_latest_, ...)
 * Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
-* Publishers are *awaitable* (e.g. ``await ( adc_raw )``)
+* Publishers are *awaitable* (e.g. ``await adc_raw``)
 * Supporting broker functionality (via Hub_)
 * Compact library (<1000 lines of code), but well documented (>1000 lines of comments)
 * Fully unit tested (coverage towards 100%), coding style checked with flake8_, static typing checked with mypy_
@@ -112,7 +112,7 @@ Operators
 +----------------------------------+-----------------------------------------------------------------------------+
 | sliding_window_ (size, ...)      | Group ``size`` emitted values overlapping                                   |
 +----------------------------------+-----------------------------------------------------------------------------+
-| switch_ (mapping)                | emit a publisher mapped by ``mapping``                                      |
+| switch_ (mapping)                | Emit a publisher mapped by ``mapping``                                      |
 +----------------------------------+-----------------------------------------------------------------------------+
 | unpack_ (args)                   | Unpacking a sequence of values and use it to emit as arguments              |
 +----------------------------------+-----------------------------------------------------------------------------+
@@ -120,9 +120,9 @@ Operators
 Using ``asyncio`` event loop:
 
 +----------------------------------+-------------------------------------------------------------------------+
-| debounce_ (duetime)              | emit a value only after a given idle time (emits meanwhile are skipped) |
+| debounce_ (duetime)              | Emit a value only after a given idle time (emits meanwhile are skipped) |
 +----------------------------------+-------------------------------------------------------------------------+
-| delay_ (delay)                   | emit every value delayed by the given time                              |
+| delay_ (delay)                   | Emit every value delayed by the given time                              |
 +----------------------------------+-------------------------------------------------------------------------+
 | map_async_ (map_coro, mode, ...) | Apply ``map_coro`` to each emitted value allowing async processing      |
 +----------------------------------+-------------------------------------------------------------------------+
@@ -141,7 +141,7 @@ Subscriber_ are the sinks for messages.
 +-------------------------------+--------------------------------------------------------------+
 | to_future_ (timeout=None)     | Build a future able to await for                             |
 +-------------------------------+--------------------------------------------------------------+
-
+ 
 Credits
 =======
 

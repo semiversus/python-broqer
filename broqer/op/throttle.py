@@ -1,3 +1,19 @@
+"""
+Rate limit emits by the given time.
+
+Usage:
+>>> import asyncio
+>>> from broqer import Subject, op
+>>> s = Subject()
+>>> _d = s | op.throttle(0.1) | op.sink(print)
+>>> s.emit(1)
+1
+>>> s.emit(2)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
+>>> s.emit(3)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.2))
+3
+"""
 import asyncio
 from typing import Any, Tuple  # noqa: F401
 

@@ -14,7 +14,6 @@ Usage:
 >>> s.emit(3)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.15))
 3
-
 """
 import asyncio
 from typing import Any

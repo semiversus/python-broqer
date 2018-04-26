@@ -1,3 +1,14 @@
+"""
+Unpacking a sequence of values and use it to emit as arguments
+
+Usage:
+>>> from broqer import Subject, op
+>>> s = Subject()
+
+>>> _d = s | op.unpack() | op.sink(print, 'Unpacked', sep=':')
+>>> s.emit( (1, 2, 3) )
+Unpacked:1:2:3
+"""
 from typing import Any
 
 from broqer import Publisher
