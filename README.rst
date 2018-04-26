@@ -12,7 +12,7 @@ Synopsis
 
 * Pure python implementation without dependencies (except Python 3.5+)
 * Operators known from ReactiveX and other streaming frameworks (like distinct_, combine_latest_, ...)
-* Supporting ``asyncio`` for time depended operations and using coroutines (e.g. ``map_async``, ``debounce``, ...)
+* Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
 * Publishers are *awaitable* (e.g. ``await ( adc_raw )``)
 * Supporting broker functionality (via Hub_)
 * Compact library (<1000 lines of code), but well documented (>1000 lines of comments)
