@@ -31,7 +31,7 @@ Synopsis
 Install
 =======
 
-.. code-block:: python
+.. code-block:: bash
 
     pip install broqer
 
@@ -51,7 +51,7 @@ be printed (with the prefix 'Voltage too high:')
       | op.map(lambda v:v*0.3) # apply a function with one argument returning to value multiplied by 0.3
       | op.sample(0.1) # periodically emit the actual value every 0.1 seconds
       | op.sliding_window(4) # append the value to a buffer with 4 elements (and drop the oldest value)
-      | op.map(statistics.mean) # use statistics.mean_ to calulate the average over the emitted sequence
+      | op.map(statistics.mean) # use ``statistics.mean`` to calulate the average over the emitted sequence
       | op.filter(lambda v:v>1) # emit only values greater 1
       | op.sink (print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
     )
@@ -60,7 +60,7 @@ be printed (with the prefix 'Voltage too high:')
 
 Output of ``| op.sink(print, 'Voltage too high:')``:
 
-.. code-block::
+.. code-block:: bash
 
     Voltage too high: 1.25
     Voltage too high: 1.5
@@ -73,8 +73,8 @@ Output of ``| op.sink(print, 'Voltage too high:')``:
 API
 ===
 
-Publisher
----------
+Publishers
+----------
 
 Publisher_ are the sources for messages.
 
@@ -122,7 +122,7 @@ Operators
 +-------------------------------------+-----------------------------------------------------------------------------+
 | sliding_window_ (size, ...)         | Group ``size`` emitted values overlapping                                   |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| switch_ (mapping)                   | Emit a publisher mapped by ``mapping``                                      |
+| switch_ (mapping)                   | Emit selected source mapped by ``mapping``                                  |
 +-------------------------------------+-----------------------------------------------------------------------------+
 | unpack_ (args)                      | Unpacking a sequence of values and use it to emit as arguments              |
 +-------------------------------------+-----------------------------------------------------------------------------+
@@ -141,8 +141,8 @@ Using ``asyncio`` event loop:
 | throttle_ (duration)             | Rate limit emits by the given time                                      |
 +----------------------------------+-------------------------------------------------------------------------+
 
-Subscriber
-----------
+Subscribers
+-----------
 
 Subscriber_ are the sinks for messages.
 
@@ -165,7 +165,6 @@ Broqer was inspired by:
 
 .. _flake8: http://flake8.pycqa.org/en/latest/
 .. _mypy: http://mypy-lang.org/
-.. _statstics.mean: https://docs.python.org/3/library/statistics.html#statistics.mean
 .. _RxPY: https://github.com/ReactiveX/RxPY
 .. _aioreactive: https://github.com/dbrattli/aioreactive
 .. _streamz: https://github.com/mrocklin/streamz
