@@ -2,7 +2,7 @@
 
 __author__ = 'Günther Jena'
 __email__ = 'guenther@jena.at'
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 from .core import Disposable, SubscriptionDisposable, Subscriber, Publisher
 from .subject import Subject, Value
