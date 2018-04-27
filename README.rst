@@ -75,7 +75,7 @@ API
 Publishers
 ----------
 
-Publisher_ are the sources for messages.
+A Publisher_ is the source for messages.
 
 +--------------------------+--------------------------------------------------------------+
 | Subject_ ()              | Source with ``.emit(*args)`` method to publish a new message |
@@ -143,7 +143,7 @@ Using ``asyncio`` event loop:
 Subscribers
 -----------
 
-Subscriber_ are the sinks for messages.
+A Subscriber_ is the sink for messages.
 
 +----------------------------------+--------------------------------------------------------------+
 | sink_ (func, \*args, \*\*kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
@@ -170,8 +170,8 @@ g
 .. _MQTT: http://mqtt.org/
 .. _Subject: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Value: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
-.. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
-.. _Subscriber: https://github.com/semiversus/python-broqer/blob/master/broqer/subscriber.py
+.. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/core.py
+.. _Subscriber: https://github.com/semiversus/python-broqer/blob/master/broqer/core.py
 .. _accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
 .. _cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
 .. _catch_exception: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
