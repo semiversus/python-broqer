@@ -23,7 +23,6 @@ Synopsis
 * Operators known from ReactiveX and other streaming frameworks (like distinct_, combine_latest_, ...)
 * Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
 * Publishers are *awaitable* (e.g. ``await adc_raw``)
-* Supporting broker functionality (via Hub_)
 * Compact library (<1000 lines of code), but well documented (>1000 lines of comments)
 * Fully unit tested (coverage towards 100%), coding style checked with flake8_, static typing checked with mypy_
 * Under MIT license (2018 Günther Jena)
@@ -162,7 +161,7 @@ Broqer was inspired by:
 * streamz_: build pipelines to manage continous streams of data (by Matthew Rocklin)
 * MQTT_: M2M connectivity protocol
 * Florian Feurstein: spending hours of discussion, coming up with great ideas and help me understand the concepts! 
-
+g
 .. _flake8: http://flake8.pycqa.org/en/latest/
 .. _mypy: http://mypy-lang.org/
 .. _RxPY: https://github.com/ReactiveX/RxPY
@@ -173,7 +172,6 @@ Broqer was inspired by:
 .. _Value: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
 .. _Subscriber: https://github.com/semiversus/python-broqer/blob/master/broqer/subscriber.py
-.. _Hub: https://github.com/semiversus/python-broqer/blob/master/broqer/hub.py
 .. _accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
 .. _cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
 .. _catch_exception: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
