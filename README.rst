@@ -56,11 +56,11 @@ be printed (with the prefix 'Voltage too high:')
       | op.sink (print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
     )
 
-.. image:: docs/example1.svg
+.. image:: https://github.com/semiversus/python-broqer/blob/master/docs/example1.svg
 
-Output of ``| op.sink(print, 'Voltage too high:')``:
+Output to ``stdout``:
 
-.. code-block:: bash
+.. code::
 
     Voltage too high: 1.25
     Voltage too high: 1.5

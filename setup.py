@@ -27,8 +27,8 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     description="Carefully crafted library to operate with continuous " +
-        "streams of data in a reactive style with publish/subscribe and " +
-        "broker functionality.",
+                "streams of data in a reactive style with publish/subscribe " +
+                "and broker functionality.",
     install_requires=requirements,
     license="MIT license",
     long_description=readme,
