@@ -161,7 +161,7 @@ Broqer was inspired by:
 * streamz_: build pipelines to manage continous streams of data (by Matthew Rocklin)
 * MQTT_: M2M connectivity protocol
 * Florian Feurstein: spending hours of discussion, coming up with great ideas and help me understand the concepts! 
-g
+
 .. _flake8: http://flake8.pycqa.org/en/latest/
 .. _mypy: http://mypy-lang.org/
 .. _RxPY: https://github.com/ReactiveX/RxPY
