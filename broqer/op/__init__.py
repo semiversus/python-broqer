@@ -22,6 +22,7 @@ from .delay import Delay, delay
 from .from_polling import FromPolling
 from .sample import Sample, sample
 from .map_async import MapAsync, map_async, Mode
+from .map_threaded import MapThreaded, map_threaded
 from .throttle import Throttle, throttle
 from .to_future import ToFuture, to_future
 
@@ -33,8 +34,8 @@ __all__ = [
     'Pluck', 'pluck', 'Reduce', 'reduce', 'Sink', 'sink',
     'SlidingWindow', 'sliding_window', 'Switch', 'switch', 'Unpack', 'unpack',
     'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
-    'Sample', 'sample', 'MapAsync', 'map_async', 'Mode',
-    'Throttle', 'throttle', 'ToFuture', 'to_future'
+    'Sample', 'sample', 'MapAsync', 'map_async', 'Mode', 'MapThreaded',
+    'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future'
 ]
 
 # TODO operators

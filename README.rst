@@ -128,17 +128,19 @@ Operators
 
 Using ``asyncio`` event loop:
 
-+----------------------------------+-------------------------------------------------------------------------+
-| debounce_ (duetime)              | Emit a value only after a given idle time (emits meanwhile are skipped) |
-+----------------------------------+-------------------------------------------------------------------------+
-| delay_ (delay)                   | Emit every value delayed by the given time                              |
-+----------------------------------+-------------------------------------------------------------------------+
-| map_async_ (map_coro, mode, ...) | Apply ``map_coro`` to each emitted value allowing async processing      |
-+----------------------------------+-------------------------------------------------------------------------+
-| sample_ (interval)               | Emit the last received value periodically                               |
-+----------------------------------+-------------------------------------------------------------------------+
-| throttle_ (duration)             | Rate limit emits by the given time                                      |
-+----------------------------------+-------------------------------------------------------------------------+
++-------------------------------------+-------------------------------------------------------------------------+
+| debounce_ (duetime)                 | Emit a value only after a given idle time (emits meanwhile are skipped) |
++-------------------------------------+-------------------------------------------------------------------------+
+| delay_ (delay)                      | Emit every value delayed by the given time                              |
++-------------------------------------+-------------------------------------------------------------------------+
+| map_async_ (map_coro, mode, ...)    | Apply ``map_coro`` to each emitted value allowing async processing      |
++-------------------------------------+-------------------------------------------------------------------------+
+| map_threaded_ (map_func, mode, ...) | Apply ``map_func`` to each emitted value allowing threaded processing   |
++-------------------------------------+-------------------------------------------------------------------------+
+| sample_ (interval)                  | Emit the last received value periodically                               |
++-------------------------------------+-------------------------------------------------------------------------+
+| throttle_ (duration)                | Rate limit emits by the given time                                      |
++-------------------------------------+-------------------------------------------------------------------------+
 
 Subscribers
 -----------
@@ -183,6 +185,7 @@ Broqer was inspired by:
 .. _FromIterable: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_iterable.py
 .. _FromPolling: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_polling.py
 .. _map_async: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_async.py
+.. _map_threaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
 .. _map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map.py
 .. _merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py
 .. _pack: https://github.com/semiversus/python-broqer/blob/master/broqer/op/pack.py
