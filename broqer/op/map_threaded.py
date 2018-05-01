@@ -105,8 +105,10 @@ class MapThreaded(Operator):
             * QUEUE - queue the value(s) and call after coroutine is finished
             * LAST - use last emitted value after coroutine is finished
             * SKIP - skip values emitted during coroutine is running
+            ( INTERRUPT like MapAsync is not possible with MapThreaded )
         """
         Operator.__init__(self, publisher)
+        assert mode != Mode.INTERRUPT, 'mode INTERRUPT is not supported'
         self._mode = mode
         self._error_callback = error_callback
         self._future = None  # type: asyncio.Future
