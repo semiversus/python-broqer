@@ -84,6 +84,8 @@ A Publisher_ is the source for messages.
 +--------------------------+--------------------------------------------------------------+
 | FromIterable_ (iterable) | Use an ``iterable`` and emit each value                      |
 +--------------------------+--------------------------------------------------------------+
+| Just_ (\*value)          | Emit \*value on each subscribtion                            |
++--------------------------+--------------------------------------------------------------+
 
 Using ``asyncio`` event loop:
 
@@ -184,6 +186,7 @@ Broqer was inspired by:
 .. _filter: https://github.com/semiversus/python-broqer/blob/master/broqer/op/filter.py
 .. _FromIterable: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_iterable.py
 .. _FromPolling: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_polling.py
+.. _Just: https://github.com/semiversus/python-broqer/blob/master/broqer/op/just.py
 .. _map_async: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_async.py
 .. _map_threaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
 .. _map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map.py
