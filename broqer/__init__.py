@@ -6,8 +6,9 @@ __version__ = '0.1.5'
 
 from .core import Disposable, SubscriptionDisposable, Subscriber, Publisher
 from .subject import Subject, Value
+from .hub import Hub
 
 __all__ = [
     'Disposable', 'SubscriptionDisposable', 'Subscriber', 'Publisher',
-    'Subject', 'Value'
+    'Subject', 'Value', 'Hub'
 ]
