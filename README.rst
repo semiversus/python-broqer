@@ -20,12 +20,12 @@ Synopsis
 ========
 
 * Pure python implementation without dependencies (except Python 3.5+)
+* Under MIT license (2018 Günther Jena)
+* Compact library (<1000 lines of code), but well documented (>1000 lines of comments)
+* Fully unit tested (coverage towards 100%), coding style checked with flake8_, static typing checked with mypy_
 * Operators known from ReactiveX and other streaming frameworks (like distinct_, combine_latest_, ...)
 * Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
 * Publishers are *awaitable* (e.g. ``await adc_raw``)
-* Compact library (<1000 lines of code), but well documented (>1000 lines of comments)
-* Fully unit tested (coverage towards 100%), coding style checked with flake8_, static typing checked with mypy_
-* Under MIT license (2018 Günther Jena)
 
 Install
 =======

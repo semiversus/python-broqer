@@ -5,10 +5,26 @@ from typing import Any, Callable
 class Disposable(metaclass=ABCMeta):
     """ Implementation of the disposable pattern. Call .dispose() to free
             resource.
+
+        >>> d = Disposable()
+        Traceback (most recent call last):
+        ...
+        TypeError: Can't instantiate abstract class Disposable ...
+
+        >>> class MyDisposable(Disposable):
+        ...     def dispose(self):
+        ...         print('DISPOSED')
+
+        >>> d = MyDisposable()
+        >>> d.dispose()
+        DISPOSED
+        >>> with MyDisposable():
+        ...     pass
+        DISPOSED
     """
     @abstractmethod
     def dispose(self):
-        raise NotImplementedError
+        """ .dispose() method has to be overwritten"""
 
     def __enter__(self):
         pass
@@ -66,4 +82,4 @@ class Publisher():
 class Subscriber(metaclass=ABCMeta):
     @abstractmethod
     def emit(self, *args: Any, who: Publisher) -> None:
-        raise NotImplementedError
+        """ .emit(...) method has to be overwritten """
