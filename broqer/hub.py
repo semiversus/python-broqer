@@ -32,7 +32,7 @@ Assigning to a hub object without .publish will fail:
 >>> _ = op.Just(1) | hub['value2']
 Traceback (most recent call last):
 ...
-TypeError: ProxySubject is not callable (for use as operator).Use "| hub.publish(path, meta)" instead.
+TypeError: ProxySubject is not callable (for use as operator). ...
 
 >>> _d1.dispose()
 
@@ -92,7 +92,7 @@ class ProxySubject(Publisher, Subscriber):
 
     def __call__(self, *args, **kwargs) -> None:
         raise TypeError('ProxySubject is not callable (for use as operator).' +
-                        'Use "| hub.publish(path, meta)" instead.')
+                        ' Use "| hub.publish(path, meta)" instead.')
 
     @property
     def assigned(self):
@@ -113,7 +113,7 @@ class Hub:
     def publish(self, path: str, meta: Optional[dict]=None) \
             -> Callable[[Publisher], Publisher]:
         proxy = self[path]
-        
+
         def _build(publisher):
             # used for pipeline style assignment
             if proxy._subject is not None:
