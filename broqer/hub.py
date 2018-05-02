@@ -1,5 +1,5 @@
 """
->>> from broqer import Hub, Subject, op
+>>> from broqer import Hub, Value, op
 >>> hub = Hub()
 
 Accessing an object via Hub will create and return a proxy
@@ -10,17 +10,53 @@ Each following access will return the same proxy object
 True
 
 It's possible to subscribe to a proxy
->>> _d = hub['value1'] | op.sink(print, 'Output:')
+>>> _d1 = hub['value1'] | op.sink(print, 'Output:')
 
 At the moment this hub object is not assigned to a publisher
 >>> hub['value1'].assigned
 False
+
+It will raise an exception if .emit is used on this object:
+>>> hub['value1'].emit(1)
+Traceback (most recent call last):
+...
+TypeError: No subject is assigned to this ProxySubject
 
 Assign a publisher to a hub object:
 >>> _ = op.Just(1) | hub.publish('value1')
 Output: 1
 >>> hub['value1'].assigned
 True
+
+Assigning to a hub object without .publish will fail:
+>>> _ = op.Just(1) | hub['value2']
+Traceback (most recent call last):
+...
+TypeError: ProxySubject is not callable (for use as operator).Use "| hub.publish(path, meta)" instead.
+
+>>> _d1.dispose()
+
+Also assigning publisher first and then subscribing is possible:
+>>> _ = Value(2) | hub.publish('value2')
+>>> _d2 = hub['value2'] | op.sink(print, 'Output:')
+Output: 2
+
+>>> hub['value2'].emit(3)
+Output: 3
+
+>>> _d2.dispose()
+
+It's not possible to assign a second publisher to a hub object:
+>>> _ = Value(0) | hub.publish('value2')
+Traceback (most recent call last):
+...
+ValueError: ProxySubject is already assigned
+
+# Meta data
+Another feature is defining meta data as dictionary to a hub object:
+>>> _ = Value(0) | hub.publish('value3', meta={'maximum':10})
+>>> hub['value3'].meta
+{'maximum': 10}
 """
 from collections import defaultdict
 from typing import Any, Optional, Callable
@@ -56,7 +92,7 @@ class ProxySubject(Publisher, Subscriber):
 
     def __call__(self, *args, **kwargs) -> None:
         raise TypeError('ProxySubject is not callable (for use as operator).' +
-                        'Use |hub.publish(path, meta) instead.')
+                        'Use "| hub.publish(path, meta)" instead.')
 
     @property
     def assigned(self):
@@ -65,12 +101,6 @@ class ProxySubject(Publisher, Subscriber):
     @property
     def meta(self):
         return getattr(self, '_meta', None)
-
-    @meta.setter
-    def meta(self, meta_dict):
-        if hasattr(self, '_meta'):
-            raise ValueError('ProxySubject already has a meta dict')
-        self._meta = meta_dict
 
 
 class Hub:
@@ -83,9 +113,7 @@ class Hub:
     def publish(self, path: str, meta: Optional[dict]=None) \
             -> Callable[[Publisher], Publisher]:
         proxy = self[path]
-        if meta:
-            proxy.meta = meta
-
+        
         def _build(publisher):
             # used for pipeline style assignment
             if proxy._subject is not None:
@@ -95,6 +123,9 @@ class Hub:
 
             if len(proxy._subscriptions):
                 proxy._subject.subscribe(proxy)
+
+            if meta:
+                proxy._meta = meta
 
             return proxy
         return _build
