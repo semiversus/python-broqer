@@ -42,9 +42,7 @@ __all__ = [
 # TODO operators
 # debug
 # timestamp, elapsed
-# from_callback
 # from_file
 # flatten
 # zip, zip_latest
 # replace
-# Just

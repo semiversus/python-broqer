@@ -6,11 +6,6 @@ class Disposable(metaclass=ABCMeta):
     """ Implementation of the disposable pattern. Call .dispose() to free
             resource.
 
-        >>> d = Disposable()
-        Traceback (most recent call last):
-        ...
-        TypeError: Can't instantiate abstract class Disposable ...
-
         >>> class MyDisposable(Disposable):
         ...     def dispose(self):
         ...         print('DISPOSED')
@@ -19,7 +14,8 @@ class Disposable(metaclass=ABCMeta):
         >>> d.dispose()
         DISPOSED
         >>> with MyDisposable():
-        ...     pass
+        ...     print('working')
+        working
         DISPOSED
     """
     @abstractmethod
