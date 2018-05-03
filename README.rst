@@ -14,15 +14,16 @@ Python Broqer
 .. image:: https://img.shields.io/github/license/semiversus/python-broqer.svg
         :target: https://en.wikipedia.org/wiki/MIT_License
         
-Carefully crafted library to operate with continuous streams of data in a reactive style with publish/subscribe and broker functionality.
+Carefully crafted library to operate with continuous streams of data in a reactive style with publish/subscribe and
+broker functionality.
 
 Synopsis
 ========
 
 * Pure python implementation without dependencies (except Python 3.5+)
 * Under MIT license (2018 Günther Jena)
-* Compact library (<1000 lines of code), but well documented (>1000 lines of comments)
-* Fully unit tested (coverage towards 100%), coding style checked with flake8_, static typing checked with mypy_
+* Compact library (<1000 lines of code) and well documented (>1000 lines of comments)
+* Fully unit tested (coverage towards 100%), coding style checked with flake8_, static type checked with mypy_
 * Operators known from ReactiveX and other streaming frameworks (like distinct_, combine_latest_, ...)
 * Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
 * Publishers are *awaitable* (e.g. ``await adc_raw``)
@@ -38,7 +39,7 @@ Example
 =======
 
 In the first example ``adc_raw`` is a Publisher_ emitting values from an analog digital converter. The value will
-be converter (scaled by factor 0.3), sampled and a moving average is applied. Filtering for values greater 1 will
+be converted (scaled by factor 0.3), sampled and a moving average is applied. Filtering for values greater 1 will
 be printed (with the prefix 'Voltage too high:')
 
 .. code-block:: python
