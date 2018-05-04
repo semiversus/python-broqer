@@ -97,9 +97,9 @@ EMITTED
 
 """
 import asyncio
-from typing import Any, MutableSequence  # noqa: F401
-from enum import Enum
 from collections import deque
+from enum import Enum
+from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher
 

@@ -1,6 +1,7 @@
-from broqer import op
 import asyncio
 import subprocess
+
+from broqer import op
 
 (op.FromPolling(1, subprocess.check_output, 'uptime')
  | op.map(str, encoding='utf - 8')

@@ -37,8 +37,8 @@ Multiple picks:
 Plucked: ['a', 'b']
 >>> _d.dispose()
 """
-from typing import Any
 from operator import getitem
+from typing import Any
 
 from broqer import Publisher
 

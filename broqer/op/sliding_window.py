@@ -38,8 +38,8 @@ Sliding Window:1:2:3
 >>> s.emit(4)
 Sliding Window:2:3:4
 """
-from typing import Any, MutableSequence  # noqa: F401
 from collections import deque
+from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 

@@ -22,7 +22,7 @@ concurrent.futures._base.TimeoutError
 import asyncio
 from typing import Any
 
-from broqer import Subscriber, Publisher
+from broqer import Publisher, Subscriber
 
 from ._operator import build_operator
 

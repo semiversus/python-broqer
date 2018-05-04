@@ -1,5 +1,6 @@
 from broqer import Subject
-from broqer.op import distinct, sink, cache
+from broqer.op import cache, distinct, sink
+
 import mock
 
 

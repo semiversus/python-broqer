@@ -1,7 +1,9 @@
-import pytest
 from broqer import Publisher
 from broqer.subject import Subject
+
 import mock
+
+import pytest
 
 
 @pytest.mark.parametrize('cls', [Publisher])

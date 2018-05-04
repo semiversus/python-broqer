@@ -23,8 +23,8 @@ Also possible with additional args and kwargs:
 101
 
 """
-from typing import Any, Callable
 from functools import partial
+from typing import Any, Callable
 
 from broqer import Publisher
 

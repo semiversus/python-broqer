@@ -1,7 +1,8 @@
-from broqer.subject import Subject
-from broqer import op
 import asyncio
 import statistics
+
+from broqer import op
+from broqer.subject import Subject
 
 adc_raw = Subject()
 
