@@ -132,7 +132,7 @@ Operators
 Using ``asyncio`` event loop:
 
 +-------------------------------------+-------------------------------------------------------------------------+
-| debounce_ (duetime)                 | Emit a value only after a given idle time (emits meanwhile are skipped) |
+| debounce_ (duetime, *reset_value)   | Emit a value only after a given idle time (emits meanwhile are skipped) |
 +-------------------------------------+-------------------------------------------------------------------------+
 | delay_ (delay)                      | Emit every value delayed by the given time                              |
 +-------------------------------------+-------------------------------------------------------------------------+
