@@ -16,7 +16,8 @@ Usage:
 >>> _d.dispose()
 
 When debounce is retriggered you can specify a value to emit:
->>> _d = s | op.debounce(0.1, False) | op.sink(print)
+>>> debounce_publisher = s | op.debounce(0.1, False)
+>>> _d = debounce_publisher | op.sink(print)
 >>> s.emit(False)
 False
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.15))
@@ -31,6 +32,17 @@ False
 False
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.15))
 True
+
+Reseting is also possible:
+>>> s.emit(False)
+False
+>>> s.emit(True)
+False
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
+>>> debounce_publisher.reset()
+False
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.15))
+
 >>> _d.dispose()
 """
 import asyncio
@@ -61,6 +73,12 @@ class Debounce(Operator):
             self._call_later_handler.cancel()
         self._call_later_handler = \
             self._loop.call_later(self._duetime, self._emit, *args)
+
+    def reset(self):
+        if self._retrigger_value:  # if retrigger_value is not empty tuple
+            self._emit(*self._retrigger_value)
+        if self._call_later_handler:
+            self._call_later_handler.cancel()
 
 
 debounce = build_operator(Debounce)
