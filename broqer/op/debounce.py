@@ -60,7 +60,7 @@ class Debounce(Operator):
 
         Operator.__init__(self, publisher)
 
-        self._duetime = duetime
+        self.duetime = duetime
         self._retrigger_value = retrigger_value
         self._loop = loop or asyncio.get_event_loop()
         self._call_later_handler = None  # type: asyncio.Handle
@@ -72,7 +72,7 @@ class Debounce(Operator):
         if self._call_later_handler:
             self._call_later_handler.cancel()
         self._call_later_handler = \
-            self._loop.call_later(self._duetime, self._emit, *args)
+            self._loop.call_later(self.duetime, self._emit, *args)
 
     def reset(self):
         if self._retrigger_value:  # if retrigger_value is not empty tuple
