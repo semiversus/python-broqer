@@ -70,10 +70,6 @@ Output to ``stdout``:
     Voltage too high: 2
     Voltage too high: 2
 
-Example 2
-=========
-
-
 API
 ===
 
