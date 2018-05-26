@@ -56,7 +56,7 @@ be printed (with the prefix 'Voltage too high:')
       | op.sink (print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
     )
 
-.. image:: https://raw.githubusercontent.com/semiversus/python-broqer/master/docs/example1.svg
+.. image:: https://cdn.rawgit.com/semiversus/python-broqer/ec5ddbbd/docs/example1.svg
 
 Output to ``stdout``:
 
