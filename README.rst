@@ -35,8 +35,8 @@ Install
 
     pip install broqer
 
-Example
-=======
+Example 1
+=========
 
 In the first example ``adc_raw`` is a Publisher_ emitting values from an analog digital converter. The value will
 be converted (scaled by factor 0.3), sampled and a moving average is applied. Filtering for values greater 1 will
@@ -56,7 +56,7 @@ be printed (with the prefix 'Voltage too high:')
       | op.sink (print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
     )
 
-.. image:: https://github.com/semiversus/python-broqer/blob/master/docs/example1.svg
+.. image:: https://raw.githubusercontent.com/semiversus/python-broqer/master/docs/example1.svg
 
 Output to ``stdout``:
 
@@ -69,6 +69,10 @@ Output to ``stdout``:
     Voltage too high: 2
     Voltage too high: 2
     Voltage too high: 2
+
+Example 2
+=========
+
 
 API
 ===
