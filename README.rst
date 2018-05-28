@@ -27,6 +27,9 @@ Synopsis
 * Operators known from ReactiveX and other streaming frameworks (like distinct_, combine_latest_, ...)
 * Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
 * Publishers are *awaitable* (e.g. ``await adc_raw``)
+* Broker functionality via Hub_
+  * Centralised object to publish and subscribe to subjects
+  * Starting point to build applications with a microservice architecture
 
 Install
 =======
@@ -35,8 +38,8 @@ Install
 
     pip install broqer
 
-Example 1
-=========
+Example
+=======
 
 In the first example ``adc_raw`` is a Publisher_ emitting values from an analog digital converter. The value will
 be converted (scaled by factor 0.3), sampled and a moving average is applied. Filtering for values greater 1 will
@@ -173,6 +176,7 @@ Broqer was inspired by:
 .. _aioreactive: https://github.com/dbrattli/aioreactive
 .. _streamz: https://github.com/mrocklin/streamz
 .. _MQTT: http://mqtt.org/
+.. _Hub: https://github.com/semiversus/python-broqer/blob/master/broqer/hub.py
 .. _Subject: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Value: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/core.py
