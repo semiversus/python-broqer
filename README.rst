@@ -28,7 +28,6 @@ Synopsis
 - Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
 - Publishers are *awaitable* (e.g. ``await adc_raw``)
 - Broker functionality via Hub_
-
    + Centralised object to keep track of publishers and subscribers
    + Starting point to build applications with a microservice architecture
 
