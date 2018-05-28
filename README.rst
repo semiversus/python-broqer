@@ -15,16 +15,16 @@ Python Broqer
         :target: https://en.wikipedia.org/wiki/MIT_License
         
 Carefully crafted library to operate with continuous streams of data in a reactive style with publish/subscribe and
-broker functionality.
+broker functionality. Initial focus on embedded systems *Broqer* can be used wherever continuous streams of data have to be processed - and they are everywhere. Watch out!
 
 Synopsis
 ========
 
-- Pure python implementation without dependencies (except Python 3.5+)
+- Pure python implementation without dependencies
 - Under MIT license (2018 Günther Jena)
 - Compact library (<1000 lines of code) and well documented (>1000 lines of comments)
 - Fully unit tested (coverage towards 100%), coding style checked with flake8_, static type checked with mypy_
-- Operators known from ReactiveX and other streaming frameworks (like distinct_, combine_latest_, ...)
+- Operators known from ReactiveX_ and other streaming frameworks (like distinct_, combine_latest_, ...)
 - Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
 - Publishers are *awaitable* (e.g. ``await adc_raw``)
 - Broker functionality via Hub_
@@ -34,6 +34,8 @@ Synopsis
 
 Install
 =======
+
+Tested on Python 3.5 and following.
 
 .. code-block:: bash
 
@@ -174,6 +176,7 @@ Broqer was inspired by:
 .. _flake8: http://flake8.pycqa.org/en/latest/
 .. _mypy: http://mypy-lang.org/
 .. _RxPY: https://github.com/ReactiveX/RxPY
+.. _ReactiveX: http://reactivex.io/
 .. _aioreactive: https://github.com/dbrattli/aioreactive
 .. _streamz: https://github.com/mrocklin/streamz
 .. _MQTT: http://mqtt.org/
