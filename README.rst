@@ -20,16 +20,17 @@ broker functionality.
 Synopsis
 ========
 
-* Pure python implementation without dependencies (except Python 3.5+)
-* Under MIT license (2018 Günther Jena)
-* Compact library (<1000 lines of code) and well documented (>1000 lines of comments)
-* Fully unit tested (coverage towards 100%), coding style checked with flake8_, static type checked with mypy_
-* Operators known from ReactiveX and other streaming frameworks (like distinct_, combine_latest_, ...)
-* Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
-* Publishers are *awaitable* (e.g. ``await adc_raw``)
-* Broker functionality via Hub_
- - Centralised object to keep track of publishers and subscribers
- - Starting point to build applications with a microservice architecture
+- Pure python implementation without dependencies (except Python 3.5+)
+- Under MIT license (2018 Günther Jena)
+- Compact library (<1000 lines of code) and well documented (>1000 lines of comments)
+- Fully unit tested (coverage towards 100%), coding style checked with flake8_, static type checked with mypy_
+- Operators known from ReactiveX and other streaming frameworks (like distinct_, combine_latest_, ...)
+- Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
+- Publishers are *awaitable* (e.g. ``await adc_raw``)
+- Broker functionality via Hub_
+
+   + Centralised object to keep track of publishers and subscribers
+   + Starting point to build applications with a microservice architecture
 
 Install
 =======
