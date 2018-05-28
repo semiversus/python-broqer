@@ -59,7 +59,7 @@ be printed (with the prefix 'Voltage too high:')
       | op.sliding_window(4) # append the value to a buffer with 4 elements (and drop the oldest value)
       | op.map(statistics.mean) # use ``statistics.mean`` to calulate the average over the emitted sequence
       | op.filter(lambda v:v>1) # emit only values greater 1
-      | op.sink (print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
+      | op.sink(print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
     )
 
 .. image:: https://cdn.rawgit.com/semiversus/python-broqer/ec5ddbbd/docs/example1.svg
