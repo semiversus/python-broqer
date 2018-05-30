@@ -16,6 +16,8 @@ Python Broqer
         
 Initial focus on embedded systems *Broqer* can be used wherever continuous streams of data have to be processed - and they are everywhere. Watch out!
 
+.. image:: https://cdn.rawgit.com/semiversus/python-broqer/7beb7379/docs/logo.svg
+
 Synopsis
 ========
 
