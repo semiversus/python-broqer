@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'python-broqer'
-copyright = '2018, Günther Jena'
-author = 'Günther Jena'
+copyright = u'2018, Günther Jena'
+author = u'Günther Jena'
 
 # The short X.Y version
 version = '0.2.0'
