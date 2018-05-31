@@ -132,7 +132,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'python-broqer.tex', 'python-broqer Documentation',
-     'Günther Jena', 'manual'),
+     u'Günther Jena', 'manual'),
 ]
 
 
