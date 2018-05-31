@@ -2,6 +2,7 @@
 Emit every value delayed by the given time.
 
 Usage:
+
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()

@@ -2,6 +2,7 @@
 Emit the last received value periodically
 
 Usage:
+
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()

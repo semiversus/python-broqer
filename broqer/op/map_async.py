@@ -2,6 +2,7 @@
 Apply ``map_coro`` to each emitted value allowing async processing
 
 Usage:
+
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()
@@ -14,6 +15,7 @@ Usage:
 ...     return result
 
 Mode: CONCURRENT (is default)
+
 >>> _d = s | op.map_async(delay_add) | op.sink()
 >>> s.emit(0)
 >>> s.emit(1)
@@ -25,6 +27,7 @@ Finished with argument 1
 >>> _d.dispose()
 
 Mode: INTERRUPT
+
 >>> _d = s | op.map_async(delay_add, mode=op.Mode.INTERRUPT) | op.sink(print)
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.005))
@@ -37,6 +40,7 @@ Finished with argument 1
 >>> _d.dispose()
 
 Mode: QUEUE
+
 >>> _d = s | op.map_async(delay_add, mode=op.Mode.QUEUE) | op.sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
@@ -50,6 +54,7 @@ Finished with argument 1
 >>> _d.dispose()
 
 Mode: LAST
+
 >>> _d = s | op.map_async(delay_add, mode=op.Mode.LAST) | op.sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
@@ -64,6 +69,7 @@ Finished with argument 2
 >>> _d.dispose()
 
 Mode: SKIP
+
 >>> _d = s | op.map_async(delay_add, mode=op.Mode.SKIP) | op.sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
@@ -75,6 +81,7 @@ Finished with argument 0
 >>> _d.dispose()
 
 Using error_callback:
+
 >>> def cb(e):
 ...     print('Got error')
 
@@ -86,6 +93,7 @@ Got error
 >>> _d.dispose()
 
 Special case if map_coro returns None:
+
 >>> async def foo():
 ...     pass
 

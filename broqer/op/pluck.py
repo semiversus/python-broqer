@@ -2,6 +2,7 @@
 Apply sequence of picks via ``getitem`` to emitted values
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 

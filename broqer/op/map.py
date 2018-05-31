@@ -2,6 +2,7 @@
 Apply ``map_func(*args, value, **kwargs)`` to each emitted value
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 
@@ -17,6 +18,7 @@ Usage:
 >>> _disposable.dispose()
 
 Also possible with additional args and kwargs:
+
 >>> import operator
 >>> mapped_publisher = s | op.map(operator.add, 3)
 >>> _disposable = mapped_publisher | op.sink(print)
@@ -25,6 +27,7 @@ Also possible with additional args and kwargs:
 >>> _disposable.dispose()
 
 If map_func is returning None just emit subscriber without arguments:
+
 >>> _disposable = s | op.map(print, 'Output:') | op.sink(print, 'EMITTED')
 >>> s.emit(1)
 Output: 1

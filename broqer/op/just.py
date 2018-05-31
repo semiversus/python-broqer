@@ -2,6 +2,7 @@
 Emit a (constant) value on subscribe.
 
 Usage:
+
 >>> from broqer import op
 >>> j = op.Just(1)
 
@@ -15,6 +16,7 @@ Dump2: 1
 1
 
 Also handling zero or more than one argument:
+
 >>> op.Just(1, 2).cache
 (1, 2)
 >>> i = op.Just()

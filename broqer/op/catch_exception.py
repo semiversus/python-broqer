@@ -2,10 +2,12 @@
 Catching exceptions of following operators in the pipelines
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 
 Example with exception:
+
 >>> disposable = s | op.pluck(0) | op.sink(print)
 
 >>> s.emit([1,2,3])
@@ -18,6 +20,7 @@ IndexError: list index out of range
 >>> disposable.dispose()
 
 Now with ``catch_exception``:
+
 >>> s | op.catch_exception(IndexError) | op.pluck(0) | op.sink(print)
 <...>
 

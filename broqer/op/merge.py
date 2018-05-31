@@ -2,6 +2,7 @@
 Merge emits of multiple publishers into one stream
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s1 = Subject()
 >>> s2 = Subject()

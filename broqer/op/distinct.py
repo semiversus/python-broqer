@@ -2,6 +2,7 @@
 Only emit values which changed regarding to the cached state.
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 

@@ -2,6 +2,7 @@
 Group ``size`` emitted values overlapping
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 
@@ -22,7 +23,8 @@ Sliding Window: (2, 3, (4, 5))
 >>> s.emit(5)
 >>> _d.dispose()
 
-With emit_partial the state is emitted even when the queue is not full
+With emit_partial the state is emitted even when the queue is not full:
+
 >>> window_publisher = s | op.sliding_window( \
                                     3, emit_partial=True, packed=False)
 >>> _d = window_publisher | op.sink(print, 'Sliding Window', sep=':')

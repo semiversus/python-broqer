@@ -2,6 +2,7 @@
 Group ``size`` emits into one emit as tuple
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 

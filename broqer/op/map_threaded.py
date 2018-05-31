@@ -2,6 +2,7 @@
 Apply ``map_func`` to each emitted value allowing threaded processing
 
 Usage:
+
 >>> import time
 >>> from broqer import Subject, op
 >>> s = Subject()
@@ -14,6 +15,7 @@ Usage:
 ...     return result
 
 Mode: CONCURRENT (is default)
+
 >>> _d = s | op.map_threaded(delay_add) | op.sink()
 >>> s.emit(0)
 Starting with argument 0
@@ -25,6 +27,7 @@ Finished with argument 1
 >>> _d.dispose()
 
 Mode: QUEUE
+
 >>> _d = s | op.map_threaded(delay_add, mode=op.Mode.QUEUE) | op.sink(print)
 >>> s.emit(0)
 Starting with argument 0
@@ -38,6 +41,7 @@ Finished with argument 1
 >>> _d.dispose()
 
 Mode: LAST
+
 >>> _d = s | op.map_threaded(delay_add, mode=op.Mode.LAST) | op.sink(print)
 >>> s.emit(0)
 Starting with argument 0
@@ -52,6 +56,7 @@ Finished with argument 2
 >>> _d.dispose()
 
 Mode: SKIP
+
 >>> _d = s | op.map_threaded(delay_add, mode=op.Mode.SKIP) | op.sink(print)
 >>> s.emit(0)
 Starting with argument 0
@@ -63,6 +68,7 @@ Finished with argument 0
 >>> _d.dispose()
 
 Using error_callback:
+
 >>> def cb(e):
 ...     print('Got error')
 
@@ -74,6 +80,7 @@ Got error
 >>> _d.dispose()
 
 Special case if map_func returns None:
+
 >>> def foo(a):
 ...     pass
 

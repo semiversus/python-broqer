@@ -2,6 +2,7 @@
 Call ``func(*args, **kwargs)`` periodically and emit the returned values
 
 Usage:
+
 >>> import asyncio
 >>> import itertools
 >>> from broqer import op

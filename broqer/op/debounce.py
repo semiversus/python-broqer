@@ -3,6 +3,7 @@ Emit a value only after a given idle time (emits meanwhile are skipped).
 Debounce can also be used for a timeout functionality.
 
 Usage:
+
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()
@@ -16,6 +17,7 @@ Usage:
 >>> _d.dispose()
 
 When debounce is retriggered you can specify a value to emit:
+
 >>> debounce_publisher = s | op.debounce(0.1, False)
 >>> _d = debounce_publisher | op.sink(print)
 >>> s.emit(False)
@@ -34,6 +36,7 @@ False
 True
 
 Reseting is also possible:
+
 >>> s.emit(False)
 False
 >>> s.emit(True)

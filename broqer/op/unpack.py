@@ -2,6 +2,7 @@
 Unpacking a sequence of values and use it to emit as arguments
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 

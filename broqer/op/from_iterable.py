@@ -2,6 +2,7 @@
 Use an iterable and emit each value
 
 Usage:
+
 >>> from broqer import op
 >>> l = [1, 2, 3]
 >>> s = op.FromIterable(l)

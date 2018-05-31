@@ -2,6 +2,7 @@
 Apply ``func`` to the current emitted value and the last result of ``func``
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 

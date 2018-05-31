@@ -2,6 +2,7 @@
 Emit a multi-argument emit as tuple of arguments
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 

@@ -2,6 +2,7 @@
 Filters values based on a ``predicate`` function
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 
@@ -15,6 +16,7 @@ Usage:
 >>> _disposable.dispose()
 
 Also possible with additional args and kwargs:
+
 >>> import operator
 >>> filtered_publisher = s | op.filter(operator.and_, 0x01)
 >>> _disposable = filtered_publisher | op.sink(print)

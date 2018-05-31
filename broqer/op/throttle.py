@@ -2,6 +2,7 @@
 Rate limit emits by the given time.
 
 Usage:
+
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()
@@ -15,7 +16,8 @@ Usage:
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.2))
 3
 
-It's also possible to reset the throttling duration
+It's also possible to reset the throttling duration:
+
 >>> s.emit(4)
 4
 >>> s.emit(5)

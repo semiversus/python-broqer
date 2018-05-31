@@ -2,6 +2,7 @@
 Combine the latest emit of multiple publishers and emit the combination
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s1 = Subject()
 >>> s2 = Subject()
@@ -10,6 +11,7 @@ Usage:
 >>> disposable = combination | op.sink(print)
 
 CombineLatest is only emitting, when all values are collected:
+
 >>> s1.emit(1)
 >>> s2.emit(2)
 1 2

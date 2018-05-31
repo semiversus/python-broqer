@@ -3,32 +3,39 @@
 >>> hub = Hub()
 
 Accessing an object via Hub will create and return a proxy
+
 >>> value1 = hub['value1']
 
 Each following access will return the same proxy object
+
 >>> value1 == hub['value1']
 True
 
 It's possible to subscribe to a proxy
+
 >>> _d1 = hub['value1'] | op.sink(print, 'Output:')
 
 At the moment this hub object is not assigned to a publisher
+
 >>> hub['value1'].assigned
 False
 
 It will raise an exception if .emit is used on this object:
+
 >>> hub['value1'].emit(1)
 Traceback (most recent call last):
 ...
 TypeError: No subject is assigned to this ProxySubject
 
 Assign a publisher to a hub object:
+
 >>> _ = op.Just(1) | hub.publish('value1')
 Output: 1
 >>> hub['value1'].assigned
 True
 
 Assigning to a hub object without .publish will fail:
+
 >>> _ = op.Just(1) | hub['value2']
 Traceback (most recent call last):
 ...
@@ -37,6 +44,7 @@ TypeError: ProxySubject is not callable (for use as operator). ...
 >>> _d1.dispose()
 
 Also assigning publisher first and then subscribing is possible:
+
 >>> _ = Value(2) | hub.publish('value2')
 >>> _d2 = hub['value2'] | op.sink(print, 'Output:')
 Output: 2
@@ -47,19 +55,26 @@ Output: 3
 >>> _d2.dispose()
 
 It's not possible to assign a second publisher to a hub object:
+
 >>> _ = Value(0) | hub.publish('value2')
 Traceback (most recent call last):
 ...
 ValueError: ProxySubject is already assigned
 
-# Meta data
+Meta data
+---------
+
 Another feature is defining meta data as dictionary to a hub object:
+
 >>> _ = Value(0) | hub.publish('value3', meta={'maximum':10})
 >>> hub['value3'].meta
 {'maximum': 10}
 
-# Wait for assignment
+Wait for assignment
+-------------------
+
 It's also possible to wait for an assignment:
+
 >>> import asyncio
 >>> _f1 = asyncio.ensure_future(hub['value4'].wait_for_assignment(0.01))
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
@@ -77,6 +92,7 @@ False
 True
 
 When already assigned it will not wait at all:
+
 >>> _f2 = asyncio.ensure_future(hub['value4'].wait_for_assignment())
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
 >>> _f2.done()

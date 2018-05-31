@@ -4,6 +4,7 @@ possible to omit ``func`` - in this case the publisher will be subscribed, but
 no function will be applied.
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 

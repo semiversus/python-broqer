@@ -3,6 +3,7 @@ Call a function with state and new value which is returning new state and value
 to emit.
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 

@@ -2,6 +2,7 @@
 Build a future able to await for
 
 Usage:
+
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()

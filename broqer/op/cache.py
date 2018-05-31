@@ -4,6 +4,7 @@ Caching the emitted values to access it via ``.cache`` property.
 The ``Cache`` publisher is emitting a value on subscription.
 
 Usage:
+
 >>> from broqer import Subject, op
 >>> s = Subject()
 

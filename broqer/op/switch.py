@@ -2,6 +2,7 @@
 Emit a publisher mapped by ``mapping``
 
 Usage:
+
 >>> from broqer import Subject, Value, op
 >>> choose = Subject()
 >>> s1 = Value(0)
@@ -23,6 +24,7 @@ Usage:
 
 Also using switch as if-then-else construct is possible.
 This is working because False is correpsonding to integer 0, True is 1
+
 >>> if_publisher = choose | op.switch([s1, s2])
 >>> _d = if_publisher | op.sink(print)
 
