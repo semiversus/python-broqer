@@ -2,13 +2,16 @@
   :end-before: marker-for-example
 
 Sources
--------
+=======
 
 Visit the project under https://github.com/semiversus/python-broqer .
 
+=======
+Content
+=======
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
 
    examples.rst
    publishers.rst
