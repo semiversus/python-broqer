@@ -8,7 +8,6 @@ Visit the project under https://github.com/semiversus/python-broqer .
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
    :caption: Contents
 
    examples.rst
