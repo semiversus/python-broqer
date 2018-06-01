@@ -7,6 +7,7 @@ Usage:
 >>> s = Subject()
 
 Get element n in an indexable object:
+
 >>> _d = s | op.pluck(0) | op.sink(print, 'Plucked:')
 >>> s.emit(['a', 'b', 'c'])
 Plucked: a
@@ -15,6 +16,7 @@ Plucked: 1
 >>> _d.dispose()
 
 Get key k in an mapping object:
+
 >>> _d = s | op.pluck('value') | op.sink(print, 'Plucked:')
 >>> s.emit({'name':'test', 'value':5})
 Plucked: 5
@@ -25,6 +27,7 @@ KeyError: 'value'
 >>> _d.dispose()
 
 Get a slice:
+
 >>> _d = s | op.pluck(slice(0, 2)) | op.sink(print, 'Plucked:')
 >>> s.emit(['a', 'b', 'c'])
 Plucked: ['a', 'b']
@@ -33,6 +36,7 @@ Plucked: [1, 2]
 >>> _d.dispose()
 
 Multiple picks:
+
 >>> _d = s | op.pluck(1, 'value', slice(0, 2)) | op.sink(print, 'Plucked:')
 >>> s.emit([{'value':[1, 2, 3]}, {'value':['a', 'b', 'c']}])
 Plucked: ['a', 'b']
