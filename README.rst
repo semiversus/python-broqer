@@ -47,7 +47,7 @@ Python Broqer
 .. image:: https://img.shields.io/travis/semiversus/python-broqer.svg
   :target: https://travis-ci.org/semiversus/python-broqer
 
-.. image:: https://readthedocs.org/projects/broqer/badge/?version=latest
+.. image:: https://readthedocs.org/projects/python-broqer/badge/?version=latest
   :target: https://python-broqer.readthedocs.io/en/latest
 
 .. image:: https://codecov.io/gh/semiversus/python-broqer/branch/master/graph/badge.svg
