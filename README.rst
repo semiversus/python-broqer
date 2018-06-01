@@ -42,16 +42,19 @@ Python Broqer
 .. _unpack: https://github.com/semiversus/python-broqer/blob/master/broqer/op/unpack.py
 
 .. image:: https://img.shields.io/pypi/v/broqer.svg
-        :target: https://pypi.python.org/pypi/broqer
+  :target: https://pypi.python.org/pypi/broqer
 
 .. image:: https://img.shields.io/travis/semiversus/python-broqer.svg
-        :target: https://travis-ci.org/semiversus/python-broqer
+  :target: https://travis-ci.org/semiversus/python-broqer
+
+.. image:: https://readthedocs.org/projects/pip/badge/?version=latest
+  :target: https://python-broqer.readthedocs.io/en/latest
 
 .. image:: https://codecov.io/gh/semiversus/python-broqer/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/semiversus/python-broqer
         
 .. image:: https://img.shields.io/github/license/semiversus/python-broqer.svg
-        :target: https://en.wikipedia.org/wiki/MIT_License
+  :target: https://en.wikipedia.org/wiki/MIT_License
         
 Initial focus on embedded systems *Broqer* can be used wherever continuous streams of data have to be processed - and they are everywhere. Watch out!
 
