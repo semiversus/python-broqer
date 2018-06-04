@@ -26,7 +26,7 @@ Synopsis
 
 - Pure python implementation without dependencies
 - Under MIT license (2018 Günther Jena)
-- Source is hosted on GitHub_
+- Source is hosted on GitHub.com_
 - Documentation is hosted on ReadTheDocs.com_
 - Tested on Python 3.5 and following
 - Compact library (<1000 lines of code) and well documented (>1000 lines of comments)
@@ -38,6 +38,18 @@ Synopsis
 
   + Centralised object to keep track of publishers and subscribers
   + Starting point to build applications with a microservice architecture
+
+.. _flake8: http://flake8.pycqa.org/en/latest/
+.. _mypy: http://mypy-lang.org/
+.. _GitHub.com: https://github.com/semiversus/python-broqer
+.. _ReadTheDocs.com: http://python-broqer.readthedocs.io
+.. _ReactiveX: http://reactivex.io/
+
+.. _Hub: https://github.com/semiversus/python-broqer/blob/master/broqer/hub.py
+.. _debounce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/debounce.py
+.. _map_async: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_async.py
+.. _combine_latest: https://github.com/semiversus/python-broqer/blob/master/broqer/op/combine_latest.py
+.. _distinct: https://github.com/semiversus/python-broqer/blob/master/broqer/op/distinct.py
 
 Install
 =======
@@ -51,7 +63,7 @@ Install
 Example
 =======
 
-In the first example ``adc_raw`` is a Publisher_ emitting values from an analog digital converter. The value will
+In the first example ``adc_raw`` is a Publisher* emitting values from an analog digital converter. The value will
 be converted (scaled by factor 0.3), sampled and a moving average is applied. Filtering for values greater 1 will
 be printed (with the prefix 'Voltage too high:')
 
@@ -176,28 +188,7 @@ A Subscriber_ is the sink for messages.
 +----------------------------------+--------------------------------------------------------------+
 | to_future_ (timeout=None)        | Build a future able to await for                             |
 +----------------------------------+--------------------------------------------------------------+
- 
-Credits
-=======
 
-Broqer was inspired by:
-
-* RxPY_: Reactive Extension for Python (by Børge Lanes and Dag Brattli)
-* aioreactive_: Async/Await reactive tools for Python (by Dag Brattli)
-* streamz_: build pipelines to manage continuous streams of data (by Matthew Rocklin)
-* MQTT_: M2M connectivity protocol
-* Florian Feurstein: spending hours of discussion, coming up with great ideas and help me understand the concepts!
-
-.. _flake8: http://flake8.pycqa.org/en/latest/
-.. _mypy: http://mypy-lang.org/
-.. _RxPY: https://github.com/ReactiveX/RxPY
-.. _GitHub: https://github.com/semiversus/python-broqer
-.. _ReadTheDocs.com: http://python-broqer.readthedocs.io
-.. _ReactiveX: http://reactivex.io/
-.. _aioreactive: https://github.com/dbrattli/aioreactive
-.. _streamz: https://github.com/mrocklin/streamz
-.. _MQTT: http://mqtt.org/
-.. _Hub: https://github.com/semiversus/python-broqer/blob/master/broqer/hub.py
 .. _Subject: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Value: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/core.py
@@ -205,15 +196,11 @@ Broqer was inspired by:
 .. _accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
 .. _cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
 .. _catch_exception: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
-.. _combine_latest: https://github.com/semiversus/python-broqer/blob/master/broqer/op/combine_latest.py
-.. _debounce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/debounce.py
 .. _delay: https://github.com/semiversus/python-broqer/blob/master/broqer/op/delay.py
-.. _distinct: https://github.com/semiversus/python-broqer/blob/master/broqer/op/distinct.py
 .. _filter: https://github.com/semiversus/python-broqer/blob/master/broqer/op/filter.py
 .. _FromIterable: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_iterable.py
 .. _FromPolling: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_polling.py
 .. _Just: https://github.com/semiversus/python-broqer/blob/master/broqer/op/just.py
-.. _map_async: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_async.py
 .. _map_threaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
 .. _map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map.py
 .. _merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py
@@ -228,3 +215,19 @@ Broqer was inspired by:
 .. _throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py
 .. _to_future: https://github.com/semiversus/python-broqer/blob/master/broqer/op/to_future.py
 .. _unpack: https://github.com/semiversus/python-broqer/blob/master/broqer/op/unpack.py
+
+Credits
+=======
+
+Broqer was inspired by:
+
+* RxPY_: Reactive Extension for Python (by Børge Lanes and Dag Brattli)
+* aioreactive_: Async/Await reactive tools for Python (by Dag Brattli)
+* streamz_: build pipelines to manage continuous streams of data (by Matthew Rocklin)
+* MQTT_: M2M connectivity protocol
+* Florian Feurstein: spending hours of discussion, coming up with great ideas and help me understand the concepts!
+
+.. _RxPY: https://github.com/ReactiveX/RxPY
+.. _aioreactive: https://github.com/dbrattli/aioreactive
+.. _streamz: https://github.com/mrocklin/streamz
+.. _MQTT: http://mqtt.org/
