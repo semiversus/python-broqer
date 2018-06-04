@@ -26,7 +26,8 @@ Synopsis
 
 - Pure python implementation without dependencies
 - Under MIT license (2018 Günther Jena)
-- Documentation is hosted under ReadTheDocs.com_
+- Source is hosted on GitHub_
+- Documentation is hosted on ReadTheDocs.com_
 - Tested on Python 3.5 and following
 - Compact library (<1000 lines of code) and well documented (>1000 lines of comments)
 - Fully unit tested (coverage towards 100%), coding style checked with flake8_, static type checked with mypy_
@@ -190,6 +191,7 @@ Broqer was inspired by:
 .. _flake8: http://flake8.pycqa.org/en/latest/
 .. _mypy: http://mypy-lang.org/
 .. _RxPY: https://github.com/ReactiveX/RxPY
+.. _GitHub: https://github.com/semiversus/python-broqer
 .. _ReadTheDocs.com: http://python-broqer.readthedocs.io
 .. _ReactiveX: http://reactivex.io/
 .. _aioreactive: https://github.com/dbrattli/aioreactive
