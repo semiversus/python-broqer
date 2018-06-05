@@ -14,6 +14,10 @@ class Subject(Publisher, Subscriber):
     >>> s.emit(1)
     1
     """
+    def __init__(self):
+        Publisher.__init__(self)
+        Subscriber.__init__(self)
+
     emit = Publisher._emit  # type: ignore
 
 
@@ -36,7 +40,8 @@ class Value(Publisher, Subscriber):
     (1, 2)
     """
     def __init__(self, *init):
-        super().__init__()
+        Publisher.__init__(self)
+        Subscriber.__init__(self)
         self._cache = init
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
