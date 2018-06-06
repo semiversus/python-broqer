@@ -63,7 +63,7 @@ Install
 Example
 =======
 
-In the first example ``adc_raw`` is a Publisher* emitting values from an analog digital converter. The value will
+In the first example ``adc_raw`` is a *Publisher* emitting values from an analog digital converter. The value will
 be converted (scaled by factor 0.3), sampled and a moving average is applied. Filtering for values greater 1 will
 be printed (with the prefix 'Voltage too high:')
 
