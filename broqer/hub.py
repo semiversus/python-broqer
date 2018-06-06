@@ -2,16 +2,16 @@
 >>> from broqer import Hub, Value, op
 >>> hub = Hub()
 
-Accessing an object via Hub will create and return a proxy
+The hub is handling with topics referencing to publishers or subjects:
 
 >>> value1 = hub['value1']
 
-Each following access will return the same proxy object
+Each following access will return the same object
 
 >>> value1 == hub['value1']
 True
 
-It's possible to subscribe to a proxy
+It's possible to subscribe to a topic
 
 >>> _d1 = hub['value1'] | op.sink(print, 'Output:')
 
@@ -20,26 +20,33 @@ At the moment this hub object is not assigned to a publisher
 >>> hub['value1'].assigned
 False
 
-It will raise an exception if .emit is used on this object:
+Checking if a topic already exists is done via ``in`` operator
+
+>>> 'value1' in hub
+True
+>>> 'value2' in hub
+False
+
+It will raise an exception if .emit is used on an unassigned topic:
 
 >>> hub['value1'].emit(1)
 Traceback (most recent call last):
 ...
-TypeError: No subject is assigned to this ProxySubject
+TypeError: No subject is assigned to this Topic
 
-Assign a publisher to a hub object:
+Assign a publisher to a hub topic:
 
 >>> _ = op.Just(1) | hub.publish('value1')
 Output: 1
 >>> hub['value1'].assigned
 True
 
-Assigning to a hub object without .publish will fail:
+Assigning to a hub topic without .publish will fail:
 
 >>> _ = op.Just(1) | hub['value2']
 Traceback (most recent call last):
 ...
-TypeError: ProxySubject is not callable (for use as operator). ...
+TypeError: Topic is not callable (for use as operator). ...
 
 >>> _d1.dispose()
 
@@ -54,17 +61,17 @@ Output: 3
 
 >>> _d2.dispose()
 
-It's not possible to assign a second publisher to a hub object:
+It's not possible to assign a second publisher to a hub topic:
 
 >>> _ = Value(0) | hub.publish('value2')
 Traceback (most recent call last):
 ...
-ValueError: ProxySubject is already assigned
+ValueError: Topic is already assigned
 
 Meta data
 ---------
 
-Another feature is defining meta data as dictionary to a hub object:
+Another feature is defining meta data as dictionary to a hub topic:
 
 >>> _ = Value(0) | hub.publish('value3', meta={'maximum':10})
 >>> hub['value3'].meta
@@ -105,7 +112,7 @@ from typing import Any, Callable, Optional
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 
-class ProxySubject(Publisher, Subscriber):
+class Topic(Publisher, Subscriber):
     def __init__(self):
         super().__init__()
         self._subject = None
@@ -125,15 +132,15 @@ class ProxySubject(Publisher, Subscriber):
     def emit(self, *args: Any, who: Optional[Publisher]=None) -> None:
         if self._subject is None:
             # method will be replaced by .__call__
-            raise TypeError('No subject is assigned to this ProxySubject')
+            raise TypeError('No subject is assigned to this Topic')
         elif who == self._subject:
             self._emit(*args)
         elif who != self._subject:
             self._subject.emit(*args)
 
     def __call__(self, *args, **kwargs) -> None:
-        raise TypeError('ProxySubject is not callable (for use as operator).' +
-                        ' Use "| hub.publish(path, meta)" instead.')
+        raise TypeError('Topic is not callable (for use as operator).' +
+                        ' Use "| hub.publish(topic, meta)" instead.')
 
     @property
     def assigned(self):
@@ -157,19 +164,22 @@ class ProxySubject(Publisher, Subscriber):
 
 class Hub:
     def __init__(self):
-        self._proxies = defaultdict(ProxySubject)
+        self._proxies = defaultdict(Topic)
 
-    def __getitem__(self, path: str) -> ProxySubject:
-        return self._proxies[path]
+    def __getitem__(self, topic: str) -> Topic:
+        return self._proxies[topic]
 
-    def publish(self, path: str, meta: Optional[dict]=None) \
+    def __contains__(self, topic: str) -> bool:
+        return topic in self._proxies
+
+    def publish(self, topic: str, meta: Optional[dict]=None) \
             -> Callable[[Publisher], Publisher]:
-        proxy = self[path]
+        proxy = self[topic]
 
         def _build(publisher):
             # used for pipeline style assignment
             if proxy._subject is not None:
-                raise ValueError('ProxySubject is already assigned')
+                raise ValueError('Topic is already assigned')
             else:
                 proxy._subject = publisher
 
