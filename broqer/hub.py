@@ -108,7 +108,7 @@ True
 import asyncio
 from collections import defaultdict, OrderedDict
 from types import MappingProxyType
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
@@ -159,8 +159,12 @@ class Topic(Publisher, Subscriber):
                     asyncio.shield(self._assignment_future), timeout)
 
     @property
-    def meta(self):
+    def meta(self) -> dict:
         return getattr(self, '_meta', None)
+
+    @meta.setter
+    def meta(self, meta_dict: dict):
+        self._meta = meta_dict
 
 
 class Hub:
@@ -172,19 +176,25 @@ class Hub:
 
     def __contains__(self, topic: str) -> bool:
         return topic in self._topics
-    
+
     def __iter__(self):
         return sorted(self._topics.keys()).__iter__()
-    
+
     @property
     def topics(self):
-        topics_sorted = OrderedDict(sorted(self._topics.items(), key=lambda t:t[0]))
-        return MappingProxyType(topics_sorted)
+        topics_sorted = sorted(self._topics.items(), key=lambda t: t[0])
+        return MappingProxyType(OrderedDict(topics_sorted))
 
-    def assign(self, publisher:Publisher, topic: str,
-                meta: Optional[dict]=None) -> None:
-                
-        topic = self[topic]
+    @property
+    def unassigned_topics(self):
+        topics_sorted = sorted(self._topics.items(), key=lambda t: t[0])
+        result_topics = ((n, t) for n, t in topics_sorted if not t.assigned)
+        return MappingProxyType(OrderedDict(result_topics))
+
+    def assign(self, publisher: Publisher, topic_str: str,
+               meta: Optional[dict]=None) -> Topic:
+
+        topic = self[topic_str]
 
         if topic._subject is not None:
             raise ValueError('Topic is already assigned')
@@ -195,7 +205,7 @@ class Hub:
             topic._subject.subscribe(topic)
 
         if meta:
-            topic._meta = meta
+            topic.meta = meta
 
         if hasattr(topic, '_assignment_future'):
             topic._assignment_future.set_result(None)
