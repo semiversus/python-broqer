@@ -106,7 +106,7 @@ When already assigned it will not wait at all:
 True
 """
 import asyncio
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from types import MappingProxyType
 from typing import Any, Callable, Optional
 
@@ -178,7 +178,8 @@ class Hub:
     
     @property
     def topics(self):
-        return MappingProxyType(self._topics)
+        topics_sorted = OrderedDict(sorted(self._topics.items(), key=lambda t:t[0]))
+        return MappingProxyType(topics_sorted)
 
     def assign(self, publisher:Publisher, topic: str,
                 meta: Optional[dict]=None) -> None:
