@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .core import Disposable, Publisher, Subscriber, SubscriptionDisposable
-from .hub import Hub
+from .hub import Hub, SubHub
 from .subject import Subject, Value
 
 __author__ = 'Günther Jena'
@@ -9,5 +9,5 @@ __version__ = '0.2.0'
 
 __all__ = [
     'Disposable', 'SubscriptionDisposable', 'Subscriber', 'Publisher',
-    'Subject', 'Value', 'Hub'
+    'Subject', 'Value', 'Hub', 'SubHub'
 ]

@@ -36,7 +36,7 @@ TypeError: No subject is assigned to this Topic
 
 Assign a publisher to a hub topic:
 
->>> _ = hub.assign(op.Just(1), 'value1')
+>>> _ = hub.assign('value1', op.Just(1))
 Output: 1
 >>> hub['value1'].assigned
 True
@@ -52,7 +52,7 @@ TypeError: Topic is not callable (for use with | operator). ...
 
 Also assigning publisher first and then subscribing is possible:
 
->>> _ = hub.assign(Value(2), 'value2')
+>>> _ = hub.assign('value2', Value(2))
 >>> _d2 = hub['value2'] | op.sink(print, 'Output:')
 Output: 2
 
@@ -63,7 +63,7 @@ Output: 3
 
 It's not possible to assign a second publisher to a hub topic:
 
->>> _ = hub.assign(Value(0), 'value2')
+>>> _ = hub.assign('value2', Value(0))
 Traceback (most recent call last):
 ...
 ValueError: Topic is already assigned
@@ -73,7 +73,7 @@ Meta data
 
 Another feature is defining meta data as dictionary to a hub topic:
 
->>> _ = hub.assign(Value(0), 'value3', meta={'maximum':10})
+>>> _ = hub.assign('value3', Value(0), meta={'maximum':10})
 >>> hub['value3'].meta
 {'maximum': 10}
 
@@ -93,7 +93,7 @@ TimeoutError()
 >>> _f2.done()
 False
 
->>> _ = hub.assign(Value(0), 'value4')
+>>> _ = hub.assign('value4', Value(0))
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
 >>> _f2.done()
 True
@@ -191,7 +191,7 @@ class Hub:
         result_topics = ((n, t) for n, t in topics_sorted if not t.assigned)
         return MappingProxyType(OrderedDict(result_topics))
 
-    def assign(self, publisher: Publisher, topic_str: str,
+    def assign(self, topic_str: str, publisher: Publisher,
                meta: Optional[dict]=None) -> Topic:
 
         topic = self[topic_str]
@@ -211,3 +211,39 @@ class Hub:
             topic._assignment_future.set_result(None)
 
         return topic
+
+class SubHub:
+    def __init__(self, hub: Hub, prefix: str):
+        self._hub = hub
+        assert not prefix.endswith('.'), 'Prefix should not end with \'.\''
+        assert prefix, 'Prefix should not be empty'
+        self._prefix = prefix + '.'
+
+    def __getitem__(self, topic: str) -> Topic:
+        return self._hub[self._prefix + topic]
+
+    def __contains__(self, topic: str) -> bool:
+        return self._prefix + topic in self._hub
+
+    def __iter__(self):
+        l = len(self._prefix)
+        return (t[l:] for t in self._hub if t.startswith(self._prefix))
+
+    @property
+    def topics(self):
+        l = len(self._prefix)
+        topics = ((n[l:], t) for (n, t) in self._hub.topics.items()
+                  if n.startswith(self._prefix))
+        return MappingProxyType(OrderedDict(topics))
+
+    @property
+    def unassigned_topics(self):
+        l = len(self._prefix)
+        topics = ((n[l:], t) for (n, t) in self._hub.unassigned_topics.items()
+                  if n.startswith(self._prefix))
+        return MappingProxyType(OrderedDict(topics))
+
+    def assign(self, topic_str: str, publisher: Publisher,
+               meta: Optional[dict]=None) -> Topic:
+
+        return self._hub.assign(self._prefix + topic_str, publisher, meta)
