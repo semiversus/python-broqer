@@ -137,7 +137,7 @@ class MapAsync(Operator):
         self._mode = mode
         self._error_callback = error_callback
         self._future = None  # type: asyncio.Future
-        self._last_emit = None
+        self._last_emit = None # type: Any
 
         if mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
             maxlen = (None if mode == Mode.QUEUE else 1)
