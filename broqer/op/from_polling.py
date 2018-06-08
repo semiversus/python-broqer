@@ -28,14 +28,17 @@ Foo: 5
 """
 import asyncio
 from functools import partial
+import sys
 from typing import Any, Callable
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable
+from broqer import Publisher, Subscriber, SubscriptionDisposable, \
+                   default_error_handler
 
 
 class FromPolling(Publisher):
     def __init__(self, interval, poll_func: Callable[[Any], Any], *args,
-                 loop=None, **kwargs) -> None:
+                 error_callback=default_error_handler, loop=None,
+                 **kwargs) -> None:
         super().__init__()
 
         self._interval = interval
@@ -47,6 +50,7 @@ class FromPolling(Publisher):
         self._loop = loop or asyncio.get_event_loop()
 
         self._call_later_handler = None
+        self._error_callback = error_callback
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
@@ -56,12 +60,15 @@ class FromPolling(Publisher):
 
     def _poll_callback(self):
         if self._subscriptions:
-            result = self._poll_func()
-            if result is None:
-                result = ()
-            elif not isinstance(result, tuple):
-                result = (result, )
-            self._emit(*result)
+            try:
+                result = self._poll_func()
+                if result is None:
+                    result = ()
+                elif not isinstance(result, tuple):
+                    result = (result, )
+                self._emit(*result)
+            except Exception:
+                self._error_callback(*sys.exc_info())
 
             self._call_later_handler = asyncio.get_event_loop().call_later(
                 self._interval, self._poll_callback)
