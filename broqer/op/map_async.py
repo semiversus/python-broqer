@@ -82,7 +82,7 @@ Finished with argument 0
 
 Using error_callback:
 
->>> def cb(e):
+>>> def cb(*e):
 ...     print('Got error')
 
 >>> _d = s | op.map_async(delay_add, error_callback=cb) | op.sink(print)
@@ -107,9 +107,10 @@ EMITTED
 import asyncio
 from collections import deque
 from enum import Enum
+import sys
 from typing import Any, MutableSequence  # noqa: F401
 
-from broqer import Publisher
+from broqer import Publisher, default_error_handler
 
 from ._operator import Operator, build_operator
 
@@ -118,7 +119,8 @@ Mode = Enum('Mode', 'CONCURRENT INTERRUPT QUEUE LAST SKIP')
 
 class MapAsync(Operator):
     def __init__(self, publisher: Publisher, map_coro, *args,
-                 mode=Mode.CONCURRENT, error_callback=None, **kwargs) -> None:
+                 mode=Mode.CONCURRENT, error_callback=default_error_handler,
+                 **kwargs) -> None:
         """
         mode uses one of the following enumerations:
             * CONCURRENT - just run coroutines concurrent
@@ -163,15 +165,17 @@ class MapAsync(Operator):
             result = future.result()
         except asyncio.CancelledError:
             pass
-        except Exception as e:
-            if self._error_callback is not None:
-                self._error_callback(e)
+        except Exception:
+            self._error_callback(*sys.exc_info())
         else:
             if result is None:
                 result = ()
             elif not isinstance(result, tuple):
                 result = (result, )
-            self._emit(*result)
+            try:
+                self._emit(*result)
+            except Exception:
+                self._error_callback(*sys.exc_info())
 
         if self._queue:
             self._future = asyncio.ensure_future(self._map_coro(
