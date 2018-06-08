@@ -20,25 +20,34 @@ Usage:
 
 """
 import asyncio
+import sys
 from typing import Any
 
-from broqer import Publisher
+from broqer import Publisher, default_error_handler
 
 from ._operator import Operator, build_operator
 
 
 class Delay(Operator):
-    def __init__(self, publisher: Publisher, delay: float, loop=None) -> None:
+    def __init__(self, publisher: Publisher, delay: float,
+                 error_callback=default_error_handler, loop=None) -> None:
         assert delay >= 0, 'delay has to be positive'
 
         Operator.__init__(self, publisher)
 
         self._delay = delay
         self._loop = loop or asyncio.get_event_loop()
+        self._error_callback = error_callback
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
-        self._loop.call_later(self._delay, self._emit, *args)
+        self._loop.call_later(self._delay, self._delayed, *args)
+
+    def _delayed(self, *args):
+        try:
+            self._emit(*args)
+        except Exception:
+            self._error_callback(*sys.exc_info())
 
 
 delay = build_operator(Delay)
