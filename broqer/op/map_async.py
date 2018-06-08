@@ -114,7 +114,7 @@ from broqer import Publisher, default_error_handler
 
 from ._operator import Operator, build_operator
 
-Mode = Enum('Mode', 'CONCURRENT INTERRUPT QUEUE LAST SKIP')
+Mode = Enum('Mode', 'CONCURRENT INTERRUPT QUEUE LAST LAST_DISTINCT SKIP')
 
 
 class MapAsync(Operator):
@@ -127,6 +127,7 @@ class MapAsync(Operator):
             * INTERRUPT - cancel running and call for new value
             * QUEUE - queue the value(s) and call after coroutine is finished
             * LAST - use last emitted value after coroutine is finished
+            * LAST_DISTINCT - like LAST but only when value has changed
             * SKIP - skip values emitted during coroutine is running
         """
         Operator.__init__(self, publisher)
@@ -136,10 +137,11 @@ class MapAsync(Operator):
         self._mode = mode
         self._error_callback = error_callback
         self._future = None  # type: asyncio.Future
+        self._last_emit = None
 
-        if mode in (Mode.QUEUE, Mode.LAST):
-            self._queue = deque(maxlen=(None if mode == Mode.QUEUE else 1)
-                                )  # type: MutableSequence
+        if mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
+            maxlen = (None if mode == Mode.QUEUE else 1)
+            self._queue = deque(maxlen=maxlen)  # type: MutableSequence
         else:  # no queue for CONCURRENT, INTERRUPT and SKIP
             self._queue = None
 
@@ -149,15 +151,13 @@ class MapAsync(Operator):
             self._future.cancel()
 
         if (self._mode in (Mode.INTERRUPT, Mode.CONCURRENT) or
-                self._future is None or
-                self._future.done()):
+                self._future is None or self._future.done()):
 
-                self._future = \
-                    asyncio.ensure_future(
-                        self._map_coro(*args, *self._args, **self._kwargs))
-
-                self._future.add_done_callback(self._future_done)
-        elif self._mode in (Mode.QUEUE, Mode.LAST):
+            self._last_emit = args
+            future = self._map_coro(*args, *self._args, **self._kwargs)
+            self._future = asyncio.ensure_future(future)
+            self._future.add_done_callback(self._future_done)
+        elif self._mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
             self._queue.append(args)
 
     def _future_done(self, future):
@@ -178,8 +178,12 @@ class MapAsync(Operator):
                 self._error_callback(*sys.exc_info())
 
         if self._queue:
-            self._future = asyncio.ensure_future(self._map_coro(
-                *self._queue.popleft()), *self._args, **self._kwargs)
+            args = self._queue.popleft()
+            if self._mode == Mode.LAST_DISTINCT and args == self._last_emit:
+                return
+            future = self._map_coro(*args)
+            self._future = asyncio.ensure_future(future, *self._args,
+                                                 **self._kwargs)
             self._future.add_done_callback(self._future_done)
 
 
