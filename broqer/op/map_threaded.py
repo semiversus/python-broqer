@@ -69,7 +69,7 @@ Finished with argument 0
 
 Using error_callback:
 
->>> def cb(e):
+>>> def cb(*e):
 ...     print('Got error')
 
 >>> _d = s | op.map_threaded(delay_add, error_callback=cb) | op.sink(print)
@@ -95,9 +95,10 @@ import asyncio
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
+import sys
 from typing import Any, Callable, MutableSequence  # noqa: F401
 
-from broqer import Publisher
+from broqer import Publisher, default_error_handler
 
 from ._operator import Operator, build_operator
 from .map_async import Mode
@@ -105,7 +106,8 @@ from .map_async import Mode
 
 class MapThreaded(Operator):
     def __init__(self, publisher: Publisher, map_func, *args,
-                 mode=Mode.CONCURRENT, error_callback=None, **kwargs) -> None:
+                 mode=Mode.CONCURRENT, error_callback=default_error_handler,
+                 **kwargs) -> None:
         """
         mode uses one of the following enumerations:
             * CONCURRENT - just run coroutines concurrent
@@ -160,9 +162,8 @@ class MapThreaded(Operator):
     def _future_done(self, future):
         try:
             result = future.result()
-        except Exception as e:
-            if self._error_callback is not None:
-                self._error_callback(e)
+        except Exception:
+            self._error_callback(*sys.exc_info())
         else:
             if result is None:
                 result = ()
