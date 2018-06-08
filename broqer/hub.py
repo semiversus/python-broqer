@@ -202,7 +202,7 @@ class Hub:
             topic._subject = publisher
 
         if len(topic._subscriptions):
-            topic._subject.subscribe(topic)
+            publisher.subscribe(topic)
 
         if meta:
             topic.meta = meta
@@ -212,8 +212,9 @@ class Hub:
 
         return topic
 
+
 class SubHub:
-    def __init__(self, hub: Hub, prefix: str):
+    def __init__(self, hub: Hub, prefix: str) -> None:
         self._hub = hub
         assert not prefix.endswith('.'), 'Prefix should not end with \'.\''
         assert prefix, 'Prefix should not be empty'
@@ -226,20 +227,21 @@ class SubHub:
         return self._prefix + topic in self._hub
 
     def __iter__(self):
-        l = len(self._prefix)
-        return (t[l:] for t in self._hub if t.startswith(self._prefix))
+        length = len(self._prefix)
+        return (t[length:] for t in self._hub if t.startswith(self._prefix))
 
     @property
     def topics(self):
-        l = len(self._prefix)
-        topics = ((n[l:], t) for (n, t) in self._hub.topics.items()
+        length = len(self._prefix)
+        topics = ((n[length:], t) for (n, t) in self._hub.topics.items()
                   if n.startswith(self._prefix))
         return MappingProxyType(OrderedDict(topics))
 
     @property
     def unassigned_topics(self):
-        l = len(self._prefix)
-        topics = ((n[l:], t) for (n, t) in self._hub.unassigned_topics.items()
+        length = len(self._prefix)
+        topics = ((n[length:], t) for (n, t)
+                  in self._hub.unassigned_topics.items()
                   if n.startswith(self._prefix))
         return MappingProxyType(OrderedDict(topics))
 
