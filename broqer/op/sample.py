@@ -45,16 +45,18 @@ Sample 2: 2 3
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
 """
 import asyncio
+import sys
 from typing import Any, Optional, Tuple  # noqa: F401
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable
+from broqer import Publisher, Subscriber, SubscriptionDisposable, \
+                   default_error_handler
 
 from ._operator import Operator, build_operator
 
 
 class Sample(Operator):
-    def __init__(self, publisher: Publisher, interval: float, loop=None) \
-            -> None:
+    def __init__(self, publisher: Publisher, interval: float,
+                 error_callback=default_error_handler, loop=None) -> None:
         assert interval > 0, 'interval has to be positive'
 
         Operator.__init__(self, publisher)
@@ -63,6 +65,7 @@ class Sample(Operator):
         self._call_later_handle = None
         self._loop = loop or asyncio.get_event_loop()
         self._cache = None  # type: Tuple
+        self._error_callback = error_callback
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = super().subscribe(subscriber)
@@ -72,7 +75,10 @@ class Sample(Operator):
 
     def _periodic_callback(self):
         """ will be started on first emit """
-        self._emit(*self._cache)  # emit to all subscribers
+        try:
+            self._emit(*self._cache)  # emit to all subscribers
+        except Exception:
+            self._error_callback(*sys.exc_info())
 
         if self._subscriptions:
             # if there are still subscriptions register next _periodic callback
