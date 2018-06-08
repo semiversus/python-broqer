@@ -49,16 +49,18 @@ False
 >>> _d.dispose()
 """
 import asyncio
+import sys
 from typing import Any
 
-from broqer import Publisher
+from broqer import Publisher, default_error_handler
 
 from ._operator import Operator, build_operator
 
 
 class Debounce(Operator):
     def __init__(self, publisher: Publisher, duetime: float,
-                 *retrigger_value: Any, loop=None) -> None:
+                 *retrigger_value: Any, error_callback=default_error_handler,
+                 loop=None) -> None:
         assert duetime >= 0, 'duetime has to be positive'
 
         Operator.__init__(self, publisher)
@@ -67,6 +69,7 @@ class Debounce(Operator):
         self._retrigger_value = retrigger_value
         self._loop = loop or asyncio.get_event_loop()
         self._call_later_handler = None  # type: asyncio.Handle
+        self._error_callback = error_callback
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
@@ -75,7 +78,13 @@ class Debounce(Operator):
         if self._call_later_handler:
             self._call_later_handler.cancel()
         self._call_later_handler = \
-            self._loop.call_later(self.duetime, self._emit, *args)
+            self._loop.call_later(self.duetime, self._debounced, *args)
+
+    def _debounced(self, *args):
+        try:
+            self._emit(*args)
+        except Exception:
+            self._error_callback(*sys.exc_info())
 
     def reset(self):
         if self._retrigger_value:  # if retrigger_value is not empty tuple
