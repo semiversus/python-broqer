@@ -26,16 +26,17 @@ It's also possible to reset the throttling duration:
 5
 """
 import asyncio
+import sys
 from typing import Any, Tuple  # noqa: F401
 
-from broqer import Publisher
+from broqer import Publisher, default_error_handler
 
 from ._operator import Operator, build_operator
 
 
 class Throttle(Operator):
     def __init__(self, publisher: Publisher, duration: float,
-                 loop=None) -> None:
+                 error_callback=default_error_handler, loop=None) -> None:
         assert duration >= 0, 'duration has to be positive'
 
         Operator.__init__(self, publisher)
@@ -44,6 +45,7 @@ class Throttle(Operator):
         self._loop = loop or asyncio.get_event_loop()
         self._call_later_handler = None  # type: asyncio.Handle
         self._cache = None  # type: Tuple[Any, ...]
+        self._error_callback = error_callback
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
@@ -57,7 +59,10 @@ class Throttle(Operator):
 
     def _wait_done_cb(self):
         if self._cache is not None:
-            self._emit(*self._cache)
+            try:
+                self._emit(*self._cache)
+            except Exception:
+                self._error_callback(*sys.exc_info())
             self._cache = None
             self._call_later_handler = self._loop.call_later(
                 self._duration, self._wait_done_cb)
