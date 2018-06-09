@@ -17,8 +17,6 @@ CombineLatest is only emitting, when all values are collected:
 1 2
 >>> s2.emit(3)
 1 3
->>> combination.cache
-(1, 3)
 >>> disposable.dispose()
 
 Subscribing to a CombineLatest with all values available is emitting the values
@@ -37,13 +35,14 @@ from ._operator import MultiOperator, build_operator
 
 
 class CombineLatest(MultiOperator):
-    def __init__(self, *publishers: Publisher) -> None:
+    def __init__(self, *publishers: Publisher, map=None) -> None:
         MultiOperator.__init__(self, *publishers)
         self._cache = [None for _ in publishers]  # type: MutableSequence[Any]
         self._missing = set(publishers)
         self._index = \
             {p: i for i, p in enumerate(publishers)
              }  # type: Dict[Publisher, int]
+        self._map = map
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = MultiOperator.subscribe(self, subscriber)
@@ -59,11 +58,10 @@ class CombineLatest(MultiOperator):
             args = args[0]
         self._cache[self._index[who]] = args
         if not self._missing:
-            self._emit(*self._cache)
-
-    @property
-    def cache(self):
-        return tuple(self._cache)
+            if self._map:
+                self._emit(self._map(*self._cache))
+            else:
+                self._emit(*self._cache)
 
 
 combine_latest = build_operator(CombineLatest)
