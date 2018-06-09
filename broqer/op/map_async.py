@@ -138,6 +138,7 @@ class MapAsync(Operator):
         self._error_callback = error_callback
         self._future = None  # type: asyncio.Future
         self._last_emit = None  # type: Any
+        self.scheduled = Publisher()
 
         if mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
             maxlen = (None if mode == Mode.QUEUE else 1)
@@ -154,6 +155,7 @@ class MapAsync(Operator):
                 self._future is None or self._future.done()):
 
             self._last_emit = args
+            self.scheduled._emit(*args)
             future = self._map_coro(*args, *self._args, **self._kwargs)
             self._future = asyncio.ensure_future(future)
             self._future.add_done_callback(self._future_done)
@@ -181,9 +183,9 @@ class MapAsync(Operator):
             args = self._queue.popleft()
             if self._mode == Mode.LAST_DISTINCT and args == self._last_emit:
                 return
-            future = self._map_coro(*args)
-            self._future = asyncio.ensure_future(future, *self._args,
-                                                 **self._kwargs)
+            self.scheduled._emit(*args)
+            future = self._map_coro(*args, *self._args, **self._kwargs)
+            self._future = asyncio.ensure_future(future)
             self._future.add_done_callback(self._future_done)
 
 
