@@ -12,6 +12,7 @@ from .pack import Pack, pack
 from .partition import Partition, partition
 from .pluck import Pluck, pluck
 from .reduce import Reduce, reduce
+from .replace import Replace, replace
 from .sink import Sink, sink
 from .sliding_window import SlidingWindow, sliding_window
 from .switch import Switch, switch
@@ -32,11 +33,11 @@ __all__ = [
     'catch_exception', 'CombineLatest', 'combine_latest', 'Distinct',
     'distinct', 'Filter', 'filter', 'FromIterable', 'Just', 'Map', 'map',
     'Merge', 'merge', 'Pack', 'pack', 'Partition', 'partition', 'Pluck',
-    'pluck', 'Reduce', 'reduce', 'Sink', 'sink', 'SlidingWindow',
-    'sliding_window', 'Switch', 'switch', 'Unpack', 'unpack', 'Debounce',
-    'debounce', 'Delay', 'delay', 'FromPolling', 'Sample', 'sample',
-    'MapAsync', 'map_async', 'Mode', 'MapThreaded', 'map_threaded',
-    'Throttle', 'throttle', 'ToFuture', 'to_future'
+    'pluck', 'Reduce', 'reduce', 'Replace', 'replace', 'Sink', 'sink',
+    'SlidingWindow', 'sliding_window', 'Switch', 'switch', 'Unpack', 'unpack',
+    'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
+    'Sample', 'sample', 'MapAsync', 'map_async', 'Mode', 'MapThreaded',
+    'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future'
 ]
 
 # TODO operators
