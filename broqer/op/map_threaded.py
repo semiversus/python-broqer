@@ -123,6 +123,7 @@ class MapThreaded(Operator):
         self._error_callback = error_callback
         self._future = None  # type: asyncio.Future
         self._last_emit = None  # type: Any
+        self.scheduled = Publisher()
 
         if args or kwargs:
             self._map_func = \
@@ -150,6 +151,7 @@ class MapThreaded(Operator):
                 self._future.done()):
 
             self._last_emit = args
+            self.scheduled._emit(*args)
             future = asyncio.get_event_loop().run_in_executor(
                     self._executor, self._map_func, *args)
             self._future = asyncio.ensure_future(future)
@@ -176,6 +178,7 @@ class MapThreaded(Operator):
             args = self._queue.popleft()
             if self._mode == Mode.LAST_DISTINCT and args == self._last_emit:
                 return
+            self.scheduled._emit(*args)
             future = asyncio.get_event_loop().run_in_executor(
                         self._executor, self._map_func, *args)
             self._future = asyncio.ensure_future(future)
