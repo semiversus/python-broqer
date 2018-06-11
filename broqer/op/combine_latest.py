@@ -47,7 +47,10 @@ class CombineLatest(MultiOperator):
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = MultiOperator.subscribe(self, subscriber)
         if not self._missing:
-            subscriber.emit(*self._cache, who=self)
+            if self._map:
+                self._emit(self._map(*self._cache))
+            else:
+                self._emit(*self._cache)
         return disposable
 
     def emit(self, *args: Any, who: Publisher) -> None:
