@@ -6,7 +6,7 @@ from .default_error_handler import default_error_handler
 
 __author__ = 'Günther Jena'
 __email__ = 'guenther@jena.at'
-__version__ = '0.2.0'
+__version__ = '0.3.0-dev'
 
 __all__ = [
     'Disposable', 'SubscriptionDisposable', 'Subscriber', 'Publisher',
