@@ -45,7 +45,7 @@ class Value(Publisher, Subscriber):
         self._cache = init
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        disposable = super().subscribe(subscriber)
+        disposable = Publisher.subscribe(self, subscriber)
         subscriber.emit(*self._cache, who=self)
         return disposable
 
