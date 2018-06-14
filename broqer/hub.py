@@ -112,6 +112,7 @@ from typing import Any, Optional
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
+
 class TopicDisposable(SubscriptionDisposable):
     def __init__(self, topic: 'Topic', subscriber: 'Subscriber') \
             -> None:
@@ -125,6 +126,7 @@ class TopicDisposable(SubscriptionDisposable):
     def dispose(self) -> None:
         if self._publisher:
             self._publisher.unsubscribe(self._subscriber)
+
 
 class Topic(Publisher, Subscriber):
     def __init__(self):
