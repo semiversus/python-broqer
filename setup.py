@@ -40,6 +40,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/semiversus/python-broqer',
-    version='0.3.0-dev',
+    version='0.3.1-dev',
     zip_safe=False,
 )
