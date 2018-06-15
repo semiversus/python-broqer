@@ -50,12 +50,16 @@ class ToFuture(Subscriber, asyncio.Future):
         self.set_exception(asyncio.TimeoutError)
 
     def _future_done(self, future):
+        if self._disposable is not None:
+            self._disposable.dispose()
+            self._disposable = None
         if self._timeout_handle is not None:
             self._timeout_handle.cancel()
 
     def emit(self, *args: Any, who: Publisher) -> None:
         if self._disposable is not None:
             self._disposable.dispose()
+            self._disposable = None
         if len(args) == 1:
             self.set_result(args[0])
         else:
