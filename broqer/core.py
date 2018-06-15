@@ -75,6 +75,25 @@ class Publisher():
         return ToFuture(self).__await__()
 
 
+class CachedPublisher(Publisher):
+    def __init__(self, *init):
+        Publisher.__init__(self)
+        if not init:
+            self._cache = None
+        else:
+            self._cache = init
+
+    def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
+        disposable = Publisher.subscribe(self, subscriber)
+        if self._cache is not None:
+            subscriber.emit(*self._cache, who=self)
+        return disposable
+
+    def _emit(self, *args: Any) -> None:
+        self._cache = args
+        Publisher._emit(self, *args)
+
+
 class Subscriber(metaclass=ABCMeta):
     @abstractmethod
     def emit(self, *args: Any, who: Publisher) -> None:
