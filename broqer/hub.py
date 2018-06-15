@@ -146,7 +146,7 @@ class Topic(Publisher, Subscriber):
         elif who == self._subject:
             self._emit(*args)
         else:
-            self._subject.emit(*args, who=self)
+            return self._subject.emit(*args, who=self)
 
     def __call__(self, *args, **kwargs) -> None:
         raise TypeError('Topic is not callable (for use with | operator).' +
