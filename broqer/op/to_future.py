@@ -47,7 +47,6 @@ class ToFuture(Subscriber, asyncio.Future):
         self.set_exception(asyncio.TimeoutError)
 
     def _future_done(self, future):
-        self._disposable.dispose()
         if self._timeout_handle is not None:
             self._timeout_handle.cancel()
 
@@ -57,6 +56,7 @@ class ToFuture(Subscriber, asyncio.Future):
         assert not hasattr(self, '_disposable') or \
             who == self._disposable._publisher, \
             'emit comming from non assigned publisher'
+        self._disposable.dispose()
         if len(args) == 1:
             self.set_result(args[0])
         else:
