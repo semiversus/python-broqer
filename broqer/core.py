@@ -90,8 +90,9 @@ class CachedPublisher(Publisher):
         return disposable
 
     def _emit(self, *args: Any) -> None:
-        self._cache = args
-        Publisher._emit(self, *args)
+        if self._cache != args:
+            self._cache = args
+            Publisher._emit(self, *args)
 
     def clear_cache(self):
         self._cache = None
