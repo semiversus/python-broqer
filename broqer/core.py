@@ -93,6 +93,9 @@ class CachedPublisher(Publisher):
         self._cache = args
         Publisher._emit(self, *args)
 
+    def clear_cache(self):
+        self._cache = None
+
 
 class Subscriber(metaclass=ABCMeta):
     @abstractmethod
