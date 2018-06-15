@@ -51,7 +51,7 @@ class MultiOperator(Publisher, Subscriber):
 
 
 def build_operator(operator_cls):
-    """ This function is taking a operator class and is returning a function
+    """ This function is taking an operator class and is returning a function
     to be called when used in a pipeline. _op function is a closure to add
     arguments to the class initialisation.
 
