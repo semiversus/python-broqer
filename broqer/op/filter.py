@@ -48,7 +48,7 @@ class Filter(Operator):
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._predicate(*args):
-            self._emit(*args)
+            self.notify(*args)
 
 
 filter = build_operator(Filter)

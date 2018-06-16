@@ -56,7 +56,7 @@ class Publisher():
         except KeyError:
             raise ValueError('Subscriber is not registered (anymore)')
 
-    def _emit(self, *args: Any) -> None:
+    def notify(self, *args: Any) -> None:
         """ emit to all subscriptions """
         for subscriber in tuple(self._subscriptions):
             subscriber.emit(*args, who=self)
@@ -89,10 +89,10 @@ class CachedPublisher(Publisher):
             subscriber.emit(*self._cache, who=self)
         return disposable
 
-    def _emit(self, *args: Any) -> None:
+    def notify(self, *args: Any) -> None:
         if self._cache != args:
             self._cache = args
-            Publisher._emit(self, *args)
+            Publisher.notify(self, *args)
 
     def clear_cache(self):
         self._cache = None

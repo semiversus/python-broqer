@@ -45,7 +45,7 @@ class Delay(Operator):
 
     def _delayed(self, *args):
         try:
-            self._emit(*args)
+            self.notify(*args)
         except Exception:
             self._error_callback(*sys.exc_info())
 

@@ -144,7 +144,7 @@ class Topic(Publisher, Subscriber):
         if self._current_subscriber and who == self._current_subscriber:
             self._current_subscriber.emit(*args, who=self)
         elif who == self._subject:
-            self._emit(*args)
+            self.notify(*args)
         else:
             return self._subject.emit(*args, who=self)
 

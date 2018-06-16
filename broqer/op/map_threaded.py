@@ -151,7 +151,7 @@ class MapThreaded(Operator):
                 self._future.done()):
 
             self._last_emit = args
-            self.scheduled._emit(*args)
+            self.scheduled.notify(*args)
             future = asyncio.get_event_loop().run_in_executor(
                     self._executor, self._map_func, *args)
             self._future = asyncio.ensure_future(future)
@@ -170,7 +170,7 @@ class MapThreaded(Operator):
             elif not isinstance(result, tuple):
                 result = (result, )
             try:
-                self._emit(*result)
+                self.notify(*result)
             except Exception:
                 self._error_callback(*sys.exc_info())
 
@@ -178,7 +178,7 @@ class MapThreaded(Operator):
             args = self._queue.popleft()
             if self._mode == Mode.LAST_DISTINCT and args == self._last_emit:
                 return
-            self.scheduled._emit(*args)
+            self.scheduled.notify(*args)
             future = asyncio.get_event_loop().run_in_executor(
                         self._executor, self._map_func, *args)
             self._future = asyncio.ensure_future(future)

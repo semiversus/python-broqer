@@ -42,11 +42,11 @@ class Partition(Operator):
         else:
             self._queue.append(args)
         if self._size and len(self._queue) == self._size:
-            self._emit(tuple(self._queue))
+            self.notify(tuple(self._queue))
             self._queue.clear()
 
     def flush(self):
-        self._emit(tuple(self._queue))
+        self.notify(tuple(self._queue))
         self._queue.clear()
 
 

@@ -76,7 +76,7 @@ class Sample(Operator):
     def _periodic_callback(self):
         """ will be started on first emit """
         try:
-            self._emit(*self._cache)  # emit to all subscribers
+            self.notify(*self._cache)  # emit to all subscribers
         except Exception:
             self._error_callback(*sys.exc_info())
 

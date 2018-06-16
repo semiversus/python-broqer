@@ -58,7 +58,7 @@ class Accumulate(Operator):
             'reduce is only possible for emits with single argument'
         assert who == self._publisher, 'emit from non assigned publisher'
         self._state, result = self._acc_func(self._state, args[0])
-        self._emit(result)
+        self.notify(result)
 
 
 accumulate = build_operator(Accumulate)

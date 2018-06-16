@@ -66,7 +66,7 @@ class FromPolling(Publisher):
                     result = ()
                 elif not isinstance(result, tuple):
                     result = (result, )
-                self._emit(*result)
+                self.notify(*result)
             except Exception:
                 self._error_callback(*sys.exc_info())
 

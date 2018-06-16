@@ -61,7 +61,7 @@ class Distinct(Operator):
         assert len(args) >= 1, 'need at least one argument for distinct'
         if args != self._cache:
             self._cache = args
-            self._emit(*args)
+            self.notify(*args)
 
     @property
     def cache(self):

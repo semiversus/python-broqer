@@ -22,7 +22,7 @@ class Peek(Publisher, Subscriber):
             self._source_publisher.subscribe(self)
             self._wait_for_emit = True
         elif who == self._source_publisher and self._wait_for_emit:
-            self._emit(*args)
+            self.notify(*args)
             self._wait_for_emit = False
             self._source_publisher.unsubscribe(self)
 

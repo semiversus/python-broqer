@@ -18,7 +18,7 @@ class Subject(Publisher, Subscriber):
         Publisher.__init__(self)
         Subscriber.__init__(self)
 
-    emit = Publisher._emit  # type: ignore
+    emit = Publisher.notify  # type: ignore
 
 
 class Value(Publisher, Subscriber):
@@ -51,7 +51,7 @@ class Value(Publisher, Subscriber):
 
     def emit(self, *args: Any, who: Optional[Publisher]=None) -> None:
         self._cache = args
-        self._emit(*args)
+        self.notify(*args)
 
     @property
     def cache(self):

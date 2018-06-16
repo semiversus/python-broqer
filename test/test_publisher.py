@@ -58,5 +58,5 @@ def test_chaining_operator(cls):
 async def test_await(cls, event_loop):
     publisher = cls()
 
-    event_loop.call_soon(publisher._emit, 1)
+    event_loop.call_soon(publisher.notify, 1)
     assert await publisher == 1

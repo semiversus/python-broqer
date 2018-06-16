@@ -45,7 +45,7 @@ class CatchException(Operator):
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         try:
-            self._emit(*args)
+            self.notify(*args)
         except self._exceptions:
             pass
 

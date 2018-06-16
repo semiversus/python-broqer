@@ -56,12 +56,12 @@ class SlidingWindow(Operator):
         Operator.__init__(self, publisher)
 
         self._cache = deque(maxlen=size)  # type: MutableSequence
-        self._emit_partial = emit_partial
+        self.notify_partial = emit_partial
         self._packed = packed
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = Operator.subscribe(self, subscriber)
-        if (self._emit_partial and len(self._cache)) or \
+        if (self.notify_partial and len(self._cache)) or \
                 len(self._cache) == self._cache.maxlen:  # type: ignore
             if self._packed:
                 subscriber.emit(tuple(self._cache), who=self)
@@ -76,12 +76,12 @@ class SlidingWindow(Operator):
             self._cache.append(args[0])
         else:
             self._cache.append(args)
-        if self._emit_partial or \
+        if self.notify_partial or \
                 len(self._cache) == self._cache.maxlen:  # type: ignore
             if self._packed:
-                self._emit(tuple(self._cache))
+                self.notify(tuple(self._cache))
             else:
-                self._emit(*self._cache)
+                self.notify(*self._cache)
 
     def flush(self):
         self._cache.clear()

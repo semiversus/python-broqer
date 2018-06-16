@@ -74,7 +74,7 @@ class Debounce(Operator):
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._retrigger_value:  # if retrigger_value is not empty tuple
-            self._emit(*self._retrigger_value)
+            self.notify(*self._retrigger_value)
         if self._call_later_handler:
             self._call_later_handler.cancel()
         self._call_later_handler = \
@@ -82,13 +82,13 @@ class Debounce(Operator):
 
     def _debounced(self, *args):
         try:
-            self._emit(*args)
+            self.notify(*args)
         except Exception:
             self._error_callback(*sys.exc_info())
 
     def reset(self):
         if self._retrigger_value:  # if retrigger_value is not empty tuple
-            self._emit(*self._retrigger_value)
+            self.notify(*self._retrigger_value)
         if self._call_later_handler:
             self._call_later_handler.cancel()
 

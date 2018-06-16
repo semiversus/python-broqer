@@ -64,7 +64,7 @@ class Pluck(Operator):
         arg = args[0]
         for pick in self._picks:
             arg = getitem(arg, pick)
-        self._emit(arg)
+        self.notify(arg)
 
 
 pluck = build_operator(Pluck)

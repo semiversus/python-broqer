@@ -66,7 +66,7 @@ class Map(Operator):
             result = ()
         elif not isinstance(result, tuple):
             result = (result, )
-        self._emit(*result)
+        self.notify(*result)
 
 
 map = build_operator(Map)

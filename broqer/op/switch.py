@@ -63,7 +63,7 @@ class Switch(Operator):
         else:
             assert who == self._selected_publisher, \
                 'emit from not selected publisher'
-            self._emit(*args)
+            self.notify(*args)
 
 
 switch = build_operator(Switch)

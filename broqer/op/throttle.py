@@ -50,7 +50,7 @@ class Throttle(Operator):
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._call_later_handler is None:
-            self._emit(*args)
+            self.notify(*args)
             self._cache = None
             self._call_later_handler = self._loop.call_later(
                 self._duration, self._wait_done_cb)
@@ -60,7 +60,7 @@ class Throttle(Operator):
     def _wait_done_cb(self):
         if self._cache is not None:
             try:
-                self._emit(*self._cache)
+                self.notify(*self._cache)
             except Exception:
                 self._error_callback(*sys.exc_info())
             self._cache = None

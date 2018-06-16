@@ -55,7 +55,7 @@ class Reduce(Operator):
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._cache is not None:
             self._cache = self._reduce_func(self._cache, args[0])
-            self._emit(self._cache)
+            self.notify(self._cache)
         else:
             self._cache = args[0]
 

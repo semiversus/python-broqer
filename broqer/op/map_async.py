@@ -155,7 +155,7 @@ class MapAsync(Operator):
                 self._future is None or self._future.done()):
 
             self._last_emit = args
-            self.scheduled._emit(*args)
+            self.scheduled.notify(*args)
             future = self._map_coro(*args, *self._args, **self._kwargs)
             self._future = asyncio.ensure_future(future)
             self._future.add_done_callback(self._future_done)
@@ -175,7 +175,7 @@ class MapAsync(Operator):
             elif not isinstance(result, tuple):
                 result = (result, )
             try:
-                self._emit(*result)
+                self.notify(*result)
             except Exception:
                 self._error_callback(*sys.exc_info())
 
@@ -183,7 +183,7 @@ class MapAsync(Operator):
             args = self._queue.popleft()
             if self._mode == Mode.LAST_DISTINCT and args == self._last_emit:
                 return
-            self.scheduled._emit(*args)
+            self.scheduled.notify(*args)
             future = self._map_coro(*args, *self._args, **self._kwargs)
             self._future = asyncio.ensure_future(future)
             self._future.add_done_callback(self._future_done)
