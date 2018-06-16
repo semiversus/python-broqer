@@ -21,9 +21,9 @@ Mode: CONCURRENT (is default)
 Starting with argument 0
 >>> s.emit(1)
 Starting with argument 1
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
-Finished with argument 0
-Finished with argument 1
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.03))
+Finished with argument ...
+Finished with argument ...
 >>> _d.dispose()
 
 Mode: QUEUE
