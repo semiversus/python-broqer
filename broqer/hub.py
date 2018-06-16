@@ -171,14 +171,14 @@ class Topic(Publisher, Subscriber):
     def meta(self) -> dict:
         return getattr(self, '_meta', None)
 
-    @meta.setter
-    def meta(self, meta_dict: dict):
-        self._meta = meta_dict
-
 
 class Hub:
-    def __init__(self):
+    def __init__(self, permitted_meta_keys=None):
         self._topics = defaultdict(Topic)
+        if permitted_meta_keys is not None:
+            self._permitted_meta_keys = set(permitted_meta_keys)
+        else:
+            self._permitted_meta_keys = None
 
     def __getitem__(self, topic: str) -> Topic:
         return self._topics[topic]
@@ -214,7 +214,11 @@ class Hub:
             publisher.subscribe(topic)
 
         if meta:
-            topic.meta = meta
+            if self._permitted_meta_keys is not None:
+                non_keys = set(meta.keys()) - self._permitted_meta_keys
+                if non_keys:
+                    raise KeyError('Not permitted meta keys: %r' % non_keys)
+            setattr(topic, '_meta', meta)  # ._meta is not yet existing
 
         if hasattr(topic, '_assignment_future'):
             topic._assignment_future.set_result(None)
