@@ -106,7 +106,7 @@ When already assigned it will not wait at all:
 True
 """
 import asyncio
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict
 from types import MappingProxyType
 from typing import Any, Optional
 
@@ -114,10 +114,11 @@ from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 
 class Topic(Publisher, Subscriber):
-    def __init__(self):
+    def __init__(self, path: str) -> None:
         Publisher.__init__(self)
-        self._subject = None
-        self._current_subscriber = None
+        self._subject = None  # type: Publisher
+        self._current_subscriber = None  # type: Subscriber
+        self._path = path
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
@@ -146,6 +147,9 @@ class Topic(Publisher, Subscriber):
         elif who == self._subject:
             self.notify(*args)
         else:
+            assert isinstance(self._subject, Subscriber), \
+                'Topic has to be a subscriber'
+
             return self._subject.emit(*args, who=self)
 
     def __call__(self, *args, **kwargs) -> None:
@@ -171,20 +175,29 @@ class Topic(Publisher, Subscriber):
     def meta(self) -> dict:
         return getattr(self, '_meta', None)
 
+    @property
+    def path(self) -> str:
+        return self._path
+
 
 class Hub:
     def __init__(self, permitted_meta_keys=None):
-        self._topics = defaultdict(Topic)
+        self._topics = dict()
         if permitted_meta_keys is not None:
             self._permitted_meta_keys = set(permitted_meta_keys)
         else:
             self._permitted_meta_keys = None
 
-    def __getitem__(self, topic: str) -> Topic:
-        return self._topics[topic]
+    def __getitem__(self, path: str) -> Topic:
+        try:
+            return self._topics[path]
+        except KeyError:
+            topic = Topic(path)
+            self._topics[path] = topic
+            return topic
 
-    def __contains__(self, topic: str) -> bool:
-        return topic in self._topics
+    def __contains__(self, path: str) -> bool:
+        return path in self._topics
 
     def __iter__(self):
         return sorted(self._topics.keys()).__iter__()
