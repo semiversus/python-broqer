@@ -117,18 +117,16 @@ class Topic(Publisher, Subscriber):
     def __init__(self, path: str) -> None:
         Publisher.__init__(self)
         self._subject = None  # type: Publisher
-        self._current_subscriber = None  # type: Subscriber
         self._path = path
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
 
         if self._subject is not None:
-            if len(self._subscriptions) > 1:
-                self._subject.unsubscribe(self)
-            self._current_subscriber = subscriber
-            self._subject.subscribe(self)
-            self._current_subscriber = None
+            if len(self._subscriptions) == 1:
+                self._subject.subscribe(self)
+            elif self._subject.cache is not None:
+                subscriber.emit(*self._subject.cache, who=self)
 
         return disposable
 
@@ -142,9 +140,7 @@ class Topic(Publisher, Subscriber):
             # method will be replaced by .__call__
             raise TypeError('No subject is assigned to this Topic')
 
-        if self._current_subscriber and who == self._current_subscriber:
-            self._current_subscriber.emit(*args, who=self)
-        elif who == self._subject:
+        if who == self._subject:
             self.notify(*args)
         else:
             assert isinstance(self._subject, Subscriber), \
@@ -178,6 +174,10 @@ class Topic(Publisher, Subscriber):
     @property
     def path(self) -> str:
         return self._path
+
+    @property
+    def cache(self):
+        return self._subject.cache
 
 
 class Hub:

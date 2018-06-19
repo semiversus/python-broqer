@@ -74,6 +74,10 @@ class Publisher():
         from broqer.op import ToFuture  # lazy import due circular dependency
         return ToFuture(self).__await__()
 
+    @property
+    def cache(self):
+        return None
+
 
 class CachedPublisher(Publisher):
     def __init__(self, *init):
@@ -96,6 +100,10 @@ class CachedPublisher(Publisher):
 
     def clear_cache(self):
         self._cache = None
+
+    @property
+    def cache(self):
+        return self._cache
 
 
 class Subscriber(metaclass=ABCMeta):
