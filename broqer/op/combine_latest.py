@@ -37,20 +37,23 @@ from ._operator import MultiOperator, build_operator
 class CombineLatest(MultiOperator):
     def __init__(self, *publishers: Publisher, map=None) -> None:
         MultiOperator.__init__(self, *publishers)
-        self._cache = [None for _ in publishers]  # type: MutableSequence[Any]
+        partial = [None for _ in publishers]  # type: MutableSequence[Any]
+        self._partial_state = partial
         self._missing = set(publishers)
         self._index = \
             {p: i for i, p in enumerate(publishers)
              }  # type: Dict[Publisher, int]
         self._map = map
+        self._state = None  # type: MutableSequence[Any]
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = MultiOperator.subscribe(self, subscriber)
         if not self._missing:
             if self._map:
-                self.notify(self._map(*self._cache))
+                self._state = self._map(*self._partial_state)
             else:
-                self.notify(*self._cache)
+                self._state = self._partial_state
+            self.notify(*self._state)
         return disposable
 
     def emit(self, *args: Any, who: Publisher) -> None:
@@ -59,12 +62,16 @@ class CombineLatest(MultiOperator):
             self._missing.remove(who)
         if len(args) == 1:
             args = args[0]
-        self._cache[self._index[who]] = args
+        self._partial_state[self._index[who]] = args
         if not self._missing:
             if self._map:
-                self.notify(self._map(*self._cache))
+                self._state = self._map(*self._partial_state)
             else:
-                self.notify(*self._cache)
+                self._state = self._partial_state
+            self.notify(*self._state)
+
+    def cache(self):
+        return self._state
 
 
 combine_latest = build_operator(CombineLatest)

@@ -44,26 +44,26 @@ class Throttle(Operator):
         self._duration = duration
         self._loop = loop or asyncio.get_event_loop()
         self._call_later_handler = None  # type: asyncio.Handle
-        self._cache = None  # type: Tuple[Any, ...]
+        self._last_state = None  # type: Tuple[Any, ...]
         self._error_callback = error_callback
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._call_later_handler is None:
             self.notify(*args)
-            self._cache = None
+            self._last_state = None
             self._call_later_handler = self._loop.call_later(
                 self._duration, self._wait_done_cb)
         else:
-            self._cache = args
+            self._last_state = args
 
     def _wait_done_cb(self):
-        if self._cache is not None:
+        if self._last_state is not None:
             try:
-                self.notify(*self._cache)
+                self.notify(*self._last_state)
             except Exception:
                 self._error_callback(*sys.exc_info())
-            self._cache = None
+            self._last_state = None
             self._call_later_handler = self._loop.call_later(
                 self._duration, self._wait_done_cb)
         else:

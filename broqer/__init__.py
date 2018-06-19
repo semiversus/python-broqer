@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .core import CachedPublisher, Disposable, Publisher, Subscriber, \
+from .core import StatefulPublisher, Disposable, Publisher, Subscriber, \
                   SubscriptionDisposable
 
 from .hub import Hub, SubHub
@@ -11,7 +11,7 @@ __email__ = 'guenther@jena.at'
 __version__ = '0.3.2-dev'
 
 __all__ = [
-    'CachedPublisher', 'Disposable', 'Publisher', 'Subscriber',
+    'StatefulPublisher', 'Disposable', 'Publisher', 'Subscriber',
     'SubscriptionDisposable', 'Hub', 'SubHub', 'Subject', 'Value',
     'default_error_handler'
 ]

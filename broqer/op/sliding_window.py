@@ -17,7 +17,7 @@ Sliding Window: (1, 2, 3)
 2nd subscriber: (1, 2, 3)
 >>> s.emit(4, 5)
 Sliding Window: (2, 3, (4, 5))
->>> window_publisher.cache
+>>> window_publisher.state
 (2, 3, (4, 5))
 >>> window_publisher.flush()
 >>> s.emit(5)
@@ -55,40 +55,40 @@ class SlidingWindow(Operator):
 
         Operator.__init__(self, publisher)
 
-        self._cache = deque(maxlen=size)  # type: MutableSequence
+        self._state = deque(maxlen=size)  # type: MutableSequence
         self.notify_partial = emit_partial
         self._packed = packed
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = Operator.subscribe(self, subscriber)
-        if (self.notify_partial and len(self._cache)) or \
-                len(self._cache) == self._cache.maxlen:  # type: ignore
+        if (self.notify_partial and len(self._state)) or \
+                len(self._state) == self._state.maxlen:  # type: ignore
             if self._packed:
-                subscriber.emit(tuple(self._cache), who=self)
+                subscriber.emit(tuple(self._state), who=self)
             else:
-                subscriber.emit(*self._cache, who=self)
+                subscriber.emit(*self._state, who=self)
         return disposable
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         assert len(args) >= 1, 'need at least one argument for sliding window'
         if len(args) == 1:
-            self._cache.append(args[0])
+            self._state.append(args[0])
         else:
-            self._cache.append(args)
+            self._state.append(args)
         if self.notify_partial or \
-                len(self._cache) == self._cache.maxlen:  # type: ignore
+                len(self._state) == self._state.maxlen:  # type: ignore
             if self._packed:
-                self.notify(tuple(self._cache))
+                self.notify(tuple(self._state))
             else:
-                self.notify(*self._cache)
+                self.notify(*self._state)
 
     def flush(self):
-        self._cache.clear()
+        self._state.clear()
 
     @property
-    def cache(self):
-        return tuple(self._cache)
+    def state(self):
+        return tuple(self._state)
 
 
 sliding_window = build_operator(SlidingWindow)

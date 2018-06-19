@@ -12,24 +12,24 @@ def test_cache_distinct():
     dut | sink(cb)
 
     cb.assert_called_once_with(0)
-    assert dut.cache == 0
+    assert dut.state == (0,)
 
     cb.reset_mock()
 
     s.emit(0.0)
-    assert dut.cache == 0
+    assert dut.state == (0,)
     cb.assert_not_called()
 
     s.emit(False)  # False == 0
-    assert dut.cache == 0
+    assert dut.state == (0,)
     cb.assert_not_called()
 
     s.emit(1)
-    assert dut.cache == 1
+    assert dut.state == (1,)
     cb.assert_called_once_with(1)
 
     s.emit(1, 2)
-    assert dut.cache == (1, 2)
+    assert dut.state == (1, 2)
     cb.assert_called_with(1, 2)
 
 
@@ -41,18 +41,18 @@ def test_distinct():
     dut | sink(cb)
 
     cb.assert_not_called()
-    assert dut.cache is None
+    assert dut.state is None
 
     s.emit(0.0)
-    assert dut.cache == 0
+    assert dut.state == (0,)
     cb.assert_called_once_with(0)
 
     cb.reset_mock()
 
     s.emit(False)  # False == 0
-    assert dut.cache == 0
+    assert dut.state == (0,)
     cb.assert_not_called()
 
     s.emit(1)
-    assert dut.cache == 1
+    assert dut.state == (1,)
     cb.assert_called_once_with(1)

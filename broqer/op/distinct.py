@@ -14,8 +14,8 @@ Usage:
 >>> s.emit(2)
 2
 >>> s.emit(2)
->>> distinct_publisher.cache
-2
+>>> distinct_publisher.state
+(2,)
 >>> _disposable.dispose()
 
 Also working with multiple arguments in emit:
@@ -27,7 +27,7 @@ Also working with multiple arguments in emit:
 >>> s.emit(0, 0)
 >>> s.emit(0, 1)
 0 1
->>> distinct_publisher.cache
+>>> distinct_publisher.state
 (0, 1)
 """
 
@@ -42,35 +42,30 @@ class Distinct(Operator):
     def __init__(self, publisher: Publisher, *init: Any) -> None:
         Operator.__init__(self, publisher)
         if not init:
-            self._cache = None
+            self._state = None
         else:
-            self._cache = init
+            self._state = init
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        cache = self._cache  # replace self._cache temporary with None
-        self._cache = None
+        cache = self._state  # replace self._state temporary with None
+        self._state = None
         disposable = super().subscribe(subscriber)
-        if self._cache is None and cache is not None:
+        if self._state is None and cache is not None:
             # if subscriber was not emitting on subscription
-            self._cache = cache  # set self._cache back
-            subscriber.emit(*self._cache, who=self)  # and emit actual cache
+            self._state = cache  # set self._state back
+            subscriber.emit(*self._state, who=self)  # and emit actual cache
         return disposable
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         assert len(args) >= 1, 'need at least one argument for distinct'
-        if args != self._cache:
-            self._cache = args
+        if args != self._state:
+            self._state = args
             self.notify(*args)
 
     @property
-    def cache(self):
-        if self._cache is None:
-            return None
-        if len(self._cache) == 1:
-            return self._cache[0]
-        else:
-            return self._cache
+    def state(self):
+        return self._state
 
 
 distinct = build_operator(Distinct)

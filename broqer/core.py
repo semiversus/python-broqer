@@ -75,35 +75,35 @@ class Publisher():
         return ToFuture(self).__await__()
 
     @property
-    def cache(self):
+    def state(self):
         return None
 
 
-class CachedPublisher(Publisher):
+class StatefulPublisher(Publisher):
     def __init__(self, *init):
         Publisher.__init__(self)
         if not init:
-            self._cache = None
+            self._state = None
         else:
-            self._cache = init
+            self._state = init
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
-        if self._cache is not None:
-            subscriber.emit(*self._cache, who=self)
+        if self._state is not None:
+            subscriber.emit(*self._state, who=self)
         return disposable
 
     def notify(self, *args: Any) -> None:
-        if self._cache != args:
-            self._cache = args
+        if self._state != args:
+            self._state = args
             Publisher.notify(self, *args)
 
-    def clear_cache(self):
-        self._cache = None
+    def reset_state(self):
+        self._state = None
 
     @property
-    def cache(self):
-        return self._cache
+    def state(self):
+        return self._state
 
 
 class Subscriber(metaclass=ABCMeta):

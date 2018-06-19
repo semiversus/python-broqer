@@ -32,30 +32,27 @@ class Value(Publisher, Subscriber):
     0
     >>> s.emit(1)
     1
-    >>> s.cache
-    1
+    >>> s.state
+    (1,)
     >>> s.emit(1, 2)
     1 2
-    >>> s.cache
+    >>> s.state
     (1, 2)
     """
     def __init__(self, *init):
         Publisher.__init__(self)
         Subscriber.__init__(self)
-        self._cache = init
+        self._state = init
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
-        subscriber.emit(*self._cache, who=self)
+        subscriber.emit(*self._state, who=self)
         return disposable
 
     def emit(self, *args: Any, who: Optional[Publisher]=None) -> None:
-        self._cache = args
+        self._state = args
         self.notify(*args)
 
     @property
-    def cache(self):
-        if len(self._cache) == 1:
-            return self._cache[0]
-        else:
-            return self._cache
+    def state(self):
+        return self._state

@@ -125,8 +125,8 @@ class Topic(Publisher, Subscriber):
         if self._subject is not None:
             if len(self._subscriptions) == 1:
                 self._subject.subscribe(self)
-            elif self._subject.cache is not None:
-                subscriber.emit(*self._subject.cache, who=self)
+            elif self._subject.state is not None:
+                subscriber.emit(*self._subject.state, who=self)
 
         return disposable
 
@@ -176,8 +176,8 @@ class Topic(Publisher, Subscriber):
         return self._path
 
     @property
-    def cache(self):
-        return self._subject.cache
+    def state(self):
+        return self._subject.state
 
 
 class Hub:

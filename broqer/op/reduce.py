@@ -38,26 +38,26 @@ class Reduce(Operator):
     def __init__(self, publisher: Publisher, func: Callable[[Any, Any], Any],
                  init=None) -> None:
         Operator.__init__(self, publisher)
-        self._cache = init
+        self._last_state = init
 
         self._reduce_func = func
 
     def reset(self, init):
-        self._cache = init
+        self._last_state = init
 
     @property
     def state(self):
-        return self._cache
+        return self._last_state
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert len(args) == 1, \
             'reduce is only possible for emits with single argument'
         assert who == self._publisher, 'emit from non assigned publisher'
-        if self._cache is not None:
-            self._cache = self._reduce_func(self._cache, args[0])
-            self.notify(self._cache)
+        if self._last_state is not None:
+            self._last_state = self._reduce_func(self._last_state, args[0])
+            self.notify(self._last_state)
         else:
-            self._cache = args[0]
+            self._last_state = args[0]
 
 
 reduce = build_operator(Reduce)

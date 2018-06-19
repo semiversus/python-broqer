@@ -8,7 +8,7 @@ Usage:
 >>> s = Subject()
 
 >>> sample_publisher = s | op.sample(0.015)
->>> sample_publisher.cache == None
+>>> sample_publisher.state == None
 True
 >>> _d = sample_publisher | op.sink(print, 'Sample:')
 
@@ -18,15 +18,15 @@ Sample: 1
 Sample: 1
 ...
 Sample: 1
->>> sample_publisher.cache
-1
+>>> sample_publisher.state
+(1,)
 
 >>> s.emit(2, 3)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.06))
 Sample: 2 3
 ...
 Sample: 2 3
->>> sample_publisher.cache
+>>> sample_publisher.state
 (2, 3)
 
 >>> _d2 = sample_publisher | op.sink(print, 'Sample 2:')
@@ -64,19 +64,19 @@ class Sample(Operator):
         self._interval = interval
         self._call_later_handle = None
         self._loop = loop or asyncio.get_event_loop()
-        self._cache = None  # type: Tuple
+        self._state = None  # type: Tuple
         self._error_callback = error_callback
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = super().subscribe(subscriber)
-        if self._cache is not None:
-            subscriber.emit(*self._cache, who=self)
+        if self._state is not None:
+            subscriber.emit(*self._state, who=self)
         return disposable
 
     def _periodic_callback(self):
         """ will be started on first emit """
         try:
-            self.notify(*self._cache)  # emit to all subscribers
+            self.notify(*self._state)  # emit to all subscribers
         except Exception:
             self._error_callback(*sys.exc_info())
 
@@ -85,24 +85,19 @@ class Sample(Operator):
             self._call_later_handle = \
                 self._loop.call_later(self._interval, self._periodic_callback)
         else:
-            self._cache = None
+            self._state = None
             self._call_later_handle = None
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
-        self._cache = args
+        self._state = args
 
         if self._call_later_handle is None:
             self._periodic_callback()
 
     @property
-    def cache(self):
-        if self._cache is None:
-            return None
-        if len(self._cache) == 1:
-            return self._cache[0]
-        else:
-            return self._cache
+    def state(self):
+        return self._state
 
 
 sample = build_operator(Sample)
