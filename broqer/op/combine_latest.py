@@ -50,7 +50,7 @@ class CombineLatest(MultiOperator):
         disposable = MultiOperator.subscribe(self, subscriber)
         if not self._missing:
             if self._map:
-                self._state = self._map(*self._partial_state)
+                self._state = (self._map(*self._partial_state),)
             else:
                 self._state = self._partial_state
             self.notify(*self._state)
@@ -65,12 +65,12 @@ class CombineLatest(MultiOperator):
         self._partial_state[self._index[who]] = args
         if not self._missing:
             if self._map:
-                self._state = self._map(*self._partial_state)
+                self._state = (self._map(*self._partial_state),)
             else:
                 self._state = self._partial_state
             self.notify(*self._state)
 
-    def cache(self):
+    def state(self):
         return self._state
 
 
