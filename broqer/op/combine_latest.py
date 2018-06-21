@@ -27,7 +27,7 @@ Second sink: 1 3
 <...>
 
 """
-from typing import Any, Dict, MutableSequence  # noqa: F401
+from typing import Any, Dict, MutableSequence, Sequence  # noqa: F401
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
@@ -44,7 +44,7 @@ class CombineLatest(MultiOperator):
             {p: i for i, p in enumerate(publishers)
              }  # type: Dict[Publisher, int]
         self._map = map
-        self._state = None  # type: MutableSequence[Any]
+        self._state = None  # type: Sequence[Any]
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = MultiOperator.subscribe(self, subscriber)
