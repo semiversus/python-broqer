@@ -45,6 +45,7 @@ class ToFuture(Subscriber, asyncio.Future):
         self._disposable = publisher.subscribe(self)
         if self.done():
             self._disposable.dispose()
+            self._disposable = None
 
     def _timeout(self):
         self.set_exception(asyncio.TimeoutError)
