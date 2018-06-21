@@ -108,7 +108,7 @@ True
 import asyncio
 from collections import OrderedDict
 from types import MappingProxyType
-from typing import Any, Optional
+from typing import Any, Optional, Dict  # noqa: F401
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
@@ -118,6 +118,7 @@ class Topic(Publisher, Subscriber):
         Publisher.__init__(self)
         self._subject = None  # type: Publisher
         self._path = path
+        self._meta = dict()  # type: Dict[str, Any]
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
@@ -169,7 +170,7 @@ class Topic(Publisher, Subscriber):
 
     @property
     def meta(self) -> dict:
-        return getattr(self, '_meta', None)
+        return self._meta
 
     @property
     def path(self) -> str:
@@ -231,7 +232,7 @@ class Hub:
                 non_keys = set(meta.keys()) - self._permitted_meta_keys
                 if non_keys:
                     raise KeyError('Not permitted meta keys: %r' % non_keys)
-            setattr(topic, '_meta', meta)  # ._meta is not yet existing
+            topic._meta.update(meta)
 
         if hasattr(topic, '_assignment_future'):
             topic._assignment_future.set_result(None)
