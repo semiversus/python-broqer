@@ -70,6 +70,7 @@ class CombineLatest(MultiOperator):
                 self._state = self._partial_state
             self.notify(*self._state)
 
+    @property
     def state(self):
         return self._state
 
