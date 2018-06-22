@@ -1,5 +1,5 @@
 class Type:
-    name = None
+    name = 'none'
 
     def __init__(self, hub):
         self._hub = hub
@@ -55,13 +55,13 @@ class TypeCheck:
 
     def cast(self, value, topic):
         '''Will cast value to the given type. It will not check the value.'''
-        type_key = topic.meta.get('type', None)
+        type_key = topic.meta.get('type', 'none')
         return self._types[type_key].cast(value, topic.meta)
 
     def check(self, value, topic):
         '''Check the value againt the type and limits defined in meta dictionary.
         The value has to be in the appropriate type (may use cast before)'''
-        type_key = topic.meta.get('type', None)
+        type_key = topic.meta.get('type', 'none')
         return self._types[type_key].check(value, topic.meta)
 
 
