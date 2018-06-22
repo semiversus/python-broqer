@@ -1,4 +1,4 @@
-from broqer import Publisher
+from broqer import Publisher, SubscriptionError
 from broqer.subject import Subject
 
 import mock
@@ -16,15 +16,19 @@ def test_subscribe(cls):
 
     # subscribe first subscriber
     d1 = publisher.subscribe(s1)
+    assert s1 in publisher
+    assert s2 not in publisher
     assert len(publisher) == 1
 
     # re - subscribe should fail
-    with pytest.raises(ValueError):
+    with pytest.raises(SubscriptionError):
         publisher.subscribe(s1)
 
     # subscribe second subscriber
     d2 = publisher.subscribe(s2)
     assert len(publisher) == 2
+    assert s1 in publisher
+    assert s2 in publisher
 
     # unsubscribe both subscribers
     d1.dispose()
@@ -33,13 +37,13 @@ def test_subscribe(cls):
     assert len(publisher) == 0
 
     # re - unsubscribing should fail
-    with pytest.raises(ValueError):
+    with pytest.raises(SubscriptionError):
         d1.dispose()
 
-    with pytest.raises(ValueError):
+    with pytest.raises(SubscriptionError):
         publisher.unsubscribe(s1)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(SubscriptionError):
         d2.dispose()
 
 

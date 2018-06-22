@@ -39,13 +39,17 @@ class SubscriptionDisposable(Disposable):
         self._publisher.unsubscribe(self._subscriber)
 
 
+class SubscriptionError(ValueError):
+    pass
+
+
 class Publisher():
     def __init__(self):
         self._subscriptions = set()
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         if subscriber in self._subscriptions:
-            raise ValueError('Subscriber already registered')
+            raise SubscriptionError('Subscriber already registered')
 
         self._subscriptions.add(subscriber)
         return SubscriptionDisposable(self, subscriber)
@@ -54,12 +58,15 @@ class Publisher():
         try:
             self._subscriptions.remove(subscriber)
         except KeyError:
-            raise ValueError('Subscriber is not registered (anymore)')
+            raise SubscriptionError('Subscriber is not registered (anymore)')
 
     def notify(self, *args: Any) -> None:
         """ emit to all subscriptions """
         for subscriber in tuple(self._subscriptions):
             subscriber.emit(*args, who=self)
+
+    def __contains__(self, subscriber: 'Subscriber'):
+        return subscriber in self._subscriptions
 
     def __len__(self):
         """ number of subscriptions """

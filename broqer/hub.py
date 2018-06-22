@@ -32,7 +32,7 @@ It will raise an exception if .emit is used on an unassigned topic:
 >>> hub['value1'].emit(1)
 Traceback (most recent call last):
 ...
-TypeError: No subject is assigned to this Topic
+broqer.core.SubscriptionError: No subject is assigned to this Topic
 
 Assign a publisher to a hub topic:
 
@@ -46,7 +46,7 @@ Assigning to a hub topic without .publish will fail:
 >>> _ = op.Just(1) | hub['value2']
 Traceback (most recent call last):
 ...
-TypeError: Topic is not callable (for use with | operator). ...
+broqer.core.SubscriptionError: ...
 
 >>> _d1.dispose()
 
@@ -66,7 +66,7 @@ It's not possible to assign a second publisher to a hub topic:
 >>> _ = hub.assign('value2', Value(0))
 Traceback (most recent call last):
 ...
-ValueError: Topic is already assigned
+broqer.core.SubscriptionError: Topic is already assigned
 
 Meta data
 ---------
@@ -110,7 +110,8 @@ from collections import OrderedDict
 from types import MappingProxyType
 from typing import Any, Optional, Dict  # noqa: F401
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable
+from broqer import (Publisher, Subscriber, SubscriptionDisposable,
+                    SubscriptionError)
 
 
 class Topic(Publisher, Subscriber):
@@ -139,7 +140,7 @@ class Topic(Publisher, Subscriber):
     def emit(self, *args: Any, who: Optional[Publisher]=None) -> None:
         if self._subject is None:
             # method will be replaced by .__call__
-            raise TypeError('No subject is assigned to this Topic')
+            raise SubscriptionError('No subject is assigned to this Topic')
 
         if who == self._subject:
             self.notify(*args)
@@ -150,8 +151,9 @@ class Topic(Publisher, Subscriber):
             return self._subject.emit(*args, who=self)
 
     def __call__(self, *args, **kwargs) -> None:
-        raise TypeError('Topic is not callable (for use with | operator).' +
-                        ' Use "hub.assign(publisher, topic, [meta])" instead.')
+        raise SubscriptionError(
+            'To assign a publisher to this topic use "hub.assign(publisher, ' +
+            'topic, [meta])" instead.')
 
     @property
     def assigned(self):
@@ -220,7 +222,7 @@ class Hub:
         topic = self[topic_str]
 
         if topic._subject is not None:
-            raise ValueError('Topic is already assigned')
+            raise SubscriptionError('Topic is already assigned')
         else:
             topic._subject = publisher
 

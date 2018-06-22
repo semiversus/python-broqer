@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .core import StatefulPublisher, Disposable, Publisher, Subscriber, \
-                  SubscriptionDisposable
+                  SubscriptionDisposable, SubscriptionError
 
 from .hub import Hub, SubHub
 from .subject import Subject, Value
@@ -12,6 +12,6 @@ __version__ = '0.3.7-dev'
 
 __all__ = [
     'StatefulPublisher', 'Disposable', 'Publisher', 'Subscriber',
-    'SubscriptionDisposable', 'Hub', 'SubHub', 'Subject', 'Value',
-    'default_error_handler'
+    'SubscriptionDisposable', 'SubscriptionError', 'Hub', 'SubHub',
+    'Subject', 'Value', 'default_error_handler'
 ]
