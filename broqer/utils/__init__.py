@@ -1,3 +1,3 @@
-from .type_check import TypeCheck
+from .datatype_check import DatatypeCheck
 
-__all__ = ['TypeCheck']
+__all__ = ['DatatypeCheck']
