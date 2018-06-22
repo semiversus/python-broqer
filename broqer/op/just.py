@@ -13,7 +13,7 @@ Dump1: 1
 Dump2: 1
 
 >>> j.state
-(1,)
+1
 
 Also handling zero or more than one argument:
 
@@ -41,5 +41,5 @@ class Just(Publisher):
         return disposable
 
     @property
-    def state(self):
+    def state_raw(self):
         return self._state

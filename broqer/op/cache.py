@@ -15,7 +15,7 @@ Usage:
 >>> s.emit(3)
 3
 >>> cached_publisher.state
-(3,)
+3
 
 Also working with multiple arguments in emit:
 
@@ -54,7 +54,7 @@ class Cache(Operator):
         self.notify(*args)
 
     @property
-    def state(self):
+    def state_raw(self):
         return self._state
 
 

@@ -71,7 +71,7 @@ class CombineLatest(MultiOperator):
             self.notify(*self._state)
 
     @property
-    def state(self):
+    def state_raw(self):
         return self._state
 
 

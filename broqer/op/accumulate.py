@@ -50,7 +50,7 @@ class Accumulate(Operator):
         self._state = state
 
     @property
-    def state(self):
+    def state_raw(self):
         return self._state
 
     def emit(self, *args: Any, who: Publisher) -> None:

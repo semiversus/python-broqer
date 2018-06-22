@@ -33,7 +33,7 @@ class Value(Publisher, Subscriber):
     >>> s.emit(1)
     1
     >>> s.state
-    (1,)
+    1
     >>> s.emit(1, 2)
     1 2
     >>> s.state
@@ -54,5 +54,5 @@ class Value(Publisher, Subscriber):
         self.notify(*args)
 
     @property
-    def state(self):
+    def state_raw(self):
         return self._state

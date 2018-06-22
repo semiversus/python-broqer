@@ -87,7 +87,7 @@ class SlidingWindow(Operator):
         self._state.clear()
 
     @property
-    def state(self):
+    def state_raw(self):
         return tuple(self._state)
 
 

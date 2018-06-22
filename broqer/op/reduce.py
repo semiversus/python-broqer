@@ -46,8 +46,8 @@ class Reduce(Operator):
         self._last_state = init
 
     @property
-    def state(self):
-        return self._last_state
+    def state_raw(self):
+        return (self._last_state,)
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert len(args) == 1, \

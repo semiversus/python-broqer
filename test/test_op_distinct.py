@@ -2,6 +2,7 @@ from broqer import Subject
 from broqer.op import cache, distinct, sink
 
 import mock
+import pytest
 
 
 def test_cache_distinct():
@@ -12,20 +13,20 @@ def test_cache_distinct():
     dut | sink(cb)
 
     cb.assert_called_once_with(0)
-    assert dut.state == (0,)
+    assert dut.state == 0
 
     cb.reset_mock()
 
     s.emit(0.0)
-    assert dut.state == (0,)
+    assert dut.state == 0
     cb.assert_not_called()
 
     s.emit(False)  # False == 0
-    assert dut.state == (0,)
+    assert dut.state == 0
     cb.assert_not_called()
 
     s.emit(1)
-    assert dut.state == (1,)
+    assert dut.state == 1
     cb.assert_called_once_with(1)
 
     s.emit(1, 2)
@@ -41,18 +42,19 @@ def test_distinct():
     dut | sink(cb)
 
     cb.assert_not_called()
-    assert dut.state is None
+    with pytest.raises(ValueError):
+        dut.state
 
     s.emit(0.0)
-    assert dut.state == (0,)
+    assert dut.state == 0
     cb.assert_called_once_with(0)
 
     cb.reset_mock()
 
     s.emit(False)  # False == 0
-    assert dut.state == (0,)
+    assert dut.state == 0
     cb.assert_not_called()
 
     s.emit(1)
-    assert dut.state == (1,)
+    assert dut.state == 1
     cb.assert_called_once_with(1)

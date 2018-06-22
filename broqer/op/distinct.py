@@ -15,7 +15,7 @@ Usage:
 2
 >>> s.emit(2)
 >>> distinct_publisher.state
-(2,)
+2
 >>> _disposable.dispose()
 
 Also working with multiple arguments in emit:
@@ -64,7 +64,7 @@ class Distinct(Operator):
             self.notify(*args)
 
     @property
-    def state(self):
+    def state_raw(self):
         return self._state
 
 
