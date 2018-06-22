@@ -81,6 +81,10 @@ class Publisher():
         from broqer.op import ToFuture  # lazy import due circular dependency
         return ToFuture(self).__await__()
 
+    def to_future(self, timeout=None):
+        from broqer.op import ToFuture  # lazy import due circular dependency
+        return ToFuture(self, timeout)
+
     @property
     def state(self):
         _state = self.state_raw
