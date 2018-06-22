@@ -8,10 +8,10 @@ class Type:
         return value
 
     def check(self, value, meta):
-        return True
+        pass
 
     def as_str(self, value, meta):
-        return str(self)
+        return str(value)
 
     def _get(self, key, meta):
         if key not in meta:
@@ -21,10 +21,9 @@ class Type:
             topic = value[1:]
             if topic not in self._hub:
                 raise KeyError('topic %s not found in hub' % topic)
-            value = self._hub[topic].state
-            if len(value) == 1:
-                value = value[0]
+            return self._hub[topic].state
         return value
+
 
 class IntType(Type):
     name = 'integer'
@@ -40,6 +39,7 @@ class IntType(Type):
         maximum = self._get('maximum', meta)
         if maximum is not None and value > maximum:
             raise ValueError('Value %d over maximum of %d' % (value, maximum))
+
 
 class TypeCheck:
     default_type_classes = (Type, IntType)
@@ -66,12 +66,13 @@ class TypeCheck:
 
 
 if __name__ == '__main__':
-    from broqer import Hub, Value, __version__
+    from broqer import Hub, Value
 
     hub = Hub()
     type_check = TypeCheck(hub)
 
-    value_int = hub.assign('value_int', Value(0), meta={'type':'integer', 'minimum':'>value_untyped'})
+    value_int_meta = {'type': 'integer', 'minimum': '>value_untyped'}
+    value_int = hub.assign('value_int', Value(0), meta=value_int_meta)
     value_untyped = hub.assign('value_untyped', Value(0))
 
     # check value_int
@@ -79,10 +80,10 @@ if __name__ == '__main__':
     assert type_check.cast(123.45, value_int) == 123
     assert type_check.cast(b'123', value_int) == 123
 
-    assert type_check.check(123, value_int) == None
+    assert type_check.check(123, value_int) is None
     try:
         type_check.check(-100, value_int)
-    except:
+    except ValueError:
         pass
     else:
         assert False, 'should raise AssertionError'
@@ -92,5 +93,5 @@ if __name__ == '__main__':
     assert type_check.cast(123.45, value_untyped) == 123.45
     assert type_check.cast(b'123', value_untyped) == b'123'
 
-    assert type_check.check(123, value_untyped) == True
-    assert type_check.check(-100, value_untyped) == True
+    assert type_check.check(123, value_untyped) is None
+    assert type_check.check(-100, value_untyped) is None
