@@ -48,13 +48,16 @@ class CombineLatest(MultiOperator):
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = MultiOperator.subscribe(self, subscriber)
-        if not self._missing:
-            if self._map:
-                self._state = (self._map(*self._partial_state),)
-            else:
-                self._state = self._partial_state
-            self.notify(*self._state)
+        if not self._missing and len(self._subscriptions) > 1:
+            subscriber.emit(*self._state, who=self)
         return disposable
+
+    def unsubscribe(self, subscriber: Subscriber) -> None:
+        MultiOperator.unsubscribe(self, subscriber)
+        if not self._subscriptions:
+            self._missing = set(self._publishers)
+            self._partial_state = [None for _ in self._partial_state]
+            self._state = None
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who in self._publishers, 'emit from non assigned publisher'
