@@ -32,7 +32,7 @@ Reseting (or just setting) the state is also possible:
 2.0
 
 """
-from typing import Any, Callable
+from typing import Any, Callable, Tuple
 
 from broqer import Publisher
 
@@ -40,8 +40,8 @@ from ._operator import Operator, build_operator
 
 
 class Accumulate(Operator):
-    def __init__(self, publisher: Publisher, func: Callable[[Any, Any], Any],
-                 init) -> None:
+    def __init__(self, publisher: Publisher,
+                 func: Callable[[Any, Any], Tuple[Any, Any]], init) -> None:
         Operator.__init__(self, publisher)
         self._acc_func = func
         self._state = init
