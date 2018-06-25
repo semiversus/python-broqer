@@ -1,3 +1,5 @@
+from broqer.op import get
+
 class Datatype:
     name = 'none'
 
@@ -21,7 +23,7 @@ class Datatype:
             topic = value[1:]
             if topic not in self._hub:
                 raise KeyError('topic %s not found in hub' % topic)
-            return self._hub[topic].state
+            return get(self._hub[topic])
         return value
 
 
