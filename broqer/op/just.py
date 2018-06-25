@@ -12,16 +12,9 @@ Dump1: 1
 >>> _d2 = j | op.sink(print, 'Dump2:')
 Dump2: 1
 
->>> j.state
-1
-
 Also handling zero or more than one argument:
 
->>> op.Just(1, 2).state
-(1, 2)
 >>> i = op.Just()
->>> i.state
-()
 >>> _d3 = i | op.sink(print, 'Dump Empty:')
 Dump Empty:
 """
@@ -39,7 +32,3 @@ class Just(Publisher):
         disposable = Publisher.subscribe(self, subscriber)
         subscriber.emit(*self._state, who=self)
         return disposable
-
-    @property
-    def state_raw(self):
-        return self._state

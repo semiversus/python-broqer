@@ -1,5 +1,5 @@
 """
-Caching the emitted values to access it via ``.state`` property.
+Caching the emitted values.
 
 The ``Cache`` publisher is emitting a value on subscription.
 
@@ -14,15 +14,11 @@ Usage:
 
 >>> s.emit(3)
 3
->>> cached_publisher.state
-3
 
 Also working with multiple arguments in emit:
 
 >>> s.emit(1, 2)
 1 - 2
->>> cached_publisher.state
-(1, 2)
 """
 
 from typing import Any
@@ -39,13 +35,16 @@ class Cache(Operator):
         self._state = init
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        cache = self._state  # replace self._state temporary with None
+        state = self._state
         self._state = None
-        disposable = super().subscribe(subscriber)
-        if self._state is None:
-            # if subscriber was not emitting on subscription
-            self._state = cache  # set self._state back
-            subscriber.emit(*self._state, who=self)  # and emit actual cache
+        disposable = Operator.subscribe(self, subscriber)
+        if len(self._subscriptions) == 1:
+            if self._state is None:
+                self._state = state
+                subscriber.emit(*self._state, who=self)  # and emit actual cache
+        else:
+            self._state = state
+            subscriber.emit(*self._state, who=self)
         return disposable
 
     def emit(self, *args: Any, who: Publisher) -> None:
@@ -53,12 +52,5 @@ class Cache(Operator):
         self._state = args
         self.notify(*args)
 
-    @property
-    def state_raw(self):
-        return self._state
-
 
 cache = build_operator(Cache)
-
-# TODO: make a CacheBase with .state property
-# TODO: should operators with .state check for len(args) on new emits?

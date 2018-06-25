@@ -22,8 +22,6 @@ Usage:
 3.0
 >>> s.emit(3)
 3.0
->>> lowpass.state
-[3, 3, 3]
 
 Reseting (or just setting) the state is also possible:
 
@@ -34,7 +32,7 @@ Reseting (or just setting) the state is also possible:
 """
 from typing import Any, Callable, Tuple
 
-from broqer import Publisher
+from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 from ._operator import Operator, build_operator
 
@@ -49,15 +47,9 @@ class Accumulate(Operator):
     def reset(self, state):
         self._state = state
 
-    @property
-    def state_raw(self):
-        return self._state
-
-    def emit(self, *args: Any, who: Publisher) -> None:
-        assert len(args) == 1, \
-            'reduce is only possible for emits with single argument'
+    def emit(self, arg: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
-        self._state, result = self._acc_func(self._state, args[0])
+        self._state, result = self._acc_func(self._state, arg)
         self.notify(result)
 
 

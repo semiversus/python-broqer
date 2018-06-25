@@ -24,8 +24,6 @@ Reseting (or just setting) the state is also possible:
 >>> reduce_publisher.reset(123)
 >>> s.emit(4)
 Reduce: 1234
->>> reduce_publisher.state
-1234
 """
 from typing import Any, Callable
 
@@ -44,10 +42,6 @@ class Reduce(Operator):
 
     def reset(self, init):
         self._last_state = init
-
-    @property
-    def state_raw(self):
-        return (self._last_state,)
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert len(args) == 1, \

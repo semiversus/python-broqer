@@ -17,7 +17,6 @@ CombineLatest is only emitting, when all values are collected:
 1 2
 >>> s2.emit(3)
 1 3
->>> disposable.dispose()
 
 Subscribing to a CombineLatest with all values available is emitting the values
 immediatly on subscribtion:
@@ -70,12 +69,8 @@ class CombineLatest(MultiOperator):
             if self._map:
                 self._state = (self._map(*self._partial_state),)
             else:
-                self._state = self._partial_state
+                self._state = tuple(self._partial_state)
             self.notify(*self._state)
-
-    @property
-    def state_raw(self):
-        return self._state
 
 
 combine_latest = build_operator(CombineLatest)

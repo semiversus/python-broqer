@@ -17,8 +17,6 @@ Sliding Window: (1, 2, 3)
 2nd subscriber: (1, 2, 3)
 >>> s.emit(4, 5)
 Sliding Window: (2, 3, (4, 5))
->>> window_publisher.state
-(2, 3, (4, 5))
 >>> window_publisher.flush()
 >>> s.emit(5)
 >>> _d.dispose()
@@ -85,10 +83,6 @@ class SlidingWindow(Operator):
 
     def flush(self):
         self._state.clear()
-
-    @property
-    def state_raw(self):
-        return tuple(self._state)
 
 
 sliding_window = build_operator(SlidingWindow)

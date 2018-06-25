@@ -85,22 +85,6 @@ class Publisher():
         from broqer.op import ToFuture  # lazy import due circular dependency
         return ToFuture(self, timeout)
 
-    @property
-    def state(self):
-        _state = self.state_raw
-
-        if _state is None:
-            raise ValueError('Publisher has no state')
-
-        if len(_state) == 1:
-            return _state[0]
-        else:
-            return _state
-
-    @property
-    def state_raw(self):
-        return None
-
 
 class StatefulPublisher(Publisher):
     def __init__(self, *init):
@@ -123,10 +107,6 @@ class StatefulPublisher(Publisher):
 
     def reset_state(self):
         self._state = None
-
-    @property
-    def state_raw(self):
-        return self._state
 
 
 class Subscriber(metaclass=ABCMeta):

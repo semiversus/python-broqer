@@ -43,12 +43,13 @@ class _None:
     pass
 
 @pytest.mark.parametrize('operator,args,kwargs,input,output', [
-    # output is a tuple of three values:
+    # output is a tuple of five values:
     # 1. output of subscription to a non-stateful publisher
     # 2. output of subscription to a non-stateful publisher after emitting `input`
     # 3. output of subscription of a second subscriber after emitting `input`
-    # 4.
-    # 4. output of subscription to a stateful publisher with state input
+    # 4. output of subscription after disposing all other subscriptions and re-subscribing
+    # 5. output of subscription to a stateful publisher with state input
+    (Accumulate, (lambda a,b:(a+b,a+b), 1), {}, 1, (_None, 2, _None, _None, 2)),
     (Cache, (0,), {}, 1, (0, 1, 1, 1, 1)),
     (CombineLatest, (), {}, 1, (_None, 1, 1, _None, 1)),
     (CombineLatest, (Value(0),), {}, 1, (_None, (1, 0), (1, 0), _None, (1, 0))),
@@ -149,7 +150,7 @@ def test_on_subscription(operator, args, kwargs, input, output):
 
     mock1.assert_not_called()
 
-    if output[4] == _None:
+    if output[2] == _None:
         mock2.assert_not_called()
     else:
-        mock2.assert_called_once_with(*output[4])
+        mock2.assert_called_once_with(*output[2])

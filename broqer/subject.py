@@ -32,12 +32,8 @@ class Value(Publisher, Subscriber):
     0
     >>> s.emit(1)
     1
-    >>> s.state
-    1
     >>> s.emit(1, 2)
     1 2
-    >>> s.state
-    (1, 2)
     """
     def __init__(self, *init):
         Publisher.__init__(self)
@@ -52,7 +48,3 @@ class Value(Publisher, Subscriber):
     def emit(self, *args: Any, who: Optional[Publisher]=None) -> None:
         self._state = args
         self.notify(*args)
-
-    @property
-    def state_raw(self):
-        return self._state

@@ -8,10 +8,6 @@ Usage:
 >>> s = Subject()
 
 >>> sample_publisher = s | op.sample(0.015)
->>> sample_publisher.state
-Traceback (most recent call last):
-...
-ValueError: Publisher has no state
 
 >>> _d = sample_publisher | op.sink(print, 'Sample:')
 
@@ -21,16 +17,12 @@ Sample: 1
 Sample: 1
 ...
 Sample: 1
->>> sample_publisher.state
-1
 
 >>> s.emit(2, 3)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.06))
 Sample: 2 3
 ...
 Sample: 2 3
->>> sample_publisher.state
-(2, 3)
 
 >>> _d2 = sample_publisher | op.sink(print, 'Sample 2:')
 Sample 2: 2 3
@@ -97,10 +89,6 @@ class Sample(Operator):
 
         if self._call_later_handle is None:
             self._periodic_callback()
-
-    @property
-    def state_raw(self):
-        return self._state
 
 
 sample = build_operator(Sample)

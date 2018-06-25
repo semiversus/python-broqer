@@ -112,6 +112,7 @@ from typing import Any, Optional, Dict  # noqa: F401
 
 from broqer import (Publisher, Subscriber, SubscriptionDisposable,
                     SubscriptionError)
+from broqer.op import Sink
 
 
 class Topic(Publisher, Subscriber):
@@ -127,8 +128,8 @@ class Topic(Publisher, Subscriber):
         if self._subject is not None:
             if len(self._subscriptions) == 1:
                 self._subject.subscribe(self)
-            elif self._subject.state_raw is not None:
-                subscriber.emit(*self._subject.state_raw, who=self)
+            else:
+                Sink(self._subject, subscriber.emit, who=self).dispose()
 
         return disposable
 
@@ -177,10 +178,6 @@ class Topic(Publisher, Subscriber):
     @property
     def path(self) -> str:
         return self._path
-
-    @property
-    def state_raw(self):
-        return self._subject.state_raw
 
 
 class Hub:

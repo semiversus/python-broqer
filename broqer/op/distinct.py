@@ -14,8 +14,6 @@ Usage:
 >>> s.emit(2)
 2
 >>> s.emit(2)
->>> distinct_publisher.state
-2
 >>> _disposable.dispose()
 
 Also working with multiple arguments in emit:
@@ -27,8 +25,6 @@ Also working with multiple arguments in emit:
 >>> s.emit(0, 0)
 >>> s.emit(0, 1)
 0 1
->>> distinct_publisher.state
-(0, 1)
 """
 
 from typing import Any
@@ -47,12 +43,12 @@ class Distinct(Operator):
             self._state = init
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        cache = self._state  # replace self._state temporary with None
+        state = self._state  # replace self._state temporary with None
         self._state = None
-        disposable = super().subscribe(subscriber)
-        if self._state is None and cache is not None:
+        disposable = Operator.subscribe(self, subscriber)
+        if self._state is None and state is not None:
             # if subscriber was not emitting on subscription
-            self._state = cache  # set self._state back
+            self._state = state  # set self._state back
             subscriber.emit(*self._state, who=self)  # and emit actual cache
         return disposable
 
@@ -62,10 +58,6 @@ class Distinct(Operator):
         if args != self._state:
             self._state = args
             self.notify(*args)
-
-    @property
-    def state_raw(self):
-        return self._state
 
 
 distinct = build_operator(Distinct)
