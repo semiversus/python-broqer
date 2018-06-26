@@ -32,7 +32,7 @@ Reseting (or just setting) the state is also possible:
 """
 from typing import Any, Callable, Tuple
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable
+from broqer import Publisher
 
 from ._operator import Operator, build_operator
 
@@ -47,9 +47,11 @@ class Accumulate(Operator):
     def reset(self, state):
         self._state = state
 
-    def emit(self, arg: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> None:
+        assert len(args) == 1, \
+            'accumulate is only possible for emits with single argument'
         assert who == self._publisher, 'emit from non assigned publisher'
-        self._state, result = self._acc_func(self._state, arg)
+        self._state, result = self._acc_func(self._state, args[0])
         self.notify(result)
 
 

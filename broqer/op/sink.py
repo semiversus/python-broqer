@@ -33,7 +33,7 @@ from ._operator import build_operator
 
 class Sink(Subscriber, Disposable):
     def __init__(self, publisher: Publisher,
-                 sink_function: Optional[Callable[[Any], None]]=None,
+                 sink_function: Optional[Callable[..., None]]=None,
                  *args, **kwargs) -> None:
         if sink_function is None:
             self._sink_function = None  # type: Callable

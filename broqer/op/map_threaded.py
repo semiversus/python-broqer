@@ -106,8 +106,8 @@ from .map_async import Mode
 
 class MapThreaded(Operator):
     def __init__(self, publisher: Publisher, map_func, *args,
-                 mode=Mode.CONCURRENT, error_callback=default_error_handler,
-                 **kwargs) -> None:
+                 mode: Mode=Mode.CONCURRENT,
+                 error_callback=default_error_handler, **kwargs) -> None:
         """
         mode uses one of the following enumerations:
             * CONCURRENT - just run coroutines concurrent

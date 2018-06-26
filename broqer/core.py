@@ -23,7 +23,7 @@ class Disposable(metaclass=ABCMeta):
         """ .dispose() method has to be overwritten"""
 
     def __enter__(self):
-        pass
+        return self
 
     def __exit__(self, type, value, traceback):
         self.dispose()

@@ -41,7 +41,7 @@ class Cache(Operator):
         if len(self._subscriptions) == 1:
             if self._state is None:
                 self._state = state
-                subscriber.emit(*self._state, who=self)  # and emit actual cache
+                subscriber.emit(*self._state, who=self)  # emit actual cache
         else:
             self._state = state
             subscriber.emit(*self._state, who=self)

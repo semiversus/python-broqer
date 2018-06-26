@@ -1,5 +1,6 @@
 from broqer.op import get
 
+
 class Datatype:
     name = 'none'
 

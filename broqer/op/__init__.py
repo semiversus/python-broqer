@@ -33,7 +33,7 @@ from .to_future import ToFuture, to_future
 __all__ = [
     'Accumulate', 'accumulate', 'Cache', 'cache', 'CatchException',
     'catch_exception', 'CombineLatest', 'combine_latest', 'Distinct',
-    'distinct', 'Filter', 'filter', 'FromIterable', 'Getter,' ,'getter', 'get',
+    'distinct', 'Filter', 'filter', 'FromIterable', 'Getter', 'getter', 'get',
     'Just', 'Map', 'map', 'Merge', 'merge', 'Pack', 'pack', 'Partition',
     'partition', 'Peek', 'peek', 'Pluck', 'pluck', 'Reduce', 'reduce',
     'Replace', 'replace', 'Sink', 'sink', 'SlidingWindow', 'sliding_window',
