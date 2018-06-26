@@ -1,4 +1,4 @@
-from typing import Any, Tuple
+from typing import Any, Tuple  # noqa
 
 from broqer import Subscriber, Publisher, Disposable
 from ._operator import build_operator
@@ -6,7 +6,7 @@ from ._operator import build_operator
 
 class Getter(Subscriber, Disposable):
     def __init__(self, publisher: Publisher) -> None:
-        self._value = None  # type: Tuple[Any]
+        self._value = None  # type: Tuple[Any, ...]
         self._publisher = publisher
         publisher.subscribe(self)
 

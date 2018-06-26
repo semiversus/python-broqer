@@ -96,7 +96,8 @@ from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import sys
-from typing import Any, Callable, MutableSequence  # noqa: F401
+from enum import Enum  # noqa: F401
+from typing import Any, Callable, MutableSequence, Optional  # noqa: F401
 
 from broqer import Publisher, default_error_handler
 
@@ -106,7 +107,7 @@ from .map_async import Mode
 
 class MapThreaded(Operator):
     def __init__(self, publisher: Publisher, map_func, *args,
-                 mode: Mode=Mode.CONCURRENT,
+                 mode: Mode=Mode.CONCURRENT,  # type: ignore
                  error_callback=default_error_handler, **kwargs) -> None:
         """
         mode uses one of the following enumerations:
@@ -119,7 +120,7 @@ class MapThreaded(Operator):
         """
         Operator.__init__(self, publisher)
         assert mode != Mode.INTERRUPT, 'mode INTERRUPT is not supported'
-        self._mode = mode
+        self._mode = mode  # type: Enum
         self._error_callback = error_callback
         self._future = None  # type: asyncio.Future
         self._last_emit = None  # type: Any
