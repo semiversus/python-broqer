@@ -16,6 +16,3 @@ mypy = "==0.590"
 rstcheck = "==3.3"
 Sphinx = "==1.7.1"
 codecov = "==2.0.15"
-
-[requires]
-python_version = "3.6"
