@@ -1,6 +1,8 @@
 from typing import MutableMapping, Any
+
 from broqer import Subscriber, Publisher
 from broqer.hub import Topic
+
 
 class TopicMapper(Subscriber):
     def __init__(self, mapping: MutableMapping) -> None:
