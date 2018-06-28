@@ -1,8 +1,8 @@
+from unittest import mock
+
 from broqer import Disposable
 from broqer.op import Sink, cache, sink
 from broqer.subject import Subject
-
-import mock
 
 
 def test_sink():

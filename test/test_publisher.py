@@ -1,9 +1,9 @@
-from broqer import Publisher, SubscriptionError
-from broqer.subject import Subject
-
-import mock
+from unittest import mock
 
 import pytest
+
+from broqer import Publisher, SubscriptionError
+from broqer.subject import Subject
 
 
 @pytest.mark.parametrize('cls', [Publisher])
