@@ -8,15 +8,15 @@ env:
     - PIPENV_IGNORE_VIRTUALENVS = 1
 
 install:
-  pip install pipenv
-  pipenv install --dev
+  - pip install pipenv
+  - pipenv install --dev
 
 script:
-  pipenv run flake8 broqer
-  pipenv run mypy broqer
-  pipenv run rstcheck README.rst
-  pipenv run py.test --doctest-modules --cov=broqer
-  pipenv run codecov
+  - pipenv run flake8 broqer
+  - pipenv run mypy broqer
+  - pipenv run rstcheck README.rst
+  - pipenv run py.test --doctest-modules --cov=broqer
+  - pipenv run codecov
 
 deploy:
   provider: pypi
