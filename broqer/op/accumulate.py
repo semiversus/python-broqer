@@ -1,9 +1,4 @@
 """
-Call a function with state and new value which is returning new state and value
-to emit.
-
-Usage:
-
 >>> from broqer import Subject, op
 >>> s = Subject()
 
@@ -23,7 +18,7 @@ Usage:
 >>> s.emit(3)
 3.0
 
-Reseting (or just setting) the state is also possible:
+Resetting (or just setting) the state is also possible:
 
 >>> lowpass.reset([1, 1, 1])
 >>> s.emit(4)
@@ -38,13 +33,27 @@ from ._operator import Operator, build_operator
 
 
 class Accumulate(Operator):
+    """ On each emit of source publisher a function gets called with state and
+    received value as arguments and is returning new state and value to emit.
+
+    :param publisher: source publisher
+    :param func:
+        Function taking two arguments: current state and new value. The return
+        value is a tuple with (new state, result) where new state will be used
+        for the next call and result will be emitted to subscribers.
+    :param init: initialization for state
+    """
     def __init__(self, publisher: Publisher,
                  func: Callable[[Any, Any], Tuple[Any, Any]], init) -> None:
         Operator.__init__(self, publisher)
         self._acc_func = func
         self._state = init
 
-    def reset(self, state):
+    def reset(self, state:Any) -> None:
+        """ Reseting (or setting) the internal state.
+
+        :param state: new state to be set
+        """
         self._state = state
 
     def emit(self, *args: Any, who: Publisher) -> None:
