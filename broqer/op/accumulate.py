@@ -49,7 +49,7 @@ class Accumulate(Operator):
         self._acc_func = func
         self._state = init
 
-    def reset(self, state:Any) -> None:
+    def reset(self, state: Any) -> None:
         """ Reseting (or setting) the internal state.
 
         :param state: new state to be set
