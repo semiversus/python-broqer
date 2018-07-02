@@ -18,7 +18,8 @@ class Subject(Publisher, Subscriber):
         Publisher.__init__(self)
         Subscriber.__init__(self)
 
-    emit = Publisher.notify  # type: ignore
+    def emit(self, *args: Any, who: Optional[Publisher]=None) -> None:
+        self.notify(*args)
 
 
 class Value(Publisher, Subscriber):
