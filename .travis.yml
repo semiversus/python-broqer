@@ -22,7 +22,7 @@ script:
   - pipenv run rstcheck README.rst
   - pipenv run py.test --doctest-modules --cov=broqer
 
-  after_success:
+after_success:
   - pipenv run codecov
 
 deploy:
