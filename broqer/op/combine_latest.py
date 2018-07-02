@@ -34,7 +34,7 @@ from ._operator import MultiOperator, build_operator
 
 
 class CombineLatest(MultiOperator):
-    def __init__(self, *publishers: Publisher, map=None) -> None:
+    def __init__(self, *publishers: Publisher, map=None, emit_on=None) -> None:
         MultiOperator.__init__(self, *publishers)
         partial = [None for _ in publishers]  # type: MutableSequence[Any]
         self._partial_state = partial
@@ -43,6 +43,10 @@ class CombineLatest(MultiOperator):
             {p: i for i, p in enumerate(publishers)
              }  # type: Dict[Publisher, int]
         self._map = map
+        if emit_on is None:
+            self._emit_on = publishers
+        else:
+            self._emit_on = emit_on
         self._state = None  # type: Sequence[Any]
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
@@ -65,7 +69,7 @@ class CombineLatest(MultiOperator):
         if len(args) == 1:
             args = args[0]
         self._partial_state[self._index[who]] = args
-        if not self._missing:
+        if not self._missing and (who in self._emit_on):
             if self._map:
                 self._state = (self._map(*self._partial_state),)
             else:
