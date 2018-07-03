@@ -68,6 +68,10 @@ class CombineLatest(MultiOperator):
             self._missing.remove(who)
         if len(args) == 1:
             args = args[0]
+
+        if self._partial_state[self._index[who]] == args:
+            # if partial_state has not changed avoid new emit
+            return
         self._partial_state[self._index[who]] = args
         if not self._missing and (who in self._emit_on):
             if self._map:
