@@ -49,8 +49,9 @@ class Cache(Operator):
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
-        self._state = args
-        self.notify(*args)
+        if self._state != args:
+            self._state = args
+            self.notify(*args)
 
 
 cache = build_operator(Cache)
