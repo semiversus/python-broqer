@@ -6,7 +6,9 @@ from broqer import Publisher
 from ._operator import MultiOperator, build_operator
 
 
-class Any(MultiOperator):
+class _MultiPredicate(MultiOperator):
+    combination_operator = any  # type: ignore
+
     def __init__(self, *publishers: Publisher,
                  predicate: Callable[[Any_], bool]) -> None:
         MultiOperator.__init__(self, *publishers)
@@ -24,7 +26,11 @@ class Any(MultiOperator):
         assert who in self._publishers, 'emit from non assigned publisher'
 
         self._partial[self._index[who]] = self._predicate(*args)
-        self.notify(any(self._partial))
+        self.notify(self.combination_operator(*self._partial))
+
+
+class Any(_MultiPredicate):
+    pass
 
 
 any = build_operator(Any)
