@@ -181,6 +181,8 @@ class Topic(Publisher, Subscriber):
 
 
 class Hub:
+    _topic_cls = Topic
+
     def __init__(self, permitted_meta_keys=None):
         self._topics = dict()
         if permitted_meta_keys is not None:
@@ -192,7 +194,7 @@ class Hub:
         try:
             return self._topics[path]
         except KeyError:
-            topic = Topic(path)
+            topic = self._topic_cls(path)
             self._topics[path] = topic
             return topic
 
