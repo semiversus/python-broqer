@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable
+from broqer import Publisher, StatefulPublisher, Subscriber
 
 
 class Subject(Publisher, Subscriber):
@@ -22,7 +22,7 @@ class Subject(Publisher, Subscriber):
         self.notify(*args)
 
 
-class Value(Publisher, Subscriber):
+class Value(StatefulPublisher, Subscriber):
     """
     Source with a state (initialized via ``init``)
 
@@ -37,15 +37,8 @@ class Value(Publisher, Subscriber):
     1 2
     """
     def __init__(self, *init):
-        Publisher.__init__(self)
+        StatefulPublisher.__init__(self, *init)
         Subscriber.__init__(self)
-        self._state = init
-
-    def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber)
-        subscriber.emit(*self._state, who=self)
-        return disposable
 
     def emit(self, *args: Any, who: Optional[Publisher]=None) -> None:
-        self._state = args
         self.notify(*args)

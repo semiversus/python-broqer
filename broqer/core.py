@@ -60,6 +60,12 @@ class Publisher():
         except KeyError:
             raise SubscriptionError('Subscriber is not registered (anymore)')
 
+    def get(self):
+        """Return the value of a (possibly simulated) subscription to this
+        publisher
+        """
+        return None
+
     def notify(self, *args: Any) -> None:
         """ emit to all subscriptions """
         for subscriber in tuple(self._subscriptions):
@@ -105,8 +111,11 @@ class StatefulPublisher(Publisher):
             self._state = args
             Publisher.notify(self, *args)
 
-    def reset_state(self):
-        self._state = None
+    def reset_state(self, *args):
+        if not args:
+            self._state = None
+        else:
+            self._state = args
 
 
 class Subscriber(metaclass=ABCMeta):
