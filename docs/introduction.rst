@@ -20,12 +20,13 @@ Examples of sources for asynchronous data streams:
 * variables, states or data structures in an application
 * ...
 
-*Reactive programming* gives you operators to work on those streams :
+*Reactive programming* gives you operators to work on those streams:
 
 * filter streams
 * map functions to streams
 * merge streams in various ways
 * process contained data
+* ...
 
 Why Broqer?
 -----------

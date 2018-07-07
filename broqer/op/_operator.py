@@ -6,7 +6,7 @@ class Operator(Publisher, Subscriber):
     publisher will be subscribed as soon as this operator is subscribed the
     first time.
 
-    On unsubscription of the last subscriber the depentent publisher will also
+    On unsubscription of the last subscriber the dependent publisher will also
     be unsubscripted.
     """
     def __init__(self, publisher: Publisher) -> None:
