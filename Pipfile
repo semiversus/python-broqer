@@ -19,3 +19,4 @@ sphinx-rtd-theme = "==0.4.0"
 codecov = "==2.0.15"
 sphinx-autodoc-typehints = "*"
 broqer = {editable = true, path = "."}
+pylint = "*"
