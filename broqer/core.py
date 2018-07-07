@@ -112,4 +112,7 @@ class StatefulPublisher(Publisher):
 class Subscriber(metaclass=ABCMeta):
     @abstractmethod
     def emit(self, *args: Any, who: Publisher) -> None:
-        """ .emit(...) method has to be overwritten """
+        """Send new argument(s) to the subscriber
+        :param \*args: variable arguments to be send
+        :param who: reference to which publisher is emitting
+        """
