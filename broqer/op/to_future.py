@@ -23,7 +23,7 @@ concurrent.futures._base.TimeoutError
 import asyncio
 from typing import Any
 
-from broqer import Publisher, Subscriber, from_args
+from broqer import Publisher, Subscriber, unpack_args
 
 from ._operator import build_operator
 
@@ -61,7 +61,7 @@ class ToFuture(Subscriber, asyncio.Future):
         if self._disposable is not None:
             self._disposable.dispose()
             self._disposable = None
-        self.set_result(from_args(*args))
+        self.set_result(unpack_args(*args))
 
 
 to_future = build_operator(ToFuture)

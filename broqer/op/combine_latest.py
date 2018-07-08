@@ -28,7 +28,7 @@ Second sink: 1 3
 """
 from typing import Any, Dict, MutableSequence, Sequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable, from_args
+from broqer import Publisher, Subscriber, SubscriptionDisposable, unpack_args
 
 from ._operator import MultiOperator, build_operator
 
@@ -67,7 +67,7 @@ class CombineLatest(MultiOperator):
         if self._missing and who in self._missing:
             self._missing.remove(who)
 
-        args = from_args(*args)
+        args = unpack_args(*args)
 
         if self._partial_state[self._index[who]] == args:
             # if partial_state has not changed avoid new emit

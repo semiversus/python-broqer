@@ -1,6 +1,6 @@
 from typing import MutableMapping, Any
 
-from broqer import Subscriber, Publisher, from_args
+from broqer import Subscriber, Publisher, unpack_args
 from broqer.hub import Topic
 
 
@@ -10,4 +10,4 @@ class TopicMapper(Subscriber):
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert isinstance(who, Topic)
-        self._mapping[who.path] = from_args(*args)
+        self._mapping[who.path] = unpack_args(*args)

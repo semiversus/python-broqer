@@ -127,7 +127,7 @@ class Subscriber(metaclass=ABCMeta):
         """
 
 
-def from_args(*args):
+def unpack_args(*args):
     return args[0] if len(args) == 1 else args
 
 
