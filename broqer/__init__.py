@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from .core import StatefulPublisher, Disposable, Publisher, Subscriber, \
-                  SubscriptionDisposable, SubscriptionError, to_args, unpack_args
+                  SubscriptionDisposable, SubscriptionError, to_args, \
+                  unpack_args
 
 from .hub import Hub, SubHub
 from .subject import Subject, Value
