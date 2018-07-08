@@ -41,7 +41,7 @@ Sliding Window:2:3:4
 from collections import deque
 from typing import Any, MutableSequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable
+from broqer import Publisher, Subscriber, SubscriptionDisposable, from_args
 
 from ._operator import Operator, build_operator
 
@@ -70,10 +70,7 @@ class SlidingWindow(Operator):
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         assert len(args) >= 1, 'need at least one argument for sliding window'
-        if len(args) == 1:
-            self._state.append(args[0])
-        else:
-            self._state.append(args)
+        self._state.append(from_args(*args))
         if self.notify_partial or \
                 len(self._state) == self._state.maxlen:  # type: ignore
             if self._packed:

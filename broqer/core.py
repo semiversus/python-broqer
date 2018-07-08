@@ -125,3 +125,11 @@ class Subscriber(metaclass=ABCMeta):
         :param \*args: variable arguments to be send
         :param who: reference to which publisher is emitting
         """
+
+
+def from_args(*args):
+    return args[0] if len(args) == 1 else args
+
+
+def to_args(arg):
+    return arg if isinstance(arg, tuple) else (arg,)

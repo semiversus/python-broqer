@@ -20,7 +20,7 @@ Partition: (4, (5, 6))
 """
 from typing import Any, MutableSequence  # noqa: F401
 
-from broqer import Publisher
+from broqer import Publisher, from_args
 
 from ._operator import Operator, build_operator
 
@@ -37,10 +37,7 @@ class Partition(Operator):
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         assert len(args) >= 1, 'need at least one argument for partition'
-        if len(args) == 1:
-            self._queue.append(args[0])
-        else:
-            self._queue.append(args)
+        self._queue.append(from_args(*args))
         if self._size and len(self._queue) == self._size:
             self.notify(tuple(self._queue))
             self._queue.clear()
