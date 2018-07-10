@@ -1,7 +1,7 @@
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 
-class Operator(Publisher, Subscriber):
+class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
     """ Base class for operators depending on a single publisher. This
     publisher will be subscribed as soon as this operator is subscribed the
     first time.
@@ -17,6 +17,10 @@ class Operator(Publisher, Subscriber):
         disposable = Publisher.subscribe(self, subscriber)
         if len(self._subscriptions) == 1:  # if this was the first subscription
             self._publisher.subscribe(self)
+        else:
+            args = self.get()  # pylint: disable=assignment-from-none
+            if args is not None:
+                subscriber.emit(*args, who=self)  # pylint: disable=E1133
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
@@ -25,7 +29,7 @@ class Operator(Publisher, Subscriber):
             self._publisher.unsubscribe(self)
 
 
-class MultiOperator(Publisher, Subscriber):
+class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
     """ Base class for operators depending on multiple publishers. Like
     Operator all publishers will be subscribed on first subscription to this
     operator. Accordingly all publishers get unsubscribed on unsubscription
@@ -41,6 +45,10 @@ class MultiOperator(Publisher, Subscriber):
             for _publisher in self._publishers:
                 # subscribe to all dependent publishers
                 _publisher.subscribe(self)
+        else:
+            args = self.get()  # pylint: disable=assignment-from-none
+            if args is not None:
+                subscriber.emit(*args, who=self)  # pylint: disable=E1133
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
