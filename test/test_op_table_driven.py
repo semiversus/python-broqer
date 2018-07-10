@@ -1,4 +1,4 @@
-from broqer import Publisher, Value
+from broqer import Publisher, Value, unpack_args
 from broqer.op import Accumulate, Cache, CatchException, CombineLatest, Distinct, Sink
 
 from unittest.mock import Mock
@@ -6,10 +6,6 @@ import pytest
 
 
 @pytest.mark.parametrize('operator,args,kwargs,input,output', [
-    (Accumulate, (), {'func':lambda a,b:(a+b,a+b), 'init':0}, (0, 1, 2, 3), (0, 1, 3, 6)),
-    (Accumulate, (), {'func':lambda a,b:(a+b,a), 'init':0}, (0, 1, 2, 3), (0, 0, 1, 3)),
-    (Accumulate, (lambda a,b:(a+b,a+b),), {'init':0}, (0, 1, 2, 3), (0, 1, 3, 6)),
-    (Accumulate, (lambda a,b:(a+b,a+b), 0), {}, (0, 1, 2, 3), (0, 1, 3, 6)),
     (Cache, (0,), {}, (1, 2, 3), (0, 1, 2, 3)),
     (Cache, (0,1,2), {}, (1, 2, 3), ((0, 1, 2), 1, 2, 3)),
     (Cache, ('start',), {}, ('set', 'go'), ('start', 'set', 'go')),
@@ -18,8 +14,8 @@ import pytest
     (CatchException, (Exception,), {}, (0, 1, 2), (0, 1, 2)),
     (CombineLatest, (Value('a'),), {}, (0, 1, 2), ((0, 'a'), (1, 'a'), (2, 'a'))),
     (CombineLatest, (), {}, (0, 1, 2), (0, 1, 2)),
-    (CombineLatest, (Value(1),), {'map':lambda a,b:a+b}, (0, 1, 2), (1, 2, 3)),
-    (CombineLatest, (Publisher(),), {'map':lambda a,b:a+b}, (0, 1, 2), ()),
+    (CombineLatest, (Value(1),), {'map_':lambda a,b:a+b}, (0, 1, 2), (1, 2, 3)),
+    (CombineLatest, (Publisher(),), {'map_':lambda a,b:a+b}, (0, 1, 2), ()),
 ])
 def test_with_publisher(operator, args, kwargs, input, output):
     source = Publisher()
@@ -27,9 +23,7 @@ def test_with_publisher(operator, args, kwargs, input, output):
 
     result = list()
     def _append(*args):
-        if len(args) == 1:
-            args = args[0]
-        result.append(args)
+        result.append(unpack_args(*args))
     Sink(sink, _append)
 
     for v in input:
@@ -49,13 +43,12 @@ class _None:
     # 3. output of subscription of a second subscriber after emitting `input`
     # 4. output of subscription after disposing all other subscriptions and re-subscribing
     # 5. output of subscription to a stateful publisher with state input
-    (Accumulate, (lambda a,b:(a+b,a+b), 1), {}, 1, (_None, 2, _None, _None, 2)),
     (Cache, (0,), {}, 1, (0, 1, 1, 1, 1)),
     (CombineLatest, (), {}, 1, (_None, 1, 1, _None, 1)),
     (CombineLatest, (Value(0),), {}, 1, (_None, (1, 0), (1, 0), _None, (1, 0))),
     (CombineLatest, (Publisher(),), {}, 1, (_None, _None, _None, _None, _None)),
-    (CombineLatest, (), {'map':lambda v:v+1}, 1, (_None, 2, 2, _None, 2)),
-    (CombineLatest, (Value(1),), {'map':lambda a,b:a+b}, 2, (_None, 3, 3, _None, 3)),
+    (CombineLatest, (), {'map_':lambda v:v+1}, 1, (_None, 2, 2, _None, 2)),
+    (CombineLatest, (Value(1),), {'map_':lambda a,b:a+b}, 2, (_None, 3, 3, _None, 3)),
 ])
 def test_on_subscription(operator, args, kwargs, input, output):
     if not isinstance(input, tuple):
@@ -150,7 +143,7 @@ def test_on_subscription(operator, args, kwargs, input, output):
 
     mock1.assert_not_called()
 
-    if output[2] == _None:
+    if output[4] == _None:
         mock2.assert_not_called()
     else:
-        mock2.assert_called_once_with(*output[2])
+        mock2.assert_called_once_with(*output[4])
