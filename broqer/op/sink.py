@@ -33,15 +33,15 @@ from ._operator import build_operator
 
 class Sink(Subscriber, Disposable):
     def __init__(self, publisher: Publisher,
-                 sink_function: Optional[Callable[..., None]]=None,
+                 sink_function: Optional[Callable[..., None]] = None,
                  *args, **kwargs) -> None:
         if sink_function is None:
             self._sink_function = None  # type: Callable
         elif args or kwargs:
-                self._sink_function = \
-                    partial(sink_function, *args, **kwargs)  # type: Callable
+            self._sink_function = \
+                partial(sink_function, *args, **kwargs)  # type: Callable
         else:
-                self._sink_function = sink_function  # type: Callable
+            self._sink_function = sink_function  # type: Callable
 
         self._disposable = publisher.subscribe(self)
 
@@ -49,7 +49,7 @@ class Sink(Subscriber, Disposable):
         # handle special case: _disposable is set after
         # publisher.subscribe(self) in __init__
         assert not hasattr(self, '_disposable') or \
-            who == self._disposable._publisher, \
+            who == self._disposable.publisher, \
             'emit comming from non assigned publisher'
         if self._sink_function:
             self._sink_function(*args)

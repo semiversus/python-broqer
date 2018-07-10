@@ -4,7 +4,7 @@ from broqer import Subscriber, Publisher, unpack_args
 from broqer.hub import Topic
 
 
-class TopicMapper(Subscriber):
+class TopicMapper(Subscriber):  # pylint: disable=too-few-public-methods
     def __init__(self, mapping: MutableMapping) -> None:
         self._mapping = mapping
 

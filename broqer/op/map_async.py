@@ -180,7 +180,7 @@ class MapAsync(Operator):
                 self._error_callback(*sys.exc_info())
 
         if self._queue:
-            args = self._queue.popleft()
+            args = self._queue.popleft()  # pylint: disable=E1111
             if self._mode == Mode.LAST_DISTINCT and args == self._last_emit:
                 return
             self.scheduled.notify(*args)

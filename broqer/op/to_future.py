@@ -21,7 +21,7 @@ concurrent.futures._base.TimeoutError
 (1, 2)
 """
 import asyncio
-from typing import Any
+from typing import Any, Optional
 
 from broqer import Publisher, Subscriber, unpack_args
 
@@ -50,14 +50,16 @@ class ToFuture(Subscriber, asyncio.Future):
     def _timeout(self):
         self.set_exception(asyncio.TimeoutError)
 
-    def _future_done(self, future):
+    def _future_done(self, _future):
         if self._disposable is not None:
             self._disposable.dispose()
             self._disposable = None
         if self._timeout_handle is not None:
             self._timeout_handle.cancel()
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any,
+             who: Optional[Publisher] = None  # pylint: disable=unused-argument
+             ) -> None:
         if self._disposable is not None:
             self._disposable.dispose()
             self._disposable = None

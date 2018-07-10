@@ -121,6 +121,7 @@ class Topic(Publisher, Subscriber):
         self._subject = None  # type: Publisher
         self._path = path
         self._meta = dict()  # type: Dict[str, Any]
+        self.assignment_future = None
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
@@ -138,38 +139,48 @@ class Topic(Publisher, Subscriber):
         if not self._subscriptions and self._subject is not None:
             self._subject.unsubscribe(self)
 
-    def emit(self, *args: Any, who: Optional[Publisher]=None) -> None:
+    def emit(self, *args: Any, who: Optional[Publisher] = None) -> None:
         if self._subject is None:
             # method will be replaced by .__call__
             raise SubscriptionError('No subject is assigned to this Topic')
 
         if who == self._subject:
             self.notify(*args)
-        else:
-            assert isinstance(self._subject, Subscriber), \
-                'Topic has to be a subscriber'
+            return None
 
-            return self._subject.emit(*args, who=self)
+        assert isinstance(self._subject, Subscriber), \
+            'Topic has to be a subscriber'
+
+        return self._subject.emit(*args, who=self)
 
     def __call__(self, *args, **kwargs) -> None:
         raise SubscriptionError(
             'To assign a publisher to this topic use "hub.assign(publisher, ' +
             'topic, [meta])" instead.')
 
+    def assign(self, subject, meta):
+        if self._subject is not None:
+            raise SubscriptionError('Topic is already assigned')
+        self._subject = subject
+        if meta:
+            self._meta.update(meta)
+
     @property
     def assigned(self):
         return self._subject is not None
 
+    @property
+    def subject(self):
+        return self._subject
+
     async def wait_for_assignment(self, timeout=None):
-        if self.assigned:
-            return
-        else:
-            self._assignment_future = asyncio.get_event_loop().create_future()
+        if not self.assigned:
+            self.assignment_future = asyncio.get_event_loop().create_future()
             if timeout is None:
-                await self._assignment_future
+                await self.assignment_future
             else:
                 await asyncio.wait_for(
-                    asyncio.shield(self._assignment_future), timeout)
+                    asyncio.shield(self.assignment_future), timeout)
 
     @property
     def meta(self) -> dict:
@@ -216,27 +227,22 @@ class Hub:
         return MappingProxyType(OrderedDict(result_topics))
 
     def assign(self, topic_str: str, publisher: Publisher,
-               meta: Optional[dict]=None) -> Topic:
+               meta: Optional[dict] = None) -> Topic:
 
         topic = self[topic_str]
 
-        if topic._subject is not None:
-            raise SubscriptionError('Topic is already assigned')
-        else:
-            topic._subject = publisher
+        if meta and self._permitted_meta_keys:
+            non_keys = set(meta.keys()) - self._permitted_meta_keys
+            if non_keys:
+                raise KeyError('Not permitted meta keys: %r' % non_keys)
 
-        if topic._subscriptions:
+        topic.assign(publisher, meta)
+
+        if topic:
             publisher.subscribe(topic)
 
-        if meta:
-            if self._permitted_meta_keys is not None:
-                non_keys = set(meta.keys()) - self._permitted_meta_keys
-                if non_keys:
-                    raise KeyError('Not permitted meta keys: %r' % non_keys)
-            topic._meta.update(meta)
-
-        if hasattr(topic, '_assignment_future'):
-            topic._assignment_future.set_result(None)
+        if topic.assignment_future:
+            topic.assignment_future.set_result(None)
 
         return topic
 
@@ -274,6 +280,6 @@ class SubHub:
         return MappingProxyType(OrderedDict(topics))
 
     def assign(self, topic_str: str, publisher: Publisher,
-               meta: Optional[dict]=None) -> Topic:
+               meta: Optional[dict] = None) -> Topic:
 
         return self._hub.assign(self._prefix + topic_str, publisher, meta)

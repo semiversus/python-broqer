@@ -59,7 +59,7 @@ class SlidingWindow(Operator):
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = Operator.subscribe(self, subscriber)
-        if (self.notify_partial and len(self._state)) or \
+        if (self.notify_partial and self._state) or \
                 len(self._state) == self._state.maxlen:  # type: ignore
             if self._packed:
                 subscriber.emit(tuple(self._state), who=self)

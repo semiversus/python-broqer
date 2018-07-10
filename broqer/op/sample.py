@@ -41,7 +41,7 @@ Sample 2: 2 3
 """
 import asyncio
 import sys
-from typing import Any, Optional, Tuple  # noqa: F401
+from typing import Any, Tuple  # noqa: F401
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable, \
                    default_error_handler

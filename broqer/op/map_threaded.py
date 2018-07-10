@@ -97,7 +97,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import sys
 from enum import Enum  # noqa: F401
-from typing import Any, Callable, MutableSequence, Optional  # noqa: F401
+from typing import Any, Callable, MutableSequence  # noqa: F401
 
 from broqer import Publisher, default_error_handler
 
@@ -107,7 +107,7 @@ from .map_async import Mode
 
 class MapThreaded(Operator):
     def __init__(self, publisher: Publisher, map_func, *args,
-                 mode: Mode=Mode.CONCURRENT,  # type: ignore
+                 mode: Mode = Mode.CONCURRENT,  # type: ignore
                  error_callback=default_error_handler, **kwargs) -> None:
         """
         mode uses one of the following enumerations:
@@ -154,7 +154,7 @@ class MapThreaded(Operator):
             self._last_emit = args
             self.scheduled.notify(*args)
             future = asyncio.get_event_loop().run_in_executor(
-                    self._executor, self._map_func, *args)
+                self._executor, self._map_func, *args)
             self._future = asyncio.ensure_future(future)
             self._future.add_done_callback(self._future_done)
         elif self._mode in (Mode.QUEUE, Mode.LAST):
@@ -176,12 +176,12 @@ class MapThreaded(Operator):
                 self._error_callback(*sys.exc_info())
 
         if self._queue:
-            args = self._queue.popleft()
+            args = self._queue.popleft()  # pylint: disable=E1111
             if self._mode == Mode.LAST_DISTINCT and args == self._last_emit:
                 return
             self.scheduled.notify(*args)
             future = asyncio.get_event_loop().run_in_executor(
-                        self._executor, self._map_func, *args)
+                self._executor, self._map_func, *args)
             self._future = asyncio.ensure_future(future)
             self._future.add_done_callback(self._future_done)
 
