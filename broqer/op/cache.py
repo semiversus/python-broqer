@@ -1,10 +1,4 @@
 """
-Caching the emitted values.
-
-The ``Cache`` publisher is emitting a value on subscription.
-
-Usage:
-
 >>> from broqer import Subject, op
 >>> s = Subject()
 
@@ -29,6 +23,13 @@ from ._operator import Operator, build_operator
 
 
 class Cache(Operator):
+    """ Caching the emitted values.
+
+    The ``Cache`` publisher is emitting a value on subscription.
+
+    :param publisher: source publisher
+    :param init: initialization for state
+    """
     def __init__(self, publisher: Publisher, *init: Any) -> None:
         Operator.__init__(self, publisher)
         assert len(init) >= 1, 'need at least one argument for cache init'
