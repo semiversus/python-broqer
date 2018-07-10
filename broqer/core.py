@@ -25,7 +25,7 @@ class Disposable(metaclass=ABCMeta):
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, _type, _value, _traceback):
         self.dispose()
 
 
@@ -37,6 +37,14 @@ class SubscriptionDisposable(Disposable):
 
     def dispose(self) -> None:
         self._publisher.unsubscribe(self._subscriber)
+
+    @property
+    def publisher(self):
+        return self._publisher
+
+    @property
+    def subscriber(self):
+        return self._subscriber
 
 
 class SubscriptionError(ValueError):
@@ -60,7 +68,7 @@ class Publisher():
         except KeyError:
             raise SubscriptionError('Subscriber is not registered (anymore)')
 
-    def get(self):
+    def get(self):  # pylint: disable=useless-return, no-self-use
         """Return the value of a (possibly simulated) subscription to this
         publisher
         """
@@ -106,6 +114,9 @@ class StatefulPublisher(Publisher):
             subscriber.emit(*self._state, who=self)
         return disposable
 
+    def get(self):
+        return self._state
+
     def notify(self, *args: Any) -> None:
         if self._state != args:
             self._state = args
@@ -118,11 +129,11 @@ class StatefulPublisher(Publisher):
             self._state = args
 
 
-class Subscriber(metaclass=ABCMeta):
+class Subscriber(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
     @abstractmethod
     def emit(self, *args: Any, who: Publisher) -> None:
         """Send new argument(s) to the subscriber
-        :param \*args: variable arguments to be send
+        :param \\*args: variable arguments to be send
         :param who: reference to which publisher is emitting
         """
 

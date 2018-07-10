@@ -18,7 +18,9 @@ class Subject(Publisher, Subscriber):
         Publisher.__init__(self)
         Subscriber.__init__(self)
 
-    def emit(self, *args: Any, who: Optional[Publisher]=None) -> None:
+    def emit(self, *args: Any,
+             who: Optional[Publisher] = None  # pylint: disable=unused-argument
+             ) -> None:
         self.notify(*args)
 
 
@@ -40,5 +42,7 @@ class Value(StatefulPublisher, Subscriber):
         StatefulPublisher.__init__(self, *init)
         Subscriber.__init__(self)
 
-    def emit(self, *args: Any, who: Optional[Publisher]=None) -> None:
+    def emit(self, *args: Any,
+             who: Optional[Publisher] = None  # pylint: disable=unused-argument
+             ) -> None:
         self.notify(*args)
