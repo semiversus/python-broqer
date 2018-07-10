@@ -1,8 +1,4 @@
 """
-Combine the latest emit of multiple publishers and emit the combination
-
-Usage:
-
 >>> from broqer import Subject, op
 >>> s1 = Subject()
 >>> s2 = Subject()
@@ -19,7 +15,7 @@ CombineLatest is only emitting, when all values are collected:
 1 3
 
 Subscribing to a CombineLatest with all values available is emitting the values
-immediatly on subscribtion:
+immediate on subscribtion:
 
 >>> combination | op.sink(print, 'Second sink:')
 Second sink: 1 3
@@ -34,6 +30,14 @@ from ._operator import MultiOperator, build_operator
 
 
 class CombineLatest(MultiOperator):
+    """ Combine the latest emit of multiple publishers and emit the combination
+
+    :param publishers: source publishers
+    :param map_: optional function to be called for evaluation of current state
+    :param emit_on: publisher or list of publishers - only emitting result when
+        emit comes from one of this list. If None, emit on any source
+        publisher.
+    """
     def __init__(self, *publishers: Publisher, map_=None, emit_on=None
                  ) -> None:
         MultiOperator.__init__(self, *publishers)
@@ -67,13 +71,12 @@ class CombineLatest(MultiOperator):
                     return self._state
                 return None
             args = tuple(unpack_args(*a) for a in args)
-            print('ARGS', args)
             if self._map:
                 return (self._map(*args),)
-            else:
-                return args
+            return args
         if self._state is not None:
             return self._state
+        return None
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who in self._publishers, 'emit from non assigned publisher'
