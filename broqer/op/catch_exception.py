@@ -52,5 +52,6 @@ class CatchException(Operator):
         except self._exceptions:
             pass
 
+
 # pylint: disable=invalid-name
 catch_exception = build_operator(CatchException)
