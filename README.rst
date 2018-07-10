@@ -13,10 +13,10 @@ Python Broqer
 
 .. image:: https://codecov.io/gh/semiversus/python-broqer/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/semiversus/python-broqer
-        
+
 .. image:: https://img.shields.io/github/license/semiversus/python-broqer.svg
   :target: https://en.wikipedia.org/wiki/MIT_License
-        
+
 Initial focus on embedded systems *Broqer* can be used wherever continuous streams of data have to be processed - and they are everywhere. Watch out!
 
 .. image:: https://cdn.rawgit.com/semiversus/python-broqer/7beb7379/docs/logo.svg
@@ -28,7 +28,7 @@ Synopsis
 - Under MIT license (2018 Günther Jena)
 - Source is hosted on GitHub.com_
 - Documentation is hosted on ReadTheDocs.com_
-- Tested on Python 3.5 and following
+- Tested on Python 3.5, 3.6 and 3.7
 - Compact library (<1000 lines of code) and well documented (>1000 lines of comments)
 - Fully unit tested (coverage towards 100%), coding style checked with flake8_, static type checked with mypy_
 - Operators known from ReactiveX_ and other streaming frameworks (like distinct_, combine_latest_, ...)
@@ -72,7 +72,7 @@ be printed (with the prefix 'Voltage too high:')
     from broqer import op
     import statistics
 
-    ( adc_raw 
+    ( adc_raw
       | op.map(lambda v:v*0.3) # apply a function with one argument returning to value multiplied by 0.3
       | op.sample(0.1) # periodically emit the actual value every 0.1 seconds
       | op.sliding_window(4) # append the value to a buffer with 4 elements (and drop the oldest value)
@@ -101,7 +101,7 @@ How it works
 ============
 
 Basically it's based on the observable pattern - a object you can register on and you will be informed as
-soon the state has changed. The observable are called ``Publishers``. 
+soon the state has changed. The observable are called ``Publishers``.
 
 API
 ===
