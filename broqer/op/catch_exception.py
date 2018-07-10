@@ -1,8 +1,4 @@
 """
-Catching exceptions of following operators in the pipelines
-
-Usage:
-
 >>> from broqer import Subject, op
 >>> s = Subject()
 
@@ -37,6 +33,11 @@ from ._operator import Operator, build_operator
 
 
 class CatchException(Operator):
+    """ Catching exceptions of following operators in the pipelines
+
+    :param publisher: source publisher
+    :param exceptions: Exception classes to be catched
+    """
     def __init__(self, publisher: Publisher, *exceptions) -> None:
         assert len(exceptions) >= 1, 'need at least one exception'
         Operator.__init__(self, publisher)
