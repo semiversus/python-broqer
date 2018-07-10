@@ -29,19 +29,19 @@ from ._operator import Operator, build_operator
 
 
 class Delay(Operator):
-    def __init__(self, publisher: Publisher, delay: float,
+    def __init__(self, publisher: Publisher, duration: float,
                  error_callback=default_error_handler, loop=None) -> None:
-        assert delay >= 0, 'delay has to be positive'
+        assert duration >= 0, 'delay has to be positive'
 
         Operator.__init__(self, publisher)
 
-        self._delay = delay
+        self._duration = duration
         self._loop = loop or asyncio.get_event_loop()
         self._error_callback = error_callback
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
-        self._loop.call_later(self._delay, self._delayed, *args)
+        self._loop.call_later(self._duration, self._delayed, *args)
 
     def _delayed(self, *args):
         try:
