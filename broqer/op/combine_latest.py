@@ -47,7 +47,10 @@ class CombineLatest(MultiOperator):
         if emit_on is None:
             self._emit_on = publishers
         else:
-            self._emit_on = emit_on
+            if isinstance(emit_on, Publisher):
+                self._emit_on = (emit_on,)
+            else:
+                self._emit_on = emit_on
         self._state = None  # type: Sequence[Any]
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
