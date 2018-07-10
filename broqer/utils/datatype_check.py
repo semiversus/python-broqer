@@ -1,19 +1,18 @@
-from broqer.op import get
-
-
 class Datatype:
     name = 'none'
 
-    def __init__(self, hub):
-        self._hub = hub
+    def __init__(self, hub_):
+        self._hub = hub_
 
-    def cast(self, value, meta):
+    def cast(self, value, meta):  # pylint: disable=unused-argument,no-self-use
         return value
 
-    def check(self, value, meta):
+    def check(self, value,
+              meta):  # pylint: disable=unused-argument,no-self-use
         pass
 
-    def as_str(self, value, meta):
+    def as_str(self, value,
+               meta):  # pylint: disable=unused-argument,no-self-use
         return str(value)
 
     def _get(self, key, meta):
@@ -24,7 +23,7 @@ class Datatype:
             topic = value[1:]
             if topic not in self._hub:
                 raise KeyError('topic %s not found in hub' % topic)
-            return get(self._hub[topic])
+            return self._hub[topic].get()
         return value
 
 
@@ -47,9 +46,9 @@ class IntDatatype(Datatype):
 class DatatypeCheck:
     default_datatype_classes = (Datatype, IntDatatype)
 
-    def __init__(self, hub):
+    def __init__(self, hub_):
         self._datatypes = dict()
-        self._hub = hub
+        self._hub = hub_
         for datatype_cls in DatatypeCheck.default_datatype_classes:
             self.add_datatype(datatype_cls(hub))
 
