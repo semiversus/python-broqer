@@ -4,7 +4,8 @@ python:
   - 3.6
   - 3.5
 
-sudo: false
+dist: xenial
+sudo: true
 
 cache: pip
 
