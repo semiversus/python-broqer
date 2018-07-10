@@ -47,6 +47,14 @@ class Cache(Operator):
             subscriber.emit(*self._state, who=self)
         return disposable
 
+    def get(self):
+        if not self._subscriptions:
+            args = self._publisher.get()
+            if args is None:
+                return self._state
+            return args
+        return self._state
+
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._state != args:
@@ -54,4 +62,4 @@ class Cache(Operator):
             self.notify(*args)
 
 
-cache = build_operator(Cache)
+cache = build_operator(Cache)  # pylint: disable-msg=C0103
