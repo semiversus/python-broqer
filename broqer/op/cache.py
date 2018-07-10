@@ -62,4 +62,4 @@ class Cache(Operator):
             self.notify(*args)
 
 
-cache = build_operator(Cache)  # pylint: disable-msg=C0103
+cache = build_operator(Cache)  # pylint: disable=invalid-name

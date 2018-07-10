@@ -50,4 +50,4 @@ class Delay(Operator):
             self._error_callback(*sys.exc_info())
 
 
-delay = build_operator(Delay)
+delay = build_operator(Delay)  # pylint: disable=invalid-name

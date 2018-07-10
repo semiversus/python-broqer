@@ -66,4 +66,4 @@ class ToFuture(Subscriber, asyncio.Future):
         self.set_result(unpack_args(*args))
 
 
-to_future = build_operator(ToFuture)
+to_future = build_operator(ToFuture)  # pylint: disable=invalid-name

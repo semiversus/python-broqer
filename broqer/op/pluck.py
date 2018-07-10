@@ -67,4 +67,4 @@ class Pluck(Operator):
         self.notify(arg)
 
 
-pluck = build_operator(Pluck)
+pluck = build_operator(Pluck)  # pylint: disable=invalid-name

@@ -75,4 +75,4 @@ class Throttle(Operator):
             self._wait_done_cb()
 
 
-throttle = build_operator(Throttle)
+throttle = build_operator(Throttle)  # pylint: disable=invalid-name

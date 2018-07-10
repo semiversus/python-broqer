@@ -69,4 +69,4 @@ class Map(Operator):
         self.notify(*result)
 
 
-map_ = build_operator(Map)
+map_ = build_operator(Map)  # pylint: disable=invalid-name

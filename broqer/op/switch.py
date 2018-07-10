@@ -66,4 +66,4 @@ class Switch(Operator):
             self.notify(*args)
 
 
-switch = build_operator(Switch)
+switch = build_operator(Switch)  # pylint: disable=invalid-name

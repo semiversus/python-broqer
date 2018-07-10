@@ -25,4 +25,4 @@ class Unpack(Operator):
         self.notify(*args[0])
 
 
-unpack = build_operator(Unpack)
+unpack = build_operator(Unpack)  # pylint: disable=invalid-name

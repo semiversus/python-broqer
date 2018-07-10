@@ -54,4 +54,4 @@ class Reduce(Operator):
             self._last_state = args[0]
 
 
-reduce = build_operator(Reduce)
+reduce = build_operator(Reduce)  # pylint: disable=invalid-name

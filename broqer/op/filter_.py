@@ -51,4 +51,4 @@ class Filter(Operator):
             self.notify(*args)
 
 
-filter_ = build_operator(Filter)
+filter_ = build_operator(Filter)  # pylint: disable=invalid-name

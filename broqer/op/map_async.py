@@ -189,4 +189,4 @@ class MapAsync(Operator):
             self._future.add_done_callback(self._future_done)
 
 
-map_async = build_operator(MapAsync)
+map_async = build_operator(MapAsync)  # pylint: disable=invalid-name

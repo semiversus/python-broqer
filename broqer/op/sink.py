@@ -58,4 +58,4 @@ class Sink(Subscriber, Disposable):
         self._disposable.dispose()
 
 
-sink = build_operator(Sink)
+sink = build_operator(Sink)  # pylint: disable=invalid-name

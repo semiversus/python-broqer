@@ -29,4 +29,4 @@ class Merge(MultiOperator):
         self.notify(*args)
 
 
-merge = build_operator(Merge)
+merge = build_operator(Merge)  # pylint: disable=invalid-name

@@ -27,4 +27,4 @@ class Peek(Publisher, Subscriber):
             self._source_publisher.unsubscribe(self)
 
 
-peek = build_operator(Peek)
+peek = build_operator(Peek)  # pylint: disable=invalid-name

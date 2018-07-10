@@ -82,4 +82,4 @@ class SlidingWindow(Operator):
         self._state.clear()
 
 
-sliding_window = build_operator(SlidingWindow)
+sliding_window = build_operator(SlidingWindow)  # pylint: disable=invalid-name

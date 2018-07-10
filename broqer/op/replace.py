@@ -20,4 +20,4 @@ class Replace(Operator):
         self.notify(self._args)
 
 
-replace = build_operator(Replace)
+replace = build_operator(Replace)  # pylint: disable=invalid-name

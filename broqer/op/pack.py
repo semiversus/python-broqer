@@ -23,4 +23,4 @@ class Pack(Operator):
         self.notify(args)
 
 
-pack = build_operator(Pack)
+pack = build_operator(Pack)  # pylint: disable=invalid-name

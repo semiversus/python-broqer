@@ -93,4 +93,4 @@ class Debounce(Operator):
             self._call_later_handler.cancel()
 
 
-debounce = build_operator(Debounce)
+debounce = build_operator(Debounce)  # pylint: disable=invalid-name

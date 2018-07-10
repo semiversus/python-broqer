@@ -47,4 +47,4 @@ class Partition(Operator):
         self._queue.clear()
 
 
-partition = build_operator(Partition)
+partition = build_operator(Partition)  # pylint: disable=invalid-name

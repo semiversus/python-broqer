@@ -80,4 +80,4 @@ class Accumulate(Operator):
         self._state = state
 
 
-accumulate = build_operator(Accumulate)  # pylint: disable-msg=C0103
+accumulate = build_operator(Accumulate)  # pylint: disable=invalid-name

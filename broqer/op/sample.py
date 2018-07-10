@@ -91,4 +91,4 @@ class Sample(Operator):
             self._periodic_callback()
 
 
-sample = build_operator(Sample)
+sample = build_operator(Sample)  # pylint: disable=invalid-name

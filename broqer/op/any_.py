@@ -58,4 +58,4 @@ class Any(_MultiPredicate):
     pass
 
 
-any_ = build_operator(Any)  # pylint: disable-msg=C0103
+any_ = build_operator(Any)  # pylint: disable=invalid-name

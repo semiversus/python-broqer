@@ -60,4 +60,4 @@ class Distinct(Operator):
             self.notify(*args)
 
 
-distinct = build_operator(Distinct)
+distinct = build_operator(Distinct)  # pylint: disable=invalid-name

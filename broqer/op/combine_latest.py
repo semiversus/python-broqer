@@ -96,4 +96,4 @@ class CombineLatest(MultiOperator):
                 self.notify(*self._state)
 
 
-combine_latest = build_operator(CombineLatest)
+combine_latest = build_operator(CombineLatest)  # pylint: disable=invalid-name

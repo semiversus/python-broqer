@@ -9,4 +9,4 @@ class All(_MultiPredicate):
     combination_operator = all  # type: ignore
 
 
-all_ = build_operator(All)  # pylint: disable-msg=C0103
+all_ = build_operator(All)  # pylint: disable=invalid-name

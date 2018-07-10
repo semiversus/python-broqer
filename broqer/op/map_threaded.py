@@ -186,4 +186,4 @@ class MapThreaded(Operator):
             self._future.add_done_callback(self._future_done)
 
 
-map_threaded = build_operator(MapThreaded)
+map_threaded = build_operator(MapThreaded)  # pylint: disable=invalid-name
