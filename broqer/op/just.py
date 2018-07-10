@@ -32,3 +32,6 @@ class Just(Publisher):
         disposable = Publisher.subscribe(self, subscriber)
         subscriber.emit(*self._state, who=self)
         return disposable
+
+    def get(self):
+        return self._state
