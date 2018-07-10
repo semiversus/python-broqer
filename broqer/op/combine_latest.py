@@ -28,13 +28,14 @@ Second sink: 1 3
 """
 from typing import Any, Dict, MutableSequence, Sequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable, unpack_args
+from broqer import Publisher, Subscriber, unpack_args
 
 from ._operator import MultiOperator, build_operator
 
 
 class CombineLatest(MultiOperator):
-    def __init__(self, *publishers: Publisher, map=None, emit_on=None) -> None:
+    def __init__(self, *publishers: Publisher, map_=None, emit_on=None
+                 ) -> None:
         MultiOperator.__init__(self, *publishers)
         partial = [None for _ in publishers]  # type: MutableSequence[Any]
         self._partial_state = partial
@@ -42,25 +43,34 @@ class CombineLatest(MultiOperator):
         self._index = \
             {p: i for i, p in enumerate(publishers)
              }  # type: Dict[Publisher, int]
-        self._map = map
+        self._map = map_
         if emit_on is None:
             self._emit_on = publishers
         else:
             self._emit_on = emit_on
         self._state = None  # type: Sequence[Any]
 
-    def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        disposable = MultiOperator.subscribe(self, subscriber)
-        if not self._missing and len(self._subscriptions) > 1:
-            subscriber.emit(*self._state, who=self)
-        return disposable
-
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._missing = set(self._publishers)
             self._partial_state = [None for _ in self._partial_state]
-            self._state = None
+
+    def get(self):
+        if not self._subscriptions:  # if no subscribers listening
+            args = tuple(publisher.get() for publisher in self._publishers)
+            if None in args:
+                if self._state is not None:
+                    return self._state
+                return None
+            args = tuple(unpack_args(*a) for a in args)
+            print('ARGS', args)
+            if self._map:
+                return (self._map(*args),)
+            else:
+                return args
+        if self._state is not None:
+            return self._state
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who in self._publishers, 'emit from non assigned publisher'
@@ -75,10 +85,12 @@ class CombineLatest(MultiOperator):
         self._partial_state[self._index[who]] = args
         if not self._missing and (who in self._emit_on):
             if self._map:
-                self._state = (self._map(*self._partial_state),)
+                state = tuple((self._map(*self._partial_state),))
             else:
-                self._state = tuple(self._partial_state)
-            self.notify(*self._state)
+                state = tuple(self._partial_state)
+            if state != self._state:
+                self._state = state
+                self.notify(*self._state)
 
 
 combine_latest = build_operator(CombineLatest)
