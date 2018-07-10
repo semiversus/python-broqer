@@ -42,6 +42,9 @@ class CatchException(Operator):
         Operator.__init__(self, publisher)
         self._exceptions = exceptions
 
+    def get(self):
+        return self._publisher.get()
+
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         try:
