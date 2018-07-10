@@ -51,106 +51,19 @@ class InitializedPublisher(Publisher):
         Publisher.notify(self, *args)
 
 def check_single_operator(cls, args, kwargs, input_vector, output_vector, initial_state=None, has_state=False):
-    # Test with Publisher
-    source = Publisher()
-    dut = cls(source, *args, **kwargs)
-
-    collector = Collector()
-    collector2 = Collector()
-
-    assert dut.get() == initial_state
-    assert len(source) == 0
-    assert len(dut) == 0
-
-    dispose_collector = dut.subscribe(collector)
-    assert len(dut) == 1
-    assert len(source) == 1
-
-    if not initial_state:
-        assert not collector.state_vector
-    else:
-        assert to_args(collector.state) == initial_state
-
-    with dut.subscribe(collector2):
-        assert len(dut) == 2
-        assert len(source) == 1
-        if initial_state is None:
-            assert not collector.state_vector
-        else:
-            assert to_args(collector.state) == initial_state
-
-    assert dut.get() == initial_state
-
-    for v_emit, v_result in zip(input_vector, output_vector):
-        collector_len = len(collector)
-        collector2_len = len(collector2)
-        source.notify(*to_args(v_emit))
-        with dut.subscribe(collector2):
-            pass
-        if v_result is NONE:
-            assert collector_len == len(collector)
-            assert collector2_len + 1 == len(collector2)
-        elif has_state:
-            assert collector_len + 1 == len(collector)
-            assert collector2_len + 1 == len(collector2)
-            assert unpack_args(*dut.get()) == collector.state
-            assert collector2.state == v_result
-            assert collector.state == v_result
-        else:
-            assert collector_len + 1 == len(collector)
-            assert collector2_len == len(collector2)
-            assert dut.get() is None
-            assert collector.state == v_result
-
-    # Dispose collector
-    dispose_collector.dispose()
-
-    assert len(source) == 0
-    if has_state:
-        assert unpack_args(*dut.get()) == collector.state
-    else:
-        assert dut.get() is None
-
-    # Test with InitializedPublisher
-    source = InitializedPublisher(*to_args(input_vector[0]))
-    dut = cls(source, *args, **kwargs)
-
-    collector = Collector()
-    collector2 = Collector()
-
-    get_result = dut.get()
-
-    dut.subscribe(collector)
-
-    assert len(collector) == 1
-
-    _cmp_value = unpack_args(*initial_state) if output_vector[0] == NONE else output_vector[0]
-
-    assert collector.state == _cmp_value
-    assert unpack_args(*get_result) == _cmp_value
-    assert unpack_args(*dut.get()) == _cmp_value
-    with dut.subscribe(collector2):
-        assert collector2.state == _cmp_value
-
-    for v_emit, v_result in zip(input_vector[1:], output_vector[1:]):
-        collector_len = len(collector)
-        collector2_len = len(collector2)
-        source.notify(*to_args(v_emit))
-        assert unpack_args(*dut.get()) == collector.state
-        with dut.subscribe(collector2):
-            assert collector2.state == collector.state
-        assert collector2_len + 1 == len(collector2)
-        if v_result is NONE:
-            assert collector_len == len(collector)
-        else:
-            assert collector_len + 1 == len(collector)
-            assert v_result == collector.state
-            assert v_result == collector2.state
+    check_operator(cls, args, kwargs, input_vector, output_vector, initial_state, has_state, multi=False)
 
 def check_multi_operator(cls, kwargs, input_vector, output_vector, initial_state=None, has_state=False):
+    check_operator(cls, (), kwargs, input_vector, output_vector, initial_state, has_state, multi=True)
+
+def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state=None, has_state=False, multi=False):
     # Test with Publisher
-    sources = tuple(Publisher() for _ in input_vector[0])
-    dut = cls(*sources, **kwargs)
+    if multi:
+        sources = tuple(Publisher() for _ in input_vector[0])
+    else:
+        input_vector = tuple((v,) for v in input_vector)
+        sources = (Publisher(),)
+    dut = cls(*sources, *args, **kwargs)
 
     collector = Collector()
     collector2 = Collector()
@@ -178,7 +91,7 @@ def check_multi_operator(cls, kwargs, input_vector, output_vector, initial_state
 
     assert dut.get() == initial_state
 
-    initialized = False
+    initialized = not (initial_state is None)
     for v_emits, v_result in zip(input_vector, output_vector):
         print(v_emits, v_result)
         collector_len = len(collector)
@@ -222,7 +135,7 @@ def check_multi_operator(cls, kwargs, input_vector, output_vector, initial_state
 
     # Test with InitializedPublisher
     sources = tuple(InitializedPublisher(*to_args(v)) for v in input_vector[0])
-    dut = cls(*sources, **kwargs)
+    dut = cls(*sources, *args, **kwargs)
 
     collector = Collector()
     collector2 = Collector()
