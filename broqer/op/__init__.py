@@ -1,13 +1,14 @@
+from .any_ import Any, any_
+from .all_ import All, all_
 from .accumulate import Accumulate, accumulate
 from .cache import Cache, cache
 from .catch_exception import CatchException, catch_exception
 from .combine_latest import CombineLatest, combine_latest
 from .distinct import Distinct, distinct
-from .filter import Filter, filter
+from .filter_ import Filter, filter_
 from .from_iterable import FromIterable
-from .getter import Getter, getter, get
 from .just import Just
-from .map import Map, map
+from .map_ import Map, map_
 from .merge import Merge, merge
 from .pack import Pack, pack
 from .partition import Partition, partition
@@ -31,16 +32,15 @@ from .throttle import Throttle, throttle
 from .to_future import ToFuture, to_future
 
 __all__ = [
-    'Accumulate', 'accumulate', 'Cache', 'cache', 'CatchException',
-    'catch_exception', 'CombineLatest', 'combine_latest', 'Distinct',
-    'distinct', 'Filter', 'filter', 'FromIterable', 'Getter', 'getter', 'get',
-    'Just', 'Map', 'map', 'Merge', 'merge', 'Pack', 'pack', 'Partition',
-    'partition', 'Peek', 'peek', 'Pluck', 'pluck', 'Reduce', 'reduce',
-    'Replace', 'replace', 'Sink', 'sink', 'SlidingWindow', 'sliding_window',
-    'Switch', 'switch', 'Unpack', 'unpack', 'Debounce', 'debounce', 'Delay',
-    'delay', 'FromPolling', 'Sample', 'sample', 'MapAsync', 'map_async',
-    'Mode', 'MapThreaded', 'map_threaded', 'Throttle', 'throttle', 'ToFuture',
-    'to_future'
+    'Any', 'any_', 'All', 'all_', 'Accumulate', 'accumulate', 'Cache', 'cache',
+    'CatchException', 'catch_exception', 'CombineLatest', 'combine_latest',
+    'Distinct', 'distinct', 'Filter', 'filter_', 'FromIterable', 'Just', 'Map',
+    'map_', 'Merge', 'merge', 'Pack', 'pack', 'Partition', 'partition', 'Peek',
+    'peek', 'Pluck', 'pluck', 'Reduce', 'reduce', 'Replace', 'replace', 'Sink',
+    'sink', 'SlidingWindow', 'sliding_window', 'Switch', 'switch', 'Unpack',
+    'unpack', 'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
+    'Sample', 'sample', 'MapAsync', 'map_async', 'Mode', 'MapThreaded',
+    'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future'
 ]
 
 # TODO operators
