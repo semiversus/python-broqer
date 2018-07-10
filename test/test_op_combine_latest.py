@@ -1,8 +1,9 @@
 import pytest
 
 from broqer.op import CombineLatest, Just
+from broqer import Publisher
 
-from .helper import check_multi_operator, NONE
+from .helper import check_multi_operator, NONE, Collector
 
 @pytest.mark.parametrize('kwargs, input_vector, output_vector', [
     ({}, ((1,2), (NONE,3), (2,NONE), (2,3)), ((1,2),(1,3),(2,3),NONE)),
@@ -13,3 +14,25 @@ from .helper import check_multi_operator, NONE
 ])
 def test_with_publisher(kwargs, input_vector, output_vector):
     check_multi_operator(CombineLatest, kwargs, input_vector, output_vector, has_state=True)
+
+def test_emit_on():
+    source = Publisher()
+    source2 = Publisher()
+    dut = CombineLatest(source, source2, emit_on=source2)
+    dut2 = CombineLatest(source, source2, emit_on=(source, source2))
+    dut3 = CombineLatest(source, source2, emit_on=source, map_=lambda a,b:a+b)
+
+    collector = Collector()
+    collector2 = Collector()
+    collector3 = Collector()
+    dut.subscribe(collector)
+    dut2.subscribe(collector2)
+    dut3.subscribe(collector3)
+
+    source2.notify(1)
+    source.notify(2)
+    source2.notify(0)
+    source.notify(1)
+    assert collector.state_vector == ((2,0),)
+    assert collector2.state_vector == ((2,1), (2,0), (1,0))
+    assert collector3.state_vector == (3, 1)
