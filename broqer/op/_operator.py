@@ -1,3 +1,5 @@
+from abc import ABCMeta, abstractmethod
+
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 
@@ -22,6 +24,10 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
             if args is not None:
                 subscriber.emit(*args, who=self)  # pylint: disable=E1133
         return disposable
+
+    @abstractmethod
+    def get(self):
+        return None
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Publisher.unsubscribe(self, subscriber)
@@ -57,6 +63,9 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
             for _publisher in self._publishers:
                 _publisher.unsubscribe(self)
 
+    @abstractmethod
+    def get(self):
+        return None
 
 def build_operator(operator_cls):
     """ This function is taking an operator class and is returning a function
