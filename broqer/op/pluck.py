@@ -1,8 +1,4 @@
 """
-Apply sequence of picks via ``getitem`` to emitted values
-
-Usage:
-
 >>> from broqer import Subject, op
 >>> s = Subject()
 
@@ -51,11 +47,26 @@ from ._operator import Operator, build_operator
 
 
 class Pluck(Operator):
+    """ Apply sequence of picks via ``getitem`` to emitted values
+
+    :param publisher: source publisher
+    :param picks: variable argument list of elements applied via getitem
+        operator
+    """
     def __init__(self, publisher: Publisher, *picks: Any) -> None:
         assert len(picks) >= 1, 'need at least one pick key'
         Operator.__init__(self, publisher)
 
         self._picks = picks
+
+    def get(self):
+        args = self._publisher.get()
+        if args is None:
+            return None
+        arg = args[0]
+        for pick in self._picks:
+            arg = getitem(arg, pick)
+        return arg
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert len(args) == 1, \
