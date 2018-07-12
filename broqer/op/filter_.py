@@ -45,6 +45,12 @@ class Filter(Operator):
         else:
             self._predicate = predicate  # type: Callable
 
+    def get(self):
+        args = self._publisher.get()
+        if self._predicate(*args):
+            return args
+        return None
+
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._predicate(*args):
