@@ -25,14 +25,15 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
                 subscriber.emit(*args, who=self)  # pylint: disable=E1133
         return disposable
 
-    @abstractmethod
-    def get(self):
-        return None
-
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Publisher.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._publisher.unsubscribe(self)
+
+    @abstractmethod
+    def get(self):  # pylint: disable=useless-return, no-self-use
+        return None
+
 
 
 class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
@@ -64,7 +65,7 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
                 _publisher.unsubscribe(self)
 
     @abstractmethod
-    def get(self):
+    def get(self):  # pylint: disable=useless-return, no-self-use
         return None
 
 def build_operator(operator_cls):
