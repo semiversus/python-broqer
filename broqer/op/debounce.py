@@ -71,6 +71,9 @@ class Debounce(Operator):
         self._call_later_handler = None  # type: asyncio.Handle
         self._error_callback = error_callback
 
+    def get(self):
+        return None
+
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._retrigger_value:  # if retrigger_value is not empty tuple

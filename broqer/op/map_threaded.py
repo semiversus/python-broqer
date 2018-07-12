@@ -145,6 +145,9 @@ class MapThreaded(Operator):
 
         self._executor = ThreadPoolExecutor(max_workers=workers)
 
+    def get(self):
+        return None
+
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
 

@@ -146,6 +146,9 @@ class MapAsync(Operator):
         else:  # no queue for CONCURRENT, INTERRUPT and SKIP
             self._queue = None
 
+    def get(self):
+        return None
+
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._mode == Mode.INTERRUPT and self._future is not None:

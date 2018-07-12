@@ -68,6 +68,14 @@ class Sample(Operator):
             subscriber.emit(*self._state, who=self)
         return disposable
 
+    def get(self):
+        if not self._subscriptions:
+            args = self._publisher.get()
+            if args is None:
+                return self._state
+            return args
+        return self._state
+
     def _periodic_callback(self):
         """ will be started on first emit """
         try:
