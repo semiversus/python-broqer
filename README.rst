@@ -147,8 +147,6 @@ Operators
 +-------------------------------------+-----------------------------------------------------------------------------+
 | merge_ (\*publishers)               | Merge emits of multiple publishers into one stream                          |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| pack_ (\*args)                      | Emit a multi-argument emit as tuple of arguments                            |
-+-------------------------------------+-----------------------------------------------------------------------------+
 | partition_ (size)                   | Group ``size`` emits into one emit as tuple                                 |
 +-------------------------------------+-----------------------------------------------------------------------------+
 | pluck_ (\*picks)                    | Apply sequence of picks via ``getitem`` to emitted values                   |
@@ -158,8 +156,6 @@ Operators
 | sliding_window_ (size, ...)         | Group ``size`` emitted values overlapping                                   |
 +-------------------------------------+-----------------------------------------------------------------------------+
 | switch_ (mapping)                   | Emit selected source mapped by ``mapping``                                  |
-+-------------------------------------+-----------------------------------------------------------------------------+
-| unpack_ (args)                      | Unpacking a sequence of values and use it to emit as arguments              |
 +-------------------------------------+-----------------------------------------------------------------------------+
 
 Using ``asyncio`` event loop:
@@ -204,7 +200,6 @@ A Subscriber_ is the sink for messages.
 .. _map_threaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
 .. _map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map.py
 .. _merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py
-.. _pack: https://github.com/semiversus/python-broqer/blob/master/broqer/op/pack.py
 .. _partition: https://github.com/semiversus/python-broqer/blob/master/broqer/op/partition.py
 .. _pluck: https://github.com/semiversus/python-broqer/blob/master/broqer/op/pluck.py
 .. _reduce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/reduce.py
@@ -214,7 +209,6 @@ A Subscriber_ is the sink for messages.
 .. _switch: https://github.com/semiversus/python-broqer/blob/master/broqer/op/switch.py
 .. _throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py
 .. _to_future: https://github.com/semiversus/python-broqer/blob/master/broqer/op/to_future.py
-.. _unpack: https://github.com/semiversus/python-broqer/blob/master/broqer/op/unpack.py
 
 Credits
 =======

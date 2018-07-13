@@ -10,7 +10,6 @@ from .from_iterable import FromIterable
 from .just import Just
 from .map_ import Map, map_
 from .merge import Merge, merge
-from .pack import Pack, pack
 from .partition import Partition, partition
 from .peek import Peek, peek
 from .pluck import Pluck, pluck
@@ -19,7 +18,6 @@ from .replace import Replace, replace
 from .sink import Sink, sink
 from .sliding_window import SlidingWindow, sliding_window
 from .switch import Switch, switch
-from .unpack import Unpack, unpack
 
 # using asyncio
 from .debounce import Debounce, debounce
@@ -35,12 +33,12 @@ __all__ = [
     'Any', 'any_', 'All', 'all_', 'Accumulate', 'accumulate', 'Cache', 'cache',
     'CatchException', 'catch_exception', 'CombineLatest', 'combine_latest',
     'Distinct', 'distinct', 'Filter', 'filter_', 'FromIterable', 'Just', 'Map',
-    'map_', 'Merge', 'merge', 'Pack', 'pack', 'Partition', 'partition', 'Peek',
-    'peek', 'Pluck', 'pluck', 'Reduce', 'reduce', 'Replace', 'replace', 'Sink',
-    'sink', 'SlidingWindow', 'sliding_window', 'Switch', 'switch', 'Unpack',
-    'unpack', 'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
-    'Sample', 'sample', 'MapAsync', 'map_async', 'Mode', 'MapThreaded',
-    'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future'
+    'map_', 'Merge', 'merge', 'Partition', 'partition', 'Peek', 'peek',
+    'Pluck', 'pluck', 'Reduce', 'reduce', 'Replace', 'replace', 'Sink', 'sink',
+    'SlidingWindow', 'sliding_window', 'Switch', 'switch', 'Debounce',
+    'debounce', 'Delay', 'delay', 'FromPolling', 'Sample', 'sample',
+    'MapAsync', 'map_async', 'Mode', 'MapThreaded', 'map_threaded', 'Throttle',
+    'throttle', 'ToFuture', 'to_future'
 ]
 
 # TODO operators
