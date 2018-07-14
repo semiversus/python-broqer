@@ -32,20 +32,23 @@ class Cache(Operator):
     """
     def __init__(self, publisher: Publisher, *init: Any) -> None:
         Operator.__init__(self, publisher)
-        assert len(init) >= 1, 'need at least one argument for cache init'
-        self._state = init
+        if not init:
+            self._state = None
+        else:
+            self._state = init
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         state = self._state
         self._state = None
         disposable = Operator.subscribe(self, subscriber)
         if len(self._subscriptions) == 1:
-            if self._state is None:
+            if self._state is None and state is not None:
                 self._state = state
                 subscriber.emit(*self._state, who=self)  # emit actual cache
         else:
             self._state = state
-            subscriber.emit(*self._state, who=self)
+            if self._state is not None:
+                subscriber.emit(*self._state, who=self)
         return disposable
 
     def get(self):

@@ -4,7 +4,6 @@ from .accumulate import Accumulate, accumulate
 from .cache import Cache, cache
 from .catch_exception import CatchException, catch_exception
 from .combine_latest import CombineLatest, combine_latest
-from .distinct import Distinct, distinct
 from .filter_ import Filter, filter_
 from .from_iterable import FromIterable
 from .just import Just
@@ -32,13 +31,13 @@ from .to_future import ToFuture, to_future
 __all__ = [
     'Any', 'any_', 'All', 'all_', 'Accumulate', 'accumulate', 'Cache', 'cache',
     'CatchException', 'catch_exception', 'CombineLatest', 'combine_latest',
-    'Distinct', 'distinct', 'Filter', 'filter_', 'FromIterable', 'Just', 'Map',
-    'map_', 'Merge', 'merge', 'Partition', 'partition', 'Peek', 'peek',
-    'Pluck', 'pluck', 'Reduce', 'reduce', 'Replace', 'replace', 'Sink', 'sink',
-    'SlidingWindow', 'sliding_window', 'Switch', 'switch', 'Debounce',
-    'debounce', 'Delay', 'delay', 'FromPolling', 'Sample', 'sample',
-    'MapAsync', 'map_async', 'Mode', 'MapThreaded', 'map_threaded', 'Throttle',
-    'throttle', 'ToFuture', 'to_future'
+    'Filter', 'filter_', 'FromIterable', 'Just', 'Map', 'map_', 'Merge',
+    'merge', 'Partition', 'partition', 'Peek', 'peek', 'Pluck', 'pluck',
+    'Reduce', 'reduce', 'Replace', 'replace', 'Sink', 'sink', 'SlidingWindow',
+    'sliding_window', 'Switch', 'switch', 'Debounce', 'debounce', 'Delay',
+    'delay', 'FromPolling', 'Sample', 'sample', 'MapAsync', 'map_async',
+    'Mode', 'MapThreaded', 'map_threaded', 'Throttle', 'throttle', 'ToFuture',
+    'to_future'
 ]
 
 # TODO operators

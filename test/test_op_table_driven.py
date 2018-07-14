@@ -1,5 +1,5 @@
 from broqer import Publisher, Value, unpack_args
-from broqer.op import Accumulate, Cache, CatchException, CombineLatest, Distinct, Sink
+from broqer.op import Accumulate, Cache, CatchException, CombineLatest, Sink
 
 from unittest.mock import Mock
 import pytest
