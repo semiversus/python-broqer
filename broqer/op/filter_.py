@@ -47,7 +47,7 @@ class Filter(Operator):
 
     def get(self):
         args = self._publisher.get()
-        if self._predicate(*args):
+        if args is not None and self._predicate(*args):
             return args
         return None
 
