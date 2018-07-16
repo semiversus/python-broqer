@@ -30,10 +30,13 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
         if not self._subscriptions:
             self._publisher.unsubscribe(self)
 
+    @property
+    def source_publishers():
+        return (self._publisher, )
+
     @abstractmethod
     def get(self):  # pylint: disable=useless-return, no-self-use
         return None
-
 
 
 class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
@@ -63,6 +66,10 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
         if not self._subscriptions:
             for _publisher in self._publishers:
                 _publisher.unsubscribe(self)
+
+    @property
+    def source_publishers():
+        return self._publishers
 
     @abstractmethod
     def get(self):  # pylint: disable=useless-return, no-self-use
