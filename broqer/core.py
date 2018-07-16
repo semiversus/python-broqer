@@ -86,6 +86,10 @@ class Publisher():
         """ number of subscriptions """
         return len(self._subscriptions)
 
+    @property
+    def subscriptions(self):
+        return tuple(self._subscriptions)
+
     def __or__(self, build_subscriber: Callable[['Publisher'], 'Publisher']) \
             -> 'Publisher':
         # build_subscriber is called with `self` and returns a new publisher
