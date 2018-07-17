@@ -27,7 +27,7 @@ Resetting (or just setting) the state is also possible:
 """
 from typing import Any, Callable, Tuple
 
-from broqer import Publisher, to_args
+from broqer import Publisher, Subscriber, to_args
 
 from ._operator import Operator, build_operator
 
@@ -48,7 +48,14 @@ class Accumulate(Operator):
         Operator.__init__(self, publisher)
         self._acc_func = func
         self._state = init
+        self._init = init
         self._result = None
+
+    def unsubscribe(self, subscriber: Subscriber) -> None:
+        Operator.unsubscribe(self, subscriber)
+        if not self._subscriptions:
+            self._state = self._init
+            self._result = None
 
     def get(self) -> Any:
         if not self._subscriptions:  # if no subscribers listening
@@ -59,7 +66,7 @@ class Accumulate(Operator):
                 return None
             assert len(args) == 1, \
                 'accumulate is only possible for emits with one argument'
-            return to_args(self._acc_func(self._state, args[0])[1])
+            return to_args(self._acc_func(self._init, args[0])[1])
         if self._result is not None:
             return to_args(self._result)
 
