@@ -62,6 +62,7 @@ class CombineLatest(MultiOperator):
         if not self._subscriptions:
             self._missing = set(self._publishers)
             self._partial_state = [None for _ in self._partial_state]
+            self._state = None
 
     def get(self):
         if not self._subscriptions:  # if no subscribers listening
