@@ -3,7 +3,7 @@
 from typing import Dict, MutableSequence, Callable, Tuple  # noqa: F401
 from typing import Any as Any_
 
-from broqer import Publisher, unpack_args
+from broqer import Publisher, Subscriber, unpack_args
 
 from ._operator import MultiOperator, build_operator
 
@@ -24,6 +24,12 @@ class _MultiPredicate(MultiOperator):
         partial = [None for _ in publishers]  # type: MutableSequence[Any_]
         self._partial = partial
         self._state = None  # type: Tuple[bool]
+
+    def unsubscribe(self, subscriber: Subscriber) -> None:
+        MultiOperator.unsubscribe(self, subscriber)
+        if not self._subscriptions:
+            self._partial = [None for _ in self._partial]
+            self._state = None
 
     def get(self) -> Tuple:
         if not self._subscriptions:
