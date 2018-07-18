@@ -45,7 +45,7 @@ False
 """
 import asyncio
 import sys
-from typing import Any
+from typing import Any, Tuple
 
 from broqer import Publisher, Subscriber, default_error_handler
 
@@ -65,8 +65,8 @@ class Debounce(Operator):
         self._loop = loop or asyncio.get_event_loop()
         self._call_later_handler = None  # type: asyncio.Handle
         self._error_callback = error_callback
-        self._state = None
-        self._next_state = None
+        self._state = None  # type: Tuple[Any, ...]
+        self._next_state = None  # type: Tuple[Any, ...]
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Operator.unsubscribe(self, subscriber)
@@ -109,7 +109,7 @@ class Debounce(Operator):
         try:
             self.notify(*self._next_state)
             self._state = self._next_state
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             self._error_callback(*sys.exc_info())
 
     def reset(self):
