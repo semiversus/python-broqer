@@ -32,3 +32,6 @@ class FromIterable(Publisher):
         for v in self._iterable:
             subscriber.emit(v, who=self)
         return disposable
+
+    def get(self):
+        return next(self._iterable)
