@@ -45,10 +45,10 @@ def test_reset():
     source.notify(2)
     source.notify(0)
     source.notify(1)
-    assert collector.state_vector == (1, 2, 3, 3)
+    assert collector.result_vector == (1, 2, 3, 3)
 
     collector.reset()
     dut.reset((1, 3))
     source.notify(1)
     source.notify(2)
-    assert collector.state_vector == (2, 3)
+    assert collector.result_vector == (2, 3)

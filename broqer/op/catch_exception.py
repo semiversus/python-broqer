@@ -4,14 +4,14 @@
 
 Example with exception:
 
->>> disposable = s | op.pluck(0) | op.sink(print)
+>>> disposable = s | op.map_(lambda s:1/s) | op.sink(print)
 
->>> s.emit([1,2,3])
+>>> s.emit(1)
 1
->>> s.emit([])
+>>> s.emit(0)
 Traceback (most recent call last):
 ...
-IndexError: list index out of range
+ZeroDivisionError: division by zero
 
 >>> disposable.dispose()
 

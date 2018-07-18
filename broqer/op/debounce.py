@@ -99,6 +99,10 @@ class Debounce(Operator):
                 # skip if emit will result in the same value as the current one
                 return
 
+        if args == self._state:
+            self._next_state = self._state
+            return
+
         self._next_state = args
 
         self._call_later_handler = \
