@@ -59,6 +59,17 @@ class Map(Operator):
         else:
             self._map_func = map_func  # type: Callable
 
+    def get(self):
+        args = self._publisher.get()
+        if args is None:
+            return None
+        result = self._map_func(*args)
+        if result is None:
+            result = ()
+        elif not isinstance(result, tuple):
+            result = (result, )
+        return result
+
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         result = self._map_func(*args)
