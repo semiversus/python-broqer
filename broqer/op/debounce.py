@@ -23,15 +23,11 @@ When debounce is retriggered you can specify a value to emit:
 >>> s.emit(False)
 False
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.15))
-False
 >>> s.emit(True)
-False
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
 >>> s.emit(False)
-False
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
 >>> s.emit(True)
-False
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.15))
 True
 
@@ -40,7 +36,6 @@ Reseting is also possible:
 >>> s.emit(False)
 False
 >>> s.emit(True)
-False
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
 >>> debounce_publisher.reset()
 False
