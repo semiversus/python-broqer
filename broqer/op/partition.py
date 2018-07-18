@@ -34,6 +34,17 @@ class Partition(Operator):
         self._queue = []  # type: MutableSequence
         self._size = size
 
+    def get(self):
+        if not self._subscriptions:
+            if self._size == 1:
+                args = self._publisher.get()
+                if args is None:
+                    return None
+                return args
+            return None
+        if self._size and len(self._queue) == self._size:
+            return (tuple(self._queue),)
+
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         assert len(args) >= 1, 'need at least one argument for partition'
