@@ -53,6 +53,13 @@ class Switch(Operator):
         self._selected_publisher = None  # type: Publisher
         self._mapping = publisher_mapping
 
+    def get(self):
+        selection = self._selected_publisher.get()
+        if selection is None:
+            return
+        selected = self._mapping[selection].get()
+        return selected
+
     def emit(self, *args: Any, who: Publisher) -> None:
         if who == self._selection_publisher:
             if self._mapping[args[0]] != self._selected_publisher:
