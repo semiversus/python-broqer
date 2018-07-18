@@ -45,7 +45,7 @@ False
 """
 import asyncio
 import sys
-from typing import Any, Tuple
+from typing import Any, Tuple  # noqa: F401
 
 from broqer import Publisher, Subscriber, default_error_handler
 
