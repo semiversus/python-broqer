@@ -61,8 +61,6 @@ class Accumulate(Operator):
         if not self._subscriptions:  # if no subscribers listening
             args = self._publisher.get()
             if args is None:
-                if self._result is not None:
-                    return to_args(self._result)
                 return None
             assert len(args) == 1, \
                 'accumulate is only possible for emits with one argument'
