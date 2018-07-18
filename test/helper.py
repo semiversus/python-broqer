@@ -166,7 +166,9 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
                 assert len(collector_temporary) == stored_collector_temporary_len
         else:
             assert collector_permanent.last_result == v_result
-            if has_state or stateful:
+            if has_state is None:  # special case for undefined behavior
+                pass
+            elif has_state or stateful:
                 assert collector_permanent.last_result == unpack_args(*stored_result)
                 with dut.subscribe(collector_temporary):
                     assert collector_temporary.last_result == v_result
