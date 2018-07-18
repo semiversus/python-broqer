@@ -43,7 +43,7 @@ import asyncio
 import sys
 from typing import Any, Tuple  # noqa: F401
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable, \
+from broqer import Publisher, Subscriber, \
                    default_error_handler
 
 from ._operator import Operator, build_operator
@@ -62,11 +62,10 @@ class Sample(Operator):
         self._state = None  # type: Tuple
         self._error_callback = error_callback
 
-    def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        disposable = super().subscribe(subscriber)
-        if self._state is not None:
-            subscriber.emit(*self._state, who=self)
-        return disposable
+    def unsubscribe(self, subscriber: Subscriber) -> None:
+        Operator.unsubscribe(self, subscriber)
+        if not self._subscriptions:
+            self._state = None
 
     def get(self):
         if not self._subscriptions:
