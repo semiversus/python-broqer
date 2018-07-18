@@ -25,6 +25,10 @@ class Merge(MultiOperator):
         MultiOperator.__init__(self, *publishers)
 
     def get(self):
+        for p in self._publishers:
+            result = p.get()
+            if result is not None:
+                return result
         return None
 
     def emit(self, *args: Any, who: Publisher) -> None:
