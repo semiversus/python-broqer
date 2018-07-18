@@ -11,7 +11,7 @@ Usage:
 
 >>> reduce_publisher = s | op.reduce(build_number)
 >>> _d = reduce_publisher | op.sink(print, 'Reduce:')
->>> s.emit(4) # without initialisation the first emit is used for this
+>>> s.emit(4) # without initialization the first emit is used for this
 >>> s.emit(7)
 Reduce: 47
 >>> s.emit(8)
@@ -27,7 +27,7 @@ Reduce: 1234
 """
 from typing import Any, Callable
 
-from broqer import Publisher
+from broqer import Publisher, Subscriber
 
 from ._operator import Operator, build_operator
 
@@ -37,8 +37,28 @@ class Reduce(Operator):
                  init=None) -> None:
         Operator.__init__(self, publisher)
         self._last_state = init
+        self._init = init
 
         self._reduce_func = func
+
+    def unsubscribe(self, subscriber: Subscriber) -> None:
+        Operator.unsubscribe(self, subscriber)
+        if not self._subscriptions:
+            self._last_state = self._init
+
+    def get(self) -> Any:
+        if not self._subscriptions:
+            if self._init is None:
+                return
+            args = self._publisher.get()
+            if args is None:
+                return None
+            assert len(args) == 1, \
+                'reduce is only possible for emits with one argument'
+            return (self._reduce_func(self._init, args[0]),)
+        if self._last_state is not None:
+            return (self._reduce_func(self._last_state, args[0]),)
+        return None
 
     def reset(self, init):
         self._last_state = init
