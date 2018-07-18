@@ -19,6 +19,7 @@ from .helper import check_async_operator_coro, NONE
     (0,
      ((0, False), (0.02, True), (0.025, False), (0.04, True), (0.06, False), (0.065, True)),
      ((0.0001, False), (0.02, True), (0.025, False), (0.04, True), (0.06, False), (0.065, True))),
+     # ^-- have to fool check_async_operator_coro which is checking for 0 as really immediate
 
 ])
 @pytest.mark.asyncio
