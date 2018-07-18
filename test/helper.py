@@ -156,7 +156,9 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
         if v_result is NONE:
             with dut.subscribe(collector_temporary):
                 pass
-            if has_state and stored_last_result is not None:
+            if has_state is None:
+                pass
+            elif has_state and stored_last_result is not None:
                 assert collector_permanent.last_result == unpack_args(*stored_result)
                 assert collector_temporary.last_result == unpack_args(*stored_result)
                 assert collector_temporary.last_result == (None if stored_last_result is None else unpack_args(*stored_last_result))
