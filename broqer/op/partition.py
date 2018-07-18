@@ -20,7 +20,7 @@ Partition: (4, (5, 6))
 """
 from typing import Any, MutableSequence  # noqa: F401
 
-from broqer import Publisher, unpack_args
+from broqer import Publisher, Subscriber, unpack_args
 
 from ._operator import Operator, build_operator
 
@@ -34,16 +34,19 @@ class Partition(Operator):
         self._queue = []  # type: MutableSequence
         self._size = size
 
-    def get(self):
+    def unsubscribe(self, subscriber: Subscriber) -> None:
+        Operator.unsubscribe(self, subscriber)
         if not self._subscriptions:
-            if self._size == 1:
-                args = self._publisher.get()
-                if args is None:
-                    return None
-                return args
-            return None
-        if self._size and len(self._queue) == self._size:
-            return (tuple(self._queue),)
+            self._queue.clear()
+
+    def get(self):
+        queue = list(self._queue)
+        result = self._publisher.get()
+        if result is None:
+            return
+        queue.append(unpack_args(*result))
+        if self._size and len(queue) == self._size:
+            return (tuple(queue),)
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
