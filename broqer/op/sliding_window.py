@@ -41,7 +41,7 @@ Sliding Window:2:3:4
 from collections import deque
 from typing import Any, MutableSequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable, unpack_args
+from broqer import Publisher, Subscriber, unpack_args
 
 from ._operator import Operator, build_operator
 
@@ -57,15 +57,26 @@ class SlidingWindow(Operator):
         self.notify_partial = emit_partial
         self._packed = packed
 
-    def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        disposable = Operator.subscribe(self, subscriber)
-        if (self.notify_partial and self._state) or \
+    def unsubscribe(self, subscriber: Subscriber) -> None:
+        Operator.unsubscribe(self, subscriber)
+        if not self._subscriptions:
+            self._state.clear()
+
+    def get(self):
+        if not self._subscriptions:
+            if self._emit_partial or self._state.maxlen == 1:
+                args = self._publisher.get()
+                if args is None:
+                    return
+                if self._packed:
+                    return (args,)
+                return args
+        if self.notify_partial or \
                 len(self._state) == self._state.maxlen:  # type: ignore
             if self._packed:
-                subscriber.emit(tuple(self._state), who=self)
-            else:
-                subscriber.emit(*self._state, who=self)
-        return disposable
+                return (tuple(self._state),)
+
+            return self._state
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
