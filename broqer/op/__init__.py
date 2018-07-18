@@ -11,7 +11,6 @@ from .map_ import Map, map_
 from .merge import Merge, merge
 from .partition import Partition, partition
 from .peek import Peek, peek
-from .pluck import Pluck, pluck
 from .reduce import Reduce, reduce
 from .replace import Replace, replace
 from .sink import Sink, sink
@@ -32,11 +31,11 @@ __all__ = [
     'Any', 'any_', 'All', 'all_', 'Accumulate', 'accumulate', 'Cache', 'cache',
     'CatchException', 'catch_exception', 'CombineLatest', 'combine_latest',
     'Filter', 'filter_', 'FromIterable', 'Just', 'Map', 'map_', 'Merge',
-    'merge', 'Partition', 'partition', 'Peek', 'peek', 'Pluck', 'pluck',
-    'Reduce', 'reduce', 'Replace', 'replace', 'Sink', 'sink', 'SlidingWindow',
-    'sliding_window', 'Switch', 'switch', 'Debounce', 'debounce', 'Delay',
-    'delay', 'FromPolling', 'Sample', 'sample', 'MapAsync', 'map_async',
-    'Mode', 'MapThreaded', 'map_threaded', 'Throttle', 'throttle', 'ToFuture',
+    'merge', 'Partition', 'partition', 'Peek', 'peek', 'Reduce', 'reduce',
+    'Replace', 'replace', 'Sink', 'sink', 'SlidingWindow', 'sliding_window',
+    'Switch', 'switch', 'Debounce', 'debounce', 'Delay', 'delay',
+    'FromPolling', 'Sample', 'sample', 'MapAsync', 'map_async', 'Mode',
+    'MapThreaded', 'map_threaded', 'Throttle', 'throttle', 'ToFuture',
     'to_future'
 ]
 

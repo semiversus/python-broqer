@@ -149,8 +149,6 @@ Operators
 +-------------------------------------+-----------------------------------------------------------------------------+
 | partition_ (size)                   | Group ``size`` emits into one emit as tuple                                 |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| pluck_ (\*picks)                    | Apply sequence of picks via ``getitem`` to emitted values                   |
-+-------------------------------------+-----------------------------------------------------------------------------+
 | reduce_ (func, init)                | Apply ``func`` to the current emitted value and the last result of ``func`` |
 +-------------------------------------+-----------------------------------------------------------------------------+
 | sliding_window_ (size, ...)         | Group ``size`` emitted values overlapping                                   |
@@ -201,7 +199,6 @@ A Subscriber_ is the sink for messages.
 .. _map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map.py
 .. _merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py
 .. _partition: https://github.com/semiversus/python-broqer/blob/master/broqer/op/partition.py
-.. _pluck: https://github.com/semiversus/python-broqer/blob/master/broqer/op/pluck.py
 .. _reduce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/reduce.py
 .. _sample: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sample.py
 .. _sink: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sink.py
