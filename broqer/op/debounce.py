@@ -52,7 +52,7 @@ import asyncio
 import sys
 from typing import Any
 
-from broqer import Publisher, default_error_handler
+from broqer import Publisher, Subscriber, default_error_handler
 
 from ._operator import Operator, build_operator
 
@@ -70,28 +70,58 @@ class Debounce(Operator):
         self._loop = loop or asyncio.get_event_loop()
         self._call_later_handler = None  # type: asyncio.Handle
         self._error_callback = error_callback
+        self._state = None
+        self._next_state = None
+
+    def unsubscribe(self, subscriber: Subscriber) -> None:
+        Operator.unsubscribe(self, subscriber)
+        if not self._subscriptions:
+            self._state = None
+            if self._call_later_handler:
+                self._call_later_handler.cancel()
 
     def get(self):
-        return None
+        if not self._subscriptions and self._retrigger_value:
+            return self._retrigger_value
+        return self._state
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
-        if self._retrigger_value:  # if retrigger_value is not empty tuple
-            self.notify(*self._retrigger_value)
+
+        if args == self._next_state:
+            # skip if emit will result in the same value as the scheduled one
+            return
+
         if self._call_later_handler:
             self._call_later_handler.cancel()
-        self._call_later_handler = \
-            self._loop.call_later(self.duetime, self._debounced, *args)
 
-    def _debounced(self, *args):
+        if self._retrigger_value and self._state != self._retrigger_value:
+            # when retrigger_value is defined and current state is different
+            self.notify(*self._retrigger_value)
+            self._state = self._retrigger_value
+            self._next_state = self._retrigger_value
+            if args == self._retrigger_value:
+                # skip if emit will result in the same value as the current one
+                return
+
+        self._next_state = args
+
+        self._call_later_handler = \
+            self._loop.call_later(self.duetime, self._debounced)
+
+    def _debounced(self):
+        self._call_later_handler = None
         try:
-            self.notify(*args)
+            self.notify(*self._next_state)
+            self._state = self._next_state
         except Exception:
             self._error_callback(*sys.exc_info())
 
     def reset(self):
         if self._retrigger_value:  # if retrigger_value is not empty tuple
             self.notify(*self._retrigger_value)
+            self._state = self._retrigger_value
+            self._next_state = self._retrigger_value
         if self._call_later_handler:
             self._call_later_handler.cancel()
 

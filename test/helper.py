@@ -234,10 +234,12 @@ async def check_async_operator_coro(cls, args, kwargs, input_vector, output_vect
     await check_operator_coro(cls, args, kwargs, input_vector, output_vector, initial_state=initial_state, has_state=has_state, stateful=True, loop=loop)
 
 async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, initial_state=None, has_state=False, stateful=False, loop=None):
+    assert input_vector[0][0] == 0  # first entry has to be on timestamp 0
+    first_input_value = input_vector[0][1]
+    input_vector = input_vector[1:]
+
     if stateful:
-        source = InitializedPublisher(*to_args(input_vector[0]))
-        assert input_vector[0][0] == 0  # first entry has to be on timestamp 0
-        input_vector = input_vector[1:]
+        source = InitializedPublisher(*to_args(first_input_value))
     else:
         source = Publisher()
 
@@ -255,6 +257,9 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
 
     # make first (permanent) subscription
     dispose_collector = dut.subscribe(collector)
+
+    if not stateful:
+        source.notify(*to_args(first_input_value))
 
     # at least one subscription of the source publishers
     assert len(source.subscriptions) == 1
@@ -297,6 +302,36 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
         source.notify(*to_args(value))
 
     await asyncio.sleep(target_timestamp - loop.time() + output_vector[-1][0] - last_timestamp + 2*JITTER)
+
     for value_actual, timestamp_actual, (timestamp_target, value_target) in zip(collector.state_vector, collector.timestamp_vector, output_vector):
+        print(timestamp_target, timestamp_actual, value_target, value_actual)
         assert abs(timestamp_actual-timestamp_target)<JITTER
         assert value_actual == value_target
+    print(collector.state_vector, collector.timestamp_vector)
+    assert len(collector.state_vector) == len(output_vector)
+
+    # dispose permanent subscriber
+    collector.reset()
+    collector2.reset()
+    dispose_collector.dispose()
+
+    if stateful:
+        source.reset(*to_args(first_input_value))
+
+    stored_result = dut.get()
+
+    assert len(source.subscriptions) == 0
+    assert len(dut.subscriptions) == 0
+
+    # make first (permanent) subscription
+    dispose_collector = dut.subscribe(collector)
+
+    if not stateful:
+        source.notify(*to_args(first_input_value))
+
+    # at least one subscription of the source publishers
+    assert len(source.subscriptions) == 1
+    assert len(dut.subscriptions) == 1
+
+    # check .get() after subscription (should not change)
+    assert dut.get() == stored_result
