@@ -68,8 +68,6 @@ class CombineLatest(MultiOperator):
         if not self._subscriptions:  # if no subscribers listening
             args = tuple(publisher.get() for publisher in self._publishers)
             if None in args:
-                if self._state is not None:
-                    return self._state
                 return None
             args = tuple(unpack_args(*a) for a in args)
             if self._map:
