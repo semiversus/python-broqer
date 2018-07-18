@@ -227,7 +227,7 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
 
     assert dut.get() == stored_result
 
-JITTER = 0.005
+JITTER = 0.003
 
 async def check_async_operator_coro(cls, args, kwargs, input_vector, output_vector, initial_state=None, has_state=False, loop=None):
     await check_operator_coro(cls, args, kwargs, input_vector, output_vector, initial_state=initial_state, has_state=has_state, stateful=False, loop=loop)
@@ -289,19 +289,33 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     assert dut.get() == stored_result
 
     # check with input vector
+    failed_list = []
 
-    last_timestamp = 0
-    start_timestamp = loop.time()
-    target_timestamp = start_timestamp
+    def _check_temporary(timestamp, value):
+        result = dut.get()
+        collector2_len = len(collector2.state_vector)
+        with dut.subscribe(collector2):
+            pass
+        if result is not None:
+            result = unpack_args(*result)
+        if has_state:
+            if collector2.state != value or len(collector2) != collector2_len + 1:
+                failed_list.append( ('SUBSCRIBE', timestamp, value, result) )
+            if result != value or collector2.state != result:
+                failed_list.append( ('GET', timestamp, value, result) )
+        else:
+            if len(collector2) != collector2_len:
+                failed_list.append( ('SUBSCRIBE', timestamp, value, result) )
+            if result is not None:
+                failed_list.append( ('GET', timestamp, value, result) )
 
     for timestamp, value in input_vector:
-        await asyncio.sleep(target_timestamp - loop.time() + timestamp - last_timestamp)
-        target_timestamp += timestamp - last_timestamp
-        last_timestamp = timestamp
+        loop.call_later(timestamp, source.notify, *to_args(value))
 
-        source.notify(*to_args(value))
+    for timestamp, value in output_vector:
+        loop.call_later(timestamp + JITTER, _check_temporary, timestamp, value)
 
-    await asyncio.sleep(target_timestamp - loop.time() + output_vector[-1][0] - last_timestamp + 2*JITTER)
+    await asyncio.sleep(output_vector[-1][0] + 2*JITTER)
 
     for value_actual, timestamp_actual, (timestamp_target, value_target) in zip(collector.state_vector, collector.timestamp_vector, output_vector):
         print(timestamp_target, timestamp_actual, value_target, value_actual)
@@ -309,6 +323,8 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
         assert value_actual == value_target
     print(collector.state_vector, collector.timestamp_vector)
     assert len(collector.state_vector) == len(output_vector)
+
+    assert not failed_list
 
     # dispose permanent subscriber
     collector.reset()
