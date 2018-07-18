@@ -295,7 +295,10 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
         result = dut.get()
         collector2_len = len(collector2.state_vector)
         with dut.subscribe(collector2):
-            pass
+            assert len(source.subscriptions) == 1
+            assert len(dut.subscriptions) == 2
+        assert len(source.subscriptions) == 1
+        assert len(dut.subscriptions) == 1
         if result is not None:
             result = unpack_args(*result)
         if has_state:
