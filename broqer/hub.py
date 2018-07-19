@@ -126,11 +126,8 @@ class Topic(Publisher, Subscriber):
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
 
-        if self._subject is not None:
-            if len(self._subscriptions) == 1:
-                self._subject.subscribe(self)
-            else:
-                Sink(self._subject, subscriber.emit, who=self).dispose()
+        if len(self._subscriptions) == 1 and self._subject is not None:
+            self._subject.subscribe(self)
 
         return disposable
 
@@ -138,6 +135,9 @@ class Topic(Publisher, Subscriber):
         Publisher.unsubscribe(self, subscriber)
         if not self._subscriptions and self._subject is not None:
             self._subject.unsubscribe(self)
+
+    def get(self):
+        return self._subject.get()
 
     def emit(self, *args: Any, who: Optional[Publisher] = None) -> None:
         if self._subject is None:
