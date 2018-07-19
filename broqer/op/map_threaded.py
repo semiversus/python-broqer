@@ -160,7 +160,7 @@ class MapThreaded(Operator):
                 self._executor, self._map_func, *args)
             self._future = asyncio.ensure_future(future)
             self._future.add_done_callback(self._future_done)
-        elif self._mode in (Mode.QUEUE, Mode.LAST):
+        elif self._mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
             self._queue.append(args)
 
     def _future_done(self, future):

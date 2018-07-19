@@ -6,19 +6,19 @@ from .helper import check_async_operator_coro, NONE
 
 @pytest.mark.parametrize('duration, input_vector, output_vector', [
     # repeated False followed by repeated True
-    (0.01,
-     ((0, False), (0.005, False), (0.010, False), (0.015, True), (0.02, True), (0.025, True)),
-     ((0.01, False), (0.015, False), (0.020, False), (0.025, True), (0.03, True), (0.035, True))),
+    (0.1,
+     ((0, False), (0.05, False), (0.10, False), (0.15, True), (0.2, True), (0.25, True)),
+     ((0.1, False), (0.15, False), (0.20, False), (0.25, True), (0.3, True), (0.35, True))),
 
     # short glitches
-    (0.01,
-     ((0, False), (0.02, True), (0.025, False), (0.04, True), (0.06, False), (0.065, True)),
-     ((0.01, False), (0.03, True), (0.035, False), (0.05, True), (0.07, False), (0.075, True))),
+    (0.1,
+     ((0, False), (0.2, True), (0.25, False), (0.4, True), (0.6, False), (0.65, True)),
+     ((0.1, False), (0.3, True), (0.35, False), (0.5, True), (0.7, False), (0.75, True))),
 
     # short glitches with 0 delay
     (0,
-     ((0, False), (0.02, True), (0.025, False), (0.04, True), (0.06, False), (0.065, True)),
-     ((0.0001, False), (0.02, True), (0.025, False), (0.04, True), (0.06, False), (0.065, True))),
+     ((0, False), (0.2, True), (0.25, False), (0.4, True), (0.6, False), (0.65, True)),
+     ((0.001, False), (0.2, True), (0.25, False), (0.4, True), (0.6, False), (0.65, True))),
      # ^-- have to fool check_async_operator_coro which is checking for 0 as really immediate
 
 ])
