@@ -135,6 +135,7 @@ class MapAsync(Operator):
         self._args = args
         self._kwargs = kwargs
         self._mode = mode
+        print(error_callback)
         self._error_callback = error_callback
         self._future = None  # type: asyncio.Future
         self._last_emit = None  # type: Any
@@ -159,8 +160,8 @@ class MapAsync(Operator):
 
             self._last_emit = args
             self.scheduled.notify(*args)
-            future = self._map_coro(*args, *self._args, **self._kwargs)
-            self._future = asyncio.ensure_future(future)
+            coro = self._map_coro(*args, *self._args, **self._kwargs)
+            self._future = asyncio.ensure_future(coro)
             self._future.add_done_callback(self._future_done)
         elif self._mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
             self._queue.append(args)
