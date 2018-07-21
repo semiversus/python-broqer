@@ -102,91 +102,32 @@ from typing import Any, Callable, MutableSequence  # noqa: F401
 from broqer import Publisher, default_error_handler
 
 from ._operator import Operator, build_operator
-from .map_async import Mode
+from .map_async import MapAsync, Mode
 
 
-class MapThreaded(Operator):
+class MapThreaded(MapAsync):
     def __init__(self, publisher: Publisher, map_func, *args,
                  mode: Mode = Mode.CONCURRENT,  # type: ignore
                  error_callback=default_error_handler, **kwargs) -> None:
-        """
-        mode uses one of the following enumerations:
-            * CONCURRENT - just run coroutines concurrent
-            * QUEUE - queue the value(s) and call after coroutine is finished
-            * LAST - use last emitted value after coroutine is finished
-            * LAST_DISTINCT - like LAST but only when value has changed
-            * SKIP - skip values emitted during coroutine is running
-            ( INTERRUPT like MapAsync is not possible with MapThreaded )
-        """
-        Operator.__init__(self, publisher)
+
         assert mode != Mode.INTERRUPT, 'mode INTERRUPT is not supported'
-        self._mode = mode  # type: Enum
-        self._error_callback = error_callback
-        self._future = None  # type: asyncio.Future
-        self._last_emit = None  # type: Any
-        self.scheduled = Publisher()
+
+        MapAsync.__init__(self, publisher, self._thread_coro, mode=mode,
+            error_callback=error_callback)
 
         if args or kwargs:
+            print('INIT', args, kwargs)
             self._map_func = \
-                partial(map_func, *args, **kwargs)  # type: Callable
+               partial(map_func, *args, **kwargs)  # type: Callable
         else:
             self._map_func = map_func  # type: Callable
 
-        if mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
-            maxlen = (None if mode == Mode.QUEUE else 1)
-            self._queue = deque(maxlen=maxlen)  # type: MutableSequence
-        else:  # no queue for CONCURRENT and SKIP
-            self._queue = None
+        self._executor = ThreadPoolExecutor()
 
-        if mode == Mode.CONCURRENT:
-            workers = None
-        else:
-            workers = 1
+    async def _thread_coro(self, *args, **kwargs):
+        print('THREAD', args, kwargs)
 
-        self._executor = ThreadPoolExecutor(max_workers=workers)
-
-    def get(self):
-        return None
-
-    def emit(self, *args: Any, who: Publisher) -> None:
-        assert who == self._publisher, 'emit from non assigned publisher'
-
-        if (self._mode == Mode.CONCURRENT or self._future is None or
-                self._future.done()):
-
-            self._last_emit = args
-            self.scheduled.notify(*args)
-            future = asyncio.get_event_loop().run_in_executor(
-                self._executor, self._map_func, *args)
-            self._future = asyncio.ensure_future(future)
-            self._future.add_done_callback(self._future_done)
-        elif self._mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
-            self._queue.append(args)
-
-    def _future_done(self, future):
-        try:
-            result = future.result()
-        except Exception:
-            self._error_callback(*sys.exc_info())
-        else:
-            if result is None:
-                result = ()
-            elif not isinstance(result, tuple):
-                result = (result, )
-            try:
-                self.notify(*result)
-            except Exception:
-                self._error_callback(*sys.exc_info())
-
-        if self._queue:
-            args = self._queue.popleft()  # pylint: disable=E1111
-            if self._mode == Mode.LAST_DISTINCT and args == self._last_emit:
-                return
-            self.scheduled.notify(*args)
-            future = asyncio.get_event_loop().run_in_executor(
-                self._executor, self._map_func, *args)
-            self._future = asyncio.ensure_future(future)
-            self._future.add_done_callback(self._future_done)
-
+        return await asyncio.get_event_loop().run_in_executor(
+            self._executor, self._map_func, *args)
 
 map_threaded = build_operator(MapThreaded)  # pylint: disable=invalid-name

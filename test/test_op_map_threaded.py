@@ -6,6 +6,7 @@ from broqer.op import MapThreaded, Mode
 from .helper import check_async_operator_coro, NONE
 
 def add1(v, i=1):
+    print('ADD', v, i)
     return v+i
 
 def wait(v, duration=0.15):

@@ -234,7 +234,7 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
 
     assert dut.get() == stored_result
 
-JITTER = 0.01
+JITTER = 0.015
 
 async def check_async_operator_coro(cls, args, kwargs, input_vector, output_vector, initial_state=None, has_state=False, loop=None):
     await check_operator_coro(cls, args, kwargs, input_vector, output_vector, initial_state=initial_state, has_state=has_state, stateful=False, loop=loop)
@@ -328,7 +328,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     collector_permanent.reset_timestamp()
     collector_temporary.reset_timestamp()
 
-    await asyncio.sleep(output_vector[-1][0] + 10*JITTER)
+    await asyncio.sleep(output_vector[-1][0] + 2*JITTER)
 
     for value_actual, timestamp_actual, (timestamp_target, value_target) in zip(collector_permanent.result_vector, collector_permanent.timestamp_vector, output_vector):
         print(timestamp_target, timestamp_actual, value_target, value_actual)
