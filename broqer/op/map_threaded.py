@@ -116,7 +116,6 @@ class MapThreaded(MapAsync):
             error_callback=error_callback)
 
         if args or kwargs:
-            print('INIT', args, kwargs)
             self._map_func = \
                partial(map_func, *args, **kwargs)  # type: Callable
         else:
@@ -125,8 +124,6 @@ class MapThreaded(MapAsync):
         self._executor = ThreadPoolExecutor()
 
     async def _thread_coro(self, *args, **kwargs):
-        print('THREAD', args, kwargs)
-
         return await asyncio.get_event_loop().run_in_executor(
             self._executor, self._map_func, *args)
 
