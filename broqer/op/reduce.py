@@ -9,9 +9,10 @@ Usage:
 >>> def build_number(last_result, value):
 ...     return last_result*10+value
 
->>> reduce_publisher = s | op.reduce(build_number)
+>>> reduce_publisher = s | op.reduce(build_number, 0)
 >>> _d = reduce_publisher | op.sink(print, 'Reduce:')
->>> s.emit(4) # without initialization the first emit is used for this
+>>> s.emit(4)
+Reduce: 4
 >>> s.emit(7)
 Reduce: 47
 >>> s.emit(8)
