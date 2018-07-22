@@ -135,7 +135,6 @@ class MapAsync(Operator):
         self._args = args
         self._kwargs = kwargs
         self._mode = mode
-        print(error_callback)
         self._error_callback = error_callback
         self._future = None  # type: asyncio.Future
         self._last_emit = None  # type: Any

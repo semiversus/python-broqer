@@ -18,10 +18,11 @@ Mode: CONCURRENT (is default)
 
 >>> _d = s | op.map_threaded(delay_add) | op.sink()
 >>> s.emit(0)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument 0
 >>> s.emit(1)
-Starting with argument 1
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.03))
+Starting with argument 1
 Finished with argument ...
 Finished with argument ...
 >>> _d.dispose()
@@ -29,7 +30,9 @@ Finished with argument ...
 Mode: QUEUE
 
 >>> _d = s | op.map_threaded(delay_add, mode=op.Mode.QUEUE) | op.sink(print)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 >>> s.emit(0)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument 0
 >>> s.emit(1)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.04))
@@ -44,6 +47,7 @@ Mode: LAST
 
 >>> _d = s | op.map_threaded(delay_add, mode=op.Mode.LAST) | op.sink(print)
 >>> s.emit(0)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument 0
 >>> s.emit(1)
 >>> s.emit(2)
@@ -59,6 +63,7 @@ Mode: SKIP
 
 >>> _d = s | op.map_threaded(delay_add, mode=op.Mode.SKIP) | op.sink(print)
 >>> s.emit(0)
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument 0
 >>> s.emit(1)
 >>> s.emit(2)
@@ -74,6 +79,7 @@ Using error_callback:
 
 >>> _d = s | op.map_threaded(delay_add, error_callback=cb) | op.sink(print)
 >>> s.emit('abc')
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument abc
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
 Got error
