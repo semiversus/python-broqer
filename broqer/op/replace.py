@@ -15,9 +15,13 @@ class Replace(Operator):
 
         self._args = args
 
+    def get(self):
+        if self._publisher.get() is not None:
+            return self._args
+
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
-        self.notify(self._args)
+        self.notify(*self._args)
 
 
 replace = build_operator(Replace)  # pylint: disable=invalid-name
