@@ -30,48 +30,16 @@ from typing import Any, Callable
 from broqer import Publisher, Subscriber
 
 from ._operator import Operator, build_operator
+from .accumulate import Accumulate
 
 
-class Reduce(Operator):
+class Reduce(Accumulate):
     def __init__(self, publisher: Publisher, func: Callable[[Any, Any], Any],
                  init=None) -> None:
-        Operator.__init__(self, publisher)
-        self._last_state = init
-        self._init = init
-
-        self._reduce_func = func
-
-    def unsubscribe(self, subscriber: Subscriber) -> None:
-        Operator.unsubscribe(self, subscriber)
-        if not self._subscriptions:
-            self._last_state = self._init
-
-    def get(self) -> Any:
-        if not self._subscriptions:
-            if self._init is None:
-                return
-            args = self._publisher.get()
-            if args is None:
-                return None
-            assert len(args) == 1, \
-                'reduce is only possible for emits with one argument'
-            return (self._reduce_func(self._init, args[0]),)
-        if self._last_state is not None:
-            return (self._reduce_func(self._last_state, args[0]),)
-        return None
-
-    def reset(self, init):
-        self._last_state = init
-
-    def emit(self, *args: Any, who: Publisher) -> None:
-        assert len(args) == 1, \
-            'reduce is only possible for emits with single argument'
-        assert who == self._publisher, 'emit from non assigned publisher'
-        if self._last_state is not None:
-            self._last_state = self._reduce_func(self._last_state, args[0])
-            self.notify(self._last_state)
-        else:
-            self._last_state = args[0]
+        def _func(state, value):
+            result = func(state, value)
+            return (result, result) # new state and result is the same
+        Accumulate.__init__(self, publisher, _func, init)
 
 
 reduce = build_operator(Reduce)  # pylint: disable=invalid-name
