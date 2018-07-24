@@ -28,9 +28,9 @@ Reduce: 1234
 """
 from typing import Any, Callable
 
-from broqer import Publisher, Subscriber
+from broqer import Publisher
 
-from ._operator import Operator, build_operator
+from ._operator import build_operator
 from .accumulate import Accumulate
 
 
@@ -39,7 +39,7 @@ class Reduce(Accumulate):
                  init=None) -> None:
         def _func(state, value):
             result = func(state, value)
-            return (result, result) # new state and result is the same
+            return (result, result)  # new state and result is the same
         Accumulate.__init__(self, publisher, _func, init)
 
 

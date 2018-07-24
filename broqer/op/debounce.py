@@ -77,7 +77,7 @@ class Debounce(Operator):
 
     def get(self):
         if self._retrigger_value and (
-            not self._subscriptions or self._state is None):
+                not self._subscriptions or self._state is None):
             return self._retrigger_value
         return self._state
 

@@ -112,7 +112,6 @@ from typing import Any, Optional, Dict  # noqa: F401
 
 from broqer import (Publisher, Subscriber, SubscriptionDisposable,
                     SubscriptionError)
-from broqer.op import Sink
 
 
 class Topic(Publisher, Subscriber):

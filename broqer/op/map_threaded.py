@@ -98,16 +98,14 @@ EMITTED
 
 """
 import asyncio
-from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-import sys
 from enum import Enum  # noqa: F401
 from typing import Any, Callable, MutableSequence  # noqa: F401
 
 from broqer import Publisher, default_error_handler
 
-from ._operator import Operator, build_operator
+from ._operator import build_operator
 from .map_async import MapAsync, Mode
 
 
@@ -119,7 +117,7 @@ class MapThreaded(MapAsync):
         assert mode != Mode.INTERRUPT, 'mode INTERRUPT is not supported'
 
         MapAsync.__init__(self, publisher, self._thread_coro, mode=mode,
-            error_callback=error_callback)
+                          error_callback=error_callback)
 
         if args or kwargs:
             self._map_func = \
@@ -132,5 +130,6 @@ class MapThreaded(MapAsync):
     async def _thread_coro(self, *args, **kwargs):
         return await asyncio.get_event_loop().run_in_executor(
             self._executor, self._map_func, *args)
+
 
 map_threaded = build_operator(MapThreaded)  # pylint: disable=invalid-name
