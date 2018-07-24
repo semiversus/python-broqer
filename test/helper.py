@@ -265,9 +265,6 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     # make first (permanent) subscription
     dispose_collector_permanent = dut.subscribe(collector_permanent)
 
-    if not stateful:
-        source.notify(*to_args(first_input_value))
-
     # at least one subscription of the source publishers
     assert len(source.subscriptions) == 1
     assert len(dut.subscriptions) == 1
@@ -285,15 +282,12 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
         assert len(dut.subscriptions) == 1
         assert (collector_temporary.result_vector == collector_permanent.result_vector)
     else:
-        assert initial_state == stored_result
-        assert initial_state == (to_args(collector_permanent.last_result) if initial_state else None)
         with dut.subscribe(collector_temporary):
             assert len(dut.subscriptions) == 2
-            assert stored_result == (to_args(collector_temporary.last_result) if initial_state else None)
-        assert len(collector_permanent.result_vector) == (1 if initial_state else 0)
-        assert len(collector_temporary.result_vector) == (1 if initial_state else 0)
+        assert len(dut.subscriptions) == 1
 
-    assert dut.get() == stored_result
+    if not stateful:
+        source.notify(*to_args(first_input_value))
 
     # check with input vector
     failed_list = []
@@ -352,11 +346,8 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     assert len(source.subscriptions) == 0
     assert len(dut.subscriptions) == 0
 
-    # make first (permanent) subscription
+    # re-make permanent subscription
     dispose_collector_permanent = dut.subscribe(collector_permanent)
-
-    if not stateful:
-        source.notify(*to_args(first_input_value))
 
     # at least one subscription of the source publishers
     assert len(source.subscriptions) == 1

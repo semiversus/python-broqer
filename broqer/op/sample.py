@@ -70,8 +70,6 @@ class Sample(Operator):
     def get(self):
         if not self._subscriptions:
             args = self._publisher.get()
-            if args is None:
-                return self._state
             return args
         return self._state
 
