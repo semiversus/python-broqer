@@ -54,7 +54,7 @@ class SlidingWindow(Operator):
         Operator.__init__(self, publisher)
 
         self._state = deque(maxlen=size)  # type: MutableSequence
-        self.notify_partial = emit_partial
+        self._emit_partial = emit_partial
         self._packed = packed
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
@@ -71,7 +71,9 @@ class SlidingWindow(Operator):
                 if self._packed:
                     return (args,)
                 return args
-        if self.notify_partial or \
+        if len(self._state) == 0:
+            return
+        if self._emit_partial or \
                 len(self._state) == self._state.maxlen:  # type: ignore
             if self._packed:
                 return (tuple(self._state),)
@@ -82,8 +84,10 @@ class SlidingWindow(Operator):
         assert who == self._publisher, 'emit from non assigned publisher'
         assert len(args) >= 1, 'need at least one argument for sliding window'
         self._state.append(unpack_args(*args))
-        if self.notify_partial or \
+        print('EMIT', self._state, args)
+        if self._emit_partial or \
                 len(self._state) == self._state.maxlen:  # type: ignore
+            print('NOTIFY', self._state)
             if self._packed:
                 self.notify(tuple(self._state))
             else:
