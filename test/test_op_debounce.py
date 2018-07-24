@@ -46,4 +46,4 @@ from .helper import check_async_operator_coro, NONE
 @pytest.mark.asyncio
 async def test_with_publisher(args, input_vector, output_vector, event_loop):
     init = args[1:] if args[1:] else None
-    await check_async_operator_coro(Debounce, args, {}, input_vector, output_vector, initial_state=init, has_state=True, loop=event_loop)
+    await check_async_operator_coro(Debounce, args, {}, input_vector, output_vector, has_state=True, loop=event_loop)
