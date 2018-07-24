@@ -1,6 +1,6 @@
 import pytest
 
-from broqer import Publisher, to_args
+from broqer import Publisher
 from broqer.op import Accumulate
 
 from .helper import check_single_operator, Collector
@@ -8,12 +8,11 @@ from .helper import check_single_operator, Collector
 def min_max_avg(state, input):
     """emit minimum, maximum and average. Keep internal state with minimum,
     maximum, sum and count of emits"""
-    input = to_args(input)
     _min, _max, _sum, _count = state
-    _min = min(_min, *input)
-    _max = max(_max, *input)
-    _sum = sum((_sum, *input))
-    _count += len(input)
+    _min = min(_min, input)
+    _max = max(_max, input)
+    _sum = sum((_sum, input))
+    _count += 1
     return (_min, _max, _sum, _count), (_min, _max, _sum/_count)
 
 def distinct_elements(state, input):

@@ -73,11 +73,11 @@ class Publisher():
         """Return the value of a (possibly simulated) subscription to this
         publisher
         """
-        return None
+        raise ValueError('No value available')
 
-    def notify(self, *args: Any) -> asyncio.Future:
+    def notify(self, value: Any) -> asyncio.Future:
         """ emit to all subscriptions """
-        results = (s.emit(*args, who=self) for s in tuple(self._subscriptions))
+        results = (s.emit(value, who=self) for s in tuple(self._subscriptions))
         futures = tuple(r for r in results if r is not None)
 
         if futures:
@@ -112,50 +112,35 @@ class Publisher():
 
 
 class StatefulPublisher(Publisher):
-    def __init__(self, *init):
+    def __init__(self, init):
         Publisher.__init__(self)
-        if not init:
-            self._state = None
-        else:
-            self._state = init
+        self._state = init
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
-        if self._state is not None:
-            subscriber.emit(*self._state, who=self)
+        subscriber.emit(self._state, who=self)
         return disposable
 
     def get(self):
         return self._state
 
-    def notify(self, *args: Any) -> asyncio.Future:
-        if self._state != args:
-            self._state = args
-            return Publisher.notify(self, *args)
+    def notify(self, value: Any) -> asyncio.Future:
+        if self._state != value:
+            self._state = value
+            return Publisher.notify(self, value)
         return None
 
-    def reset_state(self, *args):
-        if not args:
-            self._state = None
-        else:
-            self._state = args
+    def reset_state(self, value):
+        self._state = value
 
 
 class Subscriber(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
     @abstractmethod
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
-        """Send new argument(s) to the subscriber
-        :param \\*args: variable arguments to be send
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+        """Send new value to the subscriber
+        :param value: value to be send
         :param who: reference to which publisher is emitting
         """
 
     def __call__(self, publisher: Publisher):
         return publisher.subscribe(self)
-
-
-def unpack_args(*args):
-    return args[0] if len(args) == 1 else args
-
-
-def to_args(arg):
-    return arg if isinstance(arg, tuple) else (arg,)

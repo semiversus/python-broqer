@@ -3,7 +3,7 @@ import asyncio
 from typing import Dict, MutableSequence, Callable, Tuple  # noqa: F401
 from typing import Any as Any_
 
-from broqer import Publisher, Subscriber, unpack_args
+from broqer import Publisher, Subscriber
 
 from ._operator import MultiOperator, build_operator
 

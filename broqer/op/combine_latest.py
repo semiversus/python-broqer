@@ -25,7 +25,7 @@ Second sink: 1 3
 import asyncio
 from typing import Any, Dict, MutableSequence, Sequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, unpack_args
+from broqer import Publisher, Subscriber
 
 from ._operator import MultiOperator, build_operator
 

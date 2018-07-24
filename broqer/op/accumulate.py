@@ -28,7 +28,7 @@ Resetting (or just setting) the state is also possible:
 import asyncio
 from typing import Any, Callable, Tuple
 
-from broqer import Publisher, Subscriber, to_args
+from broqer import Publisher, Subscriber
 
 from ._operator import Operator, build_operator
 
@@ -59,23 +59,16 @@ class Accumulate(Operator):
             self._result = None
 
     def get(self) -> Any:
-        if not self._subscriptions:  # if no subscribers listening
-            args = self._publisher.get()
-            if args is None:
-                return None
-            assert len(args) == 1, \
-                'accumulate is only possible for emits with one argument'
-            return to_args(self._acc_func(self._init, args[0])[1])
         if self._result is not None:
-            return to_args(self._result)
+            return self._result
+        value = self._publisher.get()  # may be raises ValueError
+        return self._acc_func(self._init, value)[1]
 
-        return None
-
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
-        assert len(args) == 1, \
-            'accumulate is only possible for emits with one argument'
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
-        self._state, self._result = self._acc_func(self._state, args[0])
+        self._state, self._result = self._acc_func(self._state, value)
+        assert self._result is not None, \
+            'Accumulate function should never return None as result'
         return self.notify(self._result)
 
     def reset(self, state: Any) -> None:

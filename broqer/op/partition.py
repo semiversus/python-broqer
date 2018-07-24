@@ -21,7 +21,7 @@ Partition: (4, (5, 6))
 import asyncio
 from typing import Any, MutableSequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, unpack_args
+from broqer import Publisher, Subscriber
 
 from ._operator import Operator, build_operator
 

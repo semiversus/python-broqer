@@ -42,7 +42,7 @@ import asyncio
 from collections import deque
 from typing import Any, MutableSequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, unpack_args
+from broqer import Publisher, Subscriber
 
 from ._operator import Operator, build_operator
 

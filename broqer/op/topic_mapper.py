@@ -1,6 +1,6 @@
 from typing import MutableMapping, Any
 
-from broqer import Subscriber, Publisher, unpack_args
+from broqer import Subscriber, Publisher
 from broqer.hub import Topic
 
 
