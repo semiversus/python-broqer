@@ -84,10 +84,8 @@ class SlidingWindow(Operator):
         assert who == self._publisher, 'emit from non assigned publisher'
         assert len(args) >= 1, 'need at least one argument for sliding window'
         self._state.append(unpack_args(*args))
-        print('EMIT', self._state, args)
         if self._emit_partial or \
                 len(self._state) == self._state.maxlen:  # type: ignore
-            print('NOTIFY', self._state)
             if self._packed:
                 self.notify(tuple(self._state))
             else:
