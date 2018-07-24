@@ -9,7 +9,7 @@ from .subject import Subject, Value
 
 __author__ = 'Günther Jena'
 __email__ = 'guenther@jena.at'
-__version__ = '0.3.9-dev'
+__version__ = '0.4.0-dev'
 
 __all__ = [
     'StatefulPublisher', 'Disposable', 'Publisher', 'Subscriber', 'to_args',
