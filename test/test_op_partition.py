@@ -11,3 +11,4 @@ from .helper import check_single_operator, NONE
 ])
 def test_with_publisher(size, input_vector, output_vector):
     check_single_operator(Partition, (size,), {}, input_vector, output_vector, has_state=None)
+    # TODO: remove has_state=None

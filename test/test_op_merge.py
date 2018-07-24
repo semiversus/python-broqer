@@ -9,3 +9,4 @@ from .helper import check_multi_operator, NONE
 ])
 def test_with_publisher(input_vector, output_vector):
     check_multi_operator(Merge, {}, input_vector, output_vector, has_state=None)
+    # TODO: remove has_state=None
