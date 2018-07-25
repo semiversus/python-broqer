@@ -95,7 +95,7 @@ class CombineLatest(MultiOperator):
                 state = tuple(self._partial_state)
             if state != self._state:
                 self._state = state
-                self.notify(*self._state)
+                return self.notify(*self._state)
 
 
 combine_latest = build_operator(CombineLatest)  # pylint: disable=invalid-name

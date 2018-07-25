@@ -149,8 +149,7 @@ class Topic(Publisher, Subscriber):
             raise SubscriptionError('No subject is assigned to this Topic')
 
         if who == self._subject:
-            self.notify(*args)
-            return None
+            return self.notify(*args)
 
         assert isinstance(self._subject, Subscriber), \
             'Topic has to be a subscriber'

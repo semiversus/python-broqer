@@ -76,8 +76,7 @@ class Publisher():
 
     def notify(self, *args: Any) -> None:
         """ emit to all subscriptions """
-        for subscriber in tuple(self._subscriptions):
-            subscriber.emit(*args, who=self)
+        return tuple(s.emit(*args, who=self) for s in self._subscriptions)
 
     def __contains__(self, subscriber: 'Subscriber'):
         return subscriber in self._subscriptions
