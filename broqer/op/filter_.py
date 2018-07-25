@@ -34,12 +34,13 @@ from ._operator import Operator, build_operator
 
 
 class Filter(Operator):
-    def __init__(self, publisher: Publisher, predicate: Callable[[Any], bool],
+    def __init__(self, publisher: Publisher,
+                 predicate: Callable[[Any], bool] = None,
                  *args, **kwargs) -> None:
 
         Operator.__init__(self, publisher)
 
-        if args or kwargs:
+        if predicate is not None and (args or kwargs):
             self._predicate = \
                 partial(predicate, *args, **kwargs)  # type: Callable
         else:
@@ -47,12 +48,21 @@ class Filter(Operator):
 
     def get(self):
         args = self._publisher.get()
-        if args is not None and self._predicate(*args):
-            return args
+        if args is not None:
+            if self._predicate is None:
+                if all(args):
+                    return args
+                return None
+            if self._predicate(*args):
+                return args
         return None
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
+        if self._predicate is None:
+            if all(args):
+                self.notify(*args)
+            return
         if self._predicate(*args):
             self.notify(*args)
 
