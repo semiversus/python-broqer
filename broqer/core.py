@@ -76,7 +76,11 @@ class Publisher():
 
     def notify(self, *args: Any) -> None:
         """ emit to all subscriptions """
-        return tuple(s.emit(*args, who=self) for s in self._subscriptions)
+        results = tuple(s.emit(*args, who=self) for s in self._subscriptions)
+        futures = tuple(r is not None for r in results)
+
+        if futures:
+            return ((_f for _f in f) for f in futures)
 
     def __contains__(self, subscriber: 'Subscriber'):
         return subscriber in self._subscriptions
@@ -123,7 +127,7 @@ class StatefulPublisher(Publisher):
     def notify(self, *args: Any) -> None:
         if self._state != args:
             self._state = args
-            Publisher.notify(self, *args)
+            return Publisher.notify(self, *args)
 
     def reset_state(self, *args):
         if not args:
