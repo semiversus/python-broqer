@@ -125,8 +125,13 @@ class Topic(Publisher, Subscriber):
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
 
-        if len(self._subscriptions) == 1 and self._subject is not None:
-            self._subject.subscribe(self)
+        if self._subject is not None:
+            if len(self._subscriptions) == 1:
+                self._subject.subscribe(self)
+            else:
+                args = self._subject.get()
+                if args is not None:
+                    subscriber.emit(*args, who=self)
 
         return disposable
 
