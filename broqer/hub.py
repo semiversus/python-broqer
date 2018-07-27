@@ -121,6 +121,7 @@ class Topic(Publisher, Subscriber):
         self._path = path
         self._meta = dict()  # type: Dict[str, Any]
         self.assignment_future = None
+        self._pre_assign_emit = None
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
@@ -145,8 +146,11 @@ class Topic(Publisher, Subscriber):
 
     def emit(self, *args: Any, who: Optional[Publisher] = None) -> None:
         if self._subject is None:
-            # method will be replaced by .__call__
-            raise SubscriptionError('No subject is assigned to this Topic')
+            if self._pre_assign_emit is not None:
+                # method will be replaced by .__call__
+                raise SubscriptionError('Only one emit will be stored before assignment')
+            self._pre_assign_emit = args
+            return
 
         if who == self._subject:
             return self.notify(*args)
@@ -160,6 +164,8 @@ class Topic(Publisher, Subscriber):
         if self._subject is not None:
             raise SubscriptionError('Topic is already assigned')
         self._subject = subject
+        if self._pre_assign_emit is not None:
+            self._subject.emit(*self._pre_assign_emit, who=self)
         if meta:
             self._meta.update(meta)
 
