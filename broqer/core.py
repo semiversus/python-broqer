@@ -144,6 +144,9 @@ class Subscriber(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
         :param who: reference to which publisher is emitting
         """
 
+    def __call__(self, publisher: Publisher):
+        return publisher.subscribe(self)
+
 
 def unpack_args(*args):
     return args[0] if len(args) == 1 else args
