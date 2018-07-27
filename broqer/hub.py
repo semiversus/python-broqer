@@ -156,11 +156,6 @@ class Topic(Publisher, Subscriber):
 
         return self._subject.emit(*args, who=self)
 
-    def __call__(self, *args, **kwargs) -> None:
-        raise SubscriptionError(
-            'To assign a publisher to this topic use "hub.assign(publisher, ' +
-            'topic, [meta])" instead.')
-
     def assign(self, subject, meta):
         if self._subject is not None:
             raise SubscriptionError('Topic is already assigned')

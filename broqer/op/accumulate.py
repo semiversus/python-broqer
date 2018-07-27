@@ -75,7 +75,7 @@ class Accumulate(Operator):
             'accumulate is only possible for emits with one argument'
         assert who == self._publisher, 'emit from non assigned publisher'
         self._state, self._result = self._acc_func(self._state, args[0])
-        self.notify(self._result)
+        return self.notify(self._result)
 
     def reset(self, state: Any) -> None:
         """ Reseting (or setting) the internal state.

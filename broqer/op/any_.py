@@ -56,7 +56,7 @@ class _MultiPredicate(MultiOperator):
         state = (self.combination_operator(self._partial),)  # type:ignore
         if state != self._state:
             self._state = state
-            self.notify(*self._state)
+            return self.notify(*self._state)
 
 
 class Any(_MultiPredicate):

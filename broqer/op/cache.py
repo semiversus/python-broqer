@@ -63,7 +63,7 @@ class Cache(Operator):
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._state != args:
             self._state = args
-            self.notify(*args)
+            return self.notify(*args)
 
 
 cache = build_operator(Cache)  # pylint: disable=invalid-name

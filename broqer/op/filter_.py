@@ -59,12 +59,10 @@ class Filter(Operator):
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
-        if self._predicate is None:
-            if all(args):
-                self.notify(*args)
-            return
-        if self._predicate(*args):
-            self.notify(*args)
+        if self._predicate is None and all(args):
+            return self.notify(*args)
+        elif self._predicate(*args):
+            return self.notify(*args)
 
 
 filter_ = build_operator(Filter)  # pylint: disable=invalid-name

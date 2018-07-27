@@ -70,7 +70,7 @@ class Switch(Operator):
         else:
             assert who == self._selected_publisher, \
                 'emit from not selected publisher'
-            self.notify(*args)
+            return self.notify(*args)
 
 
 switch = build_operator(Switch)  # pylint: disable=invalid-name

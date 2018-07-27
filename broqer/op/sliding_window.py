@@ -87,9 +87,8 @@ class SlidingWindow(Operator):
         if self._emit_partial or \
                 len(self._state) == self._state.maxlen:  # type: ignore
             if self._packed:
-                self.notify(tuple(self._state))
-            else:
-                self.notify(*self._state)
+                return self.notify(tuple(self._state))
+            return self.notify(*self._state)
 
     def flush(self):
         self._state.clear()

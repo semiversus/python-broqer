@@ -77,7 +77,7 @@ class Map(Operator):
             result = ()
         elif not isinstance(result, tuple):
             result = (result, )
-        self.notify(*result)
+        return self.notify(*result)
 
 
 map_ = build_operator(Map)  # pylint: disable=invalid-name

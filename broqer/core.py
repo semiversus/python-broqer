@@ -77,10 +77,12 @@ class Publisher():
     def notify(self, *args: Any) -> None:
         """ emit to all subscriptions """
         results = tuple(s.emit(*args, who=self) for s in self._subscriptions)
-        futures = tuple(r is not None for r in results)
+        futures = tuple(r for r in results if r is not None)
 
         if futures:
-            return ((_f for _f in f) for f in futures)
+            if len(futures) == 1:
+                return futures[0]
+            return asyncio.gather(*futures)
 
     def __contains__(self, subscriber: 'Subscriber'):
         return subscriber in self._subscriptions

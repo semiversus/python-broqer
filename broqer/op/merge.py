@@ -33,7 +33,7 @@ class Merge(MultiOperator):
 
     def emit(self, *args: Any, who: Publisher) -> None:
         assert who in self._publishers, 'emit from non assigned publisher'
-        self.notify(*args)
+        return self.notify(*args)
 
 
 merge = build_operator(Merge)  # pylint: disable=invalid-name

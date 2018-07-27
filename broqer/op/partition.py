@@ -53,8 +53,9 @@ class Partition(Operator):
         assert len(args) >= 1, 'need at least one argument for partition'
         self._queue.append(unpack_args(*args))
         if self._size and len(self._queue) == self._size:
-            self.notify(tuple(self._queue))
+            future = self.notify(tuple(self._queue))
             self._queue.clear()
+            return future
 
     def flush(self):
         self.notify(tuple(self._queue))
