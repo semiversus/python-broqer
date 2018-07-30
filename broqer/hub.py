@@ -27,26 +27,22 @@ True
 >>> 'value2' in hub
 False
 
-It will raise an exception if .emit is used on an unassigned topic:
+It will store the first .emit for an unassigned topic:
+>>> hub['value1'].emit(2)
 
->>> hub['value1'].emit(1)
+And will raise an exception if .emit is used a second time on unassigned topic:
+
+>>> hub['value1'].emit(3)
 Traceback (most recent call last):
 ...
-broqer.core.SubscriptionError: No subject is assigned to this Topic
+broqer.core.SubscriptionError: Only one emit will be stored before assignment
 
 Assign a publisher to a hub topic:
 
->>> _ = hub.assign('value1', op.Just(1))
-Output: 1
+>>> _ = hub.assign('value1', Value(1))
+Output: 2
 >>> hub['value1'].assigned
 True
-
-Assigning to a hub topic without .publish will fail:
-
->>> _ = op.Just(1) | hub['value2']
-Traceback (most recent call last):
-...
-broqer.core.SubscriptionError: ...
 
 >>> _d1.dispose()
 
@@ -121,7 +117,7 @@ class Topic(Publisher, Subscriber):
         self._path = path
         self._meta = dict()  # type: Dict[str, Any]
         self.assignment_future = None
-        self._pre_assign_emit = None
+        self._pre_assign_emit = None  # type: Any
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
@@ -144,13 +140,15 @@ class Topic(Publisher, Subscriber):
     def get(self):
         return self._subject.get()
 
-    def emit(self, *args: Any, who: Optional[Publisher] = None) -> None:
+    def emit(self, *args: Any,
+             who: Optional[Publisher] = None) -> asyncio.Future:
         if self._subject is None:
             if self._pre_assign_emit is not None:
                 # method will be replaced by .__call__
-                raise SubscriptionError('Only one emit will be stored before assignment')
+                raise SubscriptionError('Only one emit will be stored before' +
+                                        ' assignment')
             self._pre_assign_emit = args
-            return
+            return None
 
         if who == self._subject:
             return self.notify(*args)

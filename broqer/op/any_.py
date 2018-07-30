@@ -1,5 +1,5 @@
 """Applying any or all build in function to multiple publishers"""
-
+import asyncio
 from typing import Dict, MutableSequence, Callable, Tuple  # noqa: F401
 from typing import Any as Any_
 
@@ -44,7 +44,7 @@ class _MultiPredicate(MultiOperator):
         else:
             return self._state
 
-    def emit(self, *args: Any_, who: Publisher) -> None:
+    def emit(self, *args: Any_, who: Publisher) -> asyncio.Future:
         assert who in self._publishers, 'emit from non assigned publisher'
 
         if self._predicate is not None:
@@ -52,11 +52,12 @@ class _MultiPredicate(MultiOperator):
         else:
             self._partial[self._index[who]] = unpack_args(*args)
         if None in self._partial:
-            return
+            return None
         state = (self.combination_operator(self._partial),)  # type:ignore
         if state != self._state:
             self._state = state
             return self.notify(*self._state)
+        return None
 
 
 class Any(_MultiPredicate):

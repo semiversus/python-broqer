@@ -18,6 +18,7 @@ Partition: (1, 2, 3)
 >>> partitioned_publisher.flush()
 Partition: (4, (5, 6))
 """
+import asyncio
 from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher, Subscriber, unpack_args
@@ -48,7 +49,7 @@ class Partition(Operator):
         if self._size and len(queue) == self._size:
             return (tuple(queue),)
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
         assert len(args) >= 1, 'need at least one argument for partition'
         self._queue.append(unpack_args(*args))
@@ -56,6 +57,7 @@ class Partition(Operator):
             future = self.notify(tuple(self._queue))
             self._queue.clear()
             return future
+        return None
 
     def flush(self):
         self.notify(tuple(self._queue))

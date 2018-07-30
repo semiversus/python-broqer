@@ -1,7 +1,7 @@
 """
 When this operators gets emitted it's emitting a defined value
 """
-
+import asyncio
 from typing import Any
 
 from broqer import Publisher
@@ -19,7 +19,7 @@ class Replace(Operator):
         if self._publisher.get() is not None:
             return self._args
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
         return self.notify(*self._args)
 

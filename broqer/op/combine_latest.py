@@ -22,6 +22,7 @@ Second sink: 1 3
 <...>
 
 """
+import asyncio
 from typing import Any, Dict, MutableSequence, Sequence  # noqa: F401
 
 from broqer import Publisher, Subscriber, unpack_args
@@ -77,7 +78,7 @@ class CombineLatest(MultiOperator):
             return self._state
         return None
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         assert who in self._publishers, 'emit from non assigned publisher'
         if self._missing and who in self._missing:
             self._missing.remove(who)
@@ -86,7 +87,7 @@ class CombineLatest(MultiOperator):
 
         if self._partial_state[self._index[who]] == args:
             # if partial_state has not changed avoid new emit
-            return
+            return None
         self._partial_state[self._index[who]] = args
         if not self._missing and (who in self._emit_on):
             if self._map:
@@ -96,6 +97,7 @@ class CombineLatest(MultiOperator):
             if state != self._state:
                 self._state = state
                 return self.notify(*self._state)
+        return None
 
 
 combine_latest = build_operator(CombineLatest)  # pylint: disable=invalid-name

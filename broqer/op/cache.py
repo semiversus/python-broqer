@@ -14,7 +14,7 @@ Also working with multiple arguments in emit:
 >>> s.emit(1, 2)
 1 - 2
 """
-
+import asyncio
 from typing import Any
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
@@ -59,11 +59,12 @@ class Cache(Operator):
             return args
         return self._state
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._state != args:
             self._state = args
             return self.notify(*args)
+        return None
 
 
 cache = build_operator(Cache)  # pylint: disable=invalid-name

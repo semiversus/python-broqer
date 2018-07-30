@@ -26,6 +26,7 @@ Now with ``catch_exception``:
 >>> s.emit(0) # will cause a exception but will be catched
 
 """
+import asyncio
 from typing import Any
 
 from broqer import Publisher
@@ -47,12 +48,13 @@ class CatchException(Operator):
     def get(self):
         return self._publisher.get()
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
         try:
             return self.notify(*args)
         except self._exceptions:
             pass
+        return None
 
 
 # pylint: disable=invalid-name

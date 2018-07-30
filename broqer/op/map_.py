@@ -33,6 +33,7 @@ If map_func is returning None just emit subscriber without arguments:
 Output: 1
 EMITTED
 """
+import asyncio
 from functools import partial
 from typing import Any, Callable
 
@@ -70,7 +71,7 @@ class Map(Operator):
             result = (result, )
         return result
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
         result = self._map_func(*args)
         if result is None:

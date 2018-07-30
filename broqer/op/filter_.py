@@ -25,6 +25,7 @@ Also possible with additional args and kwargs:
 101
 
 """
+import asyncio
 from functools import partial
 from typing import Any, Callable
 
@@ -57,12 +58,14 @@ class Filter(Operator):
                 return args
         return None
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
-        if self._predicate is None and all(args):
-            return self.notify(*args)
+        if self._predicate is None:
+            if all(args):
+                return self.notify(*args)
         elif self._predicate(*args):
             return self.notify(*args)
+        return None
 
 
 filter_ = build_operator(Filter)  # pylint: disable=invalid-name

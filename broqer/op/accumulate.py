@@ -25,6 +25,7 @@ Resetting (or just setting) the state is also possible:
 2.0
 
 """
+import asyncio
 from typing import Any, Callable, Tuple
 
 from broqer import Publisher, Subscriber, to_args
@@ -70,7 +71,7 @@ class Accumulate(Operator):
 
         return None
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         assert len(args) == 1, \
             'accumulate is only possible for emits with one argument'
         assert who == self._publisher, 'emit from non assigned publisher'

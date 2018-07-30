@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any, Optional
 
 from broqer import Publisher, StatefulPublisher, Subscriber
@@ -20,7 +21,7 @@ class Subject(Publisher, Subscriber):
 
     def emit(self, *args: Any,
              who: Optional[Publisher] = None  # pylint: disable=unused-argument
-             ) -> None:
+             ) -> asyncio.Future:
         return self.notify(*args)
 
 
@@ -44,5 +45,5 @@ class Value(StatefulPublisher, Subscriber):
 
     def emit(self, *args: Any,
              who: Optional[Publisher] = None  # pylint: disable=unused-argument
-             ) -> None:
+             ) -> asyncio.Future:
         return self.notify(*args)

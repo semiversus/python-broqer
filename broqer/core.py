@@ -1,3 +1,4 @@
+import asyncio
 from abc import ABCMeta, abstractmethod
 from typing import Any, Callable
 
@@ -74,7 +75,7 @@ class Publisher():
         """
         return None
 
-    def notify(self, *args: Any) -> None:
+    def notify(self, *args: Any) -> asyncio.Future:
         """ emit to all subscriptions """
         results = tuple(s.emit(*args, who=self) for s in self._subscriptions)
         futures = tuple(r for r in results if r is not None)
@@ -83,6 +84,7 @@ class Publisher():
             if len(futures) == 1:
                 return futures[0]
             return asyncio.gather(*futures)
+        return None
 
     def __contains__(self, subscriber: 'Subscriber'):
         return subscriber in self._subscriptions
@@ -126,10 +128,11 @@ class StatefulPublisher(Publisher):
     def get(self):
         return self._state
 
-    def notify(self, *args: Any) -> None:
+    def notify(self, *args: Any) -> asyncio.Future:
         if self._state != args:
             self._state = args
             return Publisher.notify(self, *args)
+        return None
 
     def reset_state(self, *args):
         if not args:
@@ -140,7 +143,7 @@ class StatefulPublisher(Publisher):
 
 class Subscriber(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
     @abstractmethod
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         """Send new argument(s) to the subscriber
         :param \\*args: variable arguments to be send
         :param who: reference to which publisher is emitting

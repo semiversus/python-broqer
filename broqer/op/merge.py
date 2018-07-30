@@ -13,6 +13,7 @@ Merge: 1
 >>> s2.emit('abc')
 Merge: abc
 """
+import asyncio
 from typing import Any
 
 from broqer import Publisher
@@ -31,7 +32,7 @@ class Merge(MultiOperator):
                 return result
         return None
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         assert who in self._publishers, 'emit from non assigned publisher'
         return self.notify(*args)
 

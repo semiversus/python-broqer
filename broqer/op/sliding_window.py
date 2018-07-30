@@ -38,6 +38,7 @@ Sliding Window:1:2:3
 >>> s.emit(4)
 Sliding Window:2:3:4
 """
+import asyncio
 from collections import deque
 from typing import Any, MutableSequence  # noqa: F401
 
@@ -80,7 +81,7 @@ class SlidingWindow(Operator):
 
             return self._state
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
         assert len(args) >= 1, 'need at least one argument for sliding window'
         self._state.append(unpack_args(*args))
@@ -89,6 +90,7 @@ class SlidingWindow(Operator):
             if self._packed:
                 return self.notify(tuple(self._state))
             return self.notify(*self._state)
+        return None
 
     def flush(self):
         self._state.clear()

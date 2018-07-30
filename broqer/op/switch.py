@@ -38,6 +38,7 @@ This is working because False is correpsonding to integer 0, True is 1
 >>> choose.emit(False)
 1
 """
+import asyncio
 from typing import Any, List
 
 from broqer import Publisher
@@ -60,17 +61,17 @@ class Switch(Operator):
         selected = self._mapping[selection].get()
         return selected
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
         if who == self._selection_publisher:
             if self._mapping[args[0]] != self._selected_publisher:
                 if self._selected_publisher:
                     self._selected_publisher.unsubscribe(self)
                 self._selected_publisher = self._mapping[args[0]]
                 self._selected_publisher.subscribe(self)
-        else:
-            assert who == self._selected_publisher, \
-                'emit from not selected publisher'
-            return self.notify(*args)
+            return None
+        assert who == self._selected_publisher, \
+            'emit from not selected publisher'
+        return self.notify(*args)
 
 
 switch = build_operator(Switch)  # pylint: disable=invalid-name
