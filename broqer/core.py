@@ -77,7 +77,7 @@ class Publisher():
 
     def notify(self, *args: Any) -> asyncio.Future:
         """ emit to all subscriptions """
-        results = tuple(s.emit(*args, who=self) for s in self._subscriptions)
+        results = (s.emit(*args, who=self) for s in tuple(self._subscriptions))
         futures = tuple(r for r in results if r is not None)
 
         if futures:
