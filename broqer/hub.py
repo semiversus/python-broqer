@@ -198,6 +198,7 @@ class Hub:
 
     def __init__(self, permitted_meta_keys=None):
         self._topics = dict()
+        self._frozen = False
         if permitted_meta_keys is not None:
             self._permitted_meta_keys = set(permitted_meta_keys)
         else:
@@ -207,6 +208,9 @@ class Hub:
         try:
             return self._topics[path]
         except KeyError:
+            if self._frozen:
+                raise ValueError('Hub is frozen, so it\'s impossible to ' +
+                                 'access the unknown topic %s' % path)
             topic = self._topic_cls(path)
             self._topics[path] = topic
             return topic
@@ -216,6 +220,9 @@ class Hub:
 
     def __iter__(self):
         return sorted(self._topics.keys()).__iter__()
+
+    def freeze(self, freeze: bool = True):
+        self._frozen = freeze
 
     @property
     def topics(self):
