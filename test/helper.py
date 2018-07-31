@@ -65,7 +65,7 @@ class InitializedPublisher(Publisher):
 
     def get(self):
         if self._state is NONE:
-            raise Publisher.get(self)
+            return Publisher.get(self)
         return self._state
 
     def reset(self, init):
@@ -157,7 +157,10 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
             if v_emit is not NONE:
                 source.notify(v_emit)
 
-        stored_result = dut.get()
+        try:
+            stored_result = dut.get()
+        except ValueError:
+            stored_result = None
 
         if v_result is NONE:
             with dut.subscribe(collector_temporary):
