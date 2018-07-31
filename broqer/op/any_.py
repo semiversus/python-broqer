@@ -32,31 +32,26 @@ class _MultiPredicate(MultiOperator):
             self._state = None
 
     def get(self) -> Tuple:
-        if not self._subscriptions:
-            values = tuple(p.get() for p in self._publishers)
-            if None in values:
-                return self._state
-            if self._predicate is not None:
-                evaluated = (self._predicate(*v) for v in values)
-            else:
-                evaluated = (unpack_args(*v) for v in values)
-            return (self.combination_operator(evaluated),)  # type: ignore
-        else:
+        if self._state is not None:
             return self._state
+        values = tuple(p.get() for p in self._publishers)  # may raise ValueError
+        if self._predicate is not None:
+            values = (self._predicate(v) for v in values)
+        return self.combination_operator(values)
 
-    def emit(self, *args: Any_, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
         assert who in self._publishers, 'emit from non assigned publisher'
 
         if self._predicate is not None:
-            self._partial[self._index[who]] = self._predicate(*args)
+            self._partial[self._index[who]] = self._predicate(value)
         else:
-            self._partial[self._index[who]] = unpack_args(*args)
+            self._partial[self._index[who]] = value
         if None in self._partial:
             return None
-        state = (self.combination_operator(self._partial),)  # type:ignore
+        state = self.combination_operator(self._partial)  # type:ignore
         if state != self._state:
             self._state = state
-            return self.notify(*self._state)
+            return self.notify(self._state)
         return None
 
 
