@@ -24,13 +24,13 @@ from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 
 class Just(Publisher):
-    def __init__(self, *value: Any) -> None:
+    def __init__(self, value: Any) -> None:
         super().__init__()
         self._state = value
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
-        subscriber.emit(*self._state, who=self)
+        subscriber.emit(self._state, who=self)
         return disposable
 
     def get(self):
