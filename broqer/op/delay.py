@@ -40,15 +40,16 @@ class Delay(Operator):
         self._error_callback = error_callback
 
     def get(self):
-        return None
+        return Publisher.get(self)  # will raise ValueError
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, value: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
-        self._loop.call_later(self._duration, self._delayed, *args)
+        self._loop.call_later(self._duration, self._delayed, value)
 
-    def _delayed(self, *args):
+    def _delayed(self, value):
+        print(value)
         try:
-            self.notify(*args)
+            self.notify(value)
         except Exception:
             self._error_callback(*sys.exc_info())
 

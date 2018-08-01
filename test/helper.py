@@ -274,7 +274,10 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
 
     # store result of .get() and check subscriptions before the first
     # subscription to dut is made
-    stored_result = dut.get()
+    try:
+        stored_result = dut.get()
+    except ValueError:
+        stored_result = None
 
     assert len(source.subscriptions) == 0
     assert len(dut.subscriptions) == 0
@@ -287,7 +290,10 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     assert len(dut.subscriptions) == 1
 
     # check .get() after subscription (should not change)
-    assert dut.get() == stored_result
+    try:
+        assert dut.get() == stored_result
+    except ValueError:
+        assert stored_result is None
 
     # check emitted values after subscription
     if stateful and output_vector[0][0] == 0:
@@ -356,7 +362,10 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     if stateful:
         source.reset(first_input_value)
 
-    stored_result = dut.get()
+    try:
+        stored_result = dut.get()
+    except ValueError:
+        stored_result = None
 
     assert len(source.subscriptions) == 0
     assert len(dut.subscriptions) == 0
@@ -369,4 +378,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     assert len(dut.subscriptions) == 1
 
     # check .get() after subscription (should not change)
-    assert dut.get() == stored_result
+    try:
+        assert dut.get() == stored_result
+    except ValueError:
+        assert stored_result is None
