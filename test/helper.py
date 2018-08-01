@@ -263,7 +263,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     input_vector = input_vector[1:]
 
     if stateful:
-        source = InitializedPublisher(*to_args(first_input_value))
+        source = InitializedPublisher(first_input_value)
     else:
         source = Publisher()
 
@@ -292,10 +292,10 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     # check emitted values after subscription
     if stateful and output_vector[0][0] == 0:
         print(stored_result)
-        assert collector_permanent.last_result == unpack_args(*stored_result)
+        assert collector_permanent.last_result == stored_result
         with dut.subscribe(collector_temporary):
             assert len(dut.subscriptions) == 2
-            assert collector_temporary.last_result == unpack_args(*stored_result)
+            assert collector_temporary.last_result == stored_result
         assert len(dut.subscriptions) == 1
         assert (collector_temporary.result_vector == collector_permanent.result_vector)
     else:
@@ -304,7 +304,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
         assert len(dut.subscriptions) == 1
 
     if not stateful:
-        source.notify(*to_args(first_input_value))
+        source.notify(first_input_value)
 
     # check with input vector
     failed_list = []
@@ -317,8 +317,6 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
             assert len(dut.subscriptions) == 2
         assert len(source.subscriptions) == 1
         assert len(dut.subscriptions) == 1
-        if result is not None:
-            result = unpack_args(*result)
         if has_state:
             if collector_temporary.last_result != value or len(collector_temporary) != collector_temporary_len + 1:
                 failed_list.append( ('SUBSCRIBE', timestamp, value, result) )
@@ -331,7 +329,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
                 failed_list.append( ('GET', timestamp, value, result) )
 
     for timestamp, value in input_vector:
-        loop.call_later(timestamp, source.notify, *to_args(value))
+        loop.call_later(timestamp, source.notify, value)
 
     for timestamp, value in output_vector:
         loop.call_later(timestamp + JITTER, _check_temporary, timestamp, value)
@@ -356,7 +354,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     dispose_collector_permanent.dispose()
 
     if stateful:
-        source.reset(*to_args(first_input_value))
+        source.reset(first_input_value)
 
     stored_result = dut.get()
 

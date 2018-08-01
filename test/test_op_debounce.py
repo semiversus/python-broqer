@@ -38,7 +38,7 @@ from .helper import check_async_operator_coro, NONE
 
     # various tests
     ((0.1,), ((0, True), (0.05, False), (0.1, True), (0.3, False)), ((0.2, True), (0.4, False))),
-    ((0.1, False), ((0, True), (0.05, False), (0.1, True), (0.3, None)), ((0, False), (0.2, True), (0.3, False), (0.4, None))),
+    ((0.1, False), ((0, True), (0.05, False), (0.1, True), (0.3, -1)), ((0, False), (0.2, True), (0.3, False), (0.4, -1))),
     ((0.1, True), ((0, False), (0.05, False), (0.10, False), (0.15, True), (0.2, True), (0.25, True)), ((0, True), (0.1, False), (0.15, True))), # retrigger
     ((0.1,), ((0, True), (0.15, True), (0.2, True), (0.25, False), (0.3, False)), ((0.1, True), (0.35, False))),
     ((0.1,), ((0, 0), (0.05, 1), (0.1, 1.0), (0.3, 2)), ((0.15, 1), (0.4, 2))),
