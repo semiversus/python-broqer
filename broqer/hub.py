@@ -222,6 +222,9 @@ class Hub:
         return sorted(self._topics.keys()).__iter__()
 
     def freeze(self, freeze: bool = True):
+        for path, topic in self._topics.items():
+            if not topic.assigned:
+                raise ValueError('Topic %r referenced but unassigned' % path)
         self._frozen = freeze
 
     @property
