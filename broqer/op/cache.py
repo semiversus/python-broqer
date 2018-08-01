@@ -61,6 +61,7 @@ class Cache(Operator):
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
+        assert value is not None, 'value to be emitted can not be None'
         if self._state != value:
             self._state = value
             return self.notify(value)

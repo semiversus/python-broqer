@@ -77,6 +77,7 @@ class CombineLatest(MultiOperator):
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who in self._publishers, 'emit from non assigned publisher'
+        assert value is not None, 'value to be emitted can not be None'
         if self._missing and who in self._missing:
             self._missing.remove(who)
 
