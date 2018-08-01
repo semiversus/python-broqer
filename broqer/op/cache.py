@@ -8,11 +8,6 @@
 
 >>> s.emit(3)
 3
-
-Also working with multiple arguments in emit:
-
->>> s.emit(1, 2)
-1 - 2
 """
 import asyncio
 from typing import Any

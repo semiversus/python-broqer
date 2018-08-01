@@ -47,7 +47,6 @@ class Delay(Operator):
         self._loop.call_later(self._duration, self._delayed, value)
 
     def _delayed(self, value):
-        print(value)
         try:
             self.notify(value)
         except Exception:

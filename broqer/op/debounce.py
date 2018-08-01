@@ -36,7 +36,8 @@ Reseting is also possible:
 >>> s.emit(False)
 False
 >>> s.emit(True)
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
+>>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.15))
+True
 >>> debounce_publisher.reset()
 False
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.15))
@@ -119,7 +120,7 @@ class Debounce(Operator):
             self._error_callback(*sys.exc_info())
 
     def reset(self):
-        if self._retrigger_value:  # if retrigger_value is not empty tuple
+        if self._retrigger_value is not None:  # if retrigger_value is not empty tuple
             self.notify(self._retrigger_value)
             self._state = self._retrigger_value
             self._next_state = self._retrigger_value

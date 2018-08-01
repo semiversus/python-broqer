@@ -10,15 +10,15 @@ CombineLatest is only emitting, when all values are collected:
 
 >>> s1.emit(1)
 >>> s2.emit(2)
-1 2
+(1, 2)
 >>> s2.emit(3)
-1 3
+(1, 3)
 
 Subscribing to a CombineLatest with all values available is emitting the values
 immediate on subscription:
 
 >>> combination | op.sink(print, 'Second sink:')
-Second sink: 1 3
+Second sink: (1, 3)
 <...>
 
 """

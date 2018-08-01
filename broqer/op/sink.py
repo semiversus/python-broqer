@@ -16,8 +16,8 @@ Usage:
 
 >>> s.emit(1)
 Sink:1
->>> s.emit(1, 2)
-Sink:1:2
+>>> s.emit((1, 2))
+Sink:(1, 2)
 
 >>> _d.dispose()
 >>> len(s)

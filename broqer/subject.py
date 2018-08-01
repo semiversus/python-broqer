@@ -19,10 +19,10 @@ class Subject(Publisher, Subscriber):
         Publisher.__init__(self)
         Subscriber.__init__(self)
 
-    def emit(self, *args: Any,
+    def emit(self, value: Any,
              who: Optional[Publisher] = None  # pylint: disable=unused-argument
              ) -> asyncio.Future:
-        return self.notify(*args)
+        return self.notify(value)
 
 
 class Value(StatefulPublisher, Subscriber):
@@ -36,14 +36,12 @@ class Value(StatefulPublisher, Subscriber):
     0
     >>> s.emit(1)
     1
-    >>> s.emit(1, 2)
-    1 2
     """
-    def __init__(self, *init):
-        StatefulPublisher.__init__(self, *init)
+    def __init__(self, init):
+        StatefulPublisher.__init__(self, init)
         Subscriber.__init__(self)
 
-    def emit(self, *args: Any,
+    def emit(self, value: Any,
              who: Optional[Publisher] = None  # pylint: disable=unused-argument
              ) -> asyncio.Future:
-        return self.notify(*args)
+        return self.notify(value)

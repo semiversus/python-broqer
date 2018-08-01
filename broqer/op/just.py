@@ -12,11 +12,6 @@ Dump1: 1
 >>> _d2 = j | op.sink(print, 'Dump2:')
 Dump2: 1
 
-Also handling zero or more than one argument:
-
->>> i = op.Just()
->>> _d3 = i | op.sink(print, 'Dump Empty:')
-Dump Empty:
 """
 from typing import Any
 

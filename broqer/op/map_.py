@@ -26,12 +26,10 @@ Also possible with additional args and kwargs:
 103
 >>> _disposable.dispose()
 
-If map_func is returning None just emit subscriber without arguments:
-
 >>> _disposable = s | op.map_(print, 'Output:') | op.sink(print, 'EMITTED')
 >>> s.emit(1)
 Output: 1
-EMITTED
+EMITTED None
 """
 import asyncio
 from functools import partial
@@ -61,24 +59,13 @@ class Map(Operator):
             self._map_func = map_func  # type: Callable
 
     def get(self):
-        args = self._publisher.get()
-        if args is None:
-            return None
-        result = self._map_func(*args)
-        if result is None:
-            result = ()
-        elif not isinstance(result, tuple):
-            result = (result, )
-        return result
+        value = self._publisher.get()  # may raise ValueError
+        return self._map_func(value)
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
-        result = self._map_func(*args)
-        if result is None:
-            result = ()
-        elif not isinstance(result, tuple):
-            result = (result, )
-        return self.notify(*result)
+        result = self._map_func(value)
+        return self.notify(result)
 
 
 map_ = build_operator(Map)  # pylint: disable=invalid-name

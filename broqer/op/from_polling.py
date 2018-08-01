@@ -59,12 +59,7 @@ class FromPolling(Publisher):
         return disposable
 
     def get(self):
-        result = self._poll_func()
-        if result is None:
-            result = ()
-        elif not isinstance(result, tuple):
-            result = (result, )
-        return result
+        return self._poll_func()
 
     def _poll_callback(self):
         if self._subscriptions:

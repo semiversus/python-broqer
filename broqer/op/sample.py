@@ -18,21 +18,21 @@ Sample: 1
 ...
 Sample: 1
 
->>> s.emit(2, 3)
+>>> s.emit((2, 3))
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.06))
-Sample: 2 3
+Sample: (2, 3)
 ...
-Sample: 2 3
+Sample: (2, 3)
 
 >>> _d2 = sample_publisher | op.sink(print, 'Sample 2:')
-Sample 2: 2 3
+Sample 2: (2, 3)
 >>> _d.dispose()
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.06))
-Sample 2: 2 3
+Sample 2: (2, 3)
 ...
-Sample 2: 2 3
+Sample 2: (2, 3)
 
->>> len(s) # how many subscriber are registred
+>>> len(s) # how many subscriber are registered
 1
 >>> _d2.dispose()
 >>> len(s)
@@ -69,14 +69,13 @@ class Sample(Operator):
 
     def get(self):
         if not self._subscriptions:
-            args = self._publisher.get()
-            return args
+            return self._publisher.get()  # may raises ValueError
         return self._state
 
     def _periodic_callback(self):
         """ will be started on first emit """
         try:
-            self.notify(*self._state)  # emit to all subscribers
+            self.notify(self._state)  # emit to all subscribers
         except Exception:
             self._error_callback(*sys.exc_info())
 
@@ -88,9 +87,11 @@ class Sample(Operator):
             self._state = None
             self._call_later_handle = None
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, value: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
-        self._state = args
+        assert value is not None, 'value to be emitted can not be None'
+
+        self._state = value
 
         if self._call_later_handle is None:
             self._periodic_callback()
