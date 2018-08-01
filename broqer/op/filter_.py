@@ -48,23 +48,21 @@ class Filter(Operator):
             self._predicate = predicate  # type: Callable
 
     def get(self):
-        args = self._publisher.get()
-        if args is not None:
-            if self._predicate is None:
-                if all(args):
-                    return args
-                return None
-            if self._predicate(*args):
-                return args
-        return None
+        value = self._publisher.get()  # may raise ValueError
+        if self._predicate is None:
+            if value:
+                return value
+        elif self._predicate(value):
+            return value
+        Publisher.get(self)  # raises ValueError
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._predicate is None:
-            if all(args):
-                return self.notify(*args)
-        elif self._predicate(*args):
-            return self.notify(*args)
+            if value:
+                return self.notify(value)
+        elif self._predicate(value):
+            return self.notify(value)
         return None
 
 
