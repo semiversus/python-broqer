@@ -10,13 +10,13 @@ from .helper import check_single_operator, NONE
     ((-1,), (0, 1, 2, 3), (0, 1, 2, 3)),
     ((-1,), (-1, -1, -1, -1), (NONE, NONE, NONE, NONE)),
     ((-1,), (1, 1, -1, -1), (1, NONE, -1, NONE)),
-    (('a',), (None, None, 'b', -1), (None, NONE, 'b', -1)),
-    ((1,2), ((1,2), (1,3), (1,3)), (NONE, (1,3), NONE)),
+    (('a',), (0, 0, 'b', -1), (0, NONE, 'b', -1)),
+    (((1,2),), ((1,2), (1,3), (1,3)), (NONE, (1,3), NONE)),
     ((), (0, 1, 2, 3), (0, 1, 2, 3)),
     ((), (-1, -1, -1, 1), (-1, NONE, NONE, 1)),
 ])
 def test_with_publisher(args, input_vector, output_vector):
-    init = args if args else None
+    init = args[0] if args else None
     check_single_operator(Cache, args, {}, input_vector, output_vector, initial_state=init, has_state=True)
 
 def test_uninitialised_with_publisher():

@@ -30,40 +30,40 @@ class Cache(Operator):
     :param publisher: source publisher
     :param init: initialization for state
     """
-    def __init__(self, publisher: Publisher, *init: Any) -> None:
+    def __init__(self, publisher: Publisher, init: Any=None) -> None:
         Operator.__init__(self, publisher)
-        if not init:
-            self._state = None
-        else:
-            self._state = init
+        self._state = init
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        state = self._state
-        self._state = None
-        disposable = Operator.subscribe(self, subscriber)
-        if len(self._subscriptions) == 1:
-            if self._state is None and state is not None:
-                self._state = state
-                subscriber.emit(*self._state, who=self)  # emit actual cache
-        else:
-            self._state = state
+        disposable = Publisher.subscribe(self, subscriber)
+
+        old_state = self._state  # to check if .emit was called
+
+        if len(self._subscriptions) == 1:  # if this was the first subscription
+            self._publisher.subscribe(self)
+
+        try:
+            value = self._publisher.get()
+        except ValueError:
             if self._state is not None:
-                subscriber.emit(*self._state, who=self)
+                subscriber.emit(self._state, who=self)
+        else:
+            if len(self._subscriptions) > 1 or old_state == self._state:
+                subscriber.emit(value, who=self)
+
         return disposable
 
     def get(self):
-        if not self._subscriptions:
-            args = self._publisher.get()
-            if args is None:
-                return self._state
-            return args
-        return self._state
+        try:
+            return self._publisher.get()  # may raise ValueError
+        except ValueError:
+            return self._state
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
-        if self._state != args:
-            self._state = args
-            return self.notify(*args)
+        if self._state != value:
+            self._state = value
+            return self.notify(value)
         return None
 
 

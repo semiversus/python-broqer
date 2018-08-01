@@ -238,11 +238,11 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
         assert stored_subscription_pattern == tuple(len(source.subscriptions) for source in sources)
         assert (collector_temporary.result_vector == collector_permanent.result_vector)
     else:
-        assert stored_result == (to_args(collector_permanent.last_result) if stored_result else None)
+        assert stored_result == (collector_permanent.last_result if stored_result else None)
         with dut.subscribe(collector_temporary):
             assert len(dut.subscriptions) == 2
             assert stored_subscription_pattern == tuple(len(source.subscriptions) for source in sources)
-            assert stored_result == (to_args(collector_temporary.last_result) if stored_result else None)
+            assert stored_result == (collector_temporary.last_result if stored_result else None)
         assert len(collector_permanent.result_vector) == (1 if stored_result else 0)
         assert len(collector_temporary.result_vector) == (1 if stored_result else 0)
 
