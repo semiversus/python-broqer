@@ -48,22 +48,23 @@ class Throttle(Operator):
         self._error_callback = error_callback
 
     def get(self):
-        return None
+        Publisher.get(self)
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, value: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
+        assert value is not None, 'value to be emitted can not be None'
         if self._call_later_handler is None:
-            self.notify(*args)
+            self.notify(value)
             self._last_state = None
             self._call_later_handler = self._loop.call_later(
                 self._duration, self._wait_done_cb)
         else:
-            self._last_state = args
+            self._last_state = value
 
     def _wait_done_cb(self):
         if self._last_state is not None:
             try:
-                self.notify(*self._last_state)
+                self.notify(self._last_state)
             except Exception:
                 self._error_callback(*sys.exc_info())
             self._last_state = None

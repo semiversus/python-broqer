@@ -48,10 +48,10 @@ class CatchException(Operator):
     def get(self):
         return self._publisher.get()
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
         try:
-            return self.notify(*args)
+            return self.notify(value)
         except self._exceptions:
             pass
         return None

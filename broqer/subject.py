@@ -6,7 +6,7 @@ from broqer import Publisher, StatefulPublisher, Subscriber
 
 class Subject(Publisher, Subscriber):
     """
-    Source with ``.emit(*args)`` method to publish a new message.
+    Source with ``.emit(value)`` method to publish a new message.
 
     >>> from broqer import op
 

@@ -65,11 +65,7 @@ class FromPolling(Publisher):
         if self._subscriptions:
             try:
                 result = self._poll_func()
-                if result is None:
-                    result = ()
-                elif not isinstance(result, tuple):
-                    result = (result, )
-                self.notify(*result)
+                self.notify(result)
             except Exception:
                 self._error_callback(*sys.exc_info())
 

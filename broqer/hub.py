@@ -126,9 +126,12 @@ class Topic(Publisher, Subscriber):
             if len(self._subscriptions) == 1:
                 self._subject.subscribe(self)
             else:
-                args = self._subject.get()
-                if args is not None:
-                    subscriber.emit(*args, who=self)
+                try:
+                    value = self._subject.get()
+                except ValueError:
+                    pass
+                else:
+                    subscriber.emit(value, who=self)
 
         return disposable
 
@@ -140,30 +143,30 @@ class Topic(Publisher, Subscriber):
     def get(self):
         return self._subject.get()
 
-    def emit(self, *args: Any,
+    def emit(self, value: Any,
              who: Optional[Publisher] = None) -> asyncio.Future:
         if self._subject is None:
             if self._pre_assign_emit is not None:
                 # method will be replaced by .__call__
                 raise SubscriptionError('Only one emit will be stored before' +
                                         ' assignment')
-            self._pre_assign_emit = args
+            self._pre_assign_emit = value
             return None
 
         if who == self._subject:
-            return self.notify(*args)
+            return self.notify(value)
 
         assert isinstance(self._subject, Subscriber), \
             'Topic has to be a subscriber'
 
-        return self._subject.emit(*args, who=self)
+        return self._subject.emit(value, who=self)
 
     def assign(self, subject, meta):
         if self._subject is not None:
             raise SubscriptionError('Topic is already assigned')
         self._subject = subject
         if self._pre_assign_emit is not None:
-            self._subject.emit(*self._pre_assign_emit, who=self)
+            self._subject.emit(self._pre_assign_emit, who=self)
         if meta:
             self._meta.update(meta)
 

@@ -9,12 +9,10 @@ from ._operator import MultiOperator, build_operator
 
 
 class _MultiPredicate(MultiOperator):
-    combination_operator = any  # type: ignore
-
     def __init__(self, *publishers: Publisher,
                  predicate: Callable[[Any_], bool] = None) -> None:
         MultiOperator.__init__(self, *publishers)
-
+        self.combination_operator = any
         self._predicate = predicate  # type: Callable
 
         self._index = \
@@ -23,7 +21,7 @@ class _MultiPredicate(MultiOperator):
 
         partial = [None for _ in publishers]  # type: MutableSequence[Any_]
         self._partial = partial
-        self._state = None  # type: Tuple[bool]
+        self._state = None  # type: bool
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
@@ -31,10 +29,10 @@ class _MultiPredicate(MultiOperator):
             self._partial = [None for _ in self._partial]
             self._state = None
 
-    def get(self) -> Tuple:
+    def get(self) -> Any_:
         if self._state is not None:
             return self._state
-        values = tuple(p.get() for p in self._publishers)  # may raise ValueError
+        values = (p.get() for p in self._publishers)  # may raise ValueError
         if self._predicate is not None:
             values = (self._predicate(v) for v in values)
         return self.combination_operator(values)
@@ -58,7 +56,10 @@ class _MultiPredicate(MultiOperator):
 
 class Any(_MultiPredicate):
     """Applying any built in to source publishers"""
-    pass
+    def __init__(self, *publishers: Publisher,
+                 predicate: Callable[[Any_], bool] = None) -> None:
+        _MultiPredicate.__init__(self, *publishers, predicate=predicate)
+        self.combination_operator = any
 
 
 any_ = build_operator(Any)  # pylint: disable=invalid-name

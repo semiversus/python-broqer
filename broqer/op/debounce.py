@@ -55,7 +55,8 @@ from ._operator import Operator, build_operator
 
 class Debounce(Operator):
     def __init__(self, publisher: Publisher, duetime: float,
-                 retrigger_value: Any=None, error_callback=default_error_handler,
+                 retrigger_value: Any=None,
+                 error_callback=default_error_handler,
                  loop=None) -> None:
         assert duetime >= 0, 'duetime has to be positive'
 
@@ -93,7 +94,8 @@ class Debounce(Operator):
         if self._call_later_handler:
             self._call_later_handler.cancel()
 
-        if self._retrigger_value is not None and self._state != self._retrigger_value:
+        if self._retrigger_value is not None and \
+           self._state != self._retrigger_value:
             # when retrigger_value is defined and current state is different
             self.notify(self._retrigger_value)
             self._state = self._retrigger_value
@@ -120,7 +122,7 @@ class Debounce(Operator):
             self._error_callback(*sys.exc_info())
 
     def reset(self):
-        if self._retrigger_value is not None:  # if retrigger_value is not empty tuple
+        if self._retrigger_value is not None:
             self.notify(self._retrigger_value)
             self._state = self._retrigger_value
             self._next_state = self._retrigger_value
