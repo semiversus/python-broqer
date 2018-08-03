@@ -10,22 +10,22 @@ CombineLatest is only emitting, when all values are collected:
 
 >>> s1.emit(1)
 >>> s2.emit(2)
-1 2
+(1, 2)
 >>> s2.emit(3)
-1 3
+(1, 3)
 
 Subscribing to a CombineLatest with all values available is emitting the values
-immediate on subscribtion:
+immediate on subscription:
 
 >>> combination | op.sink(print, 'Second sink:')
-Second sink: 1 3
+Second sink: (1, 3)
 <...>
 
 """
 import asyncio
-from typing import Any, Dict, MutableSequence, Sequence  # noqa: F401
+from typing import Any, Dict, MutableSequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, unpack_args
+from broqer import Publisher, Subscriber, UNINITIALIZED
 
 from ._operator import MultiOperator, build_operator
 
@@ -56,47 +56,42 @@ class CombineLatest(MultiOperator):
                 self._emit_on = (emit_on,)
             else:
                 self._emit_on = emit_on
-        self._state = None  # type: Sequence[Any]
+        self._state = UNINITIALIZED  # type: Any
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._missing = set(self._publishers)
             self._partial_state = [None for _ in self._partial_state]
-            self._state = None
+            self._state = UNINITIALIZED
 
     def get(self):
         if not self._subscriptions:  # if no subscribers listening
-            args = tuple(publisher.get() for publisher in self._publishers)
-            if None in args:
-                return None
-            args = tuple(unpack_args(*a) for a in args)
+            values = tuple(publisher.get() for publisher in self._publishers)
             if self._map:
-                return (self._map(*args),)
-            return args
-        if self._state is not None:
+                return self._map(*values)
+            return values
+        if self._state is not UNINITIALIZED:
             return self._state
-        return None
+        return Publisher.get(self)  # will raise ValueError
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who in self._publishers, 'emit from non assigned publisher'
         if self._missing and who in self._missing:
             self._missing.remove(who)
 
-        args = unpack_args(*args)
-
-        if self._partial_state[self._index[who]] == args:
+        if self._partial_state[self._index[who]] == value:
             # if partial_state has not changed avoid new emit
             return None
-        self._partial_state[self._index[who]] = args
+        self._partial_state[self._index[who]] = value
         if not self._missing and (who in self._emit_on):
             if self._map:
-                state = tuple((self._map(*self._partial_state),))
+                state = self._map(*self._partial_state)
             else:
                 state = tuple(self._partial_state)
             if state != self._state:
                 self._state = state
-                return self.notify(*self._state)
+                return self.notify(self._state)
         return None
 
 

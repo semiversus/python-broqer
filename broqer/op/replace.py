@@ -10,18 +10,18 @@ from ._operator import Operator, build_operator
 
 
 class Replace(Operator):
-    def __init__(self, publisher: Publisher, *args: Any) -> None:
+    def __init__(self, publisher: Publisher, value: Any) -> None:
         Operator.__init__(self, publisher)
 
-        self._args = args
+        self._value = value
 
     def get(self):
-        if self._publisher.get() is not None:
-            return self._args
+        self._publisher.get()  # may raises ValueError
+        return self._value
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
-        return self.notify(*self._args)
+        return self.notify(self._value)
 
 
 replace = build_operator(Replace)  # pylint: disable=invalid-name

@@ -16,8 +16,8 @@ Usage:
 
 >>> s.emit(1)
 Sink:1
->>> s.emit(1, 2)
-Sink:1:2
+>>> s.emit((1, 2))
+Sink:(1, 2)
 
 >>> _d.dispose()
 >>> len(s)
@@ -34,7 +34,7 @@ from ._operator import build_operator
 class Sink(Subscriber, Disposable):
     def __init__(self, publisher: Publisher,
                  sink_function: Optional[Callable[..., None]] = None,
-                 *args, **kwargs) -> None:
+                 *args, unpack=False, **kwargs) -> None:
         if sink_function is None:
             self._sink_function = None  # type: Callable
         elif args or kwargs:
@@ -43,16 +43,20 @@ class Sink(Subscriber, Disposable):
         else:
             self._sink_function = sink_function  # type: Callable
 
+        self._unpack = unpack
         self._disposable = publisher.subscribe(self)
 
-    def emit(self, *args: Any, who: Publisher):
+    def emit(self, value: Any, who: Publisher):
         # handle special case: _disposable is set after
         # publisher.subscribe(self) in __init__
         assert not hasattr(self, '_disposable') or \
             who == self._disposable.publisher, \
             'emit comming from non assigned publisher'
         if self._sink_function:
-            self._sink_function(*args)
+            if self._unpack:
+                self._sink_function(*value)
+            else:
+                self._sink_function(value)
 
     def dispose(self):
         self._disposable.dispose()

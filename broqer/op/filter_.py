@@ -37,7 +37,7 @@ from ._operator import Operator, build_operator
 class Filter(Operator):
     def __init__(self, publisher: Publisher,
                  predicate: Callable[[Any], bool] = None,
-                 *args, **kwargs) -> None:
+                 *args, unpack: bool = False, **kwargs) -> None:
 
         Operator.__init__(self, publisher)
 
@@ -47,24 +47,30 @@ class Filter(Operator):
         else:
             self._predicate = predicate  # type: Callable
 
-    def get(self):
-        args = self._publisher.get()
-        if args is not None:
-            if self._predicate is None:
-                if all(args):
-                    return args
-                return None
-            if self._predicate(*args):
-                return args
-        return None
+        self._unpack = unpack
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def get(self):
+        value = self._publisher.get()  # may raise ValueError
+        if self._predicate is None:
+            if value:
+                return value
+        else:
+            if (self._unpack and self._predicate(*value)) or \
+                 self._predicate(value):
+                return value
+        return Publisher.get(self)  # raises ValueError
+
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._predicate is None:
-            if all(args):
-                return self.notify(*args)
-        elif self._predicate(*args):
-            return self.notify(*args)
+            if value:
+                return self.notify(value)
+        else:
+            if self._unpack:
+                if self._predicate(*value):
+                    return self.notify(value)
+            elif self._predicate(value):
+                return self.notify(value)
         return None
 
 

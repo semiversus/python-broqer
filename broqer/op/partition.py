@@ -14,14 +14,14 @@ Usage:
 >>> s.emit(3)
 Partition: (1, 2, 3)
 >>> s.emit(4)
->>> s.emit(5, 6)
+>>> s.emit((5, 6))
 >>> partitioned_publisher.flush()
 Partition: (4, (5, 6))
 """
 import asyncio
 from typing import Any, MutableSequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, unpack_args
+from broqer import Publisher, Subscriber
 
 from ._operator import Operator, build_operator
 
@@ -42,17 +42,15 @@ class Partition(Operator):
 
     def get(self):
         queue = list(self._queue)
-        result = self._publisher.get()
-        if result is None:
-            return
-        queue.append(unpack_args(*result))
+        value = self._publisher.get()  # may raises ValueError
+        queue.append(value)
         if self._size and len(queue) == self._size:
-            return (tuple(queue),)
+            return tuple(queue)
+        return Publisher.get(self)  # raises ValueError
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
-        assert len(args) >= 1, 'need at least one argument for partition'
-        self._queue.append(unpack_args(*args))
+        self._queue.append(value)
         if self._size and len(self._queue) == self._size:
             future = self.notify(tuple(self._queue))
             self._queue.clear()

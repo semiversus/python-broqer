@@ -1,7 +1,7 @@
 import pytest
 import operator
 
-from broqer import Publisher, to_args
+from broqer import Publisher
 from broqer.op import Reduce
 
 from .helper import check_single_operator, NONE

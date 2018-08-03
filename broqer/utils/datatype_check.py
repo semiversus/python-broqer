@@ -1,6 +1,3 @@
-from broqer import unpack_args
-
-
 class Datatype:
     name = 'none'
 
@@ -26,10 +23,7 @@ class Datatype:
             topic = value[1:]
             if topic not in self._hub:
                 raise KeyError('topic %s not found in hub' % topic)
-            result = self._hub[topic].get()
-            if result is None:
-                return result
-            return unpack_args(*result)
+            return self._hub[topic].get()
         return value
 
 

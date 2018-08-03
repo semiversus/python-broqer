@@ -41,7 +41,7 @@ This is working because False is correpsonding to integer 0, True is 1
 import asyncio
 from typing import Any, List
 
-from broqer import Publisher
+from broqer import Publisher, UNINITIALIZED
 
 from ._operator import Operator, build_operator
 
@@ -51,27 +51,24 @@ class Switch(Operator):
                  publisher_mapping: List[Publisher]) -> None:
         Operator.__init__(self, selection_publisher)
         self._selection_publisher = selection_publisher
-        self._selected_publisher = None  # type: Publisher
+        self._selected_publisher = UNINITIALIZED
         self._mapping = publisher_mapping
 
     def get(self):
-        selection = self._selected_publisher.get()
-        if selection is None:
-            return
-        selected = self._mapping[selection].get()
-        return selected
+        selection = self._selected_publisher.get()  # may raises ValueError
+        return self._mapping[selection].get()  # may raises ValueError
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         if who == self._selection_publisher:
-            if self._mapping[args[0]] != self._selected_publisher:
-                if self._selected_publisher:
-                    self._selected_publisher.unsubscribe(self)
-                self._selected_publisher = self._mapping[args[0]]
-                self._selected_publisher.subscribe(self)
+            if self._mapping[value] != self._selected_publisher:
+                if self._selected_publisher is not UNINITIALIZED:
+                    self._selected_publisher.unsubscribe(self)  # type: ignore
+                self._selected_publisher = self._mapping[value]
+                self._selected_publisher.subscribe(self)  # type: ignore
             return None
         assert who == self._selected_publisher, \
             'emit from not selected publisher'
-        return self.notify(*args)
+        return self.notify(value)
 
 
 switch = build_operator(Switch)  # pylint: disable=invalid-name

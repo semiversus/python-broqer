@@ -16,14 +16,14 @@ Traceback (most recent call last):
 ...
 concurrent.futures._base.TimeoutError
 
->>> _ = asyncio.get_event_loop().call_later(0.05, s.emit, 1, 2)
+>>> _ = asyncio.get_event_loop().call_later(0.05, s.emit, (1, 2))
 >>> asyncio.get_event_loop().run_until_complete(s)
 (1, 2)
 """
 import asyncio
 from typing import Any, Optional
 
-from broqer import Publisher, Subscriber, unpack_args
+from broqer import Publisher, Subscriber
 
 from ._operator import build_operator
 
@@ -57,13 +57,13 @@ class ToFuture(Subscriber, asyncio.Future):
         if self._timeout_handle is not None:
             self._timeout_handle.cancel()
 
-    def emit(self, *args: Any,
+    def emit(self, value: Any,
              who: Optional[Publisher] = None  # pylint: disable=unused-argument
              ) -> None:
         if self._disposable is not None:
             self._disposable.dispose()
             self._disposable = None
-        self.set_result(unpack_args(*args))
+        self.set_result(value)
 
 
 to_future = build_operator(ToFuture)  # pylint: disable=invalid-name

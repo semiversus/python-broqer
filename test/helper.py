@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any
 
-from broqer import Subscriber, Publisher, unpack_args, SubscriptionDisposable, to_args
+from broqer import Subscriber, Publisher, SubscriptionDisposable
 
 class Collector(Subscriber):
     def __init__(self, loop=None):
@@ -12,8 +12,8 @@ class Collector(Subscriber):
             self._start_timestamp = loop.time()
         self._loop = loop
 
-    def emit(self, *args: Any, who: Publisher) -> None:
-        self._result_vector.append(unpack_args(*args))
+    def emit(self, value: Any, who: Publisher) -> None:
+        self._result_vector.append(value)
         if self._loop is not None:
             self._timestamp_vector.append(self._loop.time() - self._start_timestamp)
 
@@ -53,25 +53,27 @@ class NONE:
 
 
 class InitializedPublisher(Publisher):
-    def __init__(self, *init):
+    def __init__(self, init):
         Publisher.__init__(self)
         self._state = init
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
-        if unpack_args(*self._state) != NONE :
-            subscriber.emit(*self._state, who=self)
+        if self._state is not NONE :
+            subscriber.emit(self._state, who=self)
         return disposable
 
     def get(self):
-        return self._state if unpack_args(*self._state) != NONE else None
+        if self._state is NONE:
+            return Publisher.get(self)
+        return self._state
 
-    def reset(self, *init):
+    def reset(self, init):
         self._state = init
 
-    def notify(self, *args: Any) -> None:
-        self._state = args
-        Publisher.notify(self, *args)
+    def notify(self, value: Any) -> None:
+        self._state = value
+        Publisher.notify(self, value)
 
 def check_single_operator(cls, args, kwargs, input_vector, output_vector, initial_state=None, has_state=False):
     input_vector = tuple((v,) for v in input_vector)
@@ -88,7 +90,7 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
     first_result = output_vector[0]
 
     if stateful:
-        sources = tuple(InitializedPublisher(*to_args(v)) for v in input_vector[0])
+        sources = tuple(InitializedPublisher(v) for v in input_vector[0])
         input_vector = input_vector[1:]
         output_vector = output_vector[1:]
     else:
@@ -101,7 +103,10 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
 
     # store result of .get() and check subscriptions before the first
     # subscription to dut is made
-    stored_result = dut.get()
+    try:
+        stored_result = dut.get()
+    except ValueError:
+        stored_result = None
 
     assert all(len(source.subscriptions) == 0 for source in sources)
     assert len(dut.subscriptions) == 0
@@ -116,29 +121,30 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
     assert len(dut.subscriptions) == 1
 
     # check .get() after subscription (should not change)
-    assert dut.get() == stored_result
+    try:
+        assert dut.get() == stored_result
+    except ValueError:
+        assert stored_result is None
 
     # check emitted values after subscription
     if stateful and first_result != NONE:
-        assert collector_permanent.last_result == unpack_args(*stored_result)
+        assert collector_permanent.last_result == stored_result
         with dut.subscribe(collector_temporary):
             assert len(dut.subscriptions) == 2
             assert stored_subscription_pattern == tuple(len(source.subscriptions) for source in sources)
-            assert collector_temporary.last_result == unpack_args(*stored_result)
+            assert collector_temporary.last_result == stored_result
         assert len(dut.subscriptions) == 1
         assert stored_subscription_pattern == tuple(len(source.subscriptions) for source in sources)
         assert (collector_temporary.result_vector == collector_permanent.result_vector)
     else:
         assert initial_state == stored_result
-        assert initial_state == (to_args(collector_permanent.last_result) if initial_state else None)
+        assert initial_state == (collector_permanent.last_result if initial_state else None)
         with dut.subscribe(collector_temporary):
             assert len(dut.subscriptions) == 2
             assert stored_subscription_pattern == tuple(len(source.subscriptions) for source in sources)
-            assert stored_result == (to_args(collector_temporary.last_result) if initial_state else None)
+            assert stored_result == (collector_temporary.last_result if initial_state else None)
         assert len(collector_permanent.result_vector) == (1 if initial_state else 0)
         assert len(collector_temporary.result_vector) == (1 if initial_state else 0)
-
-    assert dut.get() == stored_result
 
     # check with input vector
     stored_last_result = stored_result
@@ -149,9 +155,12 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
 
         for source, v_emit in zip(sources, v_emits):
             if v_emit is not NONE:
-                source.notify(*to_args(v_emit))
+                source.notify(v_emit)
 
-        stored_result = dut.get()
+        try:
+            stored_result = dut.get()
+        except ValueError:
+            stored_result = None
 
         if v_result is NONE:
             with dut.subscribe(collector_temporary):
@@ -159,9 +168,8 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
             if has_state is None:
                 pass
             elif has_state and stored_last_result is not None:
-                assert collector_permanent.last_result == unpack_args(*stored_result)
-                assert collector_temporary.last_result == unpack_args(*stored_result)
-                assert collector_temporary.last_result == (None if stored_last_result is None else unpack_args(*stored_last_result))
+                assert collector_permanent.last_result == stored_result
+                assert collector_temporary.last_result == stored_result
                 assert len(collector_temporary) == stored_collector_temporary_len + 1
             else:
                 assert stored_result is None
@@ -171,7 +179,7 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
             if has_state is None:  # special case for undefined behavior
                 pass
             elif has_state or stateful:
-                assert collector_permanent.last_result == unpack_args(*stored_result)
+                assert collector_permanent.last_result == stored_result
                 with dut.subscribe(collector_temporary):
                     assert collector_temporary.last_result == v_result
                 assert len(collector_temporary) == stored_collector_temporary_len + 1
@@ -192,11 +200,14 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
     if stateful:
         for source, v_emit in zip(sources, first_input):
             if v_emit is NONE:
-                source.reset(*to_args(v_emit))
+                source.reset(v_emit)
             else:
-                source.notify(*to_args(v_emit))
+                source.notify(v_emit)
 
-    stored_result = dut.get()
+    try:
+        stored_result = dut.get()
+    except ValueError:
+        stored_result = None
 
     assert all(len(source.subscriptions) == 0 for source in sources)
     assert len(dut.subscriptions) == 0
@@ -211,28 +222,34 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
     assert len(dut.subscriptions) == 1
 
     # check .get() after subscription (should not change)
-    assert dut.get() == stored_result
+    try:
+        assert dut.get() == stored_result
+    except ValueError:
+        assert stored_result is None
 
     # check emitted values after subscription
     if stateful and first_result != NONE:
-        assert collector_permanent.last_result == unpack_args(*stored_result)
+        assert collector_permanent.last_result == stored_result
         with dut.subscribe(collector_temporary):
             assert len(dut.subscriptions) == 2
             assert stored_subscription_pattern == tuple(len(source.subscriptions) for source in sources)
-            assert collector_temporary.last_result == unpack_args(*stored_result)
+            assert collector_temporary.last_result == stored_result
         assert len(dut.subscriptions) == 1
         assert stored_subscription_pattern == tuple(len(source.subscriptions) for source in sources)
         assert (collector_temporary.result_vector == collector_permanent.result_vector)
     else:
-        assert stored_result == (to_args(collector_permanent.last_result) if stored_result else None)
+        assert stored_result == (collector_permanent.last_result if stored_result else None)
         with dut.subscribe(collector_temporary):
             assert len(dut.subscriptions) == 2
             assert stored_subscription_pattern == tuple(len(source.subscriptions) for source in sources)
-            assert stored_result == (to_args(collector_temporary.last_result) if stored_result else None)
+            assert stored_result == (collector_temporary.last_result if stored_result else None)
         assert len(collector_permanent.result_vector) == (1 if stored_result else 0)
         assert len(collector_temporary.result_vector) == (1 if stored_result else 0)
 
-    assert dut.get() == stored_result
+    try:
+        assert dut.get() == stored_result
+    except ValueError:
+        assert stored_result is None
 
 JITTER = 0.015
 
@@ -246,7 +263,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     input_vector = input_vector[1:]
 
     if stateful:
-        source = InitializedPublisher(*to_args(first_input_value))
+        source = InitializedPublisher(first_input_value)
     else:
         source = Publisher()
 
@@ -257,7 +274,10 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
 
     # store result of .get() and check subscriptions before the first
     # subscription to dut is made
-    stored_result = dut.get()
+    try:
+        stored_result = dut.get()
+    except ValueError:
+        stored_result = None
 
     assert len(source.subscriptions) == 0
     assert len(dut.subscriptions) == 0
@@ -270,15 +290,18 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     assert len(dut.subscriptions) == 1
 
     # check .get() after subscription (should not change)
-    assert dut.get() == stored_result
+    try:
+        assert dut.get() == stored_result
+    except ValueError:
+        assert stored_result is None
 
     # check emitted values after subscription
     if stateful and output_vector[0][0] == 0:
         print(stored_result)
-        assert collector_permanent.last_result == unpack_args(*stored_result)
+        assert collector_permanent.last_result == stored_result
         with dut.subscribe(collector_temporary):
             assert len(dut.subscriptions) == 2
-            assert collector_temporary.last_result == unpack_args(*stored_result)
+            assert collector_temporary.last_result == stored_result
         assert len(dut.subscriptions) == 1
         assert (collector_temporary.result_vector == collector_permanent.result_vector)
     else:
@@ -287,7 +310,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
         assert len(dut.subscriptions) == 1
 
     if not stateful:
-        source.notify(*to_args(first_input_value))
+        source.notify(first_input_value)
 
     # check with input vector
     failed_list = []
@@ -300,8 +323,6 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
             assert len(dut.subscriptions) == 2
         assert len(source.subscriptions) == 1
         assert len(dut.subscriptions) == 1
-        if result is not None:
-            result = unpack_args(*result)
         if has_state:
             if collector_temporary.last_result != value or len(collector_temporary) != collector_temporary_len + 1:
                 failed_list.append( ('SUBSCRIBE', timestamp, value, result) )
@@ -314,7 +335,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
                 failed_list.append( ('GET', timestamp, value, result) )
 
     for timestamp, value in input_vector:
-        loop.call_later(timestamp, source.notify, *to_args(value))
+        loop.call_later(timestamp, source.notify, value)
 
     for timestamp, value in output_vector:
         loop.call_later(timestamp + JITTER, _check_temporary, timestamp, value)
@@ -339,9 +360,12 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     dispose_collector_permanent.dispose()
 
     if stateful:
-        source.reset(*to_args(first_input_value))
+        source.reset(first_input_value)
 
-    stored_result = dut.get()
+    try:
+        stored_result = dut.get()
+    except ValueError:
+        stored_result = None
 
     assert len(source.subscriptions) == 0
     assert len(dut.subscriptions) == 0
@@ -354,4 +378,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     assert len(dut.subscriptions) == 1
 
     # check .get() after subscription (should not change)
-    assert dut.get() == stored_result
+    try:
+        assert dut.get() == stored_result
+    except ValueError:
+        assert stored_result is None

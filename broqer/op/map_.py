@@ -26,12 +26,10 @@ Also possible with additional args and kwargs:
 103
 >>> _disposable.dispose()
 
-If map_func is returning None just emit subscriber without arguments:
-
 >>> _disposable = s | op.map_(print, 'Output:') | op.sink(print, 'EMITTED')
 >>> s.emit(1)
 Output: 1
-EMITTED
+EMITTED None
 """
 import asyncio
 from functools import partial
@@ -44,7 +42,7 @@ from ._operator import Operator, build_operator
 
 class Map(Operator):
     def __init__(self, publisher: Publisher, map_func: Callable[[Any], Any],
-                 *args, **kwargs) -> None:
+                 *args, unpack=False, **kwargs) -> None:
         """ special care for return values:
               * return `None` (or nothing) if you don't want to return a result
               * return `None, ` if you want to return `None`
@@ -60,25 +58,24 @@ class Map(Operator):
         else:
             self._map_func = map_func  # type: Callable
 
-    def get(self):
-        args = self._publisher.get()
-        if args is None:
-            return None
-        result = self._map_func(*args)
-        if result is None:
-            result = ()
-        elif not isinstance(result, tuple):
-            result = (result, )
-        return result
+        self._unpack = unpack
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def get(self):
+        value = self._publisher.get()  # may raise ValueError
+        if self._unpack:
+            return self._map_func(*value)
+        else:
+            return self._map_func(value)
+
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
-        result = self._map_func(*args)
-        if result is None:
-            result = ()
-        elif not isinstance(result, tuple):
-            result = (result, )
-        return self.notify(*result)
+
+        if self._unpack:
+            result = self._map_func(*value)
+        else:
+            result = self._map_func(value)
+
+        return self.notify(result)
 
 
 map_ = build_operator(Map)  # pylint: disable=invalid-name

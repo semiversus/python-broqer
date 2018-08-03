@@ -107,7 +107,7 @@ from types import MappingProxyType
 from typing import Any, Optional, Dict  # noqa: F401
 
 from broqer import (Publisher, Subscriber, SubscriptionDisposable,
-                    SubscriptionError)
+                    SubscriptionError, UNINITIALIZED)
 
 
 class Topic(Publisher, Subscriber):
@@ -117,7 +117,7 @@ class Topic(Publisher, Subscriber):
         self._path = path
         self._meta = dict()  # type: Dict[str, Any]
         self.assignment_future = None
-        self._pre_assign_emit = None  # type: Any
+        self._pre_assign_emit = UNINITIALIZED  # type: Any
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
@@ -126,9 +126,12 @@ class Topic(Publisher, Subscriber):
             if len(self._subscriptions) == 1:
                 self._subject.subscribe(self)
             else:
-                args = self._subject.get()
-                if args is not None:
-                    subscriber.emit(*args, who=self)
+                try:
+                    value = self._subject.get()
+                except ValueError:
+                    pass
+                else:
+                    subscriber.emit(value, who=self)
 
         return disposable
 
@@ -140,30 +143,30 @@ class Topic(Publisher, Subscriber):
     def get(self):
         return self._subject.get()
 
-    def emit(self, *args: Any,
+    def emit(self, value: Any,
              who: Optional[Publisher] = None) -> asyncio.Future:
         if self._subject is None:
-            if self._pre_assign_emit is not None:
+            if self._pre_assign_emit is not UNINITIALIZED:
                 # method will be replaced by .__call__
                 raise SubscriptionError('Only one emit will be stored before' +
                                         ' assignment')
-            self._pre_assign_emit = args
+            self._pre_assign_emit = value
             return None
 
         if who == self._subject:
-            return self.notify(*args)
+            return self.notify(value)
 
         assert isinstance(self._subject, Subscriber), \
             'Topic has to be a subscriber'
 
-        return self._subject.emit(*args, who=self)
+        return self._subject.emit(value, who=self)
 
     def assign(self, subject, meta):
         if self._subject is not None:
             raise SubscriptionError('Topic is already assigned')
         self._subject = subject
-        if self._pre_assign_emit is not None:
-            self._subject.emit(*self._pre_assign_emit, who=self)
+        if self._pre_assign_emit is not UNINITIALIZED:
+            self._subject.emit(self._pre_assign_emit, who=self)
         if meta:
             self._meta.update(meta)
 
@@ -222,6 +225,9 @@ class Hub:
         return sorted(self._topics.keys()).__iter__()
 
     def freeze(self, freeze: bool = True):
+        for path, topic in self._topics.items():
+            if not topic.assigned:
+                raise ValueError('Topic %r referenced but unassigned' % path)
         self._frozen = freeze
 
     @property

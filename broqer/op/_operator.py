@@ -20,9 +20,12 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
         if len(self._subscriptions) == 1:  # if this was the first subscription
             self._publisher.subscribe(self)
         else:
-            args = self.get()  # pylint: disable=assignment-from-none
-            if args is not None:
-                subscriber.emit(*args, who=self)  # pylint: disable=E1133
+            try:
+                value = self.get()
+            except ValueError:
+                pass
+            else:
+                subscriber.emit(value, who=self)  # pylint: disable=E1133
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
@@ -56,9 +59,12 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
                 # subscribe to all dependent publishers
                 _publisher.subscribe(self)
         else:
-            args = self.get()  # pylint: disable=assignment-from-none
-            if args is not None:
-                subscriber.emit(*args, who=self)  # pylint: disable=E1133
+            try:
+                value = self.get()
+            except ValueError:
+                pass
+            else:
+                subscriber.emit(value, who=self)  # pylint: disable=E1133
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:

@@ -84,23 +84,10 @@ Starting with argument abc
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
 Got error
 >>> _d.dispose()
-
-Special case if map_func returns None:
-
->>> def foo(a):
-...     pass
-
->>> _d = s | op.map_threaded(foo, 1) | op.sink(print, 'EMITTED')
->>> s.emit()
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
-EMITTED
->>> _d.dispose()
-
 """
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from enum import Enum  # noqa: F401
 from typing import Any, Callable, MutableSequence  # noqa: F401
 
 from broqer import Publisher, default_error_handler

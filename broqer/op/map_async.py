@@ -91,18 +91,6 @@ Using error_callback:
 Starting with argument abc
 Got error
 >>> _d.dispose()
-
-Special case if map_coro returns None:
-
->>> async def foo():
-...     pass
-
->>> _d = s | op.map_async(foo) | op.sink(print, 'EMITTED')
->>> s.emit()
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
-EMITTED
->>> _d.dispose()
-
 """
 import asyncio
 from collections import deque
@@ -120,7 +108,7 @@ Mode = Enum('Mode', 'CONCURRENT INTERRUPT QUEUE LAST LAST_DISTINCT SKIP')
 class MapAsync(Operator):
     def __init__(self, publisher: Publisher, map_coro, *args,
                  mode=Mode.CONCURRENT, error_callback=default_error_handler,
-                 **kwargs) -> None:
+                 unpack=False, **kwargs) -> None:
         """
         mode uses one of the following enumerations:
             * CONCURRENT - just run coroutines concurrent
@@ -139,6 +127,7 @@ class MapAsync(Operator):
         self._future = None  # type: asyncio.Future
         self._last_emit = None  # type: Any
         self.scheduled = Publisher()
+        self._unpack = unpack
 
         if mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
             maxlen = (None if mode == Mode.QUEUE else 1)
@@ -147,9 +136,9 @@ class MapAsync(Operator):
             self._queue = None
 
     def get(self):
-        return None
+        Publisher.get(self)  # raises ValueError
 
-    def emit(self, *args: Any, who: Publisher) -> None:
+    def emit(self, value: Any, who: Publisher) -> None:
         assert who == self._publisher, 'emit from non assigned publisher'
         if self._mode == Mode.INTERRUPT and self._future is not None:
             self._future.cancel()
@@ -157,37 +146,39 @@ class MapAsync(Operator):
         if (self._mode in (Mode.INTERRUPT, Mode.CONCURRENT) or
                 self._future is None or self._future.done()):
 
-            self._last_emit = args
-            self.scheduled.notify(*args)
-            coro = self._map_coro(*args, *self._args, **self._kwargs)
+            self._last_emit = value
+            self.scheduled.notify(value)
+            if self._unpack:
+                coro = self._map_coro(*value, *self._args, **self._kwargs)
+            else:
+                coro = self._map_coro(value, *self._args, **self._kwargs)
             self._future = asyncio.ensure_future(coro)
             self._future.add_done_callback(self._future_done)
         elif self._mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
-            self._queue.append(args)
+            self._queue.append(value)
 
     def _future_done(self, future):
         try:
             result = future.result()
         except asyncio.CancelledError:
             pass
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             self._error_callback(*sys.exc_info())
         else:
-            if result is None:
-                result = ()
-            elif not isinstance(result, tuple):
-                result = (result, )
             try:
-                self.notify(*result)
-            except Exception:
+                self.notify(result)
+            except Exception:  # pylint: disable=broad-except
                 self._error_callback(*sys.exc_info())
 
         if self._queue:
-            args = self._queue.popleft()  # pylint: disable=E1111
-            if self._mode == Mode.LAST_DISTINCT and args == self._last_emit:
+            value = self._queue.popleft()  # pylint: disable=E1111
+            if self._mode == Mode.LAST_DISTINCT and value == self._last_emit:
                 return
-            self.scheduled.notify(*args)
-            future = self._map_coro(*args, *self._args, **self._kwargs)
+            self.scheduled.notify(value)
+            if self._unpack:
+                future = self._map_coro(*value, *self._args, **self._kwargs)
+            else:
+                future = self._map_coro(value, *self._args, **self._kwargs)
             self._future = asyncio.ensure_future(future)
             self._future.add_done_callback(self._future_done)
 

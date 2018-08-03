@@ -8,16 +8,11 @@
 
 >>> s.emit(3)
 3
-
-Also working with multiple arguments in emit:
-
->>> s.emit(1, 2)
-1 - 2
 """
 import asyncio
 from typing import Any
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable
+from broqer import Publisher, Subscriber, SubscriptionDisposable, UNINITIALIZED
 
 from ._operator import Operator, build_operator
 
@@ -30,40 +25,43 @@ class Cache(Operator):
     :param publisher: source publisher
     :param init: initialization for state
     """
-    def __init__(self, publisher: Publisher, *init: Any) -> None:
+    def __init__(self, publisher: Publisher,
+                 init: Any = UNINITIALIZED) -> None:
         Operator.__init__(self, publisher)
-        if not init:
-            self._state = None
-        else:
-            self._state = init
+        self._state = init
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        state = self._state
-        self._state = None
-        disposable = Operator.subscribe(self, subscriber)
-        if len(self._subscriptions) == 1:
-            if self._state is None and state is not None:
-                self._state = state
-                subscriber.emit(*self._state, who=self)  # emit actual cache
+        disposable = Publisher.subscribe(self, subscriber)
+
+        old_state = self._state  # to check if .emit was called
+
+        if len(self._subscriptions) == 1:  # if this was the first subscription
+            self._publisher.subscribe(self)
+
+        try:
+            value = self._publisher.get()
+        except ValueError:
+            if self._state is not UNINITIALIZED:
+                subscriber.emit(self._state, who=self)
         else:
-            self._state = state
-            if self._state is not None:
-                subscriber.emit(*self._state, who=self)
+            if len(self._subscriptions) > 1 or old_state == self._state:
+                subscriber.emit(value, who=self)
+
         return disposable
 
     def get(self):
-        if not self._subscriptions:
-            args = self._publisher.get()
-            if args is None:
+        try:
+            return self._publisher.get()  # may raise ValueError
+        except ValueError:
+            if self._state is not UNINITIALIZED:
                 return self._state
-            return args
-        return self._state
+        Publisher.get(self)  # raises ValueError
 
-    def emit(self, *args: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
-        if self._state != args:
-            self._state = args
-            return self.notify(*args)
+        if self._state != value:
+            self._state = value
+            return self.notify(value)
         return None
 
 
