@@ -66,7 +66,7 @@ class FromPolling(Publisher):
             try:
                 result = self._poll_func()
                 self.notify(result)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 self._error_callback(*sys.exc_info())
 
             self._call_later_handler = asyncio.get_event_loop().call_later(

@@ -29,8 +29,8 @@ class FromIterable(Publisher):
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
-        for v in self._iterable:
-            subscriber.emit(v, who=self)
+        for value in self._iterable:
+            subscriber.emit(value, who=self)
         return disposable
 
     def get(self):

@@ -107,7 +107,7 @@ from types import MappingProxyType
 from typing import Any, Optional, Dict  # noqa: F401
 
 from broqer import (Publisher, Subscriber, SubscriptionDisposable,
-                    SubscriptionError)
+                    SubscriptionError, UNINITIALIZED)
 
 
 class Topic(Publisher, Subscriber):
@@ -117,7 +117,7 @@ class Topic(Publisher, Subscriber):
         self._path = path
         self._meta = dict()  # type: Dict[str, Any]
         self.assignment_future = None
-        self._pre_assign_emit = None  # type: Any
+        self._pre_assign_emit = UNINITIALIZED  # type: Any
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
@@ -146,7 +146,7 @@ class Topic(Publisher, Subscriber):
     def emit(self, value: Any,
              who: Optional[Publisher] = None) -> asyncio.Future:
         if self._subject is None:
-            if self._pre_assign_emit is not None:
+            if self._pre_assign_emit is not UNINITIALIZED:
                 # method will be replaced by .__call__
                 raise SubscriptionError('Only one emit will be stored before' +
                                         ' assignment')
@@ -165,7 +165,7 @@ class Topic(Publisher, Subscriber):
         if self._subject is not None:
             raise SubscriptionError('Topic is already assigned')
         self._subject = subject
-        if self._pre_assign_emit is not None:
+        if self._pre_assign_emit is not UNINITIALIZED:
             self._subject.emit(self._pre_assign_emit, who=self)
         if meta:
             self._meta.update(meta)

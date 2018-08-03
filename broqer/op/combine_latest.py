@@ -23,9 +23,9 @@ Second sink: (1, 3)
 
 """
 import asyncio
-from typing import Any, Dict, MutableSequence, Sequence  # noqa: F401
+from typing import Any, Dict, MutableSequence  # noqa: F401
 
-from broqer import Publisher, Subscriber
+from broqer import Publisher, Subscriber, UNINITIALIZED
 
 from ._operator import MultiOperator, build_operator
 
@@ -56,14 +56,14 @@ class CombineLatest(MultiOperator):
                 self._emit_on = (emit_on,)
             else:
                 self._emit_on = emit_on
-        self._state = None  # type: Sequence[Any]
+        self._state = UNINITIALIZED  # type: Any
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._missing = set(self._publishers)
             self._partial_state = [None for _ in self._partial_state]
-            self._state = None
+            self._state = UNINITIALIZED
 
     def get(self):
         if not self._subscriptions:  # if no subscribers listening
@@ -71,13 +71,12 @@ class CombineLatest(MultiOperator):
             if self._map:
                 return self._map(*values)
             return values
-        if self._state is not None:
+        if self._state is not UNINITIALIZED:
             return self._state
-        Publisher.get(self)  # will raise ValueError
+        return Publisher.get(self)  # will raise ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who in self._publishers, 'emit from non assigned publisher'
-        assert value is not None, 'value to be emitted can not be None'
         if self._missing and who in self._missing:
             self._missing.remove(who)
 

@@ -46,7 +46,7 @@ class Partition(Operator):
         queue.append(value)
         if self._size and len(queue) == self._size:
             return tuple(queue)
-        Publisher.get(self)  # raises ValueError
+        return Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'

@@ -158,12 +158,12 @@ class MapAsync(Operator):
             result = future.result()
         except asyncio.CancelledError:
             pass
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             self._error_callback(*sys.exc_info())
         else:
             try:
                 self.notify(result)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 self._error_callback(*sys.exc_info())
 
         if self._queue:

@@ -1,9 +1,9 @@
 """Applying any or all build in function to multiple publishers"""
 import asyncio
-from typing import Dict, MutableSequence, Callable, Tuple  # noqa: F401
+from typing import Dict, MutableSequence, Callable  # noqa: F401
 from typing import Any as Any_
 
-from broqer import Publisher, Subscriber
+from broqer import Publisher, Subscriber, UNINITIALIZED
 
 from ._operator import MultiOperator, build_operator
 
@@ -21,16 +21,16 @@ class _MultiPredicate(MultiOperator):
 
         partial = [None for _ in publishers]  # type: MutableSequence[Any_]
         self._partial = partial
-        self._state = None  # type: bool
+        self._state = UNINITIALIZED  # type: Any_
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._partial = [None for _ in self._partial]
-            self._state = None
+            self._state = UNINITIALIZED
 
     def get(self) -> Any_:
-        if self._state is not None:
+        if self._state is not UNINITIALIZED:
             return self._state
         values = (p.get() for p in self._publishers)  # may raise ValueError
         if self._predicate is not None:
@@ -39,7 +39,6 @@ class _MultiPredicate(MultiOperator):
 
     def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
         assert who in self._publishers, 'emit from non assigned publisher'
-        assert value is not None, 'value to be emitted can not be None'
 
         if self._predicate is not None:
             self._partial[self._index[who]] = self._predicate(value)
@@ -47,7 +46,7 @@ class _MultiPredicate(MultiOperator):
             self._partial[self._index[who]] = value
         if None in self._partial:
             return None
-        state = self.combination_operator(self._partial)  # type:ignore
+        state = self.combination_operator(self._partial)  # type: ignore
         if state != self._state:
             self._state = state
             return self.notify(self._state)

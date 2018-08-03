@@ -2,9 +2,10 @@
 from typing import Callable
 from typing import Any as Any_
 
+from broqer import Publisher
+
 from .any_ import _MultiPredicate
 from ._operator import build_operator
-from broqer import Publisher
 
 
 class All(_MultiPredicate):

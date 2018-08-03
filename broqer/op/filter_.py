@@ -54,7 +54,7 @@ class Filter(Operator):
                 return value
         elif self._predicate(value):
             return value
-        Publisher.get(self)  # raises ValueError
+        return Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'

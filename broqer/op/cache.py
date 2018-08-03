@@ -12,7 +12,7 @@
 import asyncio
 from typing import Any
 
-from broqer import Publisher, Subscriber, SubscriptionDisposable
+from broqer import Publisher, Subscriber, SubscriptionDisposable, UNINITIALIZED
 
 from ._operator import Operator, build_operator
 
@@ -25,7 +25,8 @@ class Cache(Operator):
     :param publisher: source publisher
     :param init: initialization for state
     """
-    def __init__(self, publisher: Publisher, init: Any=None) -> None:
+    def __init__(self, publisher: Publisher,
+                 init: Any = UNINITIALIZED) -> None:
         Operator.__init__(self, publisher)
         self._state = init
 
@@ -40,7 +41,7 @@ class Cache(Operator):
         try:
             value = self._publisher.get()
         except ValueError:
-            if self._state is not None:
+            if self._state is not UNINITIALIZED:
                 subscriber.emit(self._state, who=self)
         else:
             if len(self._subscriptions) > 1 or old_state == self._state:
@@ -52,11 +53,12 @@ class Cache(Operator):
         try:
             return self._publisher.get()  # may raise ValueError
         except ValueError:
-            return self._state
+            if self._state is not UNINITIALIZED:
+                return self._state
+        Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
-        assert value is not None, 'value to be emitted can not be None'
         if self._state != value:
             self._state = value
             return self.notify(value)

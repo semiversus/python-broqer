@@ -3,6 +3,11 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, Callable
 
 
+class UNINITIALIZED:
+    """ marker class used for initialization of state """
+    pass
+
+
 class Disposable(metaclass=ABCMeta):
     """ Implementation of the disposable pattern. Call .dispose() to free
             resource.
@@ -112,13 +117,14 @@ class Publisher():
 
 
 class StatefulPublisher(Publisher):
-    def __init__(self, init):
+    def __init__(self, init=UNINITIALIZED):
         Publisher.__init__(self)
         self._state = init
 
     def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber)
-        subscriber.emit(self._state, who=self)
+        if self._state is not UNINITIALIZED:
+            subscriber.emit(self._state, who=self)
         return disposable
 
     def get(self):

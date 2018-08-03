@@ -26,9 +26,11 @@ class Merge(MultiOperator):
         MultiOperator.__init__(self, *publishers)
 
     def get(self):
-        for p in self._publishers:
-            result = p.get()
-            return result
+        for publisher in self._publishers:
+            try:
+                return publisher.get()
+            except ValueError:
+                pass
         Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:

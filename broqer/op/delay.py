@@ -49,7 +49,7 @@ class Delay(Operator):
     def _delayed(self, value):
         try:
             self.notify(value)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             self._error_callback(*sys.exc_info())
 
 

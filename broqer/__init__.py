@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from .default_error_handler import default_error_handler
 from .core import StatefulPublisher, Disposable, Publisher, Subscriber, \
-                  SubscriptionDisposable, SubscriptionError
+                  SubscriptionDisposable, SubscriptionError, UNINITIALIZED
 
 from .hub import Hub, SubHub
 from .subject import Subject, Value
@@ -12,6 +12,6 @@ __version__ = '0.4.1-dev'
 
 __all__ = [
     'StatefulPublisher', 'Disposable', 'Publisher', 'Subscriber',
-    'SubscriptionDisposable', 'SubscriptionError', 'Hub', 'SubHub', 'Subject',
-    'Value', 'default_error_handler'
+    'SubscriptionDisposable', 'SubscriptionError', 'UNINITIALIZED', 'Hub',
+    'SubHub', 'Subject', 'Value', 'default_error_handler'
 ]

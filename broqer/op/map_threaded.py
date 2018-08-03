@@ -88,7 +88,6 @@ Got error
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from enum import Enum  # noqa: F401
 from typing import Any, Callable, MutableSequence  # noqa: F401
 
 from broqer import Publisher, default_error_handler
