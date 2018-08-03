@@ -128,7 +128,9 @@ class StatefulPublisher(Publisher):
         return disposable
 
     def get(self):
-        return self._state
+        if self._state is not UNINITIALIZED:
+            return self._state
+        return Publisher.get(self)
 
     def notify(self, value: Any) -> asyncio.Future:
         if self._state != value:
