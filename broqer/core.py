@@ -136,7 +136,7 @@ class StatefulPublisher(Publisher):
             return Publisher.notify(self, value)
         return None
 
-    def reset_state(self, value):
+    def reset_state(self, value=UNINITIALIZED):
         self._state = value
 
 
