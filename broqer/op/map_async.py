@@ -108,7 +108,7 @@ Mode = Enum('Mode', 'CONCURRENT INTERRUPT QUEUE LAST LAST_DISTINCT SKIP')
 class MapAsync(Operator):
     def __init__(self, publisher: Publisher, map_coro, *args,
                  mode=Mode.CONCURRENT, error_callback=default_error_handler,
-                 **kwargs) -> None:
+                 unpack=False, **kwargs) -> None:
         """
         mode uses one of the following enumerations:
             * CONCURRENT - just run coroutines concurrent
@@ -127,6 +127,7 @@ class MapAsync(Operator):
         self._future = None  # type: asyncio.Future
         self._last_emit = None  # type: Any
         self.scheduled = Publisher()
+        self._unpack = unpack
 
         if mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
             maxlen = (None if mode == Mode.QUEUE else 1)
@@ -147,7 +148,10 @@ class MapAsync(Operator):
 
             self._last_emit = value
             self.scheduled.notify(value)
-            coro = self._map_coro(value, *self._args, **self._kwargs)
+            if self._unpack:
+                coro = self._map_coro(*value, *self._args, **self._kwargs)
+            else:
+                coro = self._map_coro(value, *self._args, **self._kwargs)
             self._future = asyncio.ensure_future(coro)
             self._future.add_done_callback(self._future_done)
         elif self._mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
@@ -171,7 +175,10 @@ class MapAsync(Operator):
             if self._mode == Mode.LAST_DISTINCT and value == self._last_emit:
                 return
             self.scheduled.notify(value)
-            future = self._map_coro(value, *self._args, **self._kwargs)
+            if self._unpack:
+                future = self._map_coro(*value, *self._args, **self._kwargs)
+            else:
+                future = self._map_coro(value, *self._args, **self._kwargs)
             self._future = asyncio.ensure_future(future)
             self._future.add_done_callback(self._future_done)
 

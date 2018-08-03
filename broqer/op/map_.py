@@ -42,7 +42,7 @@ from ._operator import Operator, build_operator
 
 class Map(Operator):
     def __init__(self, publisher: Publisher, map_func: Callable[[Any], Any],
-                 *args, **kwargs) -> None:
+                 *args, unpack=False, **kwargs) -> None:
         """ special care for return values:
               * return `None` (or nothing) if you don't want to return a result
               * return `None, ` if you want to return `None`
@@ -58,13 +58,23 @@ class Map(Operator):
         else:
             self._map_func = map_func  # type: Callable
 
+        self._unpack = unpack
+
     def get(self):
         value = self._publisher.get()  # may raise ValueError
-        return self._map_func(value)
+        if self._unpack:
+            return self._map_func(*value)
+        else:
+            return self._map_func(value)
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who == self._publisher, 'emit from non assigned publisher'
-        result = self._map_func(value)
+
+        if self._unpack:
+            result = self._map_func(*value)
+        else:
+            result = self._map_func(value)
+
         return self.notify(result)
 
 
