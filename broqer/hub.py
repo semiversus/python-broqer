@@ -40,6 +40,7 @@ broqer.core.SubscriptionError: Only one emit will be stored before assignment
 Assign a publisher to a hub topic:
 
 >>> _ = hub.assign('value1', Value(1))
+Output: 1
 Output: 2
 >>> hub['value1'].assigned
 True
@@ -115,7 +116,6 @@ class Topic(Publisher, Subscriber):
         Publisher.__init__(self)
         self._subject = None  # type: Publisher
         self._path = path
-        self._meta = dict()  # type: Dict[str, Any]
         self.assignment_future = None
         self._pre_assign_emit = UNINITIALIZED  # type: Any
 
@@ -141,7 +141,10 @@ class Topic(Publisher, Subscriber):
             self._subject.unsubscribe(self)
 
     def get(self):
-        return self._subject.get()
+        try:
+            return self._subject.get()
+        except AttributeError:  # if self._subject is None
+            raise ValueError('Topic is not yet assigned')
 
     def emit(self, value: Any,
              who: Optional[Publisher] = None) -> asyncio.Future:
@@ -161,14 +164,20 @@ class Topic(Publisher, Subscriber):
 
         return self._subject.emit(value, who=self)
 
-    def assign(self, subject, meta):
+    def assign(self, subject):
         if self._subject is not None:
             raise SubscriptionError('Topic is already assigned')
         self._subject = subject
+        if self._subscriptions:
+            self._subject.subscribe(self)
         if self._pre_assign_emit is not UNINITIALIZED:
             self._subject.emit(self._pre_assign_emit, who=self)
-        if meta:
-            self._meta.update(meta)
+        if self.assignment_future is not None:
+            self.assignment_future.set_result(None)
+
+    def freeze(self):
+        if self._subject is None:
+            raise ValueError('Topic is not assigned, so freeze is failing')
 
     @property
     def assigned(self):
@@ -188,24 +197,26 @@ class Topic(Publisher, Subscriber):
                     asyncio.shield(self.assignment_future), timeout)
 
     @property
-    def meta(self) -> dict:
-        return self._meta
-
-    @property
     def path(self) -> str:
         return self._path
 
 
-class Hub:
-    _topic_cls = Topic
+class MetaTopic(Topic):
+    def __init__(self, path: str) -> None:
+        Topic.__init__(self, path)
+        self.meta = dict()  # type: Dict[str, Any]
 
-    def __init__(self, permitted_meta_keys=None):
+    def assign(self, subject, meta=None):
+        Topic.assign(self, subject)
+        if meta is not None:
+            self.meta.update(meta)
+
+
+class Hub:
+    def __init__(self, topic_factory=MetaTopic):
         self._topics = dict()
         self._frozen = False
-        if permitted_meta_keys is not None:
-            self._permitted_meta_keys = set(permitted_meta_keys)
-        else:
-            self._permitted_meta_keys = None
+        self._topic_factory = topic_factory
 
     def __getitem__(self, path: str) -> Topic:
         try:
@@ -214,7 +225,7 @@ class Hub:
             if self._frozen:
                 raise ValueError('Hub is frozen, so it\'s impossible to ' +
                                  'access the unknown topic %s' % path)
-            topic = self._topic_cls(path)
+            topic = self._topic_factory(path)
             self._topics[path] = topic
             return topic
 
@@ -225,9 +236,8 @@ class Hub:
         return sorted(self._topics.keys()).__iter__()
 
     def freeze(self, freeze: bool = True):
-        for path, topic in self._topics.items():
-            if not topic.assigned:
-                raise ValueError('Topic %r referenced but unassigned' % path)
+        for topic in self._topics.values():
+            topic.freeze()
         self._frozen = freeze
 
     @property
@@ -235,30 +245,11 @@ class Hub:
         topics_sorted = sorted(self._topics.items(), key=lambda t: t[0])
         return MappingProxyType(OrderedDict(topics_sorted))
 
-    @property
-    def unassigned_topics(self):
-        topics_sorted = sorted(self._topics.items(), key=lambda t: t[0])
-        result_topics = ((n, t) for n, t in topics_sorted if not t.assigned)
-        return MappingProxyType(OrderedDict(result_topics))
-
     def assign(self, topic_str: str, publisher: Publisher,
-               meta: Optional[dict] = None) -> Topic:
+               *args, **kwargs) -> Topic:
 
         topic = self[topic_str]
-
-        if meta and self._permitted_meta_keys:
-            non_keys = set(meta.keys()) - self._permitted_meta_keys
-            if non_keys:
-                raise KeyError('Not permitted meta keys: %r' % non_keys)
-
-        topic.assign(publisher, meta)
-
-        if topic:
-            publisher.subscribe(topic)
-
-        if topic.assignment_future:
-            topic.assignment_future.set_result(None)
-
+        topic.assign(publisher, *args, **kwargs)  # type: ignore
         return topic
 
 
