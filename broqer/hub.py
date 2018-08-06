@@ -204,12 +204,16 @@ class Topic(Publisher, Subscriber):
 class MetaTopic(Topic):
     def __init__(self, path: str) -> None:
         Topic.__init__(self, path)
-        self.meta = dict()  # type: Dict[str, Any]
+        self._meta = dict()  # type: Dict[str, Any]
 
     def assign(self, subject, meta=None):
         Topic.assign(self, subject)
         if meta is not None:
-            self.meta.update(meta)
+            self._meta.update(meta)
+    
+    @property
+    def meta(self):
+        return self._meta
 
 
 class Hub:
