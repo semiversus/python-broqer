@@ -80,10 +80,6 @@ Wait for assignment
 It's also possible to wait for an assignment:
 
 >>> import asyncio
->>> _f1 = asyncio.ensure_future(hub['value4'].wait_for_assignment(0.01))
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
->>> _f1.exception()
-TimeoutError()
 
 >>> _f2 = asyncio.ensure_future(hub['value4'].wait_for_assignment())
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
@@ -187,14 +183,10 @@ class Topic(Publisher, Subscriber):
     def subject(self):
         return self._subject
 
-    async def wait_for_assignment(self, timeout=None):
+    async def wait_for_assignment(self):
         if not self.assigned:
             self.assignment_future = asyncio.get_event_loop().create_future()
-            if timeout is None:
-                await self.assignment_future
-            else:
-                await asyncio.wait_for(
-                    asyncio.shield(self.assignment_future), timeout)
+            await self.assignment_future
 
     @property
     def path(self) -> str:
@@ -210,7 +202,7 @@ class MetaTopic(Topic):
         Topic.assign(self, subject)
         if meta is not None:
             self._meta.update(meta)
-    
+
     @property
     def meta(self):
         return self._meta
@@ -267,29 +259,8 @@ class SubHub:
     def __getitem__(self, topic: str) -> Topic:
         return self._hub[self._prefix + topic]
 
-    def __contains__(self, topic: str) -> bool:
-        return self._prefix + topic in self._hub
-
-    def __iter__(self):
-        length = len(self._prefix)
-        return (t[length:] for t in self._hub if t.startswith(self._prefix))
-
-    @property
-    def topics(self):
-        length = len(self._prefix)
-        topics = ((n[length:], t) for (n, t) in self._hub.topics.items()
-                  if n.startswith(self._prefix))
-        return MappingProxyType(OrderedDict(topics))
-
-    @property
-    def unassigned_topics(self):
-        length = len(self._prefix)
-        topics = ((n[length:], t) for (n, t)
-                  in self._hub.unassigned_topics.items()
-                  if n.startswith(self._prefix))
-        return MappingProxyType(OrderedDict(topics))
-
     def assign(self, topic_str: str, publisher: Publisher,
-               meta: Optional[dict] = None) -> Topic:
+               *args, **kwargs) -> Topic:
 
-        return self._hub.assign(self._prefix + topic_str, publisher, meta)
+        return self._hub.assign(self._prefix + topic_str, publisher,
+                                *args, **kwargs)
