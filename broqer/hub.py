@@ -108,7 +108,7 @@ from broqer import (Publisher, Subscriber, SubscriptionDisposable,
 
 
 class Topic(Publisher, Subscriber):
-    def __init__(self, path: str) -> None:
+    def __init__(self, hub: 'Hub', path: str) -> None:
         Publisher.__init__(self)
         self._subject = None  # type: Publisher
         self._path = path
@@ -194,8 +194,8 @@ class Topic(Publisher, Subscriber):
 
 
 class MetaTopic(Topic):
-    def __init__(self, path: str) -> None:
-        Topic.__init__(self, path)
+    def __init__(self, hub: 'Hub', path: str) -> None:
+        Topic.__init__(self, hub, path)
         self._meta = dict()  # type: Dict[str, Any]
 
     def assign(self, subject, meta=None):
@@ -221,7 +221,7 @@ class Hub:
             if self._frozen:
                 raise ValueError('Hub is frozen, so it\'s impossible to ' +
                                  'access the unknown topic %s' % path)
-            topic = self._topic_factory(path)
+            topic = self._topic_factory(self, path)
             self._topics[path] = topic
             return topic
 
@@ -240,6 +240,10 @@ class Hub:
     def topics(self):
         topics_sorted = sorted(self._topics.items(), key=lambda t: t[0])
         return MappingProxyType(OrderedDict(topics_sorted))
+
+    @property
+    def topic_factory(self):
+        return self._topic_factory
 
     def assign(self, topic_str: str, publisher: Publisher,
                *args, **kwargs) -> Topic:
