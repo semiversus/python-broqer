@@ -68,13 +68,6 @@ def test_datatype_check(meta, values, cast_results, check_results, str_results):
             assert hub['value'].check(value) is None
 
         try:
-            if issubclass(str_result, Exception):
-                with pytest.raises(str_result):
-                    hub['value'].as_str(value)
-        except TypeError:
-            assert hub['value'].as_str(value) == str_result
-
-        try:
             if issubclass(cast_result, Exception):
                 with pytest.raises(cast_result):
                     hub['value'].checked_emit(value)
@@ -114,3 +107,27 @@ def test_custom_datatype():
     assert hub['value'].check('THIS IS A TEST') is None
     with pytest.raises(ValueError):
         hub['value'].check('This is a test')
+
+def test_validate():
+
+    dt_registry = DTRegistry()
+
+    hub = Hub(topic_factory=dt_registry)
+
+    class EvenDT(DT):
+        def check(self, _hub, value, _meta):
+            if value%2:
+                raise ValueError('%r is not even'%value)
+
+    hub.topic_factory.add_datatype('even', EvenDT() )
+
+    hub.assign('value', Value(''), meta={'datatype': 'integer', 'minimum':0, 'validate':'even'})
+
+    assert hub['value'].cast('122') == 122
+    assert hub['value'].check(122) is None
+
+    with pytest.raises(ValueError):
+        hub['value'].check(123)
+
+    with pytest.raises(ValueError):
+        hub['value'].check(-2)

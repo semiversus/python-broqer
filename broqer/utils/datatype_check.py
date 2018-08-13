@@ -21,9 +21,6 @@ class DT:
     def check(self, _hub, _value, _meta):
         pass
 
-    def as_str(self, hub, value, meta):
-        return str(self.cast(hub, value, meta))
-
 class NumberDT(DT):
     """ Datatype for general numbers
 
@@ -77,9 +74,6 @@ class DTTopic(MetaTopic):
         '''
         self._hub.topic_factory.check(self._hub, value, self._meta)
 
-    def as_str(self, value):
-        return self._hub.topic_factory.as_str(self._hub, value, self._meta)
-
     def checked_emit(self, value: Any) -> asyncio.Future:
         value = self.cast(value)
         self.check(value)
@@ -106,8 +100,6 @@ class DTRegistry:
 
     def check(self, hub, value, meta):
         datatype_key = meta.get('datatype', 'none')
-        return self._datatypes[datatype_key].check(hub, value, meta)
-
-    def as_str(self, hub, value, meta):
-        datatype_key = meta.get('datatype', 'none')
-        return self._datatypes[datatype_key].as_str(hub, value, meta)
+        self._datatypes[datatype_key].check(hub, value, meta)
+        if 'validate' in meta:
+            self._datatypes[meta['validate']].check(hub, value, meta)
