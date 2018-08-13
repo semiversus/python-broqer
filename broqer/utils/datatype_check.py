@@ -1,63 +1,54 @@
 from broqer.hub import MetaTopic
 
+def resolve_meta_key(hub, key, meta):
+    if key not in meta:
+        return None
+    value = meta[key]
+    if isinstance(value, str) and value[0] == '>':
+        topic = value[1:]
+        if topic not in hub:
+            raise KeyError('topic %s not found in hub' % topic)
+        return hub[topic].get()
+    return value
+
 class DT:
-    name = 'none'
-
-    def __init__(self, hub_):
-        self._hub = hub_
-
-    def cast(self, value, meta):  # pylint: disable=unused-argument,no-self-use
+    @staticmethod
+    def cast(_hub, value, _meta):
         return value
 
-    def check(self, value,
-              meta):  # pylint: disable=unused-argument,no-self-use
+    @staticmethod
+    def check(_hub, _value, _meta):
         pass
 
-    def as_str(self, value,
-               meta):  # pylint: disable=unused-argument,no-self-use
-        return str(value)
+    def as_str(self, hub, value, meta):
+        return str(self.cast(hub, value, meta))
 
-    def _get(self, key, meta):
-        if key not in meta:
-            return None
-        value = meta[key]
-        if isinstance(value, str) and value[0] == '>':
-            topic = value[1:]
-            if topic not in self._hub:
-                raise KeyError('topic %s not found in hub' % topic)
-            return self._hub[topic].get()
-        return value
+class NumberDT(DT):
+    """ Datatype for general numbers
 
-
-class IntDT(DT):
-    name = 'integer'
-
-    def cast(self, value, meta):
-        return int(value)
+    Recognized meta keys:
+    * minimum: check the value against this minimum (below raises an Exception)
+    * maximum: check against maximum (above raises an Exception)
+    """
 
     def check(self, value, meta):
-        minimum = self._get('minimum', meta)
+        minimum = resolve_meta_key(hub, 'minimum', meta)
         if minimum is not None and value < minimum:
             raise ValueError('Value %d under minimum of %d' % (value, minimum))
 
-        maximum = self._get('maximum', meta)
+        maximum = resolve_meta_key(hub, 'maximum', meta)
         if maximum is not None and value > maximum:
             raise ValueError('Value %d over maximum of %d' % (value, maximum))
 
+class IntegerDT(NumberDT):
+    @staticmethod
+    def cast(_hub, value, _meta):
+        return int(value)
 
-class DTCheck:
-    default_datatype_classes = (Datatype, IntDatatype)
-
-    def __init__(self, hub_):
-        self._datatypes = dict()
-        self._hub = hub_
-        for datatype_cls in DatatypeCheck.default_datatype_classes:
-            self.add_datatype(datatype_cls(hub_))
-
-    def add_datatype(self, datatype_obj: 'Datatype'):
-        self._datatypes[datatype_obj.name] = datatype_obj
-
-
+class FloatDT(NumberDT):
+    @staticmethod
+    def cast(_hub, value, _meta):
+        return float(value)
 
 class DTTopic(MetaTopic):
     def __init__(self, hub: 'Hub', path: str) -> None:
@@ -68,14 +59,17 @@ class DTTopic(MetaTopic):
         '''Will cast value to the given datatype. It will not check the
         value.
         '''
-        return self._hub.topic_factory.cast(hub, value, self._meta)
+        return self._hub.topic_factory.cast(self._hub, value, self._meta)
 
     def check(self, value):
         '''Check the value against the datatype and limits defined in meta
         dictionary. The value has to be in the appropriate datatype (may use
         cast before)
         '''
-        self._hub.topic_factory.check(hub, value, self._meta)
+        self._hub.topic_factory.check(self._hub, value, self._meta)
+    
+    def as_str(self, value):
+        self._hub.topic_factory.as_str(self._hub, value, self._meta)
 
     def checked_emit(self, value: Any) -> asyncio.Future:
         value = self.cast(value)
@@ -83,15 +77,15 @@ class DTTopic(MetaTopic):
         return self._subject.emit(value, who=self)
 
 class DTRegistry:
-    default_datatype_classes = (Datatype, IntDatatype)
-
     def __init__(self):
-        self._datatypes = dict()
-        for datatype_cls in self.default_datatype_classes:
-            self.add_datatype(datatype_cls)
+        self._datatypes = {
+            'integer': IntegerDT,
+            'float': FloatDT,
+            'string': DT
+        }
 
     def add_datatype(self, name: str, dt: DT):
-        self._datatypes
+        self._datatypes[name] = dt
 
     def __call__(self, hub: 'Hub', path: str) -> None:
         return DTTopic(hub, path, self)
