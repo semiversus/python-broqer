@@ -15,10 +15,10 @@ def resolve_meta_key(hub, key, meta):
     return value
 
 class DT:
-    def cast(self, _hub, value, _meta):
+    def cast(self, _topic, value):
         return value
 
-    def check(self, _hub, _value, _meta):
+    def check(self, _topic, _value):
         pass
 
 class NumberDT(DT):
@@ -29,30 +29,30 @@ class NumberDT(DT):
     * maximum: check against maximum (above raises an Exception)
     """
 
-    def check(self, hub, value, meta):
-        minimum = resolve_meta_key(hub, 'minimum', meta)
+    def check(self, topic, value):
+        minimum = resolve_meta_key(topic._hub, 'minimum', topic.meta)
         if minimum is not None and value < minimum:
             raise ValueError('Value %d under minimum of %d' % (value, minimum))
 
-        maximum = resolve_meta_key(hub, 'maximum', meta)
+        maximum = resolve_meta_key(topic._hub, 'maximum', topic.meta)
         if maximum is not None and value > maximum:
             raise ValueError('Value %d over maximum of %d' % (value, maximum))
 
 class IntegerDT(NumberDT):
-    def cast(self, _hub, value, _meta):
+    def cast(self, _topic, value):
         return int(value)
 
-    def check(self, hub, value, meta):
-        NumberDT.check(self, hub, value, meta)
+    def check(self, topic, value):
+        NumberDT.check(self, topic, value)
         if not isinstance(value, int):
             raise ValueError('%r is not an integer'%value)
 
 class FloatDT(NumberDT):
-    def cast(self, _hub, value, _meta):
+    def cast(self, _topic, value):
         return float(value)
 
-    def check(self, hub, value, meta):
-        NumberDT.check(self, hub, value, meta)
+    def check(self, topic, value):
+        NumberDT.check(self, topic, value)
         if not isinstance(value, float):
             raise ValueError('%r is not a float'%value)
 
@@ -65,14 +65,14 @@ class DTTopic(MetaTopic):
         '''Will cast value to the given datatype. It will not check the
         value.
         '''
-        return self._hub.topic_factory.cast(self._hub, value, self._meta)
+        return self._hub.topic_factory.cast(self, value)
 
     def check(self, value):
         '''Check the value against the datatype and limits defined in meta
         dictionary. The value has to be in the appropriate datatype (may use
         cast before)
         '''
-        self._hub.topic_factory.check(self._hub, value, self._meta)
+        self._hub.topic_factory.check(self, value)
 
     def checked_emit(self, value: Any) -> asyncio.Future:
         value = self.cast(value)
@@ -94,12 +94,12 @@ class DTRegistry:
     def __call__(self, hub: 'Hub', path: str) -> None:
         return DTTopic(hub, path)
 
-    def cast(self, hub, value, meta):
-        datatype_key = meta.get('datatype', 'none')
-        return self._datatypes[datatype_key].cast(hub, value, meta)
+    def cast(self, topic, value):
+        datatype_key = topic._meta.get('datatype', 'none')
+        return self._datatypes[datatype_key].cast(topic, value)
 
-    def check(self, hub, value, meta):
-        datatype_key = meta.get('datatype', 'none')
-        self._datatypes[datatype_key].check(hub, value, meta)
-        if 'validate' in meta:
-            self._datatypes[meta['validate']].check(hub, value, meta)
+    def check(self, topic, value):
+        datatype_key = topic._meta.get('datatype', 'none')
+        self._datatypes[datatype_key].check(topic, value)
+        if 'validate' in topic._meta:
+            self._datatypes[topic._meta['validate']].check(topic, value)

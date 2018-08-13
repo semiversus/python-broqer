@@ -92,10 +92,10 @@ def test_custom_datatype():
     hub = Hub(topic_factory=dt_registry)
 
     class UpperCaseDT(DT):
-        def cast(self, _hub, value, _meta):
+        def cast(self, _topic, value):
             return value.upper()
 
-        def check(self, _hub, value, _meta):
+        def check(self, _topic, value):
             if value != value.upper():
                 raise ValueError('%r is not uppercase'%value)
 
@@ -115,7 +115,7 @@ def test_validate():
     hub = Hub(topic_factory=dt_registry)
 
     class EvenDT(DT):
-        def check(self, _hub, value, _meta):
+        def check(self, _topic, value):
             if value%2:
                 raise ValueError('%r is not even'%value)
 
