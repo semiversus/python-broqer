@@ -1,30 +1,116 @@
 import pytest
+import types
 
-from broqer import Hub, Value
-from broqer.utils import DatatypeCheck
+from broqer import Hub, Subject, Value
+from broqer.utils.datatype_check import DTRegistry, resolve_meta_key, DT
 
-def test_datatype_check():
+@pytest.mark.parametrize('meta,values,cast_results,check_results,str_results', [
+    ({},
+     (1, -1, True, None, 'abc', {'a':1.23}),
+     (1, -1, True, None, 'abc', {'a':1.23}),
+     (None, None, None, None, None, None),
+     ('1', '-1', 'True', 'None', 'abc', '{\'a\': 1.23}')),
+    ({'datatype': 'none'},
+     (1, -1, True, None, 'abc', {'a':1.23}),
+     (1, -1, True, None, 'abc', {'a':1.23}),
+     (None, None, None, None, None, None),
+     ('1', '-1', 'True', 'None', 'abc', '{\'a\': 1.23}')),
+    ({'datatype': 'string'},
+     (1, -1, True, None, 'abc', {'a':1.23}),
+     (1, -1, True, None, 'abc', {'a':1.23}),
+     (None, None, None, None, None, None),
+     ('1', '-1', 'True', 'None', 'abc', '{\'a\': 1.23}')),
+    ({'datatype': 'integer'},
+     (1, -1, True, None, 'abc', {'a':1.23}, ' 123 ', 1.99),
+     (1, -1, 1, TypeError, ValueError, TypeError, 123, 1),
+     (None, None, None, ValueError, ValueError, ValueError, ValueError, ValueError),
+     ('1', '-1', '1', TypeError, ValueError, TypeError, '123', '1')),
+    ({'datatype': 'integer', 'minimum':-10, 'maximum':10},
+     (1, -1, -10, 10, -11, 11, False, -7.99),
+     (1, -1, -10, 10, -11, 11, 0, -7),
+     (None, None, None, None, ValueError, ValueError, None, ValueError),
+     ('1', '-1', '-10', '10', '-11', '11', '0', '-7')),
+    ({'datatype': 'float'},
+     (1.0, -1, True, None, 'abc', {'a':1.23}, ' 123 ', 1.99),
+     (1.0, -1.0, 1.0, TypeError, ValueError, TypeError, 123.0, 1.99),
+     (None, ValueError, ValueError, ValueError, ValueError, ValueError, ValueError, None),
+     ('1.0', '-1.0', '1.0', TypeError, ValueError, TypeError, '123.0', '1.99')),
+    ({'datatype': 'float', 'minimum':-10, 'maximum':10},
+     (1.0, -1, -10.0, 10, -11.0, 11, False, -7.99),
+     (1.0, -1.0, -10.0, 10.0, -11.0, 11.0, 0.0, -7.99),
+     (None, ValueError, None, ValueError, ValueError, ValueError, ValueError, None),
+     ('1.0', '-1.0', '-10.0', '10.0', '-11.0', '11.0', '0.0', '-7.99')),
+])
+def test_datatype_check(meta, values, cast_results, check_results, str_results):
+    dt_registry = DTRegistry()
+
+    hub = Hub(topic_factory=dt_registry)
+
+    value = hub.assign('value', Value(None), meta)
+
+    assert len(values) == len(cast_results)  == len(check_results) == len(str_results)
+
+    for value, cast_result, check_result, str_result in zip(values, cast_results, check_results, str_results):
+        print('Testing', value, ', cast_result:', cast_result, ', check_result:', check_result, ', str_result:', str_result)
+
+        try:
+            if issubclass(cast_result, Exception):
+                with pytest.raises(cast_result):
+                    hub['value'].cast(value)
+        except TypeError:
+            casted_value = hub['value'].cast(value)
+            assert casted_value == cast_result
+
+        if check_result is not None:
+            with pytest.raises(check_result):
+                hub['value'].check(value)
+        else:
+            assert hub['value'].check(value) is None
+
+        try:
+            if issubclass(str_result, Exception):
+                with pytest.raises(str_result):
+                    hub['value'].as_str(value)
+        except TypeError:
+            assert hub['value'].as_str(value) == str_result
+
+        try:
+            if issubclass(cast_result, Exception):
+                with pytest.raises(cast_result):
+                    hub['value'].checked_emit(value)
+        except TypeError:
+            if check_result is None:
+                assert hub['value'].checked_emit(value) is None
+                assert hub['value'].get() == cast_result
+
+def test_resolve_meta_key():
     hub = Hub()
-    datatype_check = DatatypeCheck(hub)
 
-    value_int_meta = {'datatype': 'integer', 'minimum': '>value_untyped'}
-    value_int = hub.assign('value_int', Value(0), meta=value_int_meta)
-    value_untyped = hub.assign('value_untyped', Value(0))
+    meta = {'minimum': '>value_minimum', 'maximum':'>blabla'}
+    hub.assign('value_minimum', Value(-2))
+    assert resolve_meta_key(hub, 'minimum', meta) == -2
 
-    # check value_int
-    assert datatype_check.cast('123', hub['value_int']) == 123
-    assert datatype_check.cast(123.45, value_int) == 123
-    assert datatype_check.cast(b'123', value_int) == 123
+    with pytest.raises(KeyError):
+        resolve_meta_key(hub, 'maximum', meta)
 
-    assert datatype_check.check(123, value_int) is None
-    # TODO: fix
-    #with pytest.raises(ValueError):
-    #    datatype_check.check(-100, value_int)
+def test_custom_datatype():
+    dt_registry = DTRegistry()
 
-    # check value_untyped
-    assert datatype_check.cast('123', value_untyped) == '123'
-    assert datatype_check.cast(123.45, value_untyped) == 123.45
-    assert datatype_check.cast(b'123', value_untyped) == b'123'
+    hub = Hub(topic_factory=dt_registry)
 
-    assert datatype_check.check(123, value_untyped) is None
-    assert datatype_check.check(-100, value_untyped) is None
+    class UpperCaseDT(DT):
+        def cast(self, _hub, value, _meta):
+            return value.upper()
+
+        def check(self, _hub, value, _meta):
+            if value != value.upper():
+                raise ValueError('%r is not uppercase'%value)
+
+    hub.topic_factory.add_datatype('uppercase', UpperCaseDT() )
+
+    hub.assign('value', Value(''), meta={'datatype': 'uppercase'})
+
+    assert hub['value'].cast('This is a test') == 'THIS IS A TEST'
+    assert hub['value'].check('THIS IS A TEST') is None
+    with pytest.raises(ValueError):
+        hub['value'].check('This is a test')

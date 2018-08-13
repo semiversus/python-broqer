@@ -1,3 +1,6 @@
+import asyncio
+from typing import Any
+
 from broqer.hub import MetaTopic
 
 def resolve_meta_key(hub, key, meta):
@@ -12,12 +15,10 @@ def resolve_meta_key(hub, key, meta):
     return value
 
 class DT:
-    @staticmethod
-    def cast(_hub, value, _meta):
+    def cast(self, _hub, value, _meta):
         return value
 
-    @staticmethod
-    def check(_hub, _value, _meta):
+    def check(self, _hub, _value, _meta):
         pass
 
     def as_str(self, hub, value, meta):
@@ -31,7 +32,7 @@ class NumberDT(DT):
     * maximum: check against maximum (above raises an Exception)
     """
 
-    def check(self, value, meta):
+    def check(self, hub, value, meta):
         minimum = resolve_meta_key(hub, 'minimum', meta)
         if minimum is not None and value < minimum:
             raise ValueError('Value %d under minimum of %d' % (value, minimum))
@@ -41,14 +42,22 @@ class NumberDT(DT):
             raise ValueError('Value %d over maximum of %d' % (value, maximum))
 
 class IntegerDT(NumberDT):
-    @staticmethod
-    def cast(_hub, value, _meta):
+    def cast(self, _hub, value, _meta):
         return int(value)
 
+    def check(self, hub, value, meta):
+        NumberDT.check(self, hub, value, meta)
+        if not isinstance(value, int):
+            raise ValueError('%r is not an integer'%value)
+
 class FloatDT(NumberDT):
-    @staticmethod
-    def cast(_hub, value, _meta):
+    def cast(self, _hub, value, _meta):
         return float(value)
+
+    def check(self, hub, value, meta):
+        NumberDT.check(self, hub, value, meta)
+        if not isinstance(value, float):
+            raise ValueError('%r is not a float'%value)
 
 class DTTopic(MetaTopic):
     def __init__(self, hub: 'Hub', path: str) -> None:
@@ -67,9 +76,9 @@ class DTTopic(MetaTopic):
         cast before)
         '''
         self._hub.topic_factory.check(self._hub, value, self._meta)
-    
+
     def as_str(self, value):
-        self._hub.topic_factory.as_str(self._hub, value, self._meta)
+        return self._hub.topic_factory.as_str(self._hub, value, self._meta)
 
     def checked_emit(self, value: Any) -> asyncio.Future:
         value = self.cast(value)
@@ -79,15 +88,26 @@ class DTTopic(MetaTopic):
 class DTRegistry:
     def __init__(self):
         self._datatypes = {
-            'integer': IntegerDT,
-            'float': FloatDT,
-            'string': DT
+            'none': DT(),
+            'integer': IntegerDT(),
+            'float': FloatDT(),
+            'string': DT()
         }
 
     def add_datatype(self, name: str, dt: DT):
         self._datatypes[name] = dt
 
     def __call__(self, hub: 'Hub', path: str) -> None:
-        return DTTopic(hub, path, self)
+        return DTTopic(hub, path)
 
     def cast(self, hub, value, meta):
+        datatype_key = meta.get('datatype', 'none')
+        return self._datatypes[datatype_key].cast(hub, value, meta)
+
+    def check(self, hub, value, meta):
+        datatype_key = meta.get('datatype', 'none')
+        return self._datatypes[datatype_key].check(hub, value, meta)
+
+    def as_str(self, hub, value, meta):
+        datatype_key = meta.get('datatype', 'none')
+        return self._datatypes[datatype_key].as_str(hub, value, meta)

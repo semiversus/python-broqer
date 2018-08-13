@@ -1,3 +1,3 @@
-from .datatype_check import DatatypeCheck
+from .datatype_check import DTRegistry
 
-__all__ = ['DatatypeCheck']
+__all__ = ['DTRegistry']
