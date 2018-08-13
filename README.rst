@@ -5,7 +5,7 @@ Python Broqer
 .. image:: https://img.shields.io/pypi/v/broqer.svg
   :target: https://pypi.python.org/pypi/broqer
 
-.. image:: https://img.shields.io/travis/semiversus/python-broqer.svg
+.. image:: https://img.shields.io/travis/semiversus/python-broqer/master.svg
   :target: https://travis-ci.org/semiversus/python-broqer
 
 .. image:: https://readthedocs.org/projects/python-broqer/badge/?version=latest
