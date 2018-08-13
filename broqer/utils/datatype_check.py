@@ -1,7 +1,9 @@
 import asyncio
 from typing import Any
 
-from broqer.hub import MetaTopic
+from broqer import Subscriber
+from broqer.hub import Hub, MetaTopic
+
 
 def resolve_meta_key(hub, key, meta):
     if key not in meta:
@@ -14,12 +16,14 @@ def resolve_meta_key(hub, key, meta):
         return hub[topic].get()
     return value
 
+
 class DT:
     def cast(self, _topic, value):
         return value
 
     def check(self, _topic, _value):
         pass
+
 
 class NumberDT(DT):
     """ Datatype for general numbers
@@ -38,6 +42,7 @@ class NumberDT(DT):
         if maximum is not None and value > maximum:
             raise ValueError('Value %d over maximum of %d' % (value, maximum))
 
+
 class IntegerDT(NumberDT):
     def cast(self, _topic, value):
         return int(value)
@@ -45,7 +50,8 @@ class IntegerDT(NumberDT):
     def check(self, topic, value):
         NumberDT.check(self, topic, value)
         if not isinstance(value, int):
-            raise ValueError('%r is not an integer'%value)
+            raise ValueError('%r is not an integer' % value)
+
 
 class FloatDT(NumberDT):
     def cast(self, _topic, value):
@@ -54,10 +60,11 @@ class FloatDT(NumberDT):
     def check(self, topic, value):
         NumberDT.check(self, topic, value)
         if not isinstance(value, float):
-            raise ValueError('%r is not a float'%value)
+            raise ValueError('%r is not a float' % value)
+
 
 class DTTopic(MetaTopic):
-    def __init__(self, hub: 'Hub', path: str) -> None:
+    def __init__(self, hub: Hub, path: str) -> None:
         MetaTopic.__init__(self, hub, path)
         self._hub = hub
 
@@ -75,9 +82,14 @@ class DTTopic(MetaTopic):
         self._hub.topic_factory.check(self, value)
 
     def checked_emit(self, value: Any) -> asyncio.Future:
+
+        assert isinstance(self._subject, Subscriber), \
+            'Topic has to be a subscriber'
+
         value = self.cast(value)
         self.check(value)
         return self._subject.emit(value, who=self)
+
 
 class DTRegistry:
     def __init__(self):
@@ -91,7 +103,7 @@ class DTRegistry:
     def add_datatype(self, name: str, dt: DT):
         self._datatypes[name] = dt
 
-    def __call__(self, hub: 'Hub', path: str) -> None:
+    def __call__(self, hub: Hub, path: str) -> DTTopic:
         return DTTopic(hub, path)
 
     def cast(self, topic, value):
