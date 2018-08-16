@@ -79,7 +79,7 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
 
     @abstractmethod
     def get(self):  # pylint: disable=useless-return, no-self-use
-        return None
+        """ get value of operator """
 
 
 def build_operator(operator_cls):
