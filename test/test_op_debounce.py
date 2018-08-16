@@ -1,4 +1,5 @@
 import pytest
+from unittest import mock
 
 from broqer.op import Debounce
 
@@ -47,3 +48,58 @@ from .helper import check_async_operator_coro, NONE
 async def test_with_publisher(args, input_vector, output_vector, event_loop):
     init = args[1:] if args[1:] else None
     await check_async_operator_coro(Debounce, args, {}, input_vector, output_vector, has_state=True, loop=event_loop)
+
+@pytest.mark.asyncio
+async def test_debounce():
+    import asyncio
+    from broqer import default_error_handler, Publisher, op
+
+    p = Publisher()
+    mock_sink = mock.Mock()
+    mock_error_handler = mock.Mock()
+
+    default_error_handler.set(mock_error_handler)
+
+    disposable = p | op.debounce(0.1) | op.sink(mock_sink)
+
+    mock_sink.side_effect = ZeroDivisionError('FAIL')
+
+    # test error_handler
+    p.notify(1)
+    mock_error_handler.assert_not_called()
+    await asyncio.sleep(0.05)
+    mock_error_handler.assert_not_called()
+    await asyncio.sleep(0.1)
+    mock_error_handler.assert_called_once_with(ZeroDivisionError, mock.ANY, mock.ANY)
+    mock_sink.assert_called_once_with(1)
+
+    mock_sink.reset_mock()
+
+    # test unsubscribe
+    p.notify(2)
+    await asyncio.sleep(0.05)
+    disposable.dispose()
+    await asyncio.sleep(0.1)
+    mock_sink.assert_not_called()
+
+    # test reset
+    mock_sink.reset_mock()
+    debounce = p | op.debounce(0.1)
+    disposable = debounce | op.sink(mock_sink)
+    p.notify(1)
+    await asyncio.sleep(0.05)
+    debounce.reset()
+    await asyncio.sleep(0.1)
+    mock_sink.assert_not_called()
+
+    disposable.dispose()
+
+    # test reset again
+    mock_sink.reset_mock()
+    mock_sink.side_effect = None
+    debounce = p | op.debounce(0, False)
+    disposable = debounce | op.sink(mock_sink)
+    p.notify(True)
+    await asyncio.sleep(0.05)
+    debounce.reset()
+    mock_sink.assert_has_calls( (mock.call(False), mock.call(True), mock.call(False)) )
