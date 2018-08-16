@@ -225,6 +225,11 @@ class Hub:
             self._topics[path] = topic
             return topic
 
+    def __setitem__(self, path: str, publisher: Publisher):
+        if not isinstance(publisher, (Publisher, Subscriber)):
+            raise TypeError('Assigned topic has to be publisher or subscriber')
+        self.assign(path, publisher)
+
     def __contains__(self, path: str) -> bool:
         return path in self._topics
 

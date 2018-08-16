@@ -91,7 +91,7 @@ def test_assign_subscribe_emit(factory):
     assert not hub['value1'].assigned
     assert hub['value1'].subject is None
 
-    hub['value1'].assign(value1)
+    hub['value1'] = value1
 
     with pytest.raises(ValueError):
         hub['value1'].assign(value1)
