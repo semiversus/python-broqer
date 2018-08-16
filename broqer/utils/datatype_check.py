@@ -95,9 +95,9 @@ class DTRegistry:
     def __init__(self):
         self._datatypes = {
             'none': DT(),
-            'integer': IntegerDT(),
+            'int': IntegerDT(),
             'float': FloatDT(),
-            'string': DT()
+            'str': DT()
         }
 
     def add_datatype(self, name: str, dt: DT):

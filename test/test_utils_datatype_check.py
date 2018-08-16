@@ -15,17 +15,17 @@ from broqer.utils.datatype_check import DTRegistry, resolve_meta_key, DT
      (1, -1, True, None, 'abc', {'a':1.23}),
      (None, None, None, None, None, None),
      ('1', '-1', 'True', 'None', 'abc', '{\'a\': 1.23}')),
-    ({'datatype': 'string'},
+    ({'datatype': 'str'},
      (1, -1, True, None, 'abc', {'a':1.23}),
      (1, -1, True, None, 'abc', {'a':1.23}),
      (None, None, None, None, None, None),
      ('1', '-1', 'True', 'None', 'abc', '{\'a\': 1.23}')),
-    ({'datatype': 'integer'},
+    ({'datatype': 'int'},
      (1, -1, True, None, 'abc', {'a':1.23}, ' 123 ', 1.99),
      (1, -1, 1, TypeError, ValueError, TypeError, 123, 1),
      (None, None, None, ValueError, ValueError, ValueError, ValueError, ValueError),
      ('1', '-1', '1', TypeError, ValueError, TypeError, '123', '1')),
-    ({'datatype': 'integer', 'minimum':-10, 'maximum':10},
+    ({'datatype': 'int', 'minimum':-10, 'maximum':10},
      (1, -1, -10, 10, -11, 11, False, -7.99),
      (1, -1, -10, 10, -11, 11, 0, -7),
      (None, None, None, None, ValueError, ValueError, None, ValueError),
@@ -121,7 +121,7 @@ def test_validate():
 
     hub.topic_factory.add_datatype('even', EvenDT() )
 
-    hub.assign('value', Value(''), meta={'datatype': 'integer', 'minimum':0, 'validate':'even'})
+    hub.assign('value', Value(''), meta={'datatype': 'int', 'minimum':0, 'validate':'even'})
 
     assert hub['value'].cast('122') == 122
     assert hub['value'].check(122) is None
