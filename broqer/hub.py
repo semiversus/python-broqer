@@ -161,6 +161,8 @@ class Topic(Publisher, Subscriber):
         return self._subject.emit(value, who=self)
 
     def assign(self, subject):
+        assert isinstance(subject, (Publisher, Subscriber))
+
         if self._subject is not None:
             raise SubscriptionError('Topic is already assigned')
         self._subject = subject
