@@ -175,7 +175,7 @@ class Topic(Publisher, Subscriber):
 
     def freeze(self):
         if self._subject is None:
-            raise ValueError('Topic is not assigned, so freeze is failing')
+            raise ValueError(f'Topic {self._path} is not assigned')
 
     @property
     def assigned(self):
