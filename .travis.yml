@@ -4,6 +4,9 @@ python:
   - 3.6
   - 3.5
 
+dist: xenial
+sudo: true
+
 cache: pip
 
 env:
@@ -13,7 +16,7 @@ env:
 
 install:
   - pip install pipenv
-  - pipenv install --dev
+  - pipenv install --dev --skip-lock
 
 script:
   - pipenv run flake8 broqer
