@@ -8,7 +8,7 @@ from .subject import Subject, Value
 
 __author__ = 'Günther Jena'
 __email__ = 'guenther@jena.at'
-__version__ = '0.4.2'
+__version__ = '0.5.0-dev'
 
 __all__ = [
     'StatefulPublisher', 'Disposable', 'Publisher', 'Subscriber',
