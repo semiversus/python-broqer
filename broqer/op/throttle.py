@@ -31,7 +31,7 @@ from typing import Any  # noqa: F401
 
 from broqer import Publisher, default_error_handler, UNINITIALIZED
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Throttle(Operator):

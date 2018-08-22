@@ -14,7 +14,7 @@ from typing import Any
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable, UNINITIALIZED
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Cache(Operator):

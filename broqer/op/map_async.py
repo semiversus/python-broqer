@@ -100,7 +100,7 @@ from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher, default_error_handler
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 Mode = Enum('Mode', 'CONCURRENT INTERRUPT QUEUE LAST LAST_DISTINCT SKIP')
 

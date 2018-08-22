@@ -30,7 +30,7 @@ from typing import Any, Callable
 
 from broqer import Publisher
 
-from ._operator import build_operator
+from .operator import build_operator
 from .accumulate import Accumulate
 
 

@@ -28,7 +28,7 @@ from typing import Any, Callable, Optional
 
 from broqer import Disposable, Publisher, Subscriber
 
-from ._operator import build_operator
+from .operator import build_operator
 
 
 class Sink(Subscriber, Disposable):

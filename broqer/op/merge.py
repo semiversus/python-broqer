@@ -18,7 +18,7 @@ from typing import Any
 
 from broqer import Publisher
 
-from ._operator import MultiOperator, build_operator
+from .operator import MultiOperator, build_operator
 
 
 class Merge(MultiOperator):

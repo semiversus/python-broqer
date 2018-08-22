@@ -5,7 +5,7 @@ from typing import Any as Any_
 from broqer import Publisher
 
 from .any_ import _MultiPredicate
-from ._operator import build_operator
+from .operator import build_operator
 
 
 class All(_MultiPredicate):

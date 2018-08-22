@@ -43,7 +43,7 @@ from typing import Any, List
 
 from broqer import Publisher, UNINITIALIZED
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Switch(Operator):

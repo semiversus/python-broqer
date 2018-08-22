@@ -5,7 +5,7 @@ from typing import Any as Any_
 
 from broqer import Publisher, Subscriber, UNINITIALIZED
 
-from ._operator import MultiOperator, build_operator
+from .operator import MultiOperator, build_operator
 
 
 class _MultiPredicate(MultiOperator):

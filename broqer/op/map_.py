@@ -37,7 +37,7 @@ from typing import Any, Callable
 
 from broqer import Publisher
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Map(Operator):

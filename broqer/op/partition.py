@@ -23,7 +23,7 @@ from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher, Subscriber
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Partition(Operator):

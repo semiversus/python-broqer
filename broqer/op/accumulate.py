@@ -30,7 +30,7 @@ from typing import Any, Callable, Tuple
 
 from broqer import Publisher, Subscriber, UNINITIALIZED
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Accumulate(Operator):

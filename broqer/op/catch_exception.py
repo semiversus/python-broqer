@@ -31,7 +31,7 @@ from typing import Any
 
 from broqer import Publisher
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class CatchException(Operator):

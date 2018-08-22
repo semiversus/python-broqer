@@ -25,7 +25,7 @@ from typing import Any
 
 from broqer import Publisher, default_error_handler
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Delay(Operator):
