@@ -7,9 +7,10 @@ Usage:
 >>> from broqer import Subject, op
 >>> s = Subject()
 
->>> async def delay_add(a):
+>>> @asyncio.coroutine
+... def delay_add(a):
 ...     print('Starting with argument', a)
-...     await asyncio.sleep(0.015)
+...     yield from asyncio.sleep(0.015)
 ...     result = a + 1
 ...     print('Finished with argument', a)
 ...     return result

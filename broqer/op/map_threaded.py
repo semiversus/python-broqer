@@ -114,9 +114,10 @@ class MapThreaded(MapAsync):
 
         self._executor = ThreadPoolExecutor()
 
-    async def _thread_coro(self, *args, **kwargs):
-        return await asyncio.get_event_loop().run_in_executor(
-            self._executor, self._map_func, *args)
+    @asyncio.coroutine
+    def _thread_coro(self, *args, **kwargs):
+        return (yield from asyncio.get_event_loop().run_in_executor(
+            self._executor, self._map_func, *args) )
 
 
 map_threaded = build_operator(MapThreaded)  # pylint: disable=invalid-name
