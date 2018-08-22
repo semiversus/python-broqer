@@ -152,7 +152,7 @@ class Topic(Publisher, Subscriber):
             self._pre_assign_emit = value
             return None
 
-        if who == self._subject:
+        if who is self._subject:
             return self.notify(value)
 
         assert isinstance(self._subject, Subscriber), \

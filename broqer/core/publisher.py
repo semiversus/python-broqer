@@ -44,13 +44,6 @@ class Publisher():
             return asyncio.gather(*futures)
         return None
 
-    def __contains__(self, subscriber: 'Subscriber'):
-        return subscriber in self._subscriptions
-
-    def __len__(self):
-        """ number of subscriptions """
-        return len(self._subscriptions)
-
     @property
     def subscriptions(self):
         return tuple(self._subscriptions)
@@ -68,14 +61,16 @@ class Publisher():
         from broqer.op import ToFuture  # lazy import due circular dependency
         return ToFuture(self, timeout)
 
-    for method in ('__lt__', '__le__', '__eq__', '__ne__', '__ge__', '__gt__',
+import operator
+
+for method in ('__lt__', '__le__', '__eq__', '__ne__', '__ge__', '__gt__',
         '__add__', '__and__', '__lshift__', '__mod__', '__mul__', '__pow__',
         '__rshift__', '__sub__', '__xor__', '__concat__', '__contains__',
         '__getitem__'):
-        def _op(a ,b, method=method):
-            from .op import CombineLatest
-            return CombineLatest(a, b, map=getattr(operator, method))
-        setattr(Publisher, method, _op)
+    def _op(a ,b, method=method):
+        from broqer.op import CombineLatest
+        return CombineLatest(a, b, map_=getattr(operator, method))
+    setattr(Publisher, method, _op)
 
 
 class StatefulPublisher(Publisher):
