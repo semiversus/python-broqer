@@ -115,6 +115,15 @@ class Publisher():
         from broqer.op import ToFuture  # lazy import due circular dependency
         return ToFuture(self, timeout)
 
+    for method in ('__lt__', '__le__', '__eq__', '__ne__', '__ge__', '__gt__',
+        '__add__', '__and__', '__lshift__', '__mod__', '__mul__', '__pow__',
+        '__rshift__', '__sub__', '__xor__', '__concat__', '__contains__',
+        '__getitem__'):
+        def _op(a ,b, method=method):
+            from .op import CombineLatest
+            return CombineLatest(a, b, map=getattr(operator, method))
+        setattr(Publisher, method, _op)
+
 
 class StatefulPublisher(Publisher):
     def __init__(self, init=UNINITIALIZED):
