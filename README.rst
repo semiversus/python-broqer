@@ -100,7 +100,7 @@ Output to ``stdout``:
 How it works
 ============
 
-Basically it's based on the observable pattern - a object you can register on and you will be informed as
+Basically it's based on the observable pattern - an object you can register on and you will be informed as
 soon the state has changed. The observable are called ``Publishers``.
 
 API
