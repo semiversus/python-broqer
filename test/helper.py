@@ -254,7 +254,7 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
     except ValueError:
         assert stored_result is None
 
-JITTER = 0.015
+JITTER = 0.05
 
 async def check_async_operator_coro(cls, args, kwargs, input_vector, output_vector, initial_state=None, has_state=False, loop=None):
     await check_operator_coro(cls, args, kwargs, input_vector, output_vector, initial_state=initial_state, has_state=has_state, stateful=False, loop=loop)
