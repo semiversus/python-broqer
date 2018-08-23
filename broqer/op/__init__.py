@@ -30,6 +30,9 @@ from .publishers.from_iterable import FromIterable
 from .subscribers.to_future import ToFuture, to_future
 from .subscribers.sink import Sink, sink
 
+# enable operator overloading
+import broqer.op.operator_overloading  # noqa: F401
+
 __all__ = [
     'Any', 'any_', 'All', 'all_', 'Accumulate', 'accumulate', 'Cache', 'cache',
     'CatchException', 'catch_exception', 'CombineLatest', 'combine_latest',

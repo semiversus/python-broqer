@@ -2,6 +2,7 @@ from unittest import mock
 import pytest
 
 from broqer import Value, Publisher, op
+import operator
 
 def test_operator_with_publishers():
     v1 = Value(0)
@@ -75,3 +76,73 @@ def test_operator_with_constant_r():
     v2.emit(3)
     mock_sink.assert_called_once_with(-2)
 
+@pytest.mark.parametrize('operator, l_value, r_value, result', [
+    (operator.lt, 0, 1, True),
+    (operator.lt, 1, 0, False),
+    (operator.lt, 1, 1, False),
+])
+def test_with_publisher(operator, l_value, r_value, result):
+    vl = Value(l_value)
+    vr = Value(r_value)
+    pl = Publisher()
+    pr = Publisher()
+    cl = l_value
+    cr = r_value
+
+    o1 = operator(vl, vr)
+    o2 = operator(vl, cr)
+    o3 = operator(vl, pr)
+
+    o4 = operator(pl, vr)
+    o5 = operator(pl, cr)
+    o6 = operator(pl, pr)
+
+    o7 = operator(cl, vr)
+    o8 = operator(cl, cr)
+    o9 = operator(cl, pr)
+
+    mock_sink_o3 = mock.Mock()
+    mock_sink_o4 = mock.Mock()
+    mock_sink_o5 = mock.Mock()
+    mock_sink_o6 = mock.Mock()
+    mock_sink_o9 = mock.Mock()
+
+    o3 | op.sink(mock_sink_o3)
+    o4 | op.sink(mock_sink_o4)
+    o5 | op.sink(mock_sink_o5)
+    o6 | op.sink(mock_sink_o6)
+    o9 | op.sink(mock_sink_o9)
+
+    for output in (o1, o2, o3, o4, o5, o6, o7, o9):
+        assert isinstance(output, Publisher)
+    
+    assert o8 == result
+
+    for output in (o1, o2, o7):
+        assert output.get() == result
+
+    for output in (o3, o4, o5, o6, o9):
+        with pytest.raises(ValueError):
+            output.get()
+
+    mock_sink_o3.assert_not_called()    
+    mock_sink_o4.assert_not_called()    
+    mock_sink_o5.assert_not_called()    
+    mock_sink_o6.assert_not_called()    
+    mock_sink_o9.assert_not_called()
+
+    pl.notify(l_value)
+
+    mock_sink_o3.assert_not_called()    
+    mock_sink_o4.assert_called_once_with(result)    
+    mock_sink_o5.assert_called_once_with(result)    
+    mock_sink_o6.assert_not_called()    
+    mock_sink_o9.assert_not_called()
+
+    pr.notify(r_value)
+
+    mock_sink_o3.assert_called_once_with(result)    
+    mock_sink_o4.assert_called_once_with(result)    
+    mock_sink_o5.assert_called_once_with(result)    
+    mock_sink_o6.assert_called_once_with(result)    
+    mock_sink_o9.assert_called_once_with(result)
