@@ -1,5 +1,7 @@
 import asyncio
 from typing import Any, Callable, TYPE_CHECKING
+import operator
+
 from broqer.core import UNINITIALIZED, SubscriptionDisposable
 
 if TYPE_CHECKING:
@@ -61,15 +63,31 @@ class Publisher():
         from broqer.op import ToFuture  # lazy import due circular dependency
         return ToFuture(self, timeout)
 
-import operator
 
 for method in ('__lt__', '__le__', '__eq__', '__ne__', '__ge__', '__gt__',
-        '__add__', '__and__', '__lshift__', '__mod__', '__mul__', '__pow__',
-        '__rshift__', '__sub__', '__xor__', '__concat__', '__contains__',
-        '__getitem__'):
-    def _op(a ,b, method=method):
-        from broqer.op import CombineLatest
-        return CombineLatest(a, b, map_=getattr(operator, method))
+               '__add__', '__and__', '__lshift__', '__mod__', '__mul__',
+               '__pow__', '__rshift__', '__sub__', '__xor__', '__concat__',
+               '__contains__', '__getitem__'):
+    def _op(a, b, method=method):
+        from broqer.op import CombineLatest, Map
+
+        if isinstance(b, Publisher):
+            return CombineLatest(a, b, map_=getattr(operator, method))
+        else:
+            return Map(a, getattr(operator, method), b)
+
+    setattr(Publisher, method, _op)
+
+for method, _method in (('__radd__', '__add__'), ('__rand__', '__and__'),
+                        ('__rlshift__', '__lhift__'), ('__rmod__', '__mod__'),
+                        ('__rmul__', '__mul__'), ('__rpow__', '__pow__'),
+                        ('__rrshift__', '__rshift__'), ('__rsub__', '__sub__'),
+                        ('__rxor__', '__xor__')):
+    def _op(a, b, method=_method):
+        from broqer.op import Map
+
+        return Map(a, getattr(operator, method), b)
+
     setattr(Publisher, method, _op)
 
 

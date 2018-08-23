@@ -1,12 +1,13 @@
 import asyncio
 import subprocess
+import operator
 
 from broqer import op
 
 (op.FromPolling(1, subprocess.check_output, 'uptime')
- | op.map(str, encoding='utf - 8')
- | op.map(str.split, sep=', ')
- | op.pluck(0)
+ | op.map_(str, encoding='utf - 8')
+ | op.map_(str.split, sep=', ')
+ | op.map_(lambda v:v[0])
  | op.sink(print)
  )
 

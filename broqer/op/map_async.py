@@ -139,7 +139,7 @@ class MapAsync(Operator):
         Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
         if self._mode == Mode.INTERRUPT and self._future is not None:
             self._future.cancel()
 

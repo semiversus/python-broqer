@@ -8,7 +8,7 @@ The hub is handling with topics referencing to publishers or subjects:
 
 Each following access will return the same object
 
->>> value1 == hub['value1']
+>>> value1 is hub['value1']
 True
 
 It's possible to subscribe to a topic

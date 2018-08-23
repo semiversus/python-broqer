@@ -38,7 +38,8 @@ class _MultiPredicate(MultiOperator):
         return self.combination_operator(values)
 
     def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
-        assert who in self._publishers, 'emit from non assigned publisher'
+        assert any(who is p for p in self._publishers), \
+            'emit from non assigned publisher'
 
         if self._predicate is not None:
             self._partial[self._index[who]] = self._predicate(value)

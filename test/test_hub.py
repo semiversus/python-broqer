@@ -10,7 +10,7 @@ def test_hub_topics():
 
     # test __getitem__
     t = hub['value1']
-    assert t == hub['value1']
+    assert t is hub['value1']
 
     hub['value2']
 

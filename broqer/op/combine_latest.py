@@ -76,16 +76,17 @@ class CombineLatest(MultiOperator):
         return Publisher.get(self)  # will raise ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        print(who in self._emit_on, self._emit_on, who)
-        assert who in self._publishers, 'emit from non assigned publisher'
-        if self._missing and who in self._missing:
+        assert any(who is p for p in self._publishers), \
+            'emit from non assigned publisher'
+
+        if self._missing and any(who is p for p in self._missing):
             self._missing.remove(who)
 
         if self._partial_state[self._index[who]] == value:
             # if partial_state has not changed avoid new emit
             return None
         self._partial_state[self._index[who]] = value
-        if not self._missing and (who in self._emit_on):
+        if not self._missing and any(who is p for p in self._emit_on):
             if self._map:
                 state = self._map(*self._partial_state)
             else:

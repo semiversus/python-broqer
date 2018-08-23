@@ -32,10 +32,10 @@ Sample 2: (2, 3)
 ...
 Sample 2: (2, 3)
 
->>> len(s) # how many subscriber are registered
+>>> len(s.subscriptions) # how many subscriber are registered
 1
 >>> _d2.dispose()
->>> len(s)
+>>> len(s.subscriptions)
 0
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
 """
@@ -90,7 +90,7 @@ class Sample(Operator):
             self._call_later_handle = None
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
 
         self._state = value
 

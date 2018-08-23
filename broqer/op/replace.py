@@ -20,7 +20,7 @@ class Replace(Operator):
         return self._value
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
         return self.notify(self._value)
 
 

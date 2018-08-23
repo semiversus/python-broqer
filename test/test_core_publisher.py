@@ -20,7 +20,7 @@ def test_subscribe(cls):
 
     # subscribe first subscriber
     d1 = publisher.subscribe(s1)
-    assert s1 in publisher.subscriptions
+    assert any(s1 is s for s in publisher.subscriptions)
     # assert s2 not in publisher.subscriptions
     assert len(publisher.subscriptions) == 1
 
@@ -31,8 +31,8 @@ def test_subscribe(cls):
     # subscribe second subscriber
     d2 = publisher.subscribe(s2)
     assert len(publisher.subscriptions) == 2
-    assert s1 in publisher.subscriptions
-    assert s2 in publisher.subscriptions
+    assert any(s1 is s for s in publisher.subscriptions)
+    assert any(s2 is s for s in publisher.subscriptions)
 
     # unsubscribe both subscribers
     d1.dispose()
@@ -80,7 +80,7 @@ async def test_future_return():
 
         def emit(self, value, who: Publisher) -> asyncio.Future:
             return self.future
-    
+
     p = Publisher()
     s1 = S()
 

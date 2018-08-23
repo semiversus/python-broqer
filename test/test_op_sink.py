@@ -14,7 +14,7 @@ def test_sink():
     assert isinstance(sink_instance, Disposable)
 
     assert not cb.called
-    assert len(s) == 1
+    assert len(s.subscriptions) == 1
 
     # test various emits on source
     with pytest.raises(TypeError):
@@ -33,7 +33,7 @@ def test_sink():
     cb.reset_mock()
 
     sink_instance.dispose()
-    assert len(s) == 0
+    assert len(s.subscriptions) == 0
 
     s.emit(1)
     assert not cb.called
@@ -47,7 +47,7 @@ def test_sink_on_subscription():
     assert isinstance(sink_instance, Disposable)
 
     cb.assert_called_with(0)
-    assert len(s) == 1
+    assert len(s.subscriptions) == 1
 
     s.emit(1)
     cb.assert_called_with(1)
@@ -56,7 +56,7 @@ def test_sink_on_subscription():
     cb.reset_mock()
 
     sink_instance.dispose()
-    assert len(s) == 0
+    assert len(s.subscriptions) == 0
 
     s.emit(1)
     assert not cb.called
@@ -70,7 +70,7 @@ def test_sink_partial():
     assert isinstance(sink_instance, Disposable)
 
     assert not cb.called
-    assert len(s) == 1
+    assert len(s.subscriptions) == 1
 
     # test various emits on source
     s.emit(None)
@@ -86,7 +86,7 @@ def test_sink_partial():
     cb.reset_mock()
 
     sink_instance.dispose()
-    assert len(s) == 0
+    assert len(s.subscriptions) == 0
 
     s.emit(1)
     assert not cb.called
