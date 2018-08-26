@@ -63,7 +63,8 @@ class ToFuture(Subscriber, asyncio.Future):
         if self._disposable is not None:
             self._disposable.dispose()
             self._disposable = None
-        self.set_result(value)
+        if not self.cancelled():
+            self.set_result(value)
 
 
 to_future = build_operator(ToFuture)  # pylint: disable=invalid-name
