@@ -1,56 +1,10 @@
 import asyncio
-from abc import ABCMeta, abstractmethod
-from typing import Any, Callable
+from typing import Any, Callable, TYPE_CHECKING
 
+from broqer.core import UNINITIALIZED, SubscriptionDisposable
 
-class UNINITIALIZED:
-    """ marker class used for initialization of state """
-    pass
-
-
-class Disposable(metaclass=ABCMeta):
-    """ Implementation of the disposable pattern. Call .dispose() to free
-            resource.
-
-        >>> class MyDisposable(Disposable):
-        ...     def dispose(self):
-        ...         print('DISPOSED')
-
-        >>> d = MyDisposable()
-        >>> d.dispose()
-        DISPOSED
-        >>> with MyDisposable():
-        ...     print('working')
-        working
-        DISPOSED
-    """
-    @abstractmethod
-    def dispose(self):
-        """ .dispose() method has to be overwritten"""
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, _type, _value, _traceback):
-        self.dispose()
-
-
-class SubscriptionDisposable(Disposable):
-    def __init__(self, publisher: 'Publisher', subscriber: 'Subscriber') \
-            -> None:
-        self._publisher = publisher
-        self._subscriber = subscriber
-
-    def dispose(self) -> None:
-        self._publisher.unsubscribe(self._subscriber)
-
-    @property
-    def publisher(self):
-        return self._publisher
-
-    @property
-    def subscriber(self):
-        return self._subscriber
+if TYPE_CHECKING:
+    from broqer.core import Subscriber  # noqa: F401
 
 
 class SubscriptionError(ValueError):
@@ -61,7 +15,7 @@ class Publisher():
     def __init__(self):
         self._subscriptions = set()
 
-    def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
+    def subscribe(self, subscriber: 'Subscriber') -> 'SubscriptionDisposable':
         if subscriber in self._subscriptions:
             raise SubscriptionError('Subscriber already registered')
 
@@ -91,13 +45,6 @@ class Publisher():
             return asyncio.gather(*futures)
         return None
 
-    def __contains__(self, subscriber: 'Subscriber'):
-        return subscriber in self._subscriptions
-
-    def __len__(self):
-        """ number of subscriptions """
-        return len(self._subscriptions)
-
     @property
     def subscriptions(self):
         return tuple(self._subscriptions)
@@ -121,7 +68,7 @@ class StatefulPublisher(Publisher):
         Publisher.__init__(self)
         self._state = init
 
-    def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
+    def subscribe(self, subscriber: 'Subscriber') -> 'SubscriptionDisposable':
         disposable = Publisher.subscribe(self, subscriber)
         if self._state is not UNINITIALIZED:
             subscriber.emit(self._state, who=self)
@@ -140,15 +87,3 @@ class StatefulPublisher(Publisher):
 
     def reset_state(self, value=UNINITIALIZED):
         self._state = value
-
-
-class Subscriber(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
-    @abstractmethod
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        """Send new value to the subscriber
-        :param value: value to be send
-        :param who: reference to which publisher is emitting
-        """
-
-    def __call__(self, publisher: Publisher):
-        return publisher.subscribe(self)

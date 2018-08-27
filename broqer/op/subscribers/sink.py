@@ -8,10 +8,10 @@ Usage:
 >>> from broqer import Subject, op
 >>> s = Subject()
 
->>> len(s)
+>>> len(s.subscriptions)
 0
 >>> _d = s | op.sink(print, 'Sink', sep=':')
->>> len(s)
+>>> len(s.subscriptions)
 1
 
 >>> s.emit(1)
@@ -20,7 +20,7 @@ Sink:1
 Sink:(1, 2)
 
 >>> _d.dispose()
->>> len(s)
+>>> len(s.subscriptions)
 0
 """
 from functools import partial
@@ -28,7 +28,7 @@ from typing import Any, Callable, Optional
 
 from broqer import Disposable, Publisher, Subscriber
 
-from ._operator import build_operator
+from broqer.op.operator import build_operator
 
 
 class Sink(Subscriber, Disposable):
@@ -50,7 +50,7 @@ class Sink(Subscriber, Disposable):
         # handle special case: _disposable is set after
         # publisher.subscribe(self) in __init__
         assert not hasattr(self, '_disposable') or \
-            who == self._disposable.publisher, \
+            who is self._disposable.publisher, \
             'emit comming from non assigned publisher'
         if self._sink_function:
             if self._unpack:

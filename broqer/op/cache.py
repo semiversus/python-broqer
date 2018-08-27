@@ -14,7 +14,7 @@ from typing import Any
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable, UNINITIALIZED
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Cache(Operator):
@@ -58,7 +58,7 @@ class Cache(Operator):
         Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
         if self._state != value:
             self._state = value
             return self.notify(value)

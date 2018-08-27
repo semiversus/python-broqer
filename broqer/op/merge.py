@@ -18,7 +18,7 @@ from typing import Any
 
 from broqer import Publisher
 
-from ._operator import MultiOperator, build_operator
+from .operator import MultiOperator, build_operator
 
 
 class Merge(MultiOperator):
@@ -34,7 +34,9 @@ class Merge(MultiOperator):
         Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who in self._publishers, 'emit from non assigned publisher'
+        assert any(who is p for p in self._publishers), \
+            'emit from non assigned publisher'
+
         return self.notify(value)
 
 

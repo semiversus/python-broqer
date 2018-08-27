@@ -37,7 +37,7 @@ from typing import Any, Callable
 
 from broqer import Publisher
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Map(Operator):
@@ -68,7 +68,7 @@ class Map(Operator):
             return self._map_func(value)
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
 
         if self._unpack:
             result = self._map_func(*value)

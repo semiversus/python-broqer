@@ -25,7 +25,7 @@ from typing import Any, Optional
 
 from broqer import Publisher, Subscriber
 
-from ._operator import build_operator
+from broqer.op.operator import build_operator
 
 
 class ToFuture(Subscriber, asyncio.Future):

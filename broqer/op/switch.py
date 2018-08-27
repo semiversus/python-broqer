@@ -43,7 +43,7 @@ from typing import Any, List
 
 from broqer import Publisher, UNINITIALIZED
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Switch(Operator):
@@ -59,14 +59,14 @@ class Switch(Operator):
         return self._mapping[selection].get()  # may raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        if who == self._selection_publisher:
-            if self._mapping[value] != self._selected_publisher:
+        if who is self._selection_publisher:
+            if self._mapping[value] is not self._selected_publisher:
                 if self._selected_publisher is not UNINITIALIZED:
                     self._selected_publisher.unsubscribe(self)  # type: ignore
                 self._selected_publisher = self._mapping[value]
                 self._selected_publisher.subscribe(self)  # type: ignore
             return None
-        assert who == self._selected_publisher, \
+        assert who is self._selected_publisher, \
             'emit from not selected publisher'
         return self.notify(value)
 

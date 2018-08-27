@@ -30,7 +30,7 @@ from typing import Any, Callable, Tuple
 
 from broqer import Publisher, Subscriber, UNINITIALIZED
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Accumulate(Operator):
@@ -65,7 +65,7 @@ class Accumulate(Operator):
         return self._acc_func(self._init, value)[1]
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
         self._state, self._result = self._acc_func(self._state, value)
         return self.notify(self._result)
 

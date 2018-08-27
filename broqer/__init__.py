@@ -6,9 +6,11 @@ from .core import StatefulPublisher, Disposable, Publisher, Subscriber, \
 from .hub import Hub, SubHub
 from .subject import Subject, Value
 
+from .op import operator_overloading  # noqa: F401enable operator overloading
+
 __author__ = 'Günther Jena'
 __email__ = 'guenther@jena.at'
-__version__ = '0.4.2'
+__version__ = '0.5.0'
 
 __all__ = [
     'StatefulPublisher', 'Disposable', 'Publisher', 'Subscriber',

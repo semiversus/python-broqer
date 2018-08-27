@@ -92,7 +92,7 @@ from typing import Any, Callable, MutableSequence  # noqa: F401
 
 from broqer import Publisher, default_error_handler
 
-from ._operator import build_operator
+from .operator import build_operator
 from .map_async import MapAsync, Mode
 
 

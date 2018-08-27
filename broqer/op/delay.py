@@ -25,7 +25,7 @@ from typing import Any
 
 from broqer import Publisher, default_error_handler
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Delay(Operator):
@@ -43,7 +43,7 @@ class Delay(Operator):
         return Publisher.get(self)  # will raise ValueError
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
         self._loop.call_later(self._duration, self._delayed, value)
 
     def _delayed(self, value):

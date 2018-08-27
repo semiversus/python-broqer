@@ -8,12 +8,6 @@ from setuptools import find_packages, setup
 with open('README.rst', 'rb') as readme_file:
     readme = readme_file.read().decode('utf-8')
 
-requirements = []
-
-setup_requirements = ['pytest-runner', ]
-
-test_requirements = ['pytest', ]
-
 setup(
     author="Günther Jena",
     author_email='guenther@jena.at',
@@ -25,21 +19,19 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     description="Carefully crafted library to operate with continuous " +
                 "streams of data in a reactive style with publish/subscribe " +
                 "and broker functionality.",
-    install_requires=requirements,
     license="MIT license",
     long_description=readme,
     include_package_data=True,
-    keywords='broker publisher subscriber reactive',
+    keywords='broker publisher subscriber reactive frp observable',
     name='broqer',
     packages=find_packages(),
-    setup_requires=setup_requirements,
     test_suite='tests',
-    tests_require=test_requirements,
     url='https://github.com/semiversus/python-broqer',
-    version='0.4.2',
+    version='0.5.0',
     zip_safe=False,
 )

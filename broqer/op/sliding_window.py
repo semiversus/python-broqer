@@ -27,7 +27,7 @@ from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher, Subscriber
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class SlidingWindow(Operator):
@@ -56,7 +56,7 @@ class SlidingWindow(Operator):
         return Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
         self._state.append(value)
         if self._emit_partial or \
                 len(self._state) == self._state.maxlen:  # type: ignore

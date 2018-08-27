@@ -50,7 +50,7 @@ from typing import Any  # noqa
 
 from broqer import Publisher, Subscriber, default_error_handler, UNINITIALIZED
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Debounce(Operator):
@@ -84,7 +84,7 @@ class Debounce(Operator):
         return self._state
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
 
         if value == self._next_state:
             # skip if emit will result in the same value as the scheduled one

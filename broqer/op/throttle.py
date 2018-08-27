@@ -31,7 +31,7 @@ from typing import Any  # noqa: F401
 
 from broqer import Publisher, default_error_handler, UNINITIALIZED
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Throttle(Operator):
@@ -51,7 +51,7 @@ class Throttle(Operator):
         Publisher.get(self)
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
         if self._call_later_handler is None:
             self.notify(value)
             self._last_state = UNINITIALIZED

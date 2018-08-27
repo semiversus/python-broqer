@@ -31,7 +31,7 @@ from typing import Any, Callable
 
 from broqer import Publisher
 
-from ._operator import Operator, build_operator
+from .operator import Operator, build_operator
 
 
 class Filter(Operator):
@@ -61,7 +61,7 @@ class Filter(Operator):
         return Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who == self._publisher, 'emit from non assigned publisher'
+        assert who is self._publisher, 'emit from non assigned publisher'
         if self._predicate is None:
             if value:
                 return self.notify(value)
@@ -74,4 +74,34 @@ class Filter(Operator):
         return None
 
 
+class True_(Operator):
+    def get(self):
+        value = self._publisher.get()  # may raise ValueError
+        if bool(value):
+            return value
+        return Publisher.get(self)  # raises ValueError
+
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+        assert who is self._publisher, 'emit from non assigned publisher'
+        if bool(value):
+            return self.notify(value)
+        return None
+
+
+class False_(Operator):
+    def get(self):
+        value = self._publisher.get()  # may raise ValueError
+        if not bool(value):
+            return value
+        return Publisher.get(self)  # raises ValueError
+
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+        assert who is self._publisher, 'emit from non assigned publisher'
+        if not bool(value):
+            return self.notify(value)
+        return None
+
+
 filter_ = build_operator(Filter)  # pylint: disable=invalid-name
+true = build_operator(True_)  # pylint: disable=invalid-name
+false = build_operator(False_)  # pylint: disable=invalid-name

@@ -1,6 +1,6 @@
 import pytest
 
-from broqer.op import Filter
+from broqer.op import Filter, True_, False_
 
 from .helper import check_single_operator, NONE
 
@@ -14,3 +14,19 @@ from .helper import check_single_operator, NONE
 ])
 def test_with_publisher(args, kwargs, input_vector, output_vector):
     check_single_operator(Filter, args, kwargs, input_vector, output_vector)
+
+@pytest.mark.parametrize('input_vector, output_vector', [
+    (('abc', False, 1, 2, 0, True, 0.0, ''), ('abc', NONE, 1, 2, NONE, True, NONE, NONE)),
+    ((False, True), (NONE, True)),
+    ((True, False), (True, NONE)),
+])
+def test_true(input_vector, output_vector):
+    check_single_operator(True_, (), {}, input_vector, output_vector)
+
+@pytest.mark.parametrize('input_vector, output_vector', [
+    (('abc', False, 1, 2, 0, True, 0.0, ''), (NONE, False, NONE, NONE, 0, NONE, 0.0, '')),
+    ((False, True), (False, NONE)),
+    ((True, False), (NONE, False)),
+])
+def test_false(input_vector, output_vector):
+    check_single_operator(False_, (), {}, input_vector, output_vector)
