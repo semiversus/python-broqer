@@ -74,6 +74,7 @@ class Debounce(Operator):
         Operator.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._state = UNINITIALIZED
+            self._next_state = UNINITIALIZED
             if self._call_later_handler:
                 self._call_later_handler.cancel()
 

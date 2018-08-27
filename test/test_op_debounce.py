@@ -103,3 +103,22 @@ async def test_debounce():
     await asyncio.sleep(0.05)
     debounce.reset()
     mock_sink.assert_has_calls( (mock.call(False), mock.call(True), mock.call(False)) )
+
+    # resubscribe
+    mock_sink.reset_mock()
+    p.notify(True)
+    await asyncio.sleep(0.05)
+    mock_sink.assert_called_once_with(True)
+
+    disposable.dispose()
+
+    debounce | op.sink()
+
+    p.notify(True)
+
+    await asyncio.sleep(0.05)
+
+    assert debounce.get() == True
+    await (debounce | op.filter_())
+    mock_sink.assert_called_once_with(True)
+
