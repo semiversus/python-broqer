@@ -4,7 +4,7 @@ from .accumulate import Accumulate, accumulate
 from .cache import Cache, cache
 from .catch_exception import CatchException, catch_exception
 from .combine_latest import CombineLatest, combine_latest
-from .filter_ import Filter, filter_
+from .filter_ import Filter, True_, False_, filter_, true, false
 from .just import Just
 from .map_ import Map, map_
 from .merge import Merge, merge
@@ -41,7 +41,8 @@ __all__ = [
     'replace', 'Sink', 'sink', 'SlidingWindow', 'sliding_window', 'Switch',
     'switch', 'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
     'Sample', 'sample', 'MapAsync', 'map_async', 'Mode', 'MapThreaded',
-    'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future'
+    'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future',
+    'True_', 'true', 'False_', 'false'
 ]
 
 # TODO operators
