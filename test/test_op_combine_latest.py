@@ -1,7 +1,7 @@
 import pytest
 
 from broqer.op import CombineLatest, Just
-from broqer import Publisher
+from broqer import Publisher, StatefulPublisher, UNINITIALIZED
 
 from .helper import check_multi_operator, NONE, Collector
 
@@ -36,3 +36,24 @@ def test_emit_on():
     assert collector.result_vector == ((2,0),)
     assert collector2.result_vector == ((2,1), (2,0), (1,0))
     assert collector3.result_vector == (3, 1)
+
+def test_allow_stateless():
+    source1 = StatefulPublisher(0)
+    source2 = Publisher()
+
+    dut = CombineLatest(source1, source2, allow_stateless=True)
+    assert dut.get() == (0, UNINITIALIZED)
+
+    collector = Collector()
+    dut.subscribe(collector)
+
+    assert dut.get() == (0, UNINITIALIZED)
+    assert collector.result_vector == ((0, UNINITIALIZED),)
+
+    source1.notify(1)
+    source2.notify(True)
+    source1.notify(2)
+    source2.notify(False)
+
+    assert collector.result_vector == ((0, UNINITIALIZED), (1, UNINITIALIZED),
+        (1, True), (2, UNINITIALIZED), (2, False))

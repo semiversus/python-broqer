@@ -25,7 +25,7 @@ Second sink: (1, 3)
 import asyncio
 from typing import Any, Dict, MutableSequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, UNINITIALIZED
+from broqer import Publisher, Subscriber, UNINITIALIZED, SubscriptionDisposable
 
 from .operator import MultiOperator, build_operator
 
@@ -38,13 +38,22 @@ class CombineLatest(MultiOperator):
     :param emit_on: publisher or list of publishers - only emitting result when
         emit comes from one of this list. If None, emit on any source
         publisher.
+    :param allow_stateless: when True evaluation is also done for stateless
+        publishers. A stateless publisher without an emit will be hold as
+        UNINITIALIZED.
     """
-    def __init__(self, *publishers: Publisher, map_=None, emit_on=None
-                 ) -> None:
+    def __init__(self, *publishers: Publisher, map_=None, emit_on=None,
+                 allow_stateless=False) -> None:
         MultiOperator.__init__(self, *publishers)
-        partial = [None for _ in publishers]  # type: MutableSequence[Any]
-        self._partial_state = partial
+        self._partial_state = [
+            UNINITIALIZED for _ in publishers]  # type: MutableSequence[Any]
         self._missing = set(publishers)
+
+        if allow_stateless:
+            self._stateless_publishers = None
+        else:
+            self._stateless_publishers = tuple(False for _ in publishers)
+
         self._index = \
             {p: i for i, p in enumerate(publishers)
              }  # type: Dict[Publisher, int]
@@ -58,21 +67,56 @@ class CombineLatest(MultiOperator):
                 self._emit_on = emit_on
         self._state = UNINITIALIZED  # type: Any
 
+    def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
+        disposable = MultiOperator.subscribe(self, subscriber)
+        if len(self._subscriptions) == 1:
+            if self._stateless_publishers is None:
+                self._stateless_publishers = tuple(
+                    v is UNINITIALIZED for v in self._partial_state)
+                for p, stateless in zip(
+                                self._publishers, self._stateless_publishers):
+                    if stateless:
+                        self._missing.remove(p)
+                if self._map:
+                    state = self._map(*self._partial_state)
+                else:
+                    state = tuple(self._partial_state)
+                self.notify(state)
+        return disposable
+
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._missing = set(self._publishers)
-            self._partial_state = [None for _ in self._partial_state]
+            self._partial_state = [UNINITIALIZED for _ in self._partial_state]
             self._state = UNINITIALIZED
 
     def get(self):
         if not self._subscriptions:  # if no subscribers listening
-            values = tuple(publisher.get() for publisher in self._publishers)
+            try:
+                values = tuple(p.get() for p in self._publishers)
+            except ValueError as e:
+                if self._stateless_publishers is None or \
+                            any(self._stateless_publishers):
+                    values = []
+                    for p in self._publishers:
+                        try:
+                            values.append(p.get())
+                        except ValueError:
+                            values.append(UNINITIALIZED)
+                else:
+                    raise e
             if self._map:
                 return self._map(*values)
-            return values
+            return tuple(values)
         if self._state is not UNINITIALIZED:
             return self._state
+        if self._stateless_publishers is None or \
+                any(self._stateless_publishers):
+            if self._map:
+                return self._map(*self._partial_state)
+            else:
+                return tuple(self._partial_state)
         return Publisher.get(self)  # will raise ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
@@ -82,15 +126,21 @@ class CombineLatest(MultiOperator):
         if self._missing and any(who is p for p in self._missing):
             self._missing.remove(who)
 
-        if self._partial_state[self._index[who]] == value:
+        index = self._index[who]
+        if self._partial_state[index] == value:
             # if partial_state has not changed avoid new emit
             return None
-        self._partial_state[self._index[who]] = value
+
+        self._partial_state[index] = value
+
         if not self._missing and any(who is p for p in self._emit_on):
             if self._map:
                 state = self._map(*self._partial_state)
             else:
                 state = tuple(self._partial_state)
+            if self._stateless_publishers and \
+                    self._stateless_publishers[index]:
+                self._partial_state[index] = UNINITIALIZED
             if state != self._state:
                 self._state = state
                 return self.notify(self._state)
