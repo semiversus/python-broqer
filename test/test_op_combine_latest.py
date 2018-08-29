@@ -1,6 +1,6 @@
 import pytest
 
-from broqer.op import CombineLatest, Just
+from broqer.op import CombineLatest, Just, sink
 from broqer import Publisher, StatefulPublisher, UNINITIALIZED
 
 from .helper import check_multi_operator, NONE, Collector
@@ -57,3 +57,41 @@ def test_allow_stateless():
 
     assert collector.result_vector == ((0, UNINITIALIZED), (1, UNINITIALIZED),
         (1, True), (2, UNINITIALIZED), (2, False))
+
+def test_allow_stateless_extensive():
+    source1 = StatefulPublisher(0)
+    source2 = Publisher()
+    source3 = StatefulPublisher(0)
+    source4 = Publisher()
+
+    dut = CombineLatest(source1, source2, source3, source4,
+        allow_stateless=True, emit_on=(source2, source3))
+
+    with pytest.raises(ValueError):
+        dut | sink()  # source4 is stateless but not in emit_on list
+
+    def reverse(s1, s2, s3, s4):
+        return (s4, s3, s2, s1)
+
+    dut = CombineLatest(source1, source2, source3, source4, map_=reverse,
+        allow_stateless=True, emit_on=(source2, source3, source4))
+
+    assert dut.get() == (UNINITIALIZED, 0, UNINITIALIZED, 0)
+
+    collector = Collector()
+    dut.subscribe(collector)
+
+    assert dut.get() == (UNINITIALIZED, 0, UNINITIALIZED, 0)
+    assert collector.result_vector == ((UNINITIALIZED, 0, UNINITIALIZED, 0),)
+
+    collector.reset()
+    source1.notify(1)
+    source2.notify(2)
+    assert dut.get() == (UNINITIALIZED, 0, UNINITIALIZED, 1)
+    assert collector.result_vector == ((UNINITIALIZED, 0, 2, 1),)
+
+    collector.reset()
+    source3.notify(3)
+    source4.notify(4)
+    assert dut.get() == (UNINITIALIZED, 3, UNINITIALIZED, 1)
+    assert collector.result_vector == ((UNINITIALIZED, 3, UNINITIALIZED, 1), (4, 3, UNINITIALIZED, 1),)

@@ -77,6 +77,10 @@ class CombineLatest(MultiOperator):
                                 self._publishers, self._stateless_publishers):
                     if stateless:
                         self._missing.remove(p)
+                        if not any(p is _p for _p in self._emit_on):
+                            raise ValueError(
+                                'Publisher %r seems to be a stateless '
+                                'publisher, but is missing in emit_on')
                 if self._map:
                     state = self._map(*self._partial_state)
                 else:
@@ -138,12 +142,16 @@ class CombineLatest(MultiOperator):
                 state = self._map(*self._partial_state)
             else:
                 state = tuple(self._partial_state)
-            if self._stateless_publishers and \
-                    self._stateless_publishers[index]:
-                self._partial_state[index] = UNINITIALIZED
             if state != self._state:
                 self._state = state
-                return self.notify(self._state)
+                result = self.notify(self._state)
+            else:
+                result = None
+            if self._stateless_publishers and \
+                    self._stateless_publishers[index]:
+                self._state = UNINITIALIZED
+                self._partial_state[index] = UNINITIALIZED
+            return result
         return None
 
 
