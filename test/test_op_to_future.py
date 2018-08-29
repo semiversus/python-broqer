@@ -4,6 +4,14 @@ import pytest
 from broqer import Publisher, StatefulPublisher
 from broqer.op import ToFuture
 
+from .eventloop import VirtualTimeEventLoop
+
+@pytest.yield_fixture()
+def event_loop():
+    loop = VirtualTimeEventLoop()
+    yield loop
+    loop.close()
+
 def test_publisher():
     p = Publisher()
     future = ToFuture(p)

@@ -1,3 +1,4 @@
+import asyncio
 import time
 import pytest
 
@@ -31,3 +32,4 @@ def wait(v, duration=0.15):
 @pytest.mark.asyncio
 async def test_with_publisher(map_thread, args, kwargs, mode, input_vector, output_vector, event_loop):
     await check_async_operator_coro(MapThreaded, (map_thread, *args), {'mode':mode, **kwargs}, input_vector, output_vector, loop=event_loop)
+    await asyncio.sleep(0.1)

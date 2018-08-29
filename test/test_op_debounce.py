@@ -4,6 +4,13 @@ from unittest import mock
 from broqer.op import Debounce
 
 from .helper import check_async_operator_coro, NONE
+from .eventloop import VirtualTimeEventLoop
+
+@pytest.yield_fixture()
+def event_loop():
+    loop = VirtualTimeEventLoop()
+    yield loop
+    loop.close()
 
 @pytest.mark.parametrize('args, input_vector, output_vector', [
     # repeated False followed by repeated True

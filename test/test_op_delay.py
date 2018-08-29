@@ -3,6 +3,13 @@ import pytest
 from broqer.op import Delay
 
 from .helper import check_async_operator_coro, NONE
+from .eventloop import VirtualTimeEventLoop
+
+@pytest.yield_fixture()
+def event_loop():
+    loop = VirtualTimeEventLoop()
+    yield loop
+    loop.close()
 
 @pytest.mark.parametrize('duration, input_vector, output_vector', [
     # repeated False followed by repeated True

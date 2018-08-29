@@ -6,6 +6,13 @@ from unittest import mock
 from broqer.op import MapAsync, Mode
 
 from .helper import check_async_operator_coro, NONE
+from .eventloop import VirtualTimeEventLoop
+
+@pytest.yield_fixture()
+def event_loop():
+    loop = VirtualTimeEventLoop()
+    yield loop
+    loop.close()
 
 async def add1(v, i=1):
     return v+i
@@ -39,6 +46,7 @@ async def foo_vargs(a, b, c):
 @pytest.mark.asyncio
 async def test_with_publisher(map_coro, args, kwargs, mode, input_vector, output_vector, event_loop):
     await check_async_operator_coro(MapAsync, (map_coro, *args), {'mode':mode, **kwargs}, input_vector, output_vector, loop=event_loop)
+    await asyncio.sleep(0.3)
 
 @pytest.mark.asyncio
 async def test_map_async():
