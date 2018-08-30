@@ -81,12 +81,6 @@ class CombineLatest(MultiOperator):
                             raise ValueError(
                                 'Publisher %r seems to be a stateless '
                                 'publisher, but is missing in emit_on')
-                if not any(self._stateless_publishers):
-                    if self._map:
-                        state = self._map(*self._partial_state)
-                    else:
-                        state = tuple(self._partial_state)
-                    self.notify(state)
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
