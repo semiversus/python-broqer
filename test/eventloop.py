@@ -1,7 +1,3 @@
-""" this file is taken from aioreactive project:
-https://github.com/dbrattli/aioreactive/blob/master/aioreactive/testing/eventloop.py
-"""
-
 import inspect
 import traceback
 import logging
@@ -44,7 +40,6 @@ def isfuture(obj):
 class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
 
     def __init__(self):
-        asyncio.AbstractEventLoop.__init__(self)
         self._timer_cancelled_count = 0
         self._closed = False
         self._stopping = False
@@ -146,7 +141,7 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
         timer._scheduled = True
         return timer
 
-    def call_soon(self, callback, *args):
+    def call_soon(self, callback, *args, context=None):
         handle = self._call_soon(callback, args)
         if handle._source_traceback:
             del handle._source_traceback[-1]
@@ -163,7 +158,7 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
         return handle
 
     def call_soon_threadsafe(self, callback, *args):
-        return asyncio.SelectorEventLoop.call_soon_threadsafe(self, callback, *args)
+        raise NotImplementedError
 
     def time(self):
         return self._time

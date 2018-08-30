@@ -42,12 +42,14 @@ def test_allow_stateless():
     source2 = Publisher()
 
     dut = CombineLatest(source1, source2, allow_stateless=True)
-    assert dut.get() == (0, UNINITIALIZED)
+    with pytest.raises(ValueError):
+        dut.get()
 
     collector = Collector()
     dut.subscribe(collector)
 
-    assert dut.get() == (0, UNINITIALIZED)
+    with pytest.raises(ValueError):
+        dut.get()
     assert collector.result_vector == ((0, UNINITIALIZED),)
 
     source1.notify(1)
@@ -70,6 +72,43 @@ def test_allow_stateless():
     source1.notify(0)
     assert collector.result_vector == ((2, False), (2, False), (0, UNINITIALIZED))
 
+    source3 = StatefulPublisher(0)
+    dut2 = CombineLatest(dut, source3)
+
+    with pytest.raises(ValueError):
+        dut2.get()
+
+def test_stateless_only():
+    source1 = Publisher()
+    source2 = Publisher()
+
+    dut = CombineLatest(source1, source2, allow_stateless=True)
+
+    collector = Collector()
+    dut.subscribe(collector)
+
+    with pytest.raises(ValueError):
+        dut.get()
+
+    source1.notify(1)
+    source2.notify(True)
+    source1.notify(2)
+    source2.notify(False)
+
+    assert collector.result_vector == ((UNINITIALIZED, UNINITIALIZED),
+        (1, UNINITIALIZED), (UNINITIALIZED, True), (2, UNINITIALIZED),
+        (UNINITIALIZED, False))
+
+    # special case with one source
+    dut2 = CombineLatest(source1, allow_stateless=True)
+    collector2 = Collector()
+    dut2.subscribe(collector2)
+
+    with pytest.raises(ValueError):
+        dut2.get()
+
+    assert collector2.result_vector == ((UNINITIALIZED,),)
+
 def test_stateless_map():
     source1 = StatefulPublisher(0)
     source2 = Publisher()
@@ -79,7 +118,8 @@ def test_stateless_map():
     collector = Collector()
     dut.subscribe(collector)
 
-    assert dut.get() == 0
+    with pytest.raises(ValueError):
+        dut.get()
     assert collector.result_vector == (0,)
 
     collector.reset()
@@ -119,22 +159,26 @@ def test_allow_stateless_extensive():
     dut = CombineLatest(source1, source2, source3, source4, map_=reverse,
         allow_stateless=True, emit_on=(source2, source3, source4))
 
-    assert dut.get() == (UNINITIALIZED, 0, UNINITIALIZED, 0)
+    with pytest.raises(ValueError):
+        dut.get()
 
     collector = Collector()
     dut.subscribe(collector)
 
-    assert dut.get() == (UNINITIALIZED, 0, UNINITIALIZED, 0)
+    with pytest.raises(ValueError):
+        dut.get()
     assert collector.result_vector == ((UNINITIALIZED, 0, UNINITIALIZED, 0),)
 
     collector.reset()
     source1.notify(1)
     source2.notify(2)
-    assert dut.get() == (UNINITIALIZED, 0, UNINITIALIZED, 1)
+    with pytest.raises(ValueError):
+        dut.get()
     assert collector.result_vector == ((UNINITIALIZED, 0, 2, 1),)
 
     collector.reset()
     source3.notify(3)
     source4.notify(4)
-    assert dut.get() == (UNINITIALIZED, 3, UNINITIALIZED, 1)
+    with pytest.raises(ValueError):
+        dut.get()
     assert collector.result_vector == ((UNINITIALIZED, 3, UNINITIALIZED, 1), (4, 3, UNINITIALIZED, 1),)

@@ -97,30 +97,12 @@ class CombineLatest(MultiOperator):
 
     def get(self):
         if not self._subscriptions:  # if no subscribers listening
-            try:
-                values = tuple(p.get() for p in self._publishers)
-            except ValueError as e:
-                if self._stateless_publishers is None or \
-                            any(self._stateless_publishers):
-                    values = []
-                    for p in self._publishers:
-                        try:
-                            values.append(p.get())
-                        except ValueError:
-                            values.append(UNINITIALIZED)
-                else:
-                    raise e
+            values = tuple(p.get() for p in self._publishers)
             if self._map:
                 return self._map(*values)
             return tuple(values)
         if self._state is not UNINITIALIZED:
             return self._state
-        if self._stateless_publishers is None or \
-                any(self._stateless_publishers):
-            if self._map:
-                return self._map(*self._partial_state)
-            else:
-                return tuple(self._partial_state)
         return Publisher.get(self)  # will raise ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
@@ -142,16 +124,19 @@ class CombineLatest(MultiOperator):
                 state = self._map(*self._partial_state)
             else:
                 state = tuple(self._partial_state)
+
             if state != self._state or (self._stateless_publishers and \
                     self._stateless_publishers[index]):
                 self._state = state
                 result = self.notify(self._state)
             else:
                 result = None
-            if self._stateless_publishers and \
-                    self._stateless_publishers[index]:
+
+            if any(self._stateless_publishers):
                 self._state = UNINITIALIZED
+            if self._stateless_publishers[index]:
                 self._partial_state[index] = UNINITIALIZED
+
             return result
         return None
 
