@@ -100,7 +100,6 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
 
     dut = cls(*sources, *args, **kwargs)
 
-    print(dut.source_publishers, sources)
     assert sources[0] in dut.source_publishers
 
     collector_permanent = Collector()
