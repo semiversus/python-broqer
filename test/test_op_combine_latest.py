@@ -58,6 +58,49 @@ def test_allow_stateless():
     assert collector.result_vector == ((0, UNINITIALIZED), (1, UNINITIALIZED),
         (1, True), (2, UNINITIALIZED), (2, False))
 
+    # combine latest should also emit when stateless publisher is emitting
+    collector.reset()
+
+    source2.notify(False)
+    assert collector.result_vector == ((2, False),)
+
+    source2.notify(False)
+    assert collector.result_vector == ((2, False), (2, False))
+
+    source1.notify(0)
+    assert collector.result_vector == ((2, False), (2, False), (0, UNINITIALIZED))
+
+def test_stateless_map():
+    source1 = StatefulPublisher(0)
+    source2 = Publisher()
+
+    dut = CombineLatest(source1, source2, map_=lambda a,b: a+(0 if b is UNINITIALIZED else b), allow_stateless=True)
+
+    collector = Collector()
+    dut.subscribe(collector)
+
+    assert dut.get() == 0
+    assert collector.result_vector == (0,)
+
+    collector.reset()
+    source1.notify(1)
+    assert collector.result_vector == (1,)
+
+    source1.notify(1)
+    assert collector.result_vector == (1,)
+
+    source1.notify(1.0)
+    assert collector.result_vector == (1,)
+
+    source2.notify(0)
+    assert collector.result_vector == (1, 1)
+
+    source2.notify(1)
+    assert collector.result_vector == (1, 1, 2)
+
+    source2.notify(1)
+    assert collector.result_vector == (1, 1, 2, 2)
+
 def test_allow_stateless_extensive():
     source1 = StatefulPublisher(0)
     source2 = Publisher()

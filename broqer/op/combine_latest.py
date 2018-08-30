@@ -142,7 +142,8 @@ class CombineLatest(MultiOperator):
                 state = self._map(*self._partial_state)
             else:
                 state = tuple(self._partial_state)
-            if state != self._state:
+            if state != self._state or (self._stateless_publishers and \
+                    self._stateless_publishers[index]):
                 self._state = state
                 result = self.notify(self._state)
             else:
