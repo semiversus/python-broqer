@@ -39,7 +39,7 @@ This is working because False is correpsonding to integer 0, True is 1
 1
 """
 import asyncio
-from typing import Any, List
+from typing import Any, Dict
 
 from broqer import Publisher, UNINITIALIZED
 
@@ -48,14 +48,14 @@ from .operator import Operator, build_operator
 
 class Switch(Operator):
     def __init__(self, selection_publisher: Publisher,
-                 publisher_mapping: List[Publisher]) -> None:
+                 publisher_mapping: Dict[Any, Publisher]) -> None:
         Operator.__init__(self, selection_publisher)
         self._selection_publisher = selection_publisher
         self._selected_publisher = UNINITIALIZED
         self._mapping = publisher_mapping
 
     def get(self):
-        selection = self._selected_publisher.get()  # may raises ValueError
+        selection = self._selection_publisher.get()  # may raises ValueError
         return self._mapping[selection].get()  # may raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
