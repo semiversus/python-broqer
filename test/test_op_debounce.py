@@ -126,6 +126,6 @@ async def test_debounce():
     await asyncio.sleep(0.05)
 
     assert debounce.get() == True
-    await (debounce | op.filter_())
+    await op.True_(debounce)
     mock_sink.assert_called_once_with(True)
 

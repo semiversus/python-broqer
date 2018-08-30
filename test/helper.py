@@ -1,6 +1,8 @@
 import asyncio
 from typing import Any
 
+import pytest
+
 from broqer import Subscriber, Publisher, SubscriptionDisposable
 
 class Collector(Subscriber):
@@ -253,6 +255,13 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
         assert dut.get() == stored_result
     except ValueError:
         assert stored_result is None
+
+    # check emit from wrong publisher
+    wrong_publisher = Publisher()
+    with pytest.raises(AssertionError):
+        dut.emit(first_input, who=wrong_publisher)
+    with pytest.raises( (AssertionError, TypeError) ):
+        dut.emit(first_input)
 
 JITTER = 0.03
 

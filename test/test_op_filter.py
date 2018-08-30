@@ -9,8 +9,7 @@ from .helper import check_single_operator, NONE
     ((), {'predicate': lambda v:v==0}, (1, 2, 0, 0.0, None), (NONE, NONE, 0, 0.0, NONE)),
     ((lambda v,a:v==a, 0), {}, (1, 2, 0, 0.0, None), (NONE, NONE, 0, 0.0, NONE)),
     ((lambda v,a:v==a, 1), {}, (1, 2, 0, 0.0, None), (1, NONE, NONE, NONE, NONE)),
-    ((), {}, (1, 2, 0, 0.0, None, True, False, []), (1, 2, NONE, NONE, NONE, True, NONE, NONE)),
-
+    ((lambda a,b:a==b,), {'unpack':True}, ((0,0), (0,1), (1,0), (1,1)), ((0,0), NONE, NONE, (1,1))),
 ])
 def test_with_publisher(args, kwargs, input_vector, output_vector):
     check_single_operator(Filter, args, kwargs, input_vector, output_vector)
