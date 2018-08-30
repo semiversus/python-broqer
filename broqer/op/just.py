@@ -20,7 +20,7 @@ from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 class Just(Publisher):
     def __init__(self, value: Any) -> None:
-        super().__init__()
+        Publisher.__init__(self)
         self._state = value
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:

@@ -12,7 +12,8 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
     be unsubscripted.
     """
     def __init__(self, publisher: Publisher) -> None:
-        super().__init__()
+        Publisher.__init__(self)
+        Subscriber.__init__(self)
         self._publisher = publisher
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
@@ -49,7 +50,8 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
     of the last subscriber.
     """
     def __init__(self, *publishers: Publisher) -> None:
-        super().__init__()
+        Publisher.__init__(self)
+        Subscriber.__init__(self)
         self._publishers = publishers
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:

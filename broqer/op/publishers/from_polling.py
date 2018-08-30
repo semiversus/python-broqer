@@ -39,7 +39,7 @@ class FromPolling(Publisher):
     def __init__(self, interval, poll_func: Callable[[Any], Any], *args,
                  error_callback=default_error_handler, loop=None,
                  **kwargs) -> None:
-        super().__init__()
+        Publisher.__init__(self)
 
         self._interval = interval
         if args or kwargs:

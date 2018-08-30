@@ -24,7 +24,7 @@ from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 class FromIterable(Publisher):
     def __init__(self, iterable) -> None:
-        super().__init__()
+        Publisher.__init__(self)
         self._iterable = iterable
 
     def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
