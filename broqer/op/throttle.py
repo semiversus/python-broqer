@@ -75,6 +75,7 @@ class Throttle(Operator):
     def reset(self):
         if self._call_later_handler is not None:
             self._call_later_handler.cancel()
+            self._call_later_handler = None
             self._wait_done_cb()
 
 
