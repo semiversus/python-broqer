@@ -59,6 +59,7 @@ async def test_throttle():
 
     # test reset
     mock_sink.reset_mock()
+    mock_sink.side_effect = None
     throttle = p | op.throttle(0.1)
     disposable = throttle | op.sink(mock_sink)
     p.notify(1)
