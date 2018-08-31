@@ -5,7 +5,6 @@ from .cache import Cache, cache
 from .catch_exception import CatchException, catch_exception
 from .combine_latest import CombineLatest, combine_latest
 from .filter_ import Filter, True_, False_, filter_, true, false
-from .just import Just
 from .map_ import Map, map_
 from .merge import Merge, merge
 from .partition import Partition, partition
@@ -25,6 +24,7 @@ from .throttle import Throttle, throttle
 # publishers
 from .publishers.from_polling import FromPolling
 from .publishers.from_iterable import FromIterable
+from .publishers.just import Just
 
 # subscribers
 from .subscribers.to_future import ToFuture, to_future
