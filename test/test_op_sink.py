@@ -38,6 +38,34 @@ def test_sink(operator_cls):
     s.emit(1)
     assert not cb.called
 
+@pytest.mark.parametrize('operator_cls', [Sink, Trace])
+def test_sink(operator_cls):
+    cb = mock.Mock()
+
+    s = Subject()
+    sink_instance = operator_cls(s, cb, unpack=True)
+    assert isinstance(sink_instance, Disposable)
+
+    # test various emits on source
+    with pytest.raises(TypeError):
+        s.emit()
+
+    with pytest.raises(TypeError):
+        s.emit(1)
+
+    cb.assert_not_called()
+
+    s.emit( (1, 2) )
+    cb.assert_called_with(1,2)
+
+@pytest.mark.parametrize('operator_cls', [Sink, Trace])
+def test_sink_without_function(operator_cls):
+    s = Subject()
+    sink_instance = operator_cls(s)
+    assert isinstance(sink_instance, Disposable)
+    assert len(s.subscriptions) == 1
+
+    s.emit(1)
 
 @pytest.mark.parametrize('operator', [sink, trace])
 def test_sink_on_subscription(operator):
