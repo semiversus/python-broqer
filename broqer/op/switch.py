@@ -41,7 +41,7 @@ This is working because False is correpsonding to integer 0, True is 1
 import asyncio
 from typing import Any, Dict
 
-from broqer import Publisher, UNINITIALIZED
+from broqer import Publisher
 
 from .operator import Operator, build_operator
 
@@ -51,7 +51,7 @@ class Switch(Operator):
                  publisher_mapping: Dict[Any, Publisher]) -> None:
         Operator.__init__(self, selection_publisher)
         self._selection_publisher = selection_publisher
-        self._selected_publisher = UNINITIALIZED
+        self._selected_publisher = None  # type: Publisher
         self._mapping = publisher_mapping
 
     def get(self):
@@ -61,7 +61,7 @@ class Switch(Operator):
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         if who is self._selection_publisher:
             if self._mapping[value] is not self._selected_publisher:
-                if self._selected_publisher is not UNINITIALIZED:
+                if self._selected_publisher is not None:
                     self._selected_publisher.unsubscribe(self)  # type: ignore
                 self._selected_publisher = self._mapping[value]
                 self._selected_publisher.subscribe(self)  # type: ignore

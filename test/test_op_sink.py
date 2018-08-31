@@ -2,15 +2,15 @@ from unittest import mock
 import pytest
 
 from broqer import Disposable
-from broqer.op import Sink, cache, sink
+from broqer.op import Sink, cache, sink, Trace, trace
 from broqer.subject import Subject
 
-
-def test_sink():
+@pytest.mark.parametrize('operator_cls', [Sink, Trace])
+def test_sink(operator_cls):
     cb = mock.Mock()
 
     s = Subject()
-    sink_instance = Sink(s, cb)
+    sink_instance = operator_cls(s, cb)
     assert isinstance(sink_instance, Disposable)
 
     assert not cb.called
@@ -39,11 +39,12 @@ def test_sink():
     assert not cb.called
 
 
-def test_sink_on_subscription():
+@pytest.mark.parametrize('operator', [sink, trace])
+def test_sink_on_subscription(operator):
     cb = mock.Mock()
 
     s = Subject()
-    sink_instance = s | cache(0) | sink(cb)
+    sink_instance = s | cache(0) | operator(cb)
     assert isinstance(sink_instance, Disposable)
 
     cb.assert_called_with(0)
@@ -62,11 +63,12 @@ def test_sink_on_subscription():
     assert not cb.called
 
 
-def test_sink_partial():
+@pytest.mark.parametrize('operator_cls', [Sink, Trace])
+def test_sink_partial(operator_cls):
     cb = mock.Mock()
 
     s = Subject()
-    sink_instance = Sink(s, cb, 1, 2, 3, a=1)
+    sink_instance = operator_cls(s, cb, 1, 2, 3, a=1)
     assert isinstance(sink_instance, Disposable)
 
     assert not cb.called

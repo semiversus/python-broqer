@@ -29,6 +29,7 @@ from .publishers.just import Just
 # subscribers
 from .subscribers.to_future import ToFuture, to_future
 from .subscribers.sink import Sink, sink
+from .subscribers.trace import Trace, trace
 
 # enable operator overloading
 import broqer.op.operator_overloading  # noqa: F401
@@ -42,7 +43,7 @@ __all__ = [
     'switch', 'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
     'Sample', 'sample', 'MapAsync', 'map_async', 'Mode', 'MapThreaded',
     'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future',
-    'True_', 'true', 'False_', 'false'
+    'True_', 'true', 'False_', 'false', 'Trace', 'trace'
 ]
 
 # TODO operators

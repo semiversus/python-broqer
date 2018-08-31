@@ -52,14 +52,15 @@ class FromPolling(Publisher):
         self._call_later_handler = None
         self._error_callback = error_callback
 
-    def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber)
+    def subscribe(self, subscriber: Subscriber,
+                  prepend: bool=False) -> SubscriptionDisposable:
+        disposable = Publisher.subscribe(self, subscriber, prepend)
         if self._call_later_handler is None:
             self._poll_callback()
         return disposable
 
     def get(self):
-        return self._poll_func()
+        Publisher.get(self)  # raises ValueError
 
     def _poll_callback(self):
         if self._subscriptions:

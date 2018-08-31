@@ -67,8 +67,9 @@ class CombineLatest(MultiOperator):
                 self._emit_on = emit_on
         self._state = UNINITIALIZED  # type: Any
 
-    def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        disposable = MultiOperator.subscribe(self, subscriber)
+    def subscribe(self, subscriber: 'Subscriber',
+                  prepend: bool=False) -> SubscriptionDisposable:
+        disposable = MultiOperator.subscribe(self, subscriber, prepend)
         if len(self._subscriptions) == 1:
             if self._stateless_publishers is None:
                 self._stateless_publishers = tuple(

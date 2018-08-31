@@ -115,8 +115,9 @@ class Topic(Publisher, Subscriber):
         self.assignment_future = None
         self._pre_assign_emit = UNINITIALIZED  # type: Any
 
-    def subscribe(self, subscriber: 'Subscriber') -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber)
+    def subscribe(self, subscriber: 'Subscriber',
+                  prepend: bool=False) -> SubscriptionDisposable:
+        disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if self._subject is not None:
             if len(self._subscriptions) == 1:

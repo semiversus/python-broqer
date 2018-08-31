@@ -16,8 +16,9 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
         Subscriber.__init__(self)
         self._publisher = publisher
 
-    def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber)
+    def subscribe(self, subscriber: 'Subscriber',
+                  prepend: bool=False) -> SubscriptionDisposable:
+        disposable = Publisher.subscribe(self, subscriber, prepend)
         if len(self._subscriptions) == 1:  # if this was the first subscription
             self._publisher.subscribe(self)
         else:
@@ -54,8 +55,9 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
         Subscriber.__init__(self)
         self._publishers = publishers
 
-    def subscribe(self, subscriber: Subscriber) -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber)
+    def subscribe(self, subscriber: 'Subscriber',
+                  prepend: bool=False) -> SubscriptionDisposable:
+        disposable = Publisher.subscribe(self, subscriber, prepend)
         if len(self._subscriptions) == 1:  # if this was the first subscription
             for _publisher in self._publishers:
                 # subscribe to all dependent publishers

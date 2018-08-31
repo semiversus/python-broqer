@@ -13,19 +13,26 @@ class SubscriptionError(ValueError):
 
 class Publisher():
     def __init__(self):
-        self._subscriptions = set()
+        self._subscriptions = list()
 
-    def subscribe(self, subscriber: 'Subscriber') -> 'SubscriptionDisposable':
-        if subscriber in self._subscriptions:
+    def subscribe(self, subscriber: 'Subscriber',
+                  prepend: bool=False) -> 'SubscriptionDisposable':
+
+        if any(subscriber is s for s in self._subscriptions):
             raise SubscriptionError('Subscriber already registered')
 
-        self._subscriptions.add(subscriber)
+        if prepend:
+            self._subscriptions.insert(0, subscriber)
+        else:
+            self._subscriptions.append(subscriber)
         return SubscriptionDisposable(self, subscriber)
 
     def unsubscribe(self, subscriber: 'Subscriber') -> None:
-        try:
-            self._subscriptions.remove(subscriber)
-        except KeyError:
+        for i, _s in enumerate(tuple(self._subscriptions)):
+            if _s is subscriber:
+                self._subscriptions.pop(i)
+                return
+        else:
             raise SubscriptionError('Subscriber is not registered (anymore)')
 
     def get(self):  # pylint: disable=useless-return, no-self-use
@@ -63,14 +70,19 @@ class Publisher():
         from broqer.op import ToFuture  # lazy import due circular dependency
         return ToFuture(self, timeout)
 
+    def __bool__(self):
+        raise NotImplementedError('Evaluation of comparison of publishers is '
+                                  'not supported')
+
 
 class StatefulPublisher(Publisher):
     def __init__(self, init=UNINITIALIZED):
         Publisher.__init__(self)
         self._state = init
 
-    def subscribe(self, subscriber: 'Subscriber') -> 'SubscriptionDisposable':
-        disposable = Publisher.subscribe(self, subscriber)
+    def subscribe(self, subscriber: 'Subscriber',
+                  prepend: bool=False) -> 'SubscriptionDisposable':
+        disposable = Publisher.subscribe(self, subscriber, prepend=prepend)
         if self._state is not UNINITIALIZED:
             subscriber.emit(self._state, who=self)
         return disposable
