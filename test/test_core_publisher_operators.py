@@ -115,7 +115,7 @@ def test_with_publisher(operator, l_value, r_value, result):
 
     for output in (o1, o2, o3, o4, o5, o6, o7, o9):
         assert isinstance(output, Publisher)
-    
+
     assert o8 == result
 
     for output in (o1, o2, o7):
@@ -125,24 +125,50 @@ def test_with_publisher(operator, l_value, r_value, result):
         with pytest.raises(ValueError):
             output.get()
 
-    mock_sink_o3.assert_not_called()    
-    mock_sink_o4.assert_not_called()    
-    mock_sink_o5.assert_not_called()    
-    mock_sink_o6.assert_not_called()    
+    mock_sink_o3.assert_not_called()
+    mock_sink_o4.assert_not_called()
+    mock_sink_o5.assert_not_called()
+    mock_sink_o6.assert_not_called()
     mock_sink_o9.assert_not_called()
 
     pl.notify(l_value)
 
-    mock_sink_o3.assert_not_called()    
-    mock_sink_o4.assert_called_once_with(result)    
-    mock_sink_o5.assert_called_once_with(result)    
-    mock_sink_o6.assert_not_called()    
+    mock_sink_o3.assert_not_called()
+    mock_sink_o4.assert_called_once_with(result)
+    mock_sink_o5.assert_called_once_with(result)
+    mock_sink_o6.assert_not_called()
     mock_sink_o9.assert_not_called()
 
     pr.notify(r_value)
 
-    mock_sink_o3.assert_called_once_with(result)    
-    mock_sink_o4.assert_called_once_with(result)    
-    mock_sink_o5.assert_called_once_with(result)    
-    mock_sink_o6.assert_called_once_with(result)    
+    mock_sink_o3.assert_called_once_with(result)
+    mock_sink_o4.assert_called_once_with(result)
+    mock_sink_o5.assert_called_once_with(result)
+    mock_sink_o6.assert_called_once_with(result)
     mock_sink_o9.assert_called_once_with(result)
+
+def test_wrong_comparision():
+    p1 = Publisher()
+    p2 = Publisher()
+
+    with pytest.raises(NotImplementedError):
+        assert p1 == p2
+
+    with pytest.raises(NotImplementedError):
+        if p1 == p2: pass
+
+    with pytest.raises(NotImplementedError):
+        if p1 != p2: pass
+
+    with pytest.raises(NotImplementedError):
+        assert p2 in (p1, p2)
+
+    with pytest.raises(NotImplementedError):
+        p1 in (p2, p2)
+
+    with pytest.raises(NotImplementedError):
+        assert p1 not in (p2, p2)
+
+    l = [p1, p2]
+    with pytest.raises(NotImplementedError):
+        l.remove(p2)
