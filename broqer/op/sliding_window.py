@@ -64,6 +64,8 @@ class SlidingWindow(Operator):
         return None
 
     def flush(self):
+        if not self._emit_partial and len(self._state) != self._state.maxlen:
+            self.notify(tuple(self._state))
         self._state.clear()
 
 

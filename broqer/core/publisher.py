@@ -25,6 +25,7 @@ class Publisher():
             self._subscriptions.insert(0, subscriber)
         else:
             self._subscriptions.append(subscriber)
+
         return SubscriptionDisposable(self, subscriber)
 
     def unsubscribe(self, subscriber: 'Subscriber') -> None:

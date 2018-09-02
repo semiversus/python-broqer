@@ -1,6 +1,8 @@
 import pytest
+from unittest.mock import Mock
 
-from broqer.op import Partition
+from broqer import Publisher
+from broqer.op import Partition, sink
 
 from .helper import check_single_operator, NONE
 
@@ -12,3 +14,15 @@ from .helper import check_single_operator, NONE
 def test_with_publisher(size, input_vector, output_vector):
     check_single_operator(Partition, (size,), {}, input_vector, output_vector, has_state=None)
     # TODO: remove has_state=None
+
+def test_partition():
+    mock = Mock()
+    p = Publisher()
+
+    dut = Partition(p,3)
+    dut | sink(mock)
+    p.notify(1)
+    p.notify(2)
+    mock.assert_not_called()
+    dut.flush()
+    mock.assert_called_once_with((1,2))

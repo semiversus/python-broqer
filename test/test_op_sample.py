@@ -1,6 +1,9 @@
 import pytest
+import asyncio
+from unittest.mock import Mock, ANY
 
-from broqer.op import Sample
+from broqer import Publisher
+from broqer.op import Sample, sink
 
 from .helper import check_async_operator_coro, NONE
 from .eventloop import VirtualTimeEventLoop
@@ -19,3 +22,39 @@ def event_loop():
 @pytest.mark.asyncio
 async def test_with_publisher(interval, input_vector, output_vector, event_loop):
     await check_async_operator_coro(Sample, (interval,), {}, input_vector, output_vector, has_state=True, loop=event_loop)
+
+@pytest.mark.asyncio
+async def test_sample():
+    p = Publisher()
+    dut = Sample(p, 0.1)
+
+    mock = Mock()
+    disposable = dut | sink(mock)
+
+    await asyncio.sleep(0.2)
+    mock.assert_not_called()
+
+    p.notify(1)
+    mock.assert_called_once_with(1)
+    mock.reset_mock()
+    await asyncio.sleep(0.15)
+    mock.assert_called_once_with(1)
+
+    disposable.dispose()
+    mock.reset_mock()
+    await asyncio.sleep(0.2)
+    mock.assert_not_called()
+
+@pytest.mark.asyncio
+async def test_errorhandler():
+    mock = Mock(side_effect=ZeroDivisionError)
+    mock_errorhandler = Mock()
+
+    p = Publisher()
+
+    dut = Sample(p, 0.1, error_callback=mock_errorhandler)
+    dut | sink(mock)
+
+    p.notify(1)
+    mock.assert_called_once_with(1)
+    mock_errorhandler.assert_called_once_with(ZeroDivisionError, ANY, ANY)

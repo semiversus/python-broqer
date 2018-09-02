@@ -23,13 +23,13 @@ from .throttle import Throttle, throttle
 
 # publishers
 from .publishers.from_polling import FromPolling
-from .publishers.from_iterable import FromIterable
 from .publishers.just import Just
 
 # subscribers
 from .subscribers.to_future import ToFuture, to_future
 from .subscribers.sink import Sink, sink
 from .subscribers.trace import Trace, trace
+from .subscribers.topic_mapper import TopicMapper, topic_mapper
 
 # enable operator overloading
 import broqer.op.operator_overloading  # noqa: F401
@@ -37,13 +37,14 @@ import broqer.op.operator_overloading  # noqa: F401
 __all__ = [
     'Any', 'any_', 'All', 'all_', 'Accumulate', 'accumulate', 'Cache', 'cache',
     'CatchException', 'catch_exception', 'CombineLatest', 'combine_latest',
-    'Filter', 'filter_', 'FromIterable', 'Just', 'Map', 'map_', 'Merge',
+    'Filter', 'filter_', 'Just', 'Map', 'map_', 'Merge',
     'merge', 'Partition', 'partition', 'Reduce', 'reduce', 'Replace',
     'replace', 'Sink', 'sink', 'SlidingWindow', 'sliding_window', 'Switch',
     'switch', 'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
     'Sample', 'sample', 'MapAsync', 'map_async', 'Mode', 'MapThreaded',
     'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future',
-    'True_', 'true', 'False_', 'false', 'Trace', 'trace'
+    'True_', 'true', 'False_', 'false', 'Trace', 'trace', 'TopicMapper',
+    'topic_mapper'
 ]
 
 # TODO operators

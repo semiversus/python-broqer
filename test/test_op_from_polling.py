@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, ANY
 import itertools
 import asyncio
 
@@ -42,8 +42,6 @@ async def test_polling():
     # resubscribe
     disposable = dut | sink(mock)
 
-
-
 @pytest.mark.parametrize('args, kwargs, result_vector', [
     ((), {}, (1, 2, 3, 4, 5)),
     ((5,), {}, (5, 6, 7, 8, 9)),
@@ -62,7 +60,28 @@ async def test_with_args(args, kwargs, result_vector):
 
     await asyncio.sleep(0.05)
 
-    for result in result_vector:
+    for result in result_vector[:-2]:
         mock.assert_called_once_with(result)
         mock.reset_mock()
         await asyncio.sleep(0.1)
+
+    mock.assert_called_once_with(result_vector[-2])
+    mock.reset_mock()
+
+    mock2 = Mock()
+    dut | sink(mock2)
+    await asyncio.sleep(0.1)
+    mock2.assert_called_once_with(result_vector[-1])
+
+@pytest.mark.asyncio
+async def test_errorhandler():
+    mock = Mock(side_effect=ZeroDivisionError)
+    mock_errorhandler = Mock()
+
+    dut = FromPolling(0.1, lambda:0, error_callback=mock_errorhandler)
+    dut | sink(mock)
+
+    await asyncio.sleep(0.05)
+
+    mock_errorhandler.assert_called_once_with(ZeroDivisionError, ANY, ANY)
+    mock.assert_called_once_with(0)

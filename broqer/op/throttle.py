@@ -53,10 +53,8 @@ class Throttle(Operator):
     def emit(self, value: Any, who: Publisher) -> None:
         assert who is self._publisher, 'emit from non assigned publisher'
         if self._call_later_handler is None:
-            self.notify(value)
-            self._last_state = UNINITIALIZED
-            self._call_later_handler = self._loop.call_later(
-                self._duration, self._wait_done_cb)
+            self._last_state = value
+            self._wait_done_cb()
         else:
             self._last_state = value
 
