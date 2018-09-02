@@ -10,7 +10,7 @@ from .op import operator_overloading  # noqa: F401enable operator overloading
 
 __author__ = 'Günther Jena'
 __email__ = 'guenther@jena.at'
-__version__ = '0.5.0'
+__version__ = '0.6.0-dev'
 
 __all__ = [
     'StatefulPublisher', 'Disposable', 'Publisher', 'Subscriber',
