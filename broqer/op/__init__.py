@@ -1,3 +1,7 @@
+# enable operator overloading
+import broqer.op.operator_overloading  # noqa: F401
+
+# synchronous operators
 from .any_ import Any, any_
 from .all_ import All, all_
 from .accumulate import Accumulate, accumulate
@@ -17,7 +21,7 @@ from .switch import Switch, switch
 from .debounce import Debounce, debounce
 from .delay import Delay, delay
 from .sample import Sample, sample
-from .map_async import MapAsync, map_async, Mode
+from .map_async import MapAsync, map_async, MODE
 from .map_threaded import MapThreaded, map_threaded
 from .throttle import Throttle, throttle
 
@@ -31,8 +35,6 @@ from .subscribers.sink import Sink, sink
 from .subscribers.trace import Trace, trace
 from .subscribers.topic_mapper import TopicMapper, topic_mapper
 
-# enable operator overloading
-import broqer.op.operator_overloading  # noqa: F401
 
 __all__ = [
     'Any', 'any_', 'All', 'all_', 'Accumulate', 'accumulate', 'Cache', 'cache',
@@ -41,7 +43,7 @@ __all__ = [
     'merge', 'Partition', 'partition', 'Reduce', 'reduce', 'Replace',
     'replace', 'Sink', 'sink', 'SlidingWindow', 'sliding_window', 'Switch',
     'switch', 'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
-    'Sample', 'sample', 'MapAsync', 'map_async', 'Mode', 'MapThreaded',
+    'Sample', 'sample', 'MapAsync', 'map_async', 'MODE', 'MapThreaded',
     'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future',
     'True_', 'true', 'False_', 'false', 'Trace', 'trace', 'TopicMapper',
     'topic_mapper'

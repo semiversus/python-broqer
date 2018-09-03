@@ -93,15 +93,15 @@ from typing import Any, Callable, MutableSequence  # noqa: F401
 from broqer import Publisher, default_error_handler
 
 from .operator import build_operator
-from .map_async import MapAsync, Mode
+from .map_async import MapAsync, MODE
 
 
 class MapThreaded(MapAsync):
     def __init__(self, publisher: Publisher, map_func, *args,
-                 mode: Mode = Mode.CONCURRENT,  # type: ignore
+                 mode: MODE = MODE.CONCURRENT,  # type: ignore
                  error_callback=default_error_handler, **kwargs) -> None:
 
-        assert mode != Mode.INTERRUPT, 'mode INTERRUPT is not supported'
+        assert mode != MODE.INTERRUPT, 'mode INTERRUPT is not supported'
 
         MapAsync.__init__(self, publisher, self._thread_coro, mode=mode,
                           error_callback=error_callback)
@@ -116,7 +116,7 @@ class MapThreaded(MapAsync):
 
     async def _thread_coro(self, *args, **kwargs):
         return await asyncio.get_event_loop().run_in_executor(
-            self._executor, self._map_func, *args)
+            self._executor, self._map_func, *args, **kwargs)
 
 
 map_threaded = build_operator(MapThreaded)  # pylint: disable=invalid-name

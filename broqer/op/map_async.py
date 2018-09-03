@@ -14,7 +14,7 @@ Usage:
 ...     print('Finished with argument', a)
 ...     return result
 
-Mode: CONCURRENT (is default)
+MODE: CONCURRENT (is default)
 
 >>> _d = s | op.map_async(delay_add) | op.sink()
 >>> s.emit(0)
@@ -26,9 +26,9 @@ Finished with argument 0
 Finished with argument 1
 >>> _d.dispose()
 
-Mode: INTERRUPT
+MODE: INTERRUPT
 
->>> _d = s | op.map_async(delay_add, mode=op.Mode.INTERRUPT) | op.sink(print)
+>>> _d = s | op.map_async(delay_add, mode=op.MODE.INTERRUPT) | op.sink(print)
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.005))
 Starting with argument 0
@@ -39,9 +39,9 @@ Finished with argument 1
 2
 >>> _d.dispose()
 
-Mode: QUEUE
+MODE: QUEUE
 
->>> _d = s | op.map_async(delay_add, mode=op.Mode.QUEUE) | op.sink(print)
+>>> _d = s | op.map_async(delay_add, mode=op.MODE.QUEUE) | op.sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.04))
@@ -53,9 +53,9 @@ Finished with argument 1
 2
 >>> _d.dispose()
 
-Mode: LAST
+MODE: LAST
 
->>> _d = s | op.map_async(delay_add, mode=op.Mode.LAST) | op.sink(print)
+>>> _d = s | op.map_async(delay_add, mode=op.MODE.LAST) | op.sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
 >>> s.emit(2)
@@ -68,9 +68,9 @@ Finished with argument 2
 3
 >>> _d.dispose()
 
-Mode: SKIP
+MODE: SKIP
 
->>> _d = s | op.map_async(delay_add, mode=op.Mode.SKIP) | op.sink(print)
+>>> _d = s | op.map_async(delay_add, mode=op.MODE.SKIP) | op.sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
 >>> s.emit(2)
@@ -102,12 +102,12 @@ from broqer import Publisher, default_error_handler
 
 from .operator import Operator, build_operator
 
-Mode = Enum('Mode', 'CONCURRENT INTERRUPT QUEUE LAST LAST_DISTINCT SKIP')
+MODE = Enum('MODE', 'CONCURRENT INTERRUPT QUEUE LAST LAST_DISTINCT SKIP')
 
 
 class MapAsync(Operator):
     def __init__(self, publisher: Publisher, map_coro, *args,
-                 mode=Mode.CONCURRENT, error_callback=default_error_handler,
+                 mode=MODE.CONCURRENT, error_callback=default_error_handler,
                  unpack=False, **kwargs) -> None:
         """
         mode uses one of the following enumerations:
@@ -129,8 +129,8 @@ class MapAsync(Operator):
         self.scheduled = Publisher()
         self._unpack = unpack
 
-        if mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
-            maxlen = (None if mode == Mode.QUEUE else 1)
+        if mode in (MODE.QUEUE, MODE.LAST, MODE.LAST_DISTINCT):
+            maxlen = (None if mode == MODE.QUEUE else 1)
             self._queue = deque(maxlen=maxlen)  # type: MutableSequence
         else:  # no queue for CONCURRENT, INTERRUPT and SKIP
             self._queue = None
@@ -140,10 +140,10 @@ class MapAsync(Operator):
 
     def emit(self, value: Any, who: Publisher) -> None:
         assert who is self._publisher, 'emit from non assigned publisher'
-        if self._mode == Mode.INTERRUPT and self._future is not None:
+        if self._mode == MODE.INTERRUPT and self._future is not None:
             self._future.cancel()
 
-        if (self._mode in (Mode.INTERRUPT, Mode.CONCURRENT) or
+        if (self._mode in (MODE.INTERRUPT, MODE.CONCURRENT) or
                 self._future is None or self._future.done()):
 
             self._last_emit = value
@@ -154,7 +154,7 @@ class MapAsync(Operator):
                 coro = self._map_coro(value, *self._args, **self._kwargs)
             self._future = asyncio.ensure_future(coro)
             self._future.add_done_callback(self._future_done)
-        elif self._mode in (Mode.QUEUE, Mode.LAST, Mode.LAST_DISTINCT):
+        elif self._mode in (MODE.QUEUE, MODE.LAST, MODE.LAST_DISTINCT):
             self._queue.append(value)
 
     def _future_done(self, future):
@@ -172,7 +172,7 @@ class MapAsync(Operator):
 
         if self._queue:
             value = self._queue.popleft()  # pylint: disable=E1111
-            if self._mode == Mode.LAST_DISTINCT and value == self._last_emit:
+            if self._mode == MODE.LAST_DISTINCT and value == self._last_emit:
                 return
             self.scheduled.notify(value)
             if self._unpack:
