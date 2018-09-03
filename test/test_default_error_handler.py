@@ -2,7 +2,7 @@ import pytest
 import asyncio
 from unittest.mock import Mock, ANY
 
-from broqer import Publisher, op, default_error_handler
+from broqer import StatefulPublisher, Publisher, op, default_error_handler
 
 from .helper import check_async_operator_coro, NONE
 from .eventloop import VirtualTimeEventLoop
@@ -17,13 +17,13 @@ async def _foo_coro(v):
     return v
 
 @pytest.mark.parametrize('operator_cls, args', [
-    (op.Debounce, (op.Just(True), 0)),
-    (op.Delay, (op.Just(True), 0)),
-    (op.MapAsync, (op.Just(True), _foo_coro)),
-    # (op.MapThreaded, (op.Just(True), lambda v:None)), # run_in_executor is not implemented in VirtualTimeEventLoop
+    (op.Debounce, (StatefulPublisher(True), 0)),
+    (op.Delay, (StatefulPublisher(True), 0)),
+    (op.MapAsync, (StatefulPublisher(True), _foo_coro)),
+    # (op.MapThreaded, (StatefulPublisher(True), lambda v:None)), # run_in_executor is not implemented in VirtualTimeEventLoop
     (op.FromPolling, (0.1, lambda:None)),
-    (op.Sample, (op.Just(True), 0.1)),
-    (op.Throttle, (op.Just(True), 0.1)),
+    (op.Sample, (StatefulPublisher(True), 0.1)),
+    (op.Throttle, (StatefulPublisher(True), 0.1)),
 ])
 @pytest.mark.asyncio
 async def test_errorhandler(operator_cls, args, capsys):

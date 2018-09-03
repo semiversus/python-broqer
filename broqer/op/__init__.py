@@ -24,7 +24,6 @@ from .throttle import Throttle, throttle
 
 # publishers
 from .publishers.from_polling import FromPolling
-from .publishers.just import Just
 
 # subscribers
 from .subscribers.to_future import ToFuture, to_future
@@ -33,14 +32,14 @@ from .subscribers.trace import Trace, trace
 from .subscribers.topic_mapper import TopicMapper, topic_mapper
 
 # enable operator overloading
-from .operator_overloading  import apply_operator_overloading
+from .operator_overloading import apply_operator_overloading
 
 apply_operator_overloading()
 
 __all__ = [
     'Any', 'any_', 'All', 'all_', 'Accumulate', 'accumulate', 'Cache', 'cache',
     'CatchException', 'catch_exception', 'CombineLatest', 'combine_latest',
-    'Filter', 'filter_', 'Just', 'Map', 'map_', 'Merge',
+    'Filter', 'filter_', 'Map', 'map_', 'Merge',
     'merge', 'Partition', 'partition', 'Reduce', 'reduce', 'Replace',
     'replace', 'Sink', 'sink', 'SlidingWindow', 'sliding_window', 'Switch',
     'switch', 'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',

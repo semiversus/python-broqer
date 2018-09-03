@@ -1,6 +1,7 @@
 import pytest
 
-from broqer.op import All, Just
+from broqer.op import All
+from broqer import StatefulPublisher
 
 from .helper import check_single_operator, check_multi_operator, NONE
 
@@ -8,12 +9,12 @@ from .helper import check_single_operator, check_multi_operator, NONE
     ((), {}, (False, False, True, False), (False, NONE, True, False)),
     ((), {'predicate':lambda v:v}, (False, False, True, False), (False, NONE, True, False)),
     ((), {'predicate':lambda v:v>0}, (0, -1, 1, 2, 0), (False, NONE, True, NONE, False)),
-    ((Just(True),), {}, (False, False, True, False), (False, NONE, True, False)),
-    ((Just(True),), {'predicate':lambda v:v}, (False, False, True, False), (False, NONE, True, False)),
-    ((Just(1),), {'predicate':lambda v:v>0}, (0, -1, 1, 2, 0), (False, NONE, True, NONE, False)),
-    ((Just(False),), {}, (False, False, True, False), (False, NONE, NONE, NONE)),
-    ((Just(False),), {'predicate':lambda v:v}, (False, False, True, False), (False, NONE, NONE, NONE)),
-    ((Just(-1),), {'predicate':lambda v:v>0}, (0, -1, 1, 2, 0), (False, NONE, NONE, NONE, NONE)),
+    ((StatefulPublisher(True),), {}, (False, False, True, False), (False, NONE, True, False)),
+    ((StatefulPublisher(True),), {'predicate':lambda v:v}, (False, False, True, False), (False, NONE, True, False)),
+    ((StatefulPublisher(1),), {'predicate':lambda v:v>0}, (0, -1, 1, 2, 0), (False, NONE, True, NONE, False)),
+    ((StatefulPublisher(False),), {}, (False, False, True, False), (False, NONE, NONE, NONE)),
+    ((StatefulPublisher(False),), {'predicate':lambda v:v}, (False, False, True, False), (False, NONE, NONE, NONE)),
+    ((StatefulPublisher(-1),), {'predicate':lambda v:v>0}, (0, -1, 1, 2, 0), (False, NONE, NONE, NONE, NONE)),
 ])
 def test_with_publisher(args, kwargs, input_vector, output_vector):
     check_single_operator(All, args, kwargs, input_vector, output_vector, has_state=True)

@@ -116,10 +116,6 @@ A Publisher_ is the source for messages.
 +--------------------------+--------------------------------------------------------------+
 | Value_ (\*init)          | Source with a state (initialized via ``init``)               |
 +--------------------------+--------------------------------------------------------------+
-| FromIterable_ (iterable) | Use an ``iterable`` and emit each value                      |
-+--------------------------+--------------------------------------------------------------+
-| Just_ (\*value)          | Emit \*value on each subscribtion                            |
-+--------------------------+--------------------------------------------------------------+
 
 Using ``asyncio`` event loop:
 
@@ -194,7 +190,6 @@ A Subscriber_ is the sink for messages.
 .. _filter: https://github.com/semiversus/python-broqer/blob/master/broqer/op/filter.py
 .. _FromIterable: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_iterable.py
 .. _FromPolling: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_polling.py
-.. _Just: https://github.com/semiversus/python-broqer/blob/master/broqer/op/just.py
 .. _map_threaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
 .. _map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map.py
 .. _merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py

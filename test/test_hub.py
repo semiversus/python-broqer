@@ -2,7 +2,7 @@ import asyncio
 from unittest import mock
 import pytest
 
-from broqer import Hub, op, Value, Subject, SubHub
+from broqer import Hub, op, Value, Subject, SubHub, StatefulPublisher
 from broqer.hub import Topic, MetaTopic
 
 def test_hub_topics():
@@ -35,7 +35,7 @@ def test_hub_topics():
 def test_freeze():
     hub = Hub()
 
-    hub.assign('value1', op.Just(0))
+    hub.assign('value1', StatefulPublisher(0))
 
     assert 'value1' in hub
 
@@ -60,7 +60,7 @@ def test_freeze():
     hub.freeze()
 
     with pytest.raises(ValueError):
-        hub.assign('value4', op.Just(0))
+        hub.assign('value4', StatefulPublisher(0))
 
     with pytest.raises(ValueError):
         hub['value5'] | op.sink()
@@ -73,7 +73,7 @@ def test_freeze():
     hub.freeze(False)
 
     hub['value4'] | op.sink()
-    hub.assign('value5', op.Just(0))
+    hub.assign('value5', StatefulPublisher(0))
     hub['value6'].emit(1)
 
     assert 'value4' in hub

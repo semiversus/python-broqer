@@ -1,7 +1,7 @@
 from unittest import mock
 import pytest
 
-from broqer.op import Cache, Just, Sink
+from broqer.op import Cache, Sink
 from broqer import Publisher, StatefulPublisher
 
 from .helper import check_single_operator, NONE

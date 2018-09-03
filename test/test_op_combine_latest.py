@@ -1,6 +1,6 @@
 import pytest
 
-from broqer.op import CombineLatest, Just, sink
+from broqer.op import CombineLatest, sink
 from broqer import Publisher, StatefulPublisher, Subject, UNINITIALIZED
 
 from .helper import check_multi_operator, NONE, Collector
