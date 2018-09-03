@@ -68,17 +68,17 @@ class CombineLatest(MultiOperator):
         self._state = UNINITIALIZED  # type: Any
 
     def subscribe(self, subscriber: 'Subscriber',
-                  prepend: bool=False) -> SubscriptionDisposable:
+                  prepend: bool = False) -> SubscriptionDisposable:
         disposable = MultiOperator.subscribe(self, subscriber, prepend)
         if len(self._subscriptions) == 1:
             if self._stateless_publishers is None:
                 self._stateless_publishers = tuple(
                     v is UNINITIALIZED for v in self._partial_state)
-                for p, stateless in zip(
-                                self._publishers, self._stateless_publishers):
+                for publisher, stateless in zip(
+                        self._publishers, self._stateless_publishers):
                     if stateless:
-                        self._missing.remove(p)
-                        if not any(p is _p for _p in self._emit_on):
+                        self._missing.remove(publisher)
+                        if not any(publisher is _p for _p in self._emit_on):
                             raise ValueError(
                                 'Publisher %r seems to be a stateless '
                                 'publisher, but is missing in emit_on')

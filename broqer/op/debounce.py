@@ -56,15 +56,13 @@ from .operator import Operator, build_operator
 class Debounce(Operator):
     def __init__(self, publisher: Publisher, duetime: float,
                  retrigger_value: Any = UNINITIALIZED,
-                 error_callback=default_error_handler,
-                 loop=None) -> None:
+                 error_callback=default_error_handler) -> None:
         assert duetime >= 0, 'duetime has to be positive'
 
         Operator.__init__(self, publisher)
 
         self.duetime = duetime
         self._retrigger_value = retrigger_value
-        self._loop = loop or asyncio.get_event_loop()
         self._call_later_handler = None  # type: asyncio.Handle
         self._error_callback = error_callback
         self._state = UNINITIALIZED  # type: Any
@@ -111,7 +109,7 @@ class Debounce(Operator):
         self._next_state = value
 
         self._call_later_handler = \
-            self._loop.call_later(self.duetime, self._debounced)
+            asyncio.get_event_loop().call_later(self.duetime, self._debounced)
 
     def _debounced(self):
         self._call_later_handler = None

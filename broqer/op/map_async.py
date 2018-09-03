@@ -93,7 +93,7 @@ Got error
 >>> _d.dispose()
 """
 import asyncio
-from collections import deque
+from collections import deque, namedtuple
 from enum import Enum
 import sys
 from typing import Any, MutableSequence  # noqa: F401
@@ -103,6 +103,9 @@ from broqer import Publisher, default_error_handler
 from .operator import Operator, build_operator
 
 MODE = Enum('MODE', 'CONCURRENT INTERRUPT QUEUE LAST LAST_DISTINCT SKIP')
+
+_Options = namedtuple('_Options', 'map_coro mode args kwargs '
+                                  'error_callback unpack')
 
 
 class MapAsync(Operator):
@@ -119,15 +122,11 @@ class MapAsync(Operator):
             * SKIP - skip values emitted during coroutine is running
         """
         Operator.__init__(self, publisher)
-        self._map_coro = map_coro
-        self._args = args
-        self._kwargs = kwargs
-        self._mode = mode
-        self._error_callback = error_callback
+        self._options = _Options(map_coro, mode, args, kwargs, error_callback,
+                                 unpack)
         self._future = None  # type: asyncio.Future
         self._last_emit = None  # type: Any
         self.scheduled = Publisher()
-        self._unpack = unpack
 
         if mode in (MODE.QUEUE, MODE.LAST, MODE.LAST_DISTINCT):
             maxlen = (None if mode == MODE.QUEUE else 1)
@@ -140,21 +139,23 @@ class MapAsync(Operator):
 
     def emit(self, value: Any, who: Publisher) -> None:
         assert who is self._publisher, 'emit from non assigned publisher'
-        if self._mode == MODE.INTERRUPT and self._future is not None:
+        if self._options.mode == MODE.INTERRUPT and self._future is not None:
             self._future.cancel()
 
-        if (self._mode in (MODE.INTERRUPT, MODE.CONCURRENT) or
+        if (self._options.mode in (MODE.INTERRUPT, MODE.CONCURRENT) or
                 self._future is None or self._future.done()):
 
             self._last_emit = value
             self.scheduled.notify(value)
-            if self._unpack:
-                coro = self._map_coro(*value, *self._args, **self._kwargs)
+            if self._options.unpack:
+                coro = self._options.map_coro(*value, *self._options.args,
+                                              **self._options.kwargs)
             else:
-                coro = self._map_coro(value, *self._args, **self._kwargs)
+                coro = self._options.map_coro(value, *self._options.args,
+                                              **self._options.kwargs)
             self._future = asyncio.ensure_future(coro)
             self._future.add_done_callback(self._future_done)
-        elif self._mode in (MODE.QUEUE, MODE.LAST, MODE.LAST_DISTINCT):
+        elif self._options.mode in (MODE.QUEUE, MODE.LAST, MODE.LAST_DISTINCT):
             self._queue.append(value)
 
     def _future_done(self, future):
@@ -163,22 +164,25 @@ class MapAsync(Operator):
         except asyncio.CancelledError:
             pass
         except Exception:  # pylint: disable=broad-except
-            self._error_callback(*sys.exc_info())
+            self._options.error_callback(*sys.exc_info())
         else:
             try:
                 self.notify(result)
             except Exception:  # pylint: disable=broad-except
-                self._error_callback(*sys.exc_info())
+                self._options.error_callback(*sys.exc_info())
 
         if self._queue:
             value = self._queue.popleft()  # pylint: disable=E1111
-            if self._mode == MODE.LAST_DISTINCT and value == self._last_emit:
+            if self._options.mode == MODE.LAST_DISTINCT and \
+                    value == self._last_emit:
                 return
             self.scheduled.notify(value)
-            if self._unpack:
-                future = self._map_coro(*value, *self._args, **self._kwargs)
+            if self._options.unpack:
+                future = self._options.map_coro(*value, *self._options.args,
+                                                **self._options.kwargs)
             else:
-                future = self._map_coro(value, *self._args, **self._kwargs)
+                future = self._options.map_coro(value, *self._options.args,
+                                                **self._options.kwargs)
             self._future = asyncio.ensure_future(future)
             self._future.add_done_callback(self._future_done)
 

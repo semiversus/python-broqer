@@ -116,7 +116,7 @@ class Topic(Publisher, Subscriber):
         self._pre_assign_emit = UNINITIALIZED  # type: Any
 
     def subscribe(self, subscriber: 'Subscriber',
-                  prepend: bool=False) -> SubscriptionDisposable:
+                  prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if self._subject is not None:

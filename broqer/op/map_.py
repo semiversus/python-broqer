@@ -64,8 +64,7 @@ class Map(Operator):
         value = self._publisher.get()  # may raise ValueError
         if self._unpack:
             return self._map_func(*value)
-        else:
-            return self._map_func(value)
+        return self._map_func(value)
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who is self._publisher, 'emit from non assigned publisher'

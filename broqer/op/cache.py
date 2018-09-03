@@ -31,7 +31,7 @@ class Cache(Operator):
         self._state = init
 
     def subscribe(self, subscriber: Subscriber,
-                  prepend: bool=False) -> SubscriptionDisposable:
+                  prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
         old_state = self._state  # to check if .emit was called

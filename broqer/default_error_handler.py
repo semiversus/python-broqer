@@ -21,4 +21,4 @@ class DefaultErrorHandler:
         self._error_callback = _default_error_callback
 
 
-default_error_handler = DefaultErrorHandler()
+default_error_handler = DefaultErrorHandler()  # pylint: disable=invalid-name

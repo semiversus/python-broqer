@@ -151,24 +151,24 @@ def test_wrong_comparision():
     p1 = Publisher()
     p2 = Publisher()
 
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError):
         assert p1 == p2
 
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError):
         if p1 == p2: pass
 
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError):
         if p1 != p2: pass
 
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError):
         assert p2 in (p1, p2)
 
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError):
         p1 in (p2, p2)
 
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError):
         assert p1 not in (p2, p2)
 
     l = [p1, p2]
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError):
         l.remove(p2)

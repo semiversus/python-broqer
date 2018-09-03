@@ -18,10 +18,10 @@ def resolve_meta_key(hub, key, meta):
 
 
 class DT:
-    def cast(self, _topic, value):
+    def cast(self, topic, value):  # pylint: disable=no-self-use,W0613
         return value
 
-    def check(self, _topic, _value):
+    def check(self, topic, value):  # pylint: disable=no-self-use,W0613
         pass
 
 
@@ -34,17 +34,17 @@ class NumberDT(DT):
     """
 
     def check(self, topic, value):
-        minimum = resolve_meta_key(topic._hub, 'minimum', topic.meta)
+        minimum = resolve_meta_key(topic.hub, 'minimum', topic.meta)
         if minimum is not None and value < minimum:
             raise ValueError('Value %d under minimum of %d' % (value, minimum))
 
-        maximum = resolve_meta_key(topic._hub, 'maximum', topic.meta)
+        maximum = resolve_meta_key(topic.hub, 'maximum', topic.meta)
         if maximum is not None and value > maximum:
             raise ValueError('Value %d over maximum of %d' % (value, maximum))
 
 
 class IntegerDT(NumberDT):
-    def cast(self, _topic, value):
+    def cast(self, topic, value):
         return int(value)
 
     def check(self, topic, value):
@@ -54,7 +54,7 @@ class IntegerDT(NumberDT):
 
 
 class FloatDT(NumberDT):
-    def cast(self, _topic, value):
+    def cast(self, topic, value):
         return float(value)
 
     def check(self, topic, value):
@@ -90,6 +90,10 @@ class DTTopic(MetaTopic):
         self.check(value)
         return self._subject.emit(value, who=self)
 
+    @property
+    def hub(self):
+        return self._hub
+
 
 class DTRegistry:
     def __init__(self):
@@ -100,18 +104,18 @@ class DTRegistry:
             'str': DT()
         }
 
-    def add_datatype(self, name: str, dt: DT):
-        self._datatypes[name] = dt
+    def add_datatype(self, name: str, datatype: DT):
+        self._datatypes[name] = datatype
 
     def __call__(self, hub: Hub, path: str) -> DTTopic:
         return DTTopic(hub, path)
 
     def cast(self, topic, value):
-        datatype_key = topic._meta.get('datatype', 'none')
+        datatype_key = topic.meta.get('datatype', 'none')
         return self._datatypes[datatype_key].cast(topic, value)
 
     def check(self, topic, value):
-        datatype_key = topic._meta.get('datatype', 'none')
+        datatype_key = topic.meta.get('datatype', 'none')
         self._datatypes[datatype_key].check(topic, value)
-        if 'validate' in topic._meta:
-            self._datatypes[topic._meta['validate']].check(topic, value)
+        if 'validate' in topic.meta:
+            self._datatypes[topic.meta['validate']].check(topic, value)

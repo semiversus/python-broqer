@@ -1,6 +1,3 @@
-# enable operator overloading
-import broqer.op.operator_overloading  # noqa: F401
-
 # synchronous operators
 from .any_ import Any, any_
 from .all_ import All, all_
@@ -35,6 +32,10 @@ from .subscribers.sink import Sink, sink
 from .subscribers.trace import Trace, trace
 from .subscribers.topic_mapper import TopicMapper, topic_mapper
 
+# enable operator overloading
+from .operator_overloading  import apply_operator_overloading
+
+apply_operator_overloading()
 
 __all__ = [
     'Any', 'any_', 'All', 'all_', 'Accumulate', 'accumulate', 'Cache', 'cache',
@@ -48,11 +49,3 @@ __all__ = [
     'True_', 'true', 'False_', 'false', 'Trace', 'trace', 'TopicMapper',
     'topic_mapper'
 ]
-
-# TODO operators
-# debug
-# timestamp, elapsed
-# from_file
-# flatten
-# zip, zip_latest
-# replace

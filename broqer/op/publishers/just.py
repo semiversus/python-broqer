@@ -24,7 +24,7 @@ class Just(Publisher):
         self._state = value
 
     def subscribe(self, subscriber: Subscriber,
-                  prepend: bool=False) -> SubscriptionDisposable:
+                  prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend)
         subscriber.emit(self._state, who=self)
         return disposable
