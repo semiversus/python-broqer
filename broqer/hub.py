@@ -165,7 +165,7 @@ class Topic(Publisher, Subscriber):
         assert isinstance(subject, (Publisher, Subscriber))
 
         if self._subject is not None:
-            raise SubscriptionError('Topic is already assigned')
+            raise SubscriptionError('Topic %r already assigned' % self._path)
         self._subject = subject
         if self._subscriptions:
             self._subject.subscribe(self)
