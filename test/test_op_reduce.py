@@ -1,10 +1,10 @@
 import pytest
 import operator
 
-from broqer import Publisher
+from broqer import Publisher, NONE
 from broqer.op import Reduce
 
-from .helper import check_single_operator, NONE
+from .helper import check_single_operator
 
 @pytest.mark.parametrize('func, init, input_vector, output_vector', [
     (lambda a,b:a+b, 0, (1, 2, 3), (1, 3, 6)),

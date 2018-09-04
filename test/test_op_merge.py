@@ -1,8 +1,9 @@
 import pytest
 
+from broqer import NONE
 from broqer.op import Merge
 
-from .helper import check_multi_operator, NONE
+from .helper import check_multi_operator
 
 @pytest.mark.parametrize('input_vector, output_vector', [
     (((1, NONE), (NONE, 2), (NONE, 3), (4, NONE)), (1, 2, 3, 4)),

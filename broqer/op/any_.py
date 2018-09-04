@@ -3,7 +3,7 @@ import asyncio
 from typing import Dict, MutableSequence, Callable  # noqa: F401
 from typing import Any as Any_
 
-from broqer import Publisher, Subscriber, UNINITIALIZED
+from broqer import Publisher, Subscriber, NONE
 
 from .operator import MultiOperator, build_operator
 
@@ -21,16 +21,16 @@ class _MultiPredicate(MultiOperator):
 
         partial = [None for _ in publishers]  # type: MutableSequence[Any_]
         self._partial = partial
-        self._state = UNINITIALIZED  # type: Any_
+        self._state = NONE  # type: Any_
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._partial = [None for _ in self._partial]
-            self._state = UNINITIALIZED
+            self._state = NONE
 
     def get(self) -> Any_:
-        if self._state is not UNINITIALIZED:
+        if self._state is not NONE:
             return self._state
         values = (p.get() for p in self._publishers)  # may raise ValueError
         if self._predicate is not None:

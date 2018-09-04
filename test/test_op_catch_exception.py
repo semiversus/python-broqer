@@ -1,9 +1,9 @@
 import pytest
 
-from broqer import Publisher, Subscriber
+from broqer import Publisher, Subscriber, NONE
 from broqer.op import CatchException
 
-from .helper import check_single_operator, NONE, Collector
+from .helper import check_single_operator, Collector
 
 @pytest.mark.parametrize('args, input_vector, output_vector', [
     ((ValueError,), (0, 1, 2, 3), (0, 1, 2, 3)),

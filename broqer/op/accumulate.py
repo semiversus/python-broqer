@@ -21,7 +21,7 @@
 import asyncio
 from typing import Any, Callable, Tuple
 
-from broqer import Publisher, Subscriber, UNINITIALIZED
+from broqer import Publisher, Subscriber, NONE
 
 from .operator import Operator, build_operator
 
@@ -43,16 +43,16 @@ class Accumulate(Operator):
         self._acc_func = func
         self._state = init
         self._init = init
-        self._result = UNINITIALIZED
+        self._result = NONE
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Operator.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._state = self._init
-            self._result = UNINITIALIZED
+            self._result = NONE
 
     def get(self) -> Any:
-        if self._result is not UNINITIALIZED:
+        if self._result is not NONE:
             return self._result
         value = self._publisher.get()  # may be raises ValueError
         return self._acc_func(self._init, value)[1]

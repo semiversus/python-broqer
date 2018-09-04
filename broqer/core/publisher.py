@@ -3,7 +3,7 @@
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Union
 
-from broqer.core import UNINITIALIZED, SubscriptionDisposable
+from broqer.core import NONE, SubscriptionDisposable
 
 if TYPE_CHECKING:
     from broqer.core import Subscriber  # noqa: F401
@@ -147,22 +147,22 @@ class StatefulPublisher(Publisher):
     - when subscribing the subscriber will be notified with the actual state
     - .get() is returning the actual state
 
-    :param init: the initial state. As long the state is UNINITIALIZED, the
+    :param init: the initial state. As long the state is NONE, the
         behavior will be equal to a stateless Publisher.
     """
-    def __init__(self, init=UNINITIALIZED):
+    def __init__(self, init=NONE):
         Publisher.__init__(self)
         self._state = init
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> 'SubscriptionDisposable':
         disposable = Publisher.subscribe(self, subscriber, prepend=prepend)
-        if self._state is not UNINITIALIZED:
+        if self._state is not NONE:
             subscriber.emit(self._state, who=self)
         return disposable
 
     def get(self):
-        if self._state is not UNINITIALIZED:
+        if self._state is not NONE:
             return self._state
         return Publisher.get(self)
 
@@ -172,7 +172,7 @@ class StatefulPublisher(Publisher):
             return Publisher.notify(self, value)
         return None
 
-    def reset_state(self, value=UNINITIALIZED):
+    def reset_state(self, value=NONE):
         """ resets the state. Behavior for .subscribe() and .get() will be
         like a stateless Publisher.
         """

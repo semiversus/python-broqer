@@ -1,9 +1,9 @@
 import pytest
 
 from broqer.op import CombineLatest, sink
-from broqer import Publisher, StatefulPublisher, Subject, UNINITIALIZED
+from broqer import Publisher, StatefulPublisher, Subject, NONE
 
-from .helper import check_multi_operator, NONE, Collector
+from .helper import check_multi_operator, Collector
 
 @pytest.mark.parametrize('kwargs, input_vector, output_vector', [
     ({}, ((1,2), (NONE,3), (2,NONE), (2,3)), ((1,2),(1,3),(2,3),NONE)),
@@ -57,8 +57,8 @@ def test_allow_stateless():
     source1.notify(2)
     source2.notify(False)
 
-    assert collector.result_vector == ((1, UNINITIALIZED),
-        (1, True), (2, UNINITIALIZED), (2, False))
+    assert collector.result_vector == ((1, NONE),
+        (1, True), (2, NONE), (2, False))
 
     # combine latest should also emit when stateless publisher is emitting
     collector.reset()
@@ -70,7 +70,7 @@ def test_allow_stateless():
     assert collector.result_vector == ((2, False), (2, False))
 
     source1.notify(0)
-    assert collector.result_vector == ((2, False), (2, False), (0, UNINITIALIZED))
+    assert collector.result_vector == ((2, False), (2, False), (0, NONE))
 
     disposable.dispose()
     assert len(dut.subscriptions) == 0
@@ -107,12 +107,12 @@ def test_stateless_nested():
 
     collector.reset()
     source1.notify(True)
-    assert collector.result_vector == (((True,),UNINITIALIZED),)
+    assert collector.result_vector == (((True,),NONE),)
 
     collector.reset()
     source2.notify(False)
 
-    assert collector.result_vector == ((UNINITIALIZED,False),)
+    assert collector.result_vector == ((NONE,False),)
 
 def test_stateless_only():
     source1 = Publisher()
@@ -131,9 +131,9 @@ def test_stateless_only():
     source1.notify(2)
     source2.notify(False)
 
-    assert collector.result_vector == ((1, UNINITIALIZED),
-        (UNINITIALIZED, True), (2, UNINITIALIZED),
-        (UNINITIALIZED, False))
+    assert collector.result_vector == ((1, NONE),
+        (NONE, True), (2, NONE),
+        (NONE, False))
 
     # special case with one source
     dut2 = CombineLatest(source1, allow_stateless=True)
@@ -149,7 +149,7 @@ def test_stateless_map():
     source1 = StatefulPublisher(0)
     source2 = Publisher()
 
-    dut = CombineLatest(source1, source2, map_=lambda a,b: a+(0 if b is UNINITIALIZED else b), allow_stateless=True)
+    dut = CombineLatest(source1, source2, map_=lambda a,b: a+(0 if b is NONE else b), allow_stateless=True)
 
     collector = Collector()
     dut.subscribe(collector)
@@ -210,11 +210,11 @@ def test_allow_stateless_extensive():
     source2.notify(2)
     with pytest.raises(ValueError):
         dut.get()
-    assert collector.result_vector == ((UNINITIALIZED, 0, 2, 1),)
+    assert collector.result_vector == ((NONE, 0, 2, 1),)
 
     collector.reset()
     source3.notify(3)
     source4.notify(4)
     with pytest.raises(ValueError):
         dut.get()
-    assert collector.result_vector == ((UNINITIALIZED, 3, UNINITIALIZED, 1), (4, 3, UNINITIALIZED, 1),)
+    assert collector.result_vector == ((NONE, 3, NONE, 1), (4, 3, NONE, 1),)

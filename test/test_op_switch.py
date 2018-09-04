@@ -1,9 +1,9 @@
 import pytest
 
+from broqer import StatefulPublisher, NONE
 from broqer.op import Switch
-from broqer import StatefulPublisher
 
-from .helper import check_single_operator, NONE
+from .helper import check_single_operator
 
 @pytest.mark.parametrize('mapping, input_vector, output_vector', [
     ({0:StatefulPublisher('a'), 1:StatefulPublisher('b'), 2:StatefulPublisher('c')}, (0, 1, 2, 2, 1), ('a', 'b', 'c', NONE, 'b'))

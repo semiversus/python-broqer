@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from broqer import Subscriber, Publisher, SubscriptionDisposable
+from broqer import Subscriber, Publisher, SubscriptionDisposable, NONE
 
 class Collector(Subscriber):
     def __init__(self, loop=None):
@@ -48,10 +48,6 @@ class Collector(Subscriber):
     @property
     def timestamp(self):
         return self._timestamp_vector[-1]
-
-
-class NONE:
-    pass
 
 
 class InitializedPublisher(Publisher):

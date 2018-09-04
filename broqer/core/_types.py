@@ -1,6 +1,6 @@
 """ Types used in broqer"""
 
 
-class UNINITIALIZED:  # pylint: disable=too-few-public-methods
+class NONE:  # pylint: disable=too-few-public-methods
     """ marker class used for initialization of undefined state """
     pass

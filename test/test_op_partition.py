@@ -1,10 +1,10 @@
 import pytest
 from unittest.mock import Mock
 
-from broqer import Publisher
+from broqer import Publisher, NONE
 from broqer.op import Partition, sink
 
-from .helper import check_single_operator, NONE
+from .helper import check_single_operator
 
 @pytest.mark.parametrize('size, input_vector, output_vector', [
     (3, (0, 1, 2, 3, 4, 5, 6, 7), (NONE, NONE, (0, 1, 2) , NONE, NONE, (3, 4, 5))),

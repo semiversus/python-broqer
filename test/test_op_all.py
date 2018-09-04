@@ -1,9 +1,9 @@
 import pytest
 
 from broqer.op import All
-from broqer import StatefulPublisher
+from broqer import StatefulPublisher, NONE
 
-from .helper import check_single_operator, check_multi_operator, NONE
+from .helper import check_single_operator, check_multi_operator
 
 @pytest.mark.parametrize('args, kwargs, input_vector, output_vector', [
     ((), {}, (False, False, True, False), (False, NONE, True, False)),

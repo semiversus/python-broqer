@@ -44,7 +44,7 @@ import sys
 from typing import Any  # noqa: F401
 
 from broqer import Publisher, Subscriber, \
-                   default_error_handler, UNINITIALIZED
+                   default_error_handler, NONE
 
 from .operator import Operator, build_operator
 
@@ -59,18 +59,18 @@ class Sample(Operator):
         self._interval = interval
         self._call_later_handle = None
         self._loop = loop or asyncio.get_event_loop()
-        self._state = UNINITIALIZED  # type: Any
+        self._state = NONE  # type: Any
         self._error_callback = error_callback
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Operator.unsubscribe(self, subscriber)
         if not self._subscriptions:
-            self._state = UNINITIALIZED
+            self._state = NONE
 
     def get(self):
         if not self._subscriptions:
             return self._publisher.get()  # may raises ValueError
-        if self._state is not UNINITIALIZED:
+        if self._state is not NONE:
             return self._state
         return Publisher.get(self)  # raises ValueError
 
@@ -86,7 +86,7 @@ class Sample(Operator):
             self._call_later_handle = \
                 self._loop.call_later(self._interval, self._periodic_callback)
         else:
-            self._state = UNINITIALIZED
+            self._state = NONE
             self._call_later_handle = None
 
     def emit(self, value: Any, who: Publisher) -> None:

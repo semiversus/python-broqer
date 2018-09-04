@@ -1,8 +1,9 @@
 import pytest
 
+from broqer import NONE
 from broqer.op import Filter, True_, False_
 
-from .helper import check_single_operator, NONE
+from .helper import check_single_operator
 
 @pytest.mark.parametrize('args, kwargs, input_vector, output_vector', [
     ((lambda v:v==0,), {}, (1, 2, 0, 0.0, None), (NONE, NONE, 0, 0.0, NONE)),

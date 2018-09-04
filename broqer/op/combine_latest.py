@@ -25,7 +25,7 @@ Second sink: (1, 3)
 import asyncio
 from typing import Any, Dict, MutableSequence  # noqa: F401
 
-from broqer import Publisher, Subscriber, UNINITIALIZED, SubscriptionDisposable
+from broqer import Publisher, Subscriber, NONE, SubscriptionDisposable
 
 from .operator import MultiOperator, build_operator
 
@@ -40,13 +40,13 @@ class CombineLatest(MultiOperator):
         publisher.
     :param allow_stateless: when True evaluation is also done for stateless
         publishers. A stateless publisher without an emit will be hold as
-        UNINITIALIZED.
+        NONE.
     """
     def __init__(self, *publishers: Publisher, map_=None, emit_on=None,
                  allow_stateless=False) -> None:
         MultiOperator.__init__(self, *publishers)
         self._partial_state = [
-            UNINITIALIZED for _ in publishers]  # type: MutableSequence[Any]
+            NONE for _ in publishers]  # type: MutableSequence[Any]
         self._missing = set(publishers)
 
         if allow_stateless:
@@ -65,7 +65,7 @@ class CombineLatest(MultiOperator):
                 self._emit_on = (emit_on,)
             else:
                 self._emit_on = emit_on
-        self._state = UNINITIALIZED  # type: Any
+        self._state = NONE  # type: Any
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
@@ -73,7 +73,7 @@ class CombineLatest(MultiOperator):
         if len(self._subscriptions) == 1:
             if self._stateless_publishers is None:
                 self._stateless_publishers = tuple(
-                    v is UNINITIALIZED for v in self._partial_state)
+                    v is NONE for v in self._partial_state)
                 for publisher, stateless in zip(
                         self._publishers, self._stateless_publishers):
                     if stateless:
@@ -88,8 +88,8 @@ class CombineLatest(MultiOperator):
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._missing = set(self._publishers)
-            self._partial_state = [UNINITIALIZED for _ in self._partial_state]
-            self._state = UNINITIALIZED
+            self._partial_state = [NONE for _ in self._partial_state]
+            self._state = NONE
 
     def get(self):
         if not self._subscriptions:  # if no subscribers listening
@@ -97,7 +97,7 @@ class CombineLatest(MultiOperator):
             if self._map:
                 return self._map(*values)
             return tuple(values)
-        if self._state is not UNINITIALIZED:
+        if self._state is not NONE:
             return self._state
         return Publisher.get(self)  # will raise ValueError
 
@@ -128,9 +128,9 @@ class CombineLatest(MultiOperator):
                 result = None
 
             if any(self._stateless_publishers):
-                self._state = UNINITIALIZED
+                self._state = NONE
             if self._stateless_publishers[index]:
-                self._partial_state[index] = UNINITIALIZED
+                self._partial_state[index] = NONE
 
             return result
         return None

@@ -48,14 +48,14 @@ import asyncio
 import sys
 from typing import Any  # noqa
 
-from broqer import Publisher, Subscriber, default_error_handler, UNINITIALIZED
+from broqer import Publisher, Subscriber, default_error_handler, NONE
 
 from .operator import Operator, build_operator
 
 
 class Debounce(Operator):
     def __init__(self, publisher: Publisher, duetime: float,
-                 retrigger_value: Any = UNINITIALIZED,
+                 retrigger_value: Any = NONE,
                  error_callback=default_error_handler) -> None:
         assert duetime >= 0, 'duetime has to be positive'
 
@@ -65,20 +65,20 @@ class Debounce(Operator):
         self._retrigger_value = retrigger_value
         self._call_later_handler = None  # type: asyncio.Handle
         self._error_callback = error_callback
-        self._state = UNINITIALIZED  # type: Any
-        self._next_state = UNINITIALIZED  # type: Any
+        self._state = NONE  # type: Any
+        self._next_state = NONE  # type: Any
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Operator.unsubscribe(self, subscriber)
         if not self._subscriptions:
-            self._state = UNINITIALIZED
-            self._next_state = UNINITIALIZED
+            self._state = NONE
+            self._next_state = NONE
             if self._call_later_handler:
                 self._call_later_handler.cancel()
 
     def get(self):
-        if self._retrigger_value is not UNINITIALIZED and (
-                not self._subscriptions or self._state is UNINITIALIZED):
+        if self._retrigger_value is not NONE and (
+                not self._subscriptions or self._state is NONE):
             return self._retrigger_value
         return self._state
 
@@ -92,7 +92,7 @@ class Debounce(Operator):
         if self._call_later_handler:
             self._call_later_handler.cancel()
 
-        if self._retrigger_value is not UNINITIALIZED and \
+        if self._retrigger_value is not NONE and \
            self._state != self._retrigger_value:
             # when retrigger_value is defined and current state is different
             self.notify(self._retrigger_value)
@@ -120,7 +120,7 @@ class Debounce(Operator):
             self._error_callback(*sys.exc_info())
 
     def reset(self):
-        if self._retrigger_value is not UNINITIALIZED:
+        if self._retrigger_value is not NONE:
             self.notify(self._retrigger_value)
             self._state = self._retrigger_value
             self._next_state = self._retrigger_value

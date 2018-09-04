@@ -2,9 +2,9 @@ import pytest
 import asyncio
 from unittest.mock import Mock, ANY
 
-from broqer import StatefulPublisher, Publisher, op, default_error_handler
+from broqer import StatefulPublisher, Publisher, op, default_error_handler, NONE
 
-from .helper import check_async_operator_coro, NONE
+from .helper import check_async_operator_coro
 from .eventloop import VirtualTimeEventLoop
 
 @pytest.yield_fixture()

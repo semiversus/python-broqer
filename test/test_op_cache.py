@@ -2,9 +2,9 @@ from unittest import mock
 import pytest
 
 from broqer.op import Cache, Sink
-from broqer import Publisher, StatefulPublisher
+from broqer import Publisher, StatefulPublisher, NONE
 
-from .helper import check_single_operator, NONE
+from .helper import check_single_operator
 
 @pytest.mark.parametrize('args, input_vector, output_vector', [
     ((-1,), (0, 1, 2, 3), (0, 1, 2, 3)),

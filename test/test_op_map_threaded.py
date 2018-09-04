@@ -2,9 +2,10 @@ import asyncio
 import time
 import pytest
 
+from broqer import NONE
 from broqer.op import MapThreaded, MODE
 
-from .helper import check_async_operator_coro, NONE
+from .helper import check_async_operator_coro
 
 def add1(v, i=1):
     print('ADD', v, i)

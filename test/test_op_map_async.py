@@ -3,9 +3,10 @@ import asyncio
 import pytest
 from unittest import mock
 
+from broqer import NONE
 from broqer.op import MapAsync, MODE
 
-from .helper import check_async_operator_coro, NONE
+from .helper import check_async_operator_coro
 from .eventloop import VirtualTimeEventLoop
 
 @pytest.yield_fixture()
