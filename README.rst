@@ -188,7 +188,6 @@ A Subscriber_ is the sink for messages.
 .. _catch_exception: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
 .. _delay: https://github.com/semiversus/python-broqer/blob/master/broqer/op/delay.py
 .. _filter: https://github.com/semiversus/python-broqer/blob/master/broqer/op/filter.py
-.. _FromIterable: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_iterable.py
 .. _FromPolling: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_polling.py
 .. _map_threaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
 .. _map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map.py
