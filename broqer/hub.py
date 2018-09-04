@@ -63,7 +63,7 @@ It's not possible to assign a second publisher to a hub topic:
 >>> _ = hub.assign('value2', Value(0))
 Traceback (most recent call last):
 ...
-broqer.core.publisher.SubscriptionError: Topic is already assigned
+broqer.core.publisher.SubscriptionError: Topic 'value2' already assigned
 
 Meta data
 ---------
