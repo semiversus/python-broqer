@@ -7,13 +7,6 @@ python:
 dist: xenial
 sudo: true
 
-cache: pip
-
-env:
-  global:
-    - PIPENV_IGNORE_VIRTUALENVS=1
-    - PIPENV_VENV_IN_PROJECT=1
-
 install:
   - pip install pipenv
   - pipenv install --dev
