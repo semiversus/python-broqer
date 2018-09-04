@@ -16,7 +16,7 @@ env:
 
 install:
   - pip install pipenv
-  - pipenv install --dev --skip-lock
+  - pipenv install --dev
 
 script:
   - pipenv run flake8 broqer

@@ -17,13 +17,6 @@
 3.0
 >>> s.emit(3)
 3.0
-
-Resetting (or just setting) the state is also possible:
-
->>> lowpass.reset([1, 1, 1])
->>> s.emit(4)
-2.0
-
 """
 import asyncio
 from typing import Any, Callable, Tuple
@@ -35,7 +28,7 @@ from .operator import Operator, build_operator
 
 class Accumulate(Operator):
     """ On each emit of source publisher a function gets called with state and
-    received value as arguments and is returning new state and value to emit.
+    received value as arguments and this returns a new state and value to emit.
 
     :param publisher: source publisher
     :param func:
