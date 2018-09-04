@@ -30,7 +30,7 @@ Synopsis
 - Documentation is hosted on ReadTheDocs.com_
 - Tested on Python 3.5, 3.6 and 3.7
 - Compact library (<1000 lines of code) and well documented (>1000 lines of comments)
-- Fully unit tested (coverage towards 100%), coding style checked with flake8_, static type checked with mypy_
+- Fully unit tested with pytest_, coding style checked with flake8_, static type checked with mypy_, static code checked with pylint_
 - Operators known from ReactiveX_ and other streaming frameworks (like distinct_, combine_latest_, ...)
 - Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
 - Publishers are *awaitable* (e.g. ``await adc_raw``)
@@ -39,8 +39,10 @@ Synopsis
   + Centralised object to keep track of publishers and subscribers
   + Starting point to build applications with a microservice architecture
 
+.. _pytest: https://docs.pytest.org/en/latest
 .. _flake8: http://flake8.pycqa.org/en/latest/
 .. _mypy: http://mypy-lang.org/
+.. _pylint: https://www.pylint.org/
 .. _GitHub.com: https://github.com/semiversus/python-broqer
 .. _ReadTheDocs.com: http://python-broqer.readthedocs.io
 .. _ReactiveX: http://reactivex.io/
