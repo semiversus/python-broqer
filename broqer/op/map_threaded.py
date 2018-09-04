@@ -29,7 +29,7 @@ Finished with argument ...
 
 Mode: QUEUE
 
->>> _d = s | op.map_threaded(delay_add, mode=op.Mode.QUEUE) | op.sink(print)
+>>> _d = s | op.map_threaded(delay_add, mode=op.MODE.QUEUE) | op.sink(print)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
@@ -45,7 +45,7 @@ Finished with argument 1
 
 Mode: LAST
 
->>> _d = s | op.map_threaded(delay_add, mode=op.Mode.LAST) | op.sink(print)
+>>> _d = s | op.map_threaded(delay_add, mode=op.MODE.LAST) | op.sink(print)
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument 0
@@ -61,7 +61,7 @@ Finished with argument 2
 
 Mode: SKIP
 
->>> _d = s | op.map_threaded(delay_add, mode=op.Mode.SKIP) | op.sink(print)
+>>> _d = s | op.map_threaded(delay_add, mode=op.MODE.SKIP) | op.sink(print)
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument 0

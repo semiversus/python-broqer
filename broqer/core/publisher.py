@@ -110,7 +110,7 @@ class Publisher():
         Example:
         >>> from broqer import Publisher, op
         >>> p = Publisher()
-        >>> p | op.sink(print)
+        >>> disposable = p | op.sink(print)
 
         :param apply: A function taking the actual publisher as argument and
             returning a new publisher when applied to an operator or a

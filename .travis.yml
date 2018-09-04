@@ -22,7 +22,7 @@ script:
   - pipenv run flake8 broqer
   - pipenv run mypy broqer
   - pipenv run rstcheck README.rst
-  - pipenv run py.test --doctest-modules --cov=broqer
+  - pipenv run pytest
 
 after_success:
   - pipenv run codecov
