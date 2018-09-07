@@ -112,10 +112,15 @@ class DTRegistry:
 
     def cast(self, topic, value):
         datatype_key = topic.meta.get('datatype', 'none')
-        return self._datatypes[datatype_key].cast(topic, value)
+        result = self._datatypes[datatype_key].cast(topic, value)
+        validate_dt = topic.meta.get('validate', None)
+        if validate_dt:
+            result = self._datatypes[validate_dt].cast(topic, result)
+        return result
 
     def check(self, topic, value):
         datatype_key = topic.meta.get('datatype', 'none')
         self._datatypes[datatype_key].check(topic, value)
-        if 'validate' in topic.meta:
-            self._datatypes[topic.meta['validate']].check(topic, value)
+        validate_dt = topic.meta.get('validate', None)
+        if validate_dt:
+            self._datatypes[validate_dt].check(topic, value)
