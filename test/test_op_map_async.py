@@ -26,6 +26,9 @@ async def foo_vargs(a, b, c):
     await asyncio.sleep(0.15)
     return a + b + c
 
+async def _filter(a, b):
+    return NONE if a>b else a+b
+
 @pytest.mark.parametrize('map_coro, args, kwargs, mode, input_vector, output_vector', [
     (add1, (), {}, MODE.CONCURRENT, ((0, 1), (0.1, 2), (0.2, 3)), ((0.01, 2), (0.1, 3), (0.2, 4))),
     (add1, (2,), {}, MODE.CONCURRENT, ((0, 1), (0.1, 2), (0.2, 3)), ((0.01, 3), (0.1, 4), (0.2, 5))),
@@ -43,10 +46,11 @@ async def foo_vargs(a, b, c):
     (wait, (), {}, MODE.LAST_DISTINCT, ((0, 0), (0.05, 1), (0.1, 0), (0.2, 3)), ((0.15, 0), (0.35, 3))),
     (wait, (), {}, MODE.SKIP, ((0, 0), (0.05, 1), (0.1, 2), (0.2, 3)), ((0.15, 0), (0.35, 3))),
     (foo_vargs, (), {'unpack':True}, MODE.QUEUE, ((0, (0, 0, 0)), (0.1, (0, 0, 1)), (0.2, (1, 0, 1))), ((0.15, 0), (0.3, 1), (0.45, 2))),
+    (_filter, (), {'unpack':True}, MODE.CONCURRENT, ((0, (0,0)), (0.1, (0,1)), (0.2, (1,0)), (0.3, (1,1))), ((0.001, 0), (0.1, 1), (0.3, 2))),
 ])
 @pytest.mark.asyncio
 async def test_with_publisher(map_coro, args, kwargs, mode, input_vector, output_vector, event_loop):
-    await check_async_operator_coro(MapAsync, (map_coro, *args), {'mode':mode, **kwargs}, input_vector, output_vector, loop=event_loop)
+    await check_async_operator_coro(MapAsync, (map_coro, *args), {'mode':mode, **kwargs}, input_vector, output_vector, has_state=None, loop=event_loop)
     await asyncio.sleep(0.3)
 
 @pytest.mark.asyncio

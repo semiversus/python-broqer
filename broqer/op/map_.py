@@ -35,7 +35,7 @@ import asyncio
 from functools import partial
 from typing import Any, Callable
 
-from broqer import Publisher
+from broqer import Publisher, NONE
 
 from .operator import Operator, build_operator
 
@@ -62,9 +62,16 @@ class Map(Operator):
 
     def get(self):
         value = self._publisher.get()  # may raise ValueError
+
         if self._unpack:
-            return self._map_func(*value)
-        return self._map_func(value)
+            result = self._map_func(*value)
+        else:
+            result = self._map_func(value)
+
+        if result is NONE:
+            Publisher.get(self)  # raises ValueError
+
+        return result
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who is self._publisher, 'emit from non assigned publisher'
@@ -74,7 +81,10 @@ class Map(Operator):
         else:
             result = self._map_func(value)
 
-        return self.notify(result)
+        if result is not NONE:
+            return self.notify(result)
+
+        return None
 
 
 map_ = build_operator(Map)  # pylint: disable=invalid-name

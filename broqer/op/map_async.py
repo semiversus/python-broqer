@@ -98,7 +98,7 @@ from enum import Enum
 import sys
 from typing import Any, MutableSequence  # noqa: F401
 
-from broqer import Publisher, default_error_handler
+from broqer import Publisher, default_error_handler, NONE
 
 from .operator import Operator, build_operator
 
@@ -166,10 +166,11 @@ class MapAsync(Operator):
         except Exception:  # pylint: disable=broad-except
             self._options.error_callback(*sys.exc_info())
         else:
-            try:
-                self.notify(result)
-            except Exception:  # pylint: disable=broad-except
-                self._options.error_callback(*sys.exc_info())
+            if result is not NONE:
+                try:
+                    self.notify(result)
+                except Exception:  # pylint: disable=broad-except
+                    self._options.error_callback(*sys.exc_info())
 
         if self._queue:
             value = self._queue.popleft()  # pylint: disable=E1111

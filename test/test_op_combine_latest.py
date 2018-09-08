@@ -11,9 +11,10 @@ from .helper import check_multi_operator, Collector
     ({}, ((1,NONE,NONE,NONE), (NONE,2,NONE,NONE), (NONE,3,NONE,NONE), (NONE,NONE,4,5)), ((NONE,NONE,NONE,(1,3,4,5)))),
     ({'map_':lambda a,b:a+b}, ((1,1), (NONE, 2), (1, NONE), (NONE, -5)), (2, 3, NONE, -4)),
     ({'map_':lambda a,b:a>b}, ((1,1), (NONE, 2), (1, NONE), (NONE, -5)), (False, NONE, NONE, True)),
+    ({'map_':lambda a,b:NONE if a>b else a-b}, ((0, 0), (NONE, 1), (1, NONE), (NONE, 0), (0, NONE)), (0, -1, 0, NONE, 0)),
 ])
 def test_with_publisher(kwargs, input_vector, output_vector):
-    check_multi_operator(CombineLatest, kwargs, input_vector, output_vector, has_state=True)
+    check_multi_operator(CombineLatest, kwargs, input_vector, output_vector, has_state=None)
 
 def test_emit_on():
     source = Publisher()

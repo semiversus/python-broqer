@@ -45,95 +45,145 @@ class CombineLatest(MultiOperator):
     def __init__(self, *publishers: Publisher, map_=None, emit_on=None,
                  allow_stateless=False) -> None:
         MultiOperator.__init__(self, *publishers)
+
+        # ._partial_state is a list keeping the latest emitted values from
+        # each publisher. Stateless publishers will always keep the NONE entry
+        # in this list.
         self._partial_state = [
             NONE for _ in publishers]  # type: MutableSequence[Any]
+
+        # ._missing is keeping a set of source publishers which are required to
+        # emit a value. This set starts with all source publishers. Stateful
+        # publishers are required, stateless publishers not (will be removed
+        # in .subscribe).
         self._missing = set(publishers)
 
+        # ._stateless is a tuple of boolean values. The boolean value
+        # is telling if the source publisher is stateless.
+        # When allow_stateless is False all publishers are handled as stateful
+        # sources (._partial_state will store the state). Otherwise the tuple
+        # will be set in .subscribe (at that point it's clear which publisher
+        # is stateless)
         if allow_stateless:
-            self._stateless_publishers = None
+            self._stateless = None
         else:
-            self._stateless_publishers = tuple(False for _ in publishers)
+            self._stateless = tuple(False for _ in publishers)
 
+        # ._index is a lookup table to get the list index based on publisher
         self._index = \
             {p: i for i, p in enumerate(publishers)
              }  # type: Dict[Publisher, int]
-        self._map = map_
+
+        # .emit_on is a set of publishers. When a source publisher is emitting
+        # and is not in this set the CombineLatest will not emit a value.
+        # If emit_on is None all the publishers will be in the set.
         if emit_on is None:
             self._emit_on = publishers
+        elif isinstance(emit_on, Publisher):
+            self._emit_on = (emit_on,)
         else:
-            if isinstance(emit_on, Publisher):
-                self._emit_on = (emit_on,)
-            else:
-                self._emit_on = emit_on
+            self._emit_on = emit_on
+
+        self._map = map_
         self._state = NONE  # type: Any
 
-    def subscribe(self, subscriber: 'Subscriber',
+    def subscribe(self, subscriber: Subscriber,
                   prepend: bool = False) -> SubscriptionDisposable:
+
         disposable = MultiOperator.subscribe(self, subscriber, prepend)
-        if len(self._subscriptions) == 1:
-            if self._stateless_publishers is None:
-                self._stateless_publishers = tuple(
-                    v is NONE for v in self._partial_state)
-                for publisher, stateless in zip(
-                        self._publishers, self._stateless_publishers):
-                    if stateless:
-                        self._missing.remove(publisher)
-                        if not any(publisher is _p for _p in self._emit_on):
-                            raise ValueError(
-                                'Publisher %r seems to be a stateless '
-                                'publisher, but is missing in emit_on')
+
+        if self._stateless is not None:
+            return disposable
+
+        # when .stateless is not defined check which publishers have emitted
+        # during first subscription (checking ._partial_state for NONE)
+        self._stateless = tuple(v is NONE for v in self._partial_state)
+
+        # _sp is a set of all stateless publishers
+        _sp = set(p for p, s in zip(self._publishers, self._stateless) if s)
+
+        # remove the stateless publishers from ._missing set
+        self._missing -= _sp
+
+        # check for statless publishers not in ._emit_on. If emit_on is missing
+        # a stateless publisher it would never emit when this publisher is
+        # emitting.
+        if _sp - set(self._emit_on):
+            raise ValueError('All stateless publishers have to be part of '
+                             'emit_on')
+
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
-            self._missing = set(self._publishers)
+            self._missing.update(self._publishers)
             self._partial_state = [NONE for _ in self._partial_state]
             self._state = NONE
+            # ._stateless will no be reset as it should not change over time
 
     def get(self):
-        if not self._subscriptions:  # if no subscribers listening
-            values = tuple(p.get() for p in self._publishers)
-            if self._map:
-                return self._map(*values)
-            return tuple(values)
+        # if all publishers are stateful ._state will be defined
         if self._state is not NONE:
             return self._state
-        return Publisher.get(self)  # will raise ValueError
+
+        # get value of all publishers
+        values = (p.get() for p in self._publishers)  # may raise ValueError
+
+        if not self._map:
+            return tuple(values)
+
+        result = self._map(*values)
+        if result is NONE:
+            Publisher.get(self)  # raises ValueError
+        return result
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert any(who is p for p in self._publishers), \
             'emit from non assigned publisher'
 
-        if self._missing and any(who is p for p in self._missing):
-            self._missing.remove(who)
+        # remove source publisher from ._missing
+        self._missing.discard(who)
 
         index = self._index[who]
-        if self._partial_state[index] == value:
-            # if partial_state has not changed avoid new emit
-            return None
 
+        # remember state of this source
         self._partial_state[index] = value
 
-        if not self._missing and any(who is p for p in self._emit_on):
-            if self._map:
-                state = self._map(*self._partial_state)
-            else:
-                state = tuple(self._partial_state)
-
-            if state != self._state or self._stateless_publishers[index]:
-                self._state = state
-                result = self.notify(self._state)
-            else:
-                result = None
-
-            if any(self._stateless_publishers):
-                self._state = NONE
-            if self._stateless_publishers[index]:
+        # if emits from stateful publishers are missing or source of this emit
+        # is not one of emit_on -> don't evaluate and notify subscribers
+        if self._missing or all(who is not p for p in self._emit_on):
+            # stateless publishers don't keep their state in ._partial_state
+            if self._stateless and self._stateless[index]:
                 self._partial_state[index] = NONE
+            return None
 
-            return result
-        return None
+        # evaluate
+        if self._map:
+            state = self._map(*self._partial_state)
+        else:
+            state = tuple(self._partial_state)
+
+        # remove stateless publisher emits from ._partial_state
+        if self._stateless[index]:
+            self._partial_state[index] = NONE
+
+        # if result of _map() was NONE don't emit
+        if state is NONE:
+            self._state = NONE
+            return None
+
+        is_new_state = (state == self._state)
+
+        # store ._state only when all publishers are stateful
+        if not any(self._stateless):
+            self._state = state
+
+        # check if state has changed or stateless publisher has emitted
+        if is_new_state and not self._stateless[index]:
+            return None
+
+        return self.notify(state)
 
 
 combine_latest = build_operator(CombineLatest)  # pylint: disable=invalid-name
