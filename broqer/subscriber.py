@@ -3,7 +3,7 @@ import asyncio
 from abc import ABCMeta, abstractmethod
 from typing import Any
 
-from broqer.core import Publisher  # noqa: F401
+from broqer import Publisher  # noqa: F401
 
 
 class Subscriber(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods

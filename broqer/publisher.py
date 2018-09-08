@@ -3,10 +3,10 @@
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Union
 
-from broqer.core import NONE, SubscriptionDisposable
+from broqer import NONE, SubscriptionDisposable
 
 if TYPE_CHECKING:
-    from broqer.core import Subscriber  # noqa: F401
+    from broqer import Subscriber  # noqa: F401
 
 
 class SubscriptionError(ValueError):

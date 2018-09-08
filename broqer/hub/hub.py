@@ -35,7 +35,7 @@ And will raise an exception if .emit is used a second time on unassigned topic:
 >>> hub['value1'].emit(3)
 Traceback (most recent call last):
 ...
-broqer.core.publisher.SubscriptionError: Only one emit will be stored ...
+broqer.publisher.SubscriptionError: Only one emit will be stored ...
 
 Assign a publisher to a hub topic:
 
@@ -63,7 +63,7 @@ It's not possible to assign a second publisher to a hub topic:
 >>> _ = hub.assign('value2', Value(0))
 Traceback (most recent call last):
 ...
-broqer.core.publisher.SubscriptionError: Topic 'value2' already assigned
+broqer.publisher.SubscriptionError: Topic 'value2' already assigned
 
 Meta data
 ---------
