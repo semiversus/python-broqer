@@ -1,3 +1,4 @@
+""" This module enables the operator overloading of publishers """
 import asyncio
 import operator
 from typing import Any
@@ -41,6 +42,7 @@ class _MapConstantReverse(Operator):
 
 
 def apply_operator_overloading():
+    """ function to apply operator overloading to Publisher class """
     for method in ('__lt__', '__le__', '__eq__', '__ne__', '__ge__', '__gt__',
                    '__add__', '__and__', '__lshift__', '__mod__', '__mul__',
                    '__pow__', '__rshift__', '__sub__', '__xor__', '__concat__',

@@ -88,7 +88,7 @@ Got error
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from typing import Any, Callable, MutableSequence  # noqa: F401
+from typing import Callable  # noqa: F401
 
 from broqer import Publisher, default_error_handler
 
@@ -97,26 +97,37 @@ from .map_async import MapAsync, MODE
 
 
 class MapThreaded(MapAsync):
+    """ Apply ``map_func`` to each emitted value allowing threaded processing.
+    :param publisher: source publisher
+    :param map_func: function called to apply
+    :param \\*args: variable arguments to be used for calling map_coro
+    :param mode: behavior when a value is currently processed
+    :param error_callback: error callback to be registered
+    :param unpack: value from emits will be unpacked as (*value)
+    :param \\**kwargs: keyword arguments to be used for calling map_coro
+    """
     def __init__(self, publisher: Publisher, map_func, *args,
                  mode: MODE = MODE.CONCURRENT,  # type: ignore
-                 error_callback=default_error_handler, **kwargs) -> None:
+                 error_callback=default_error_handler,
+                 unpack: bool = False, loop=None, **kwargs) -> None:
 
         assert mode != MODE.INTERRUPT, 'mode INTERRUPT is not supported'
 
         MapAsync.__init__(self, publisher, self._thread_coro, mode=mode,
-                          error_callback=error_callback)
+                          error_callback=error_callback, unpack=unpack)
 
         if args or kwargs:
             self._map_func = \
-               partial(map_func, *args, **kwargs)  # type: Callable
+                partial(map_func, *args, **kwargs)  # type: Callable
         else:
-            self._map_func = map_func  # type: Callable
+            self._map_func = map_func
 
+        self._loop = loop or asyncio.get_event_loop()
         self._executor = ThreadPoolExecutor()
 
-    async def _thread_coro(self, *args, **kwargs):
-        return await asyncio.get_event_loop().run_in_executor(
-            self._executor, self._map_func, *args, **kwargs)
+    async def _thread_coro(self, *args):
+        return await self._loop.run_in_executor(
+            self._executor, self._map_func, *args)
 
 
 map_threaded = build_operator(MapThreaded)  # pylint: disable=invalid-name

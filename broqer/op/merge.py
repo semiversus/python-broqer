@@ -22,6 +22,9 @@ from .operator import MultiOperator, build_operator
 
 
 class Merge(MultiOperator):
+    """ Merge emits of multiple publishers into one stream
+    :param \\*publishers: source publishers to be merged
+    """
     def __init__(self, *publishers: Publisher) -> None:
         MultiOperator.__init__(self, *publishers)
 

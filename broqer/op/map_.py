@@ -41,6 +41,13 @@ from .operator import Operator, build_operator
 
 
 class Map(Operator):
+    """ Apply ``map_func(*args, value, **kwargs)`` to each emitted value.
+    :param publisher: source publisher
+    :param map_func: function to be applied for each emit
+    :param \\*args: variable arguments to be used for calling map_coro
+    :param unpack: value from emits will be unpacked as (*value)
+    :param \\**kwargs: keyword arguments to be used for calling map_coro
+    """
     def __init__(self, publisher: Publisher, map_func: Callable[[Any], Any],
                  *args, unpack=False, **kwargs) -> None:
         """ special care for return values:

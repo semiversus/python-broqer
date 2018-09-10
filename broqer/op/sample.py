@@ -50,6 +50,12 @@ from .operator import Operator, build_operator
 
 
 class Sample(Operator):
+    """ Emit the last received value periodically
+    :param publisher: source publisher
+    :param interval: time in seconds between emits
+    :param error_callback: the error callback to be registered
+    :param loop: asyncio loop to use
+    """
     def __init__(self, publisher: Publisher, interval: float,
                  error_callback=default_error_handler, loop=None) -> None:
         assert interval > 0, 'interval has to be positive'

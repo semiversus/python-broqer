@@ -80,6 +80,7 @@ def test_operator_with_constant_r():
     (operator.lt, 0, 1, True),
     (operator.lt, 1, 0, False),
     (operator.lt, 1, 1, False),
+
 ])
 def test_with_publisher(operator, l_value, r_value, result):
     vl = Value(l_value)

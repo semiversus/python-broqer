@@ -29,6 +29,11 @@ from broqer.op.operator import build_operator
 
 
 class ToFuture(Subscriber, asyncio.Future):
+    """ Build a future able to await for.
+    :param publisher: source publisher
+    :param timeout: timeout in seconds
+    :param loop: asyncio loop to be used
+    """
     def __init__(self, publisher, timeout=None, loop=None):
         asyncio.Future.__init__(self, loop=loop)
         if loop is None:

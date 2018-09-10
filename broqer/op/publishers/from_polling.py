@@ -36,6 +36,15 @@ from broqer import Publisher, Subscriber, SubscriptionDisposable, \
 
 
 class FromPolling(Publisher):
+    """ Call ``func(*args, **kwargs)`` periodically and emit the returned
+    values.
+    :param interval: periodic interval in seconds
+    :param poll_func: function to be called
+    :param \\*args: variable arguments to be used for calling poll_func
+    :param error_callback: error callback to be registered
+    :param loop: asyncio event loop to use
+    :param \\*kwargs: keyword arguments to be used for calling poll_func
+    """
     def __init__(self, interval, poll_func: Callable[[Any], Any], *args,
                  error_callback=default_error_handler, loop=None,
                  **kwargs) -> None:
@@ -70,7 +79,7 @@ class FromPolling(Publisher):
             except Exception:  # pylint: disable=broad-except
                 self._error_callback(*sys.exc_info())
 
-            self._call_later_handler = asyncio.get_event_loop().call_later(
+            self._call_later_handler = self._loop.call_later(
                 self._interval, self._poll_callback)
         else:
             self._call_later_handler = None

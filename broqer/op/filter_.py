@@ -35,6 +35,13 @@ from .operator import Operator, build_operator
 
 
 class Filter(Operator):
+    """ Filters values based on a ``predicate`` function
+    :param publisher: source publisher
+    :param predicate: function to evaluate the filtering
+    :param \\*args: variable arguments to be used for evaluating predicate
+    :param unpack: value from emits will be unpacked as (*value)
+    :param \\**kwargs: keyword arguments to be used for evaluating predicate
+"""
     def __init__(self, publisher: Publisher,
                  predicate: Callable[[Any], bool],
                  *args, unpack: bool = False, **kwargs) -> None:
@@ -67,7 +74,8 @@ class Filter(Operator):
         return None
 
 
-class True_(Operator):
+class True_(Operator):  # pylint: disable=invalid-name
+    """ Filters all emits which evaluates for True """
     def get(self):
         value = self._publisher.get()  # may raise ValueError
         if bool(value):
@@ -81,7 +89,8 @@ class True_(Operator):
         return None
 
 
-class False_(Operator):
+class False_(Operator):  # pylint: disable=invalid-name
+    """ Filters all emits which evaluates for False """
     def get(self):
         value = self._publisher.get()  # may raise ValueError
         if not bool(value):

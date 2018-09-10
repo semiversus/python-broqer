@@ -29,6 +29,12 @@ from .operator import Operator, build_operator
 
 
 class Delay(Operator):
+    """ Emit every value delayed by the given time.
+    :param publisher: source publisher
+    :param duration: time of delay in seconds
+    :param error_callback: the error callback to be registered
+    :param loop: asyncio event loop to use
+    """
     def __init__(self, publisher: Publisher, duration: float,
                  error_callback=default_error_handler, loop=None) -> None:
         assert duration >= 0, 'delay has to be positive'

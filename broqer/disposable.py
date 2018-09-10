@@ -4,7 +4,8 @@ from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from broqer import Publisher, Subscriber  # noqa: F401
+    from broqer import (Publisher,  # noqa: F401 pylint: disable=unused-import
+                        Subscriber)
 
 
 class Disposable(metaclass=ABCMeta):

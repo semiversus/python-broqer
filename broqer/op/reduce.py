@@ -35,8 +35,17 @@ from .accumulate import Accumulate
 
 
 class Reduce(Accumulate):
+    """ Apply ``func`` to the current emitted value and the last result of
+    ``func``.
+
+    :param publisher: source publisher
+    :param func: function taking the emitted value and the last result of the
+        last run.
+    :param init: initialisation used as "first result" for the first call of
+        ``func`` on first emit.
+    """
     def __init__(self, publisher: Publisher, func: Callable[[Any, Any], Any],
-                 init=None) -> None:
+                 init) -> None:
         def _func(state, value):
             result = func(state, value)
             return (result, result)  # new state and result is the same

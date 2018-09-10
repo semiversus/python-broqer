@@ -1,3 +1,5 @@
+""" The op module contains all operators broqer offers """
+
 # synchronous operators
 from .any_ import Any, any_
 from .all_ import All, all_

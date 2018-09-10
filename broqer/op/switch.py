@@ -47,6 +47,10 @@ from .operator import Operator, build_operator
 
 
 class Switch(Operator):
+    """ Emit a publisher mapped by ``mapping``
+    :param selection_publisher: publisher which is choosing
+    :param publisher_mapping: dictionary with value:Publisher mapping
+    """
     def __init__(self, selection_publisher: Publisher,
                  publisher_mapping: Dict[Any, Publisher]) -> None:
         Operator.__init__(self, selection_publisher)

@@ -35,6 +35,12 @@ from .operator import Operator, build_operator
 
 
 class Throttle(Operator):
+    """ Rate limit emits by the given time.
+    :param publisher: source publisher
+    :param duration: time for throttling in seconds
+    :param error_callback: the error callback to be registered
+    :param loop: asyncio event loop to use
+    """
     def __init__(self, publisher: Publisher, duration: float,
                  error_callback=default_error_handler, loop=None) -> None:
         assert duration >= 0, 'duration has to be positive'
@@ -71,6 +77,7 @@ class Throttle(Operator):
             self._call_later_handler = None
 
     def reset(self):
+        """ reseting duration for throttling """
         if self._call_later_handler is not None:
             self._call_later_handler.cancel()
             self._call_later_handler = None

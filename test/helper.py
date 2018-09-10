@@ -356,7 +356,7 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
         print(timestamp_target, timestamp_actual, value_target, value_actual)
         assert abs(timestamp_actual-timestamp_target)<JITTER
         assert value_actual == value_target
-    print(collector_permanent.result_vector, collector_permanent.timestamp_vector)
+    print('*', collector_permanent.result_vector, collector_permanent.timestamp_vector, output_vector)
     assert len(collector_permanent.result_vector) == len(output_vector)
 
     assert not failed_list

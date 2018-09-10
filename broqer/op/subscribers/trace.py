@@ -7,16 +7,17 @@ from broqer.op.operator import build_operator
 
 
 class Trace(Subscriber, Disposable):
-    def __init__(self, publisher: Publisher,
-                 sink_function: Optional[Callable[..., None]] = None,
+    def __init__(self,  # pylint: disable=keyword-arg-before-vararg
+                 publisher: Publisher,
+                 callback: Optional[Callable[..., None]] = None,
                  *args, unpack=False, **kwargs) -> None:
-        if sink_function is None:
-            self._sink_function = None  # type: Callable
+        if callback is None:
+            self._callback = None  # type: Callable
         elif args or kwargs:
-            self._sink_function = \
-                partial(sink_function, *args, **kwargs)  # type: Callable
+            self._callback = \
+                partial(callback, *args, **kwargs)  # type: Callable
         else:
-            self._sink_function = sink_function  # type: Callable
+            self._callback = callback  # type: Callable
 
         self._unpack = unpack
         self._disposable = publisher.subscribe(self, prepend=True)
@@ -27,11 +28,11 @@ class Trace(Subscriber, Disposable):
         assert not hasattr(self, '_disposable') or \
             who is self._disposable.publisher, \
             'emit comming from non assigned publisher'
-        if self._sink_function:
+        if self._callback:
             if self._unpack:
-                self._sink_function(*value)
+                self._callback(*value)
             else:
-                self._sink_function(value)
+                self._callback(value)
 
     def dispose(self):
         self._disposable.dispose()

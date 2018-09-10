@@ -31,6 +31,11 @@ from .operator import Operator, build_operator
 
 
 class SlidingWindow(Operator):
+    """ Group ``size`` emitted values overlapping.
+    :param publisher: source publisher
+    :param size: size of values to be collected before emit
+    :param emit_partial: emit even if queue is not full
+    """
     def __init__(self, publisher: Publisher, size: int,
                  emit_partial=False) -> None:
         assert size > 0, 'size has to be positive'
@@ -64,6 +69,7 @@ class SlidingWindow(Operator):
         return None
 
     def flush(self):
+        """ flush the queue - this will emit the current queue """
         if not self._emit_partial and len(self._state) != self._state.maxlen:
             self.notify(tuple(self._state))
         self._state.clear()

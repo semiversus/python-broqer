@@ -8,7 +8,7 @@ from broqer.op import MapThreaded, MODE
 from .helper import check_async_operator_coro
 
 def add1(v, i=1):
-    print('ADD', v, i)
+    print('ADD', v, i, v+i)
     return v+i
 
 def wait(v, duration=0.15):

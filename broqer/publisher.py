@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Callable, Union
 from broqer import NONE, SubscriptionDisposable
 
 if TYPE_CHECKING:
-    from broqer import Subscriber  # noqa: F401
+    from broqer import Subscriber  # noqa: F401 pylint: disable=unused-import
 
 
 class SubscriptionError(ValueError):

@@ -1,3 +1,5 @@
+""" Module implementing Operator, MultiOperator and build_operator.
+"""
 from abc import abstractmethod
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
@@ -37,6 +39,7 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
 
     @property
     def source_publishers(self):
+        """ tuple with all source publishers """
         return (self._publisher, )
 
     @abstractmethod
@@ -79,6 +82,7 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
 
     @property
     def source_publishers(self):
+        """ tuple with all source publishers """
         return self._publishers
 
     @abstractmethod

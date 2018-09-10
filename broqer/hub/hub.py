@@ -108,7 +108,8 @@ from broqer import (Publisher, Subscriber, SubscriptionDisposable,
 
 
 class Topic(Publisher, Subscriber):
-    def __init__(self, hub: 'Hub', path: str) -> None:
+    def __init__(self, hub: 'Hub',  # pylint: disable=unused-argument
+                 path: str) -> None:
         Publisher.__init__(self)
         self._subject = None  # type: Publisher
         self._path = path
@@ -161,7 +162,7 @@ class Topic(Publisher, Subscriber):
 
         return self._subject.emit(value, who=self)
 
-    def assign(self, subject):
+    def assign(self, subject, *_args, **_kwargs):
         assert isinstance(subject, (Publisher, Subscriber))
 
         if self._subject is not None:
@@ -201,7 +202,7 @@ class MetaTopic(Topic):
         Topic.__init__(self, hub, path)
         self._meta = dict()  # type: Dict[str, Any]
 
-    def assign(self, subject, meta=None):
+    def assign(self, subject, meta=None):  # pylint: disable=arguments-differ
         Topic.assign(self, subject)
         if meta is not None:
             self._meta.update(meta)

@@ -1,5 +1,5 @@
 """
-When this operators gets emitted it's emitting a defined value
+Implements the Replace operator
 """
 import asyncio
 from typing import Any
@@ -10,6 +10,10 @@ from .operator import Operator, build_operator
 
 
 class Replace(Operator):
+    """ When this operators gets emitted it's emitting a defined value.
+    :param publisher: source publisher
+    :param value: replacing value to be emitted on emits to this operator
+    """
     def __init__(self, publisher: Publisher, value: Any) -> None:
         Operator.__init__(self, publisher)
 

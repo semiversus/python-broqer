@@ -27,6 +27,10 @@ from .operator import Operator, build_operator
 
 
 class Partition(Operator):
+    """ Group ``size`` emits into one emit as tuple.
+    :param publisher: source publisher
+    :param size: emits to be collected before emit
+    """
     def __init__(self, publisher: Publisher, size: int) -> None:
         # use size = 0 for unlimited partition size
         # (only make sense when using .flush() )
@@ -58,6 +62,7 @@ class Partition(Operator):
         return None
 
     def flush(self):
+        """ Emits the current queue and clears the queue """
         self.notify(tuple(self._queue))
         self._queue.clear()
 

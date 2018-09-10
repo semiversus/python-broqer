@@ -109,9 +109,18 @@ _Options = namedtuple('_Options', 'map_coro mode args kwargs '
 
 
 class MapAsync(Operator):
+    """ Apply ``map_coro`` to each emitted value allowing async processing
+    :param publisher: source publisher
+    :param map_coro: coroutine to be applied on emit
+    :param \\*args: variable arguments to be used for calling map_coro
+    :param mode: behavior when a value is currently processed
+    :param error_callback: error callback to be registered
+    :param unpack: value from emits will be unpacked as (*value)
+    :param \\*kwargs: keyword arguments to be used for calling map_coro
+    """
     def __init__(self, publisher: Publisher, map_coro, *args,
                  mode=MODE.CONCURRENT, error_callback=default_error_handler,
-                 unpack=False, **kwargs) -> None:
+                 unpack: bool = False, **kwargs) -> None:
         """
         mode uses one of the following enumerations:
             * CONCURRENT - just run coroutines concurrent

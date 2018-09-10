@@ -54,9 +54,18 @@ from .operator import Operator, build_operator
 
 
 class Debounce(Operator):
+    """ Emit a value only after a given idle time (emits meanwhile are
+    skipped). Debounce can also be used for a timeout functionality.
+    :param publisher: source publisher
+    :param duetime: time in seconds to be waited for debounce
+    :param retrigger_value: value used to emit when value has changed
+    :param error_callback: error callback to be registered
+    :param loop: asyncio loop to be used
+    """
     def __init__(self, publisher: Publisher, duetime: float,
                  retrigger_value: Any = NONE,
-                 error_callback=default_error_handler) -> None:
+                 error_callback=default_error_handler,
+                 loop=None) -> None:
         assert duetime >= 0, 'duetime has to be positive'
 
         Operator.__init__(self, publisher)
@@ -67,6 +76,7 @@ class Debounce(Operator):
         self._error_callback = error_callback
         self._state = NONE  # type: Any
         self._next_state = NONE  # type: Any
+        self._loop = loop or asyncio.get_event_loop()
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Operator.unsubscribe(self, subscriber)
@@ -109,7 +119,7 @@ class Debounce(Operator):
         self._next_state = value
 
         self._call_later_handler = \
-            asyncio.get_event_loop().call_later(self.duetime, self._debounced)
+            self._loop.call_later(self.duetime, self._debounced)
 
     def _debounced(self):
         self._call_later_handler = None
@@ -120,6 +130,7 @@ class Debounce(Operator):
             self._error_callback(*sys.exc_info())
 
     def reset(self):
+        """ Reset the debounce time """
         if self._retrigger_value is not NONE:
             self.notify(self._retrigger_value)
             self._state = self._retrigger_value
