@@ -77,10 +77,14 @@ def test_operator_with_constant_r():
     mock_sink.assert_called_once_with(-2)
 
 @pytest.mark.parametrize('operator, l_value, r_value, result', [
-    (operator.lt, 0, 1, True),
-    (operator.lt, 1, 0, False),
-    (operator.lt, 1, 1, False),
-
+    (operator.lt, 0, 1, True), (operator.lt, 1, 0, False), (operator.lt, 1, 1, False), (operator.lt, 1, 'foo', TypeError),
+    (operator.le, 0, 1, True), (operator.le, 1, 0, False), (operator.le, 1, 1, True), (operator.le, 1, 'foo', TypeError),
+    (operator.eq, 1, 0, False), (operator.eq, 1, 1, True), (operator.eq, 1, 'foo', False), (operator.eq, 'foo', 'foo', True),
+    (operator.ne, 1, 0, True), (operator.ne, 1, 1, False), (operator.ne, 1, 'foo', True), (operator.ne, 'foo', 'foo', False),
+    (operator.ge, 0, 1, False), (operator.ge, 1, 0, True), (operator.ge, 1, 1, True), (operator.ge, 1, 'foo', TypeError),
+    (operator.gt, 0, 1, False), (operator.gt, 1, 0, True), (operator.gt, 1, 1, False), (operator.gt, 1, 'foo', TypeError),
+    (operator.add, 0, 1, 1), (operator.add, 0, 1.1, 1.1), (operator.add, 'ab', 'cd', 'abcd'), (operator.add, 'ab', 1, TypeError),
+    (operator.and_, 0, 0, 0), (operator.and_, 5, 1, 1), (operator.and_, 5, 4, 4), (operator.and_, 'ab', 1, TypeError),
 ])
 def test_with_publisher(operator, l_value, r_value, result):
     vl = Value(l_value)
@@ -99,7 +103,12 @@ def test_with_publisher(operator, l_value, r_value, result):
     o6 = operator(pl, pr)
 
     o7 = operator(cl, vr)
-    o8 = operator(cl, cr)
+    try:
+        o8 = operator(cl, cr)
+    except Exception as e:
+        assert isinstance(e, result)
+        o8 = result  # to pass the following test
+
     o9 = operator(cl, pr)
 
     mock_sink_o3 = mock.Mock()
@@ -120,7 +129,10 @@ def test_with_publisher(operator, l_value, r_value, result):
     assert o8 == result
 
     for output in (o1, o2, o7):
-        assert output.get() == result
+        try:
+            assert output.get() == result
+        except Exception as e:
+            assert isinstance(e, result)
 
     for output in (o3, o4, o5, o6, o9):
         with pytest.raises(ValueError):
@@ -132,21 +144,27 @@ def test_with_publisher(operator, l_value, r_value, result):
     mock_sink_o6.assert_not_called()
     mock_sink_o9.assert_not_called()
 
-    pl.notify(l_value)
+    try:
+        pl.notify(l_value)
+    except Exception as e:
+        assert isinstance(e, result)
+    else:
+        mock_sink_o3.assert_not_called()
+        mock_sink_o4.assert_called_once_with(result)
+        mock_sink_o5.assert_called_once_with(result)
+        mock_sink_o6.assert_not_called()
+        mock_sink_o9.assert_not_called()
 
-    mock_sink_o3.assert_not_called()
-    mock_sink_o4.assert_called_once_with(result)
-    mock_sink_o5.assert_called_once_with(result)
-    mock_sink_o6.assert_not_called()
-    mock_sink_o9.assert_not_called()
-
-    pr.notify(r_value)
-
-    mock_sink_o3.assert_called_once_with(result)
-    mock_sink_o4.assert_called_once_with(result)
-    mock_sink_o5.assert_called_once_with(result)
-    mock_sink_o6.assert_called_once_with(result)
-    mock_sink_o9.assert_called_once_with(result)
+    try:
+        pr.notify(r_value)
+    except Exception as e:
+        assert isinstance(e, result)
+    else:
+        mock_sink_o3.assert_called_once_with(result)
+        mock_sink_o4.assert_called_once_with(result)
+        mock_sink_o5.assert_called_once_with(result)
+        mock_sink_o6.assert_called_once_with(result)
+        mock_sink_o9.assert_called_once_with(result)
 
 def test_wrong_comparision():
     p1 = Publisher()
