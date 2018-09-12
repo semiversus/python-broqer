@@ -29,18 +29,18 @@ class NumberDT(DT):
     """ Datatype for general numbers
 
     Recognized meta keys:
-    * minimum: check the value against this minimum (below raises an Exception)
-    * maximum: check against maximum (above raises an Exception)
+    * lower_input_limit: check the value against minimum (below->Exception)
+    * upper_input_limit: check against maximum (above raises an Exception)
     """
 
     def check(self, topic, value):
-        minimum = resolve_meta_key(topic.hub, 'minimum', topic.meta)
+        minimum = resolve_meta_key(topic.hub, 'lower_input_limit', topic.meta)
         if minimum is not None and value < minimum:
-            raise ValueError('Value %d under minimum of %d' % (value, minimum))
+            raise ValueError('Value %r under minimum of %r' % (value, minimum))
 
-        maximum = resolve_meta_key(topic.hub, 'maximum', topic.meta)
+        maximum = resolve_meta_key(topic.hub, 'upper_input_limit', topic.meta)
         if maximum is not None and value > maximum:
-            raise ValueError('Value %d over maximum of %d' % (value, maximum))
+            raise ValueError('Value %r over maximum of %r' % (value, maximum))
 
 
 class IntegerDT(NumberDT):

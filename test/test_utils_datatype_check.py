@@ -25,7 +25,7 @@ from broqer.utils.datatype_check import DTRegistry, resolve_meta_key, DT
      (1, -1, 1, TypeError, ValueError, TypeError, 123, 1),
      (None, None, None, ValueError, ValueError, ValueError, ValueError, ValueError),
      ('1', '-1', '1', TypeError, ValueError, TypeError, '123', '1')),
-    ({'datatype': 'int', 'minimum':-10, 'maximum':10},
+    ({'datatype': 'int', 'lower_input_limit':-10, 'upper_input_limit':10},
      (1, -1, -10, 10, -11, 11, False, -7.99),
      (1, -1, -10, 10, -11, 11, 0, -7),
      (None, None, None, None, ValueError, ValueError, None, ValueError),
@@ -35,7 +35,7 @@ from broqer.utils.datatype_check import DTRegistry, resolve_meta_key, DT
      (1.0, -1.0, 1.0, TypeError, ValueError, TypeError, 123.0, 1.99),
      (None, ValueError, ValueError, ValueError, ValueError, ValueError, ValueError, None),
      ('1.0', '-1.0', '1.0', TypeError, ValueError, TypeError, '123.0', '1.99')),
-    ({'datatype': 'float', 'minimum':-10, 'maximum':10},
+    ({'datatype': 'float', 'lower_input_limit':-10, 'upper_input_limit':10},
      (1.0, -1, -10.0, 10, -11.0, 11, False, -7.99),
      (1.0, -1.0, -10.0, 10.0, -11.0, 11.0, 0.0, -7.99),
      (None, ValueError, None, ValueError, ValueError, ValueError, ValueError, None),
@@ -79,12 +79,12 @@ def test_datatype_check(meta, values, cast_results, check_results, str_results):
 def test_resolve_meta_key():
     hub = Hub()
 
-    meta = {'minimum': '>value_minimum', 'maximum':'>blabla'}
+    meta = {'lower_input_limit': '>value_minimum', 'upper_input_limit':'>blabla'}
     hub.assign('value_minimum', Value(-2))
-    assert resolve_meta_key(hub, 'minimum', meta) == -2
+    assert resolve_meta_key(hub, 'lower_input_limit', meta) == -2
 
     with pytest.raises(KeyError):
-        resolve_meta_key(hub, 'maximum', meta)
+        resolve_meta_key(hub, 'upper_input_limit', meta)
 
 def test_custom_datatype():
     dt_registry = DTRegistry()
@@ -121,7 +121,7 @@ def test_validate():
 
     hub.topic_factory.add_datatype('even', EvenDT() )
 
-    hub.assign('value', Value(''), meta={'datatype': 'int', 'minimum':0, 'validate':'even'})
+    hub.assign('value', Value(''), meta={'datatype': 'int', 'lower_input_limit':0, 'validate':'even'})
 
     assert hub['value'].cast('122') == 122
     assert hub['value'].check(122) is None
