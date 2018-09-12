@@ -219,3 +219,25 @@ def test_allow_stateless_extensive():
     with pytest.raises(ValueError):
         dut.get()
     assert collector.result_vector == ((NONE, 3, NONE, 1), (4, 3, NONE, 1),)
+
+def test_allow_stateless_with_stateful_publishers():
+    source1 = StatefulPublisher(0)
+    source2 = StatefulPublisher(0)
+
+    dut = CombineLatest(source1, source2, allow_stateless=True)
+
+    collector = Collector()
+    dut.subscribe(collector)
+
+    source1.notify(1)
+    source2.notify(1)
+
+    assert collector.result_vector == ((0,0), (1,0), (1,1))
+
+def test_no_publishers():
+    dut = CombineLatest()
+
+    collector = Collector()
+    dut.subscribe(collector)
+
+    assert collector.result_vector == ((),)

@@ -92,6 +92,12 @@ class CombineLatest(MultiOperator):
 
         disposable = MultiOperator.subscribe(self, subscriber, prepend)
 
+        # if there are no source publishers emit an empty tuple on subscription
+        if not self._publishers:
+            self.notify(())
+
+        # check if ._statless is already definied (will be done on first
+        # subscription)
         if self._stateless is not None:
             return disposable
 
@@ -165,7 +171,7 @@ class CombineLatest(MultiOperator):
             state = tuple(self._partial_state)
 
         # remove stateless publisher emits from ._partial_state
-        if self._stateless[index]:
+        if self._stateless and self._stateless[index]:
             self._partial_state[index] = NONE
 
         # if result of _map() was NONE don't emit
@@ -176,7 +182,7 @@ class CombineLatest(MultiOperator):
         is_new_state = (state == self._state)
 
         # store ._state only when all publishers are stateful
-        if not any(self._stateless):
+        if self._stateless and not any(self._stateless):
             self._state = state
 
         # check if state has changed or stateless publisher has emitted
