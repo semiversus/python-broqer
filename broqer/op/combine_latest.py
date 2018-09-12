@@ -124,7 +124,7 @@ class CombineLatest(MultiOperator):
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
             self._missing.update(self._publishers)
-            self._partial_state = [NONE for _ in self._partial_state]
+            self._partial_state[:] = [NONE for _ in self._partial_state]
             self._state = NONE
             # ._stateless will no be reset as it should not change over time
 
