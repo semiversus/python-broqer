@@ -28,7 +28,7 @@ from typing import Any, Callable, Optional
 from broqer import Subscriber, Publisher
 
 
-class Sink(Subscriber):
+class Sink(Subscriber):  # pylint: disable=too-few-public-methods
     """ Apply ``callback(*args, value, **kwargs)`` to each emitted value. It's
     also possible to omit ``callback`` - in this case it's acting as dummy
     subscriber
