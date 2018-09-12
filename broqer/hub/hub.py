@@ -27,21 +27,16 @@ True
 >>> 'value2' in hub
 False
 
-It will store the first .emit for an unassigned topic:
+It will store each .emit for an unassigned topic:
 >>> hub['value1'].emit(2)
-
-And will raise an exception if .emit is used a second time on unassigned topic:
-
 >>> hub['value1'].emit(3)
-Traceback (most recent call last):
-...
-broqer.publisher.SubscriptionError: Only one emit will be stored ...
 
 Assign a publisher to a hub topic:
 
 >>> _ = hub.assign('value1', Value(1))
 Output: 1
 Output: 2
+Output: 3
 >>> hub['value1'].assigned
 True
 
@@ -114,7 +109,7 @@ class Topic(Publisher, Subscriber):
         self._subject = None  # type: Publisher
         self._path = path
         self.assignment_future = None
-        self._pre_assign_emit = NONE  # type: Any
+        self._pre_assign_emit = None  # type: list
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
@@ -147,11 +142,9 @@ class Topic(Publisher, Subscriber):
     def emit(self, value: Any,
              who: Optional[Publisher] = None) -> asyncio.Future:
         if self._subject is None:
-            if self._pre_assign_emit is not NONE:
-                # method will be replaced by .__call__
-                raise SubscriptionError('Only one emit will be stored before' +
-                                        ' assignment')
-            self._pre_assign_emit = value
+            if self._pre_assign_emit is None:
+                self._pre_assign_emit = []
+            self._pre_assign_emit.append(value)
             return None
 
         if who is self._subject:
@@ -170,8 +163,10 @@ class Topic(Publisher, Subscriber):
         self._subject = subject
         if self._subscriptions:
             self._subject.subscribe(self)
-        if self._pre_assign_emit is not NONE:
-            self._subject.emit(self._pre_assign_emit, who=self)
+        if self._pre_assign_emit is not None:
+            for value in self._pre_assign_emit:
+                self._subject.emit(value, who=self)
+            self._pre_assign_emit = None
         if self.assignment_future is not None:
             self.assignment_future.set_result(None)
 

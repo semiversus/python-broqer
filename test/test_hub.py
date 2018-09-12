@@ -162,9 +162,7 @@ def test_subscribe_emit_assign(factory):
     assert len(hub['value1']._subscriptions) == 1
 
     hub['value1'].emit(1)
-
-    with pytest.raises(ValueError):
-        hub['value1'].emit(2)
+    hub['value1'].emit(2)
 
     mock_sink.assert_not_called()
 
@@ -178,7 +176,7 @@ def test_subscribe_emit_assign(factory):
     value = Value(0)
 
     hub.assign('value1', value)
-    mock_sink.calls(mock.call(0), mock.call(1))
+    mock_sink.calls(mock.call(0), mock.call(1), mock.call(2))
 
 @pytest.mark.asyncio
 async def test_wait_for_assignment(event_loop):
