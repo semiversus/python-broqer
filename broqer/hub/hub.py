@@ -33,7 +33,7 @@ It will store each .emit for an unassigned topic:
 
 Assign a publisher to a hub topic:
 
->>> _ = hub.assign('value1', Value(1))
+>>> _ = hub['value1'].assign(Value(1))
 Output: 1
 Output: 2
 Output: 3
@@ -44,7 +44,7 @@ True
 
 Also assigning publisher first and then subscribing is possible:
 
->>> _ = hub.assign('value2', Value(2))
+>>> _ = hub['value2'].assign(Value(2))
 >>> _d2 = hub['value2'] | op.Sink(print, 'Output:')
 Output: 2
 
@@ -55,7 +55,7 @@ Output: 3
 
 It's not possible to assign a second publisher to a hub topic:
 
->>> _ = hub.assign('value2', Value(0))
+>>> _ = hub['value2'].assign(Value(0))
 Traceback (most recent call last):
 ...
 broqer.publisher.SubscriptionError: Topic 'value2' already assigned
@@ -65,7 +65,7 @@ Meta data
 
 Another feature is defining meta data as dictionary to a hub topic:
 
->>> _ = hub.assign('value3', Value(0), meta={'maximum':10})
+>>> _ = hub['value3'].assign(Value(0), meta={'maximum':10})
 >>> hub['value3'].meta
 {'maximum': 10}
 
@@ -81,7 +81,7 @@ It's also possible to wait for an assignment:
 >>> _f2.done()
 False
 
->>> _ = hub.assign('value4', Value(0))
+>>> _ = hub['value4'].assign(Value(0))
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
 >>> _f2.done()
 True
@@ -99,10 +99,15 @@ from types import MappingProxyType
 from typing import Any, Optional, Dict  # noqa: F401
 
 from broqer import (Publisher, Subscriber, SubscriptionDisposable,
-                    SubscriptionError, NONE)
+                    SubscriptionError)
 
 
 class Topic(Publisher, Subscriber):
+    """ Topic acts as a proxy to publishers and/or subscribers. It's used
+    in the context of a hub.
+    :param hub: reference to the hub
+    :param path: the path to this topic (used as key when accessing the hub)
+    """
     def __init__(self, hub: 'Hub',  # pylint: disable=unused-argument
                  path: str) -> None:
         Publisher.__init__(self)
@@ -155,7 +160,8 @@ class Topic(Publisher, Subscriber):
 
         return self._subject.emit(value, who=self)
 
-    def assign(self, subject, *_args, **_kwargs):
+    def assign(self, subject):
+        """ assigns the given subject to the topic """
         assert isinstance(subject, (Publisher, Subscriber))
 
         if self._subject is not None:
@@ -171,28 +177,35 @@ class Topic(Publisher, Subscriber):
             self.assignment_future.set_result(None)
 
     def freeze(self):
+        """ called by hub when hub is going to be frozen """
         if self._subject is None:
             raise ValueError('Topic %r is not assigned' % self._path)
 
     @property
-    def assigned(self):
+    def assigned(self) -> bool:
+        """ telling as boolean if topic is assigned with a publisher/subscriber
+        """
         return self._subject is not None
 
     @property
     def subject(self):
+        """ the assigned subject """
         return self._subject
 
     async def wait_for_assignment(self):
+        """ coroutine to wait until the assignment is finished """
         if not self.assigned:
             self.assignment_future = asyncio.get_event_loop().create_future()
             await self.assignment_future
 
     @property
     def path(self) -> str:
+        """ topic path used as key in the hub """
         return self._path
 
 
 class MetaTopic(Topic):
+    """ MetaTopic is adding a meta dictionary to each topic """
     def __init__(self, hub: 'Hub', path: str) -> None:
         Topic.__init__(self, hub, path)
         self._meta = dict()  # type: Dict[str, Any]
@@ -204,10 +217,16 @@ class MetaTopic(Topic):
 
     @property
     def meta(self):
+        """ the meta dictionary """
         return self._meta
 
 
 class Hub:
+    """ Hub is a collection of topics where each topic can be referenced as
+    string (so called "path").
+
+    :param topic_factory: function used to create new topic objects
+    """
     def __init__(self, topic_factory=MetaTopic):
         self._topics = dict()
         self._frozen = False
@@ -224,11 +243,6 @@ class Hub:
             self._topics[path] = topic
             return topic
 
-    def __setitem__(self, path: str, publisher: Publisher):
-        if not isinstance(publisher, (Publisher, Subscriber)):
-            raise TypeError('Assigned topic has to be publisher or subscriber')
-        self.assign(path, publisher)
-
     def __contains__(self, path: str) -> bool:
         return path in self._topics
 
@@ -236,28 +250,27 @@ class Hub:
         return sorted(self._topics.keys()).__iter__()
 
     def freeze(self, freeze: bool = True):
+        """ Freezing the hub means that each topic has to be assigned and no
+        new topics can be created after this point.
+        """
         for topic in self._topics.values():
             topic.freeze()
         self._frozen = freeze
 
     @property
     def topics(self):
+        """ ordered dictionary with path:topic ordered by path """
         topics_sorted = sorted(self._topics.items(), key=lambda t: t[0])
         return MappingProxyType(OrderedDict(topics_sorted))
 
     @property
     def topic_factory(self):
+        """ used topic_factory """
         return self._topic_factory
 
-    def assign(self, topic_str: str, publisher: Publisher,
-               *args, **kwargs) -> Topic:
 
-        topic = self[topic_str]
-        topic.assign(publisher, *args, **kwargs)  # type: ignore
-        return topic
-
-
-class SubHub:
+class SubHub:  # pylint: disable=too-few-public-methods
+    """ SubHub is adding a prefix to each topic access """
     def __init__(self, hub: Hub, prefix: str) -> None:
         self._hub = hub
         assert not prefix.endswith('.'), 'Prefix should not end with \'.\''
@@ -266,9 +279,3 @@ class SubHub:
 
     def __getitem__(self, topic: str) -> Topic:
         return self._hub[self._prefix + topic]
-
-    def assign(self, topic_str: str, publisher: Publisher,
-               *args, **kwargs) -> Topic:
-
-        return self._hub.assign(self._prefix + topic_str, publisher,
-                                *args, **kwargs)

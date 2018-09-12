@@ -35,7 +35,7 @@ def test_hub_topics():
 def test_freeze():
     hub = Hub()
 
-    hub.assign('value1', StatefulPublisher(0))
+    hub['value1'].assign(StatefulPublisher(0))
 
     assert 'value1' in hub
 
@@ -54,13 +54,13 @@ def test_freeze():
     with pytest.raises(ValueError):
         hub.freeze()
 
-    hub.assign('value2', Value(0))
-    hub.assign('value3', Value(0))
+    hub['value2'].assign(Value(0))
+    hub['value3'].assign(Value(0))
 
     hub.freeze()
 
     with pytest.raises(ValueError):
-        hub.assign('value4', StatefulPublisher(0))
+        hub['value4'].assign(StatefulPublisher(0))
 
     with pytest.raises(ValueError):
         hub['value5'] | op.Sink()
@@ -73,7 +73,7 @@ def test_freeze():
     hub.freeze(False)
 
     hub['value4'] | op.Sink()
-    hub.assign('value5', StatefulPublisher(0))
+    hub['value5'].assign(StatefulPublisher(0))
     hub['value6'].emit(1)
 
     assert 'value4' in hub
@@ -91,7 +91,7 @@ def test_assign_subscribe_emit(factory):
     assert not hub['value1'].assigned
     assert hub['value1'].subject is None
 
-    hub['value1'] = value1
+    hub['value1'].assign(value1)
 
     with pytest.raises(ValueError):
         hub['value1'].assign(value1)
@@ -175,7 +175,7 @@ def test_subscribe_emit_assign(factory):
 
     value = Value(0)
 
-    hub.assign('value1', value)
+    hub['value1'].assign(value)
     mock_sink.calls(mock.call(0), mock.call(1), mock.call(2))
 
 @pytest.mark.asyncio
@@ -218,6 +218,6 @@ def test_sub_hub():
     sub_hub = SubHub(hub, 'prefix')
     assert sub_hub['value2'] is hub['prefix.value2']
 
-    sub_hub.assign('value3', Value(3))
+    sub_hub['value3'].assign(Value(3))
 
     assert hub['prefix.value3'] is sub_hub['value3']
