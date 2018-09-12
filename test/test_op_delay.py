@@ -3,7 +3,7 @@ import asyncio
 from unittest.mock import Mock, ANY
 
 from broqer import Publisher, NONE
-from broqer.op import Delay, sink
+from broqer.op import Delay, Sink
 
 from .helper import check_async_operator_coro
 from .eventloop import VirtualTimeEventLoop
@@ -44,7 +44,7 @@ async def test_errorhandler():
     p = Publisher()
 
     dut = Delay(p, 0.1, error_callback=mock_errorhandler)
-    dut | sink(mock)
+    dut | Sink(mock)
 
     p.notify(1)
     await asyncio.sleep(0.15)

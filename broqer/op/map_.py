@@ -7,7 +7,7 @@ Usage:
 >>> s = Subject()
 
 >>> mapped_publisher = s | op.map_(lambda v:v*2)
->>> _disposable = mapped_publisher | op.sink(print)
+>>> _disposable = mapped_publisher | op.Sink(print)
 
 >>> s.emit(1)
 2
@@ -21,12 +21,12 @@ Also possible with additional args and kwargs:
 
 >>> import operator
 >>> mapped_publisher = s | op.map_(operator.add, 3)
->>> _disposable = mapped_publisher | op.sink(print)
+>>> _disposable = mapped_publisher | op.Sink(print)
 >>> s.emit(100)
 103
 >>> _disposable.dispose()
 
->>> _disposable = s | op.map_(print, 'Output:') | op.sink(print, 'EMITTED')
+>>> _disposable = s | op.map_(print, 'Output:') | op.Sink(print, 'EMITTED')
 >>> s.emit(1)
 Output: 1
 EMITTED None

@@ -31,7 +31,7 @@ async def test_errorhandler(operator_cls, args, capsys):
 
     # test default error handler
     dut = operator_cls(*args)
-    dut | op.sink(mock)
+    dut | op.Sink(mock)
 
     await asyncio.sleep(0.1)
 
@@ -44,7 +44,7 @@ async def test_errorhandler(operator_cls, args, capsys):
     default_error_handler.set(mock_errorhandler)
 
     dut = operator_cls(*args)
-    dut | op.sink(mock)
+    dut | op.Sink(mock)
 
     await asyncio.sleep(0.1)
 
@@ -56,7 +56,7 @@ async def test_errorhandler(operator_cls, args, capsys):
     mock_errorhandler_custom = Mock()
 
     dut = operator_cls(*args, error_callback=mock_errorhandler_custom)
-    dut | op.sink(mock)
+    dut | op.Sink(mock)
 
     await asyncio.sleep(0.1)
 

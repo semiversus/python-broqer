@@ -8,7 +8,7 @@ from broqer import op
  | op.map_(str, encoding='utf - 8')
  | op.map_(str.split, sep=', ')
  | op.map_(lambda v:v[0])
- | op.sink(print)
+ | op.Sink(print)
  )
 
 loop = asyncio.get_event_loop()

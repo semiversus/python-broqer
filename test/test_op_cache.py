@@ -23,7 +23,7 @@ def test_uninitialised_with_publisher():
     source = Publisher()
     dut = Cache(source)
     cb = mock.Mock()
-    Sink(dut, cb)
+    dut | Sink(cb)
 
     cb.assert_not_called()
 
@@ -38,7 +38,7 @@ def test_initialised_with_publisher():
     source = Publisher()
     dut = Cache(source, 1)
     cb = mock.Mock()
-    Sink(dut, cb)
+    dut | Sink(cb)
 
     cb.assert_called_once_with(1)
     cb.reset_mock()
@@ -53,7 +53,7 @@ def test_uninitialised_with_stateful():
     source = StatefulPublisher(1)
     dut = Cache(source)
     cb = mock.Mock()
-    Sink(dut, cb)
+    dut |Sink(cb)
 
     cb.assert_called_once_with(1)
     source.notify(1)
@@ -68,7 +68,7 @@ def test_initialised_with_stateful():
     source = StatefulPublisher(1)
     dut = Cache(source, 2)
     cb = mock.Mock()
-    Sink(dut, cb)
+    dut | Sink(cb)
 
     cb.assert_called_once_with(1)
 

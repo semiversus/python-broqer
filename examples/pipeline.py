@@ -14,7 +14,7 @@ adc_raw = Subject()
  | op.map_(statistics.mean)
  | op.cache()
  | op.debounce(0.5)
- | op.sink(print)
+ | op.Sink(print)
  )
 
 

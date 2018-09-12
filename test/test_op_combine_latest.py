@@ -1,6 +1,6 @@
 import pytest
 
-from broqer.op import CombineLatest, sink
+from broqer.op import CombineLatest, Sink
 from broqer import Publisher, StatefulPublisher, Subject, NONE
 
 from .helper import check_multi_operator, Collector
@@ -188,7 +188,7 @@ def test_allow_stateless_extensive():
         allow_stateless=True, emit_on=(source2, source3))
 
     with pytest.raises(ValueError):
-        dut | sink()  # source4 is stateless but not in emit_on list
+        dut | Sink()  # source4 is stateless but not in emit_on list
 
     def reverse(s1, s2, s3, s4):
         return (s4, s3, s2, s1)

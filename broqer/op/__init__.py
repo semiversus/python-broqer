@@ -29,9 +29,9 @@ from .publishers.from_polling import FromPolling
 
 # subscribers
 from .subscribers.to_future import ToFuture, to_future
-from .subscribers.sink import Sink, sink
-from .subscribers.trace import Trace, trace
-from .subscribers.topic_mapper import TopicMapper, topic_mapper
+from .subscribers.sink import Sink
+from .subscribers.trace import Trace
+from .subscribers.topic_mapper import TopicMapper
 
 # enable operator overloading
 from .operator_overloading import apply_operator_overloading
@@ -43,10 +43,9 @@ __all__ = [
     'CatchException', 'catch_exception', 'CombineLatest', 'combine_latest',
     'Filter', 'filter_', 'Map', 'map_', 'Merge',
     'merge', 'Partition', 'partition', 'Reduce', 'reduce', 'Replace',
-    'replace', 'Sink', 'sink', 'SlidingWindow', 'sliding_window', 'Switch',
+    'replace', 'Sink', 'SlidingWindow', 'sliding_window', 'Switch',
     'switch', 'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
     'Sample', 'sample', 'MapAsync', 'map_async', 'MODE', 'MapThreaded',
     'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future',
-    'True_', 'true', 'False_', 'false', 'Trace', 'trace', 'TopicMapper',
-    'topic_mapper'
+    'True_', 'true', 'False_', 'false', 'Trace', 'TopicMapper',
 ]

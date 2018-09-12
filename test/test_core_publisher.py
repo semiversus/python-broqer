@@ -115,7 +115,7 @@ def test_stateful_publisher():
     mock_sink = mock.Mock()
 
     disposable = p | v
-    v | op.sink(mock_sink)
+    v | op.Sink(mock_sink)
 
     mock_sink.assert_called_once_with(0)
     mock_sink.reset_mock()

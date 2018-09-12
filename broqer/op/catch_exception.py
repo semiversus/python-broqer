@@ -4,7 +4,7 @@
 
 Example with exception:
 
->>> disposable = s | op.map_(lambda s:1/s) | op.sink(print)
+>>> disposable = s | op.map_(lambda s:1/s) | op.Sink(print)
 
 >>> s.emit(1)
 1.0
@@ -18,7 +18,7 @@ ZeroDivisionError: division by zero
 Now with ``catch_exception``:
 
 >>> excp = ZeroDivisionError
->>> s | op.catch_exception(excp) | op.map_(lambda s:1/s) | op.sink(print)
+>>> s | op.catch_exception(excp) | op.map_(lambda s:1/s) | op.Sink(print)
 <...>
 
 >>> s.emit(1)

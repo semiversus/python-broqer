@@ -7,7 +7,7 @@ Usage:
 >>> import itertools
 >>> from broqer import op
 
->>> _d = op.FromPolling(0.015, itertools.count().__next__) | op.sink(print)
+>>> _d = op.FromPolling(0.015, itertools.count().__next__) | op.Sink(print)
 0
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.07))
 1
@@ -18,7 +18,7 @@ Usage:
 >>> def foo(arg):
 ...   print('Foo:', arg)
 
->>> _d = op.FromPolling(0.015, foo, 5) | op.sink()
+>>> _d = op.FromPolling(0.015, foo, 5) | op.Sink()
 Foo: 5
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
 Foo: 5

@@ -12,7 +12,7 @@ class Subject(Publisher, Subscriber):
     >>> from broqer import op
 
     >>> s = Subject()
-    >>> _d = s | op.sink(print)
+    >>> _d = s | op.Sink(print)
     >>> s.emit(1)
     1
     """
@@ -33,7 +33,7 @@ class Value(StatefulPublisher, Subscriber):
     >>> from broqer import op
 
     >>> s = Value(0)
-    >>> _d = s | op.sink(print)
+    >>> _d = s | op.Sink(print)
     0
     >>> s.emit(1)
     1

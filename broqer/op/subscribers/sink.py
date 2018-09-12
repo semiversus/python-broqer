@@ -1,7 +1,6 @@
 """
 Apply ``func(*args, value, **kwargs)`` to each emitted value. It's also
-possible to omit ``func`` - in this case the publisher will be subscribed, but
-no function will be applied.
+possible to omit ``func`` - in this case it's acting as dummy subscriber
 
 Usage:
 
@@ -10,7 +9,7 @@ Usage:
 
 >>> len(s.subscriptions)
 0
->>> _d = s | op.sink(print, 'Sink', sep=':')
+>>> _d = s | op.Sink(print, 'Sink', sep=':')
 >>> len(s.subscriptions)
 1
 
@@ -26,24 +25,20 @@ Sink:(1, 2)
 from functools import partial
 from typing import Any, Callable, Optional
 
-from broqer import Disposable, Publisher, Subscriber
-
-from broqer.op.operator import build_operator
+from broqer import Subscriber, Publisher
 
 
-class Sink(Subscriber, Disposable):
+class Sink(Subscriber):
     """ Apply ``callback(*args, value, **kwargs)`` to each emitted value. It's
-    also possible to omit ``callback`` - in this case the publisher will be
-    subscribed, but no function will be applied.
+    also possible to omit ``callback`` - in this case it's acting as dummy
+    subscriber
 
-    :param publisher: source publisher
     :param callback: function to be called when source publisher emits
     :param \\*args: variable arguments to be used for calling callback
     :param unpack: value from emits will be unpacked as (*value)
-    :param \\*kwargs: keyword arguments to be used for calling callback
+    :param \\**kwargs: keyword arguments to be used for calling callback
     """
     def __init__(self,  # pylint: disable=keyword-arg-before-vararg
-                 publisher: Publisher,
                  callback: Optional[Callable[..., None]] = None,
                  *args, unpack=False, **kwargs) -> None:
         if callback is None:
@@ -55,22 +50,10 @@ class Sink(Subscriber, Disposable):
             self._callback = callback  # type: Callable
 
         self._unpack = unpack
-        self._disposable = publisher.subscribe(self)
 
     def emit(self, value: Any, who: Publisher):
-        # handle special case: _disposable is set after
-        # publisher.subscribe(self) in __init__
-        assert not hasattr(self, '_disposable') or \
-            who is self._disposable.publisher, \
-            'emit comming from non assigned publisher'
         if self._callback:
             if self._unpack:
                 self._callback(*value)
             else:
                 self._callback(value)
-
-    def dispose(self):
-        self._disposable.dispose()
-
-
-sink = build_operator(Sink)  # pylint: disable=invalid-name

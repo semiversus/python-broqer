@@ -16,7 +16,7 @@ Usage:
 
 MODE: CONCURRENT (is default)
 
->>> _d = s | op.map_async(delay_add) | op.sink()
+>>> _d = s | op.map_async(delay_add) | op.Sink()
 >>> s.emit(0)
 >>> s.emit(1)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
@@ -28,7 +28,7 @@ Finished with argument 1
 
 MODE: INTERRUPT
 
->>> _d = s | op.map_async(delay_add, mode=op.MODE.INTERRUPT) | op.sink(print)
+>>> _d = s | op.map_async(delay_add, mode=op.MODE.INTERRUPT) | op.Sink(print)
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.005))
 Starting with argument 0
@@ -41,7 +41,7 @@ Finished with argument 1
 
 MODE: QUEUE
 
->>> _d = s | op.map_async(delay_add, mode=op.MODE.QUEUE) | op.sink(print)
+>>> _d = s | op.map_async(delay_add, mode=op.MODE.QUEUE) | op.Sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.04))
@@ -55,7 +55,7 @@ Finished with argument 1
 
 MODE: LAST
 
->>> _d = s | op.map_async(delay_add, mode=op.MODE.LAST) | op.sink(print)
+>>> _d = s | op.map_async(delay_add, mode=op.MODE.LAST) | op.Sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
 >>> s.emit(2)
@@ -70,7 +70,7 @@ Finished with argument 2
 
 MODE: SKIP
 
->>> _d = s | op.map_async(delay_add, mode=op.MODE.SKIP) | op.sink(print)
+>>> _d = s | op.map_async(delay_add, mode=op.MODE.SKIP) | op.Sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
 >>> s.emit(2)
@@ -85,7 +85,7 @@ Using error_callback:
 >>> def cb(*e):
 ...     print('Got error')
 
->>> _d = s | op.map_async(delay_add, error_callback=cb) | op.sink(print)
+>>> _d = s | op.map_async(delay_add, error_callback=cb) | op.Sink(print)
 >>> s.emit('abc')
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
 Starting with argument abc

@@ -3,7 +3,7 @@
 >>> s = Subject()
 
 >>> cached_publisher = s | op.cache(0)
->>> _disposable = cached_publisher | op.sink(print, sep=' - ')
+>>> _disposable = cached_publisher | op.Sink(print, sep=' - ')
 0
 
 >>> s.emit(3)

@@ -2,7 +2,7 @@ from unittest import mock
 import pytest
 
 from broqer import Disposable
-from broqer.op import Sink, cache, sink, Trace, trace
+from broqer.op import Sink, cache, Sink, Trace
 from broqer.subject import Subject
 
 @pytest.mark.parametrize('operator_cls', [Sink, Trace])
@@ -43,7 +43,7 @@ def test_sink(operator_cls):
     cb = mock.Mock()
 
     s = Subject()
-    sink_instance = operator_cls(s, cb, unpack=True)
+    sink_instance = s | operator_cls(cb, unpack=True)
     assert isinstance(sink_instance, Disposable)
 
     # test various emits on source
@@ -61,13 +61,13 @@ def test_sink(operator_cls):
 @pytest.mark.parametrize('operator_cls', [Sink, Trace])
 def test_sink_without_function(operator_cls):
     s = Subject()
-    sink_instance = operator_cls(s)
+    sink_instance = s | operator_cls()
     assert isinstance(sink_instance, Disposable)
     assert len(s.subscriptions) == 1
 
     s.emit(1)
 
-@pytest.mark.parametrize('operator', [sink, trace])
+@pytest.mark.parametrize('operator', [Sink, Trace])
 def test_sink_on_subscription(operator):
     cb = mock.Mock()
 
@@ -96,7 +96,7 @@ def test_sink_partial(operator_cls):
     cb = mock.Mock()
 
     s = Subject()
-    sink_instance = operator_cls(s, cb, 1, 2, 3, a=1)
+    sink_instance = s | operator_cls(cb, 1, 2, 3, a=1)
     assert isinstance(sink_instance, Disposable)
 
     assert not cb.called

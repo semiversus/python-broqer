@@ -80,7 +80,7 @@ be printed (with the prefix 'Voltage too high:')
       | op.sliding_window(4) # append the value to a buffer with 4 elements (and drop the oldest value)
       | op.map(statistics.mean) # use ``statistics.mean`` to calulate the average over the emitted sequence
       | op.filter(lambda v:v>1) # emit only values greater 1
-      | op.sink(print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
+      | op.Sink(print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
     )
 
 .. image:: https://cdn.rawgit.com/semiversus/python-broqer/ec5ddbbd/docs/example1.svg
@@ -176,7 +176,7 @@ Subscribers
 A Subscriber_ is the sink for messages.
 
 +----------------------------------+--------------------------------------------------------------+
-| sink_ (func, \*args, \*\*kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
+| Sink_ (func, \*args, \*\*kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
 +----------------------------------+--------------------------------------------------------------+
 | to_future_ (timeout=None)        | Build a future able to await for                             |
 +----------------------------------+--------------------------------------------------------------+
@@ -197,7 +197,7 @@ A Subscriber_ is the sink for messages.
 .. _partition: https://github.com/semiversus/python-broqer/blob/master/broqer/op/partition.py
 .. _reduce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/reduce.py
 .. _sample: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sample.py
-.. _sink: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sink.py
+.. _Sink: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sink.py
 .. _sliding_window: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sliding_window.py
 .. _switch: https://github.com/semiversus/python-broqer/blob/master/broqer/op/switch.py
 .. _throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py

@@ -3,7 +3,7 @@ import asyncio
 from unittest.mock import Mock, ANY
 
 from broqer import Publisher, NONE
-from broqer.op import Sample, sink
+from broqer.op import Sample, Sink
 
 from .helper import check_async_operator_coro
 from .eventloop import VirtualTimeEventLoop
@@ -29,7 +29,7 @@ async def test_sample():
     dut = Sample(p, 0.1)
 
     mock = Mock()
-    disposable = dut | sink(mock)
+    disposable = dut | Sink(mock)
 
     await asyncio.sleep(0.2)
     mock.assert_not_called()
@@ -53,7 +53,7 @@ async def test_errorhandler():
     p = Publisher()
 
     dut = Sample(p, 0.1, error_callback=mock_errorhandler)
-    dut | sink(mock)
+    dut | Sink(mock)
 
     p.notify(1)
     mock.assert_called_once_with(1)

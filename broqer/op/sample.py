@@ -9,7 +9,7 @@ Usage:
 
 >>> sample_publisher = s | op.sample(0.015)
 
->>> _d = sample_publisher | op.sink(print, 'Sample:')
+>>> _d = sample_publisher | op.Sink(print, 'Sample:')
 
 >>> s.emit(1)
 Sample: 1
@@ -24,7 +24,7 @@ Sample: (2, 3)
 ...
 Sample: (2, 3)
 
->>> _d2 = sample_publisher | op.sink(print, 'Sample 2:')
+>>> _d2 = sample_publisher | op.Sink(print, 'Sample 2:')
 Sample 2: (2, 3)
 >>> _d.dispose()
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.06))

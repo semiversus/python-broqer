@@ -10,7 +10,7 @@ Usage:
 ...     return last_result*10+value
 
 >>> reduce_publisher = s | op.reduce(build_number, 0)
->>> _d = reduce_publisher | op.sink(print, 'Reduce:')
+>>> _d = reduce_publisher | op.Sink(print, 'Reduce:')
 >>> s.emit(4)
 Reduce: 4
 >>> s.emit(7)

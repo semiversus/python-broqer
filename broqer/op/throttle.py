@@ -7,7 +7,7 @@ Usage:
 >>> from broqer import Subject, op
 >>> s = Subject()
 >>> throttle_publisher = s | op.throttle(0.1)
->>> _d = throttle_publisher | op.sink(print)
+>>> _d = throttle_publisher | op.Sink(print)
 >>> s.emit(1)
 1
 >>> s.emit(2)

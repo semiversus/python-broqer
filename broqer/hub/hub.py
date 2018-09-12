@@ -13,7 +13,7 @@ True
 
 It's possible to subscribe to a topic
 
->>> _d1 = hub['value1'] | op.sink(print, 'Output:')
+>>> _d1 = hub['value1'] | op.Sink(print, 'Output:')
 
 At the moment this hub object is not assigned to a publisher
 
@@ -50,7 +50,7 @@ True
 Also assigning publisher first and then subscribing is possible:
 
 >>> _ = hub.assign('value2', Value(2))
->>> _d2 = hub['value2'] | op.sink(print, 'Output:')
+>>> _d2 = hub['value2'] | op.Sink(print, 'Output:')
 Output: 2
 
 >>> hub['value2'].emit(3)

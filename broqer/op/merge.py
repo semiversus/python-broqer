@@ -7,7 +7,7 @@ Usage:
 >>> s1 = Subject()
 >>> s2 = Subject()
 
->>> _d = s1 | op.merge(s2) | op.sink(print, 'Merge:')
+>>> _d = s1 | op.merge(s2) | op.Sink(print, 'Merge:')
 >>> s1.emit(1)
 Merge: 1
 >>> s2.emit('abc')

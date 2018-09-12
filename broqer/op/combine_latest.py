@@ -4,7 +4,7 @@
 >>> s2 = Subject()
 
 >>> combination = s1 | op.combine_latest(s2)
->>> disposable = combination | op.sink(print)
+>>> disposable = combination | op.Sink(print)
 
 CombineLatest is only emitting, when all values are collected:
 
@@ -17,7 +17,7 @@ CombineLatest is only emitting, when all values are collected:
 Subscribing to a CombineLatest with all values available is emitting the values
 immediate on subscription:
 
->>> combination | op.sink(print, 'Second sink:')
+>>> combination | op.Sink(print, 'Second sink:')
 Second sink: (1, 3)
 <...>
 

@@ -6,7 +6,7 @@ Usage:
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()
->>> s | op.delay(0.1) | op.sink(print)
+>>> s | op.delay(0.1) | op.Sink(print)
 <...>
 >>> s.emit(1)
 >>> s.emit(2)

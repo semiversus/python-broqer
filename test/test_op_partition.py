@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from broqer import Publisher, NONE
-from broqer.op import Partition, sink
+from broqer.op import Partition, Sink
 
 from .helper import check_single_operator
 
@@ -20,7 +20,7 @@ def test_partition():
     p = Publisher()
 
     dut = Partition(p,3)
-    dut | sink(mock)
+    dut | Sink(mock)
     p.notify(1)
     p.notify(2)
     mock.assert_not_called()

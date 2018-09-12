@@ -7,12 +7,12 @@ Usage:
 >>> s = Subject()
 
 >>> window_publisher = s | op.sliding_window(3)
->>> _d = window_publisher | op.sink(print, 'Sliding Window:')
+>>> _d = window_publisher | op.Sink(print, 'Sliding Window:')
 >>> s.emit(1)
 >>> s.emit(2)
 >>> s.emit(3)
 Sliding Window: (1, 2, 3)
->>> with window_publisher | op.sink(print, '2nd subscriber:'):
+>>> with window_publisher | op.Sink(print, '2nd subscriber:'):
 ...     pass
 2nd subscriber: (1, 2, 3)
 >>> s.emit((4, 5))

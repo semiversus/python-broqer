@@ -7,7 +7,7 @@ Usage:
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()
->>> _d = s | op.debounce(0.1) | op.sink(print)
+>>> _d = s | op.debounce(0.1) | op.Sink(print)
 >>> s.emit(1)
 >>> s.emit(2)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
@@ -19,7 +19,7 @@ Usage:
 When debounce is retriggered you can specify a value to emit:
 
 >>> debounce_publisher = s | op.debounce(0.1, False)
->>> _d = debounce_publisher | op.sink(print)
+>>> _d = debounce_publisher | op.Sink(print)
 >>> s.emit(False)
 False
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.15))

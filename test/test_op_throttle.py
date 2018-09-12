@@ -36,7 +36,7 @@ async def test_throttle():
 
     default_error_handler.set(mock_error_handler)
 
-    disposable = p | op.throttle(0.1) | op.sink(mock_sink)
+    disposable = p | op.throttle(0.1) | op.Sink(mock_sink)
 
     mock_sink.side_effect = (None, ZeroDivisionError('FAIL'))
 
@@ -62,7 +62,7 @@ async def test_throttle():
     mock_sink.reset_mock()
     mock_sink.side_effect = None
     throttle = p | op.throttle(0.1)
-    disposable = throttle | op.sink(mock_sink)
+    disposable = throttle | op.Sink(mock_sink)
     p.notify(1)
     mock_sink.reset_mock()
     await asyncio.sleep(0.05)
@@ -77,7 +77,7 @@ async def test_throttle():
     mock_sink.reset_mock()
     mock_sink.side_effect = None
     throttle = p | op.throttle(0.1)
-    disposable = throttle | op.sink(mock_sink)
+    disposable = throttle | op.Sink(mock_sink)
 
     # resubscribe
     mock_sink.reset_mock()
@@ -87,7 +87,7 @@ async def test_throttle():
 
     disposable.dispose()
 
-    throttle | op.sink()
+    throttle | op.Sink()
 
     p.notify(2)
     await asyncio.sleep(0.05)
@@ -99,7 +99,7 @@ async def test_throttle():
     mock_sink.assert_called_once_with(1)
 
     # reset when nothing is to be emitted
-    disposable = throttle | op.sink(mock_sink)
+    disposable = throttle | op.Sink(mock_sink)
     mock_sink.reset_mock()
     await asyncio.sleep(0.15)
 

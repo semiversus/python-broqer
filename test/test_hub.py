@@ -45,7 +45,7 @@ def test_freeze():
 
     hub.freeze(False)
 
-    hub['value2'] | op.sink()
+    hub['value2'] | op.Sink()
     hub['value3'].emit(1)
 
     assert 'value2' in hub
@@ -63,7 +63,7 @@ def test_freeze():
         hub.assign('value4', StatefulPublisher(0))
 
     with pytest.raises(ValueError):
-        hub['value5'] | op.sink()
+        hub['value5'] | op.Sink()
 
     with pytest.raises(ValueError):
         hub['value6'].emit(1)
@@ -72,7 +72,7 @@ def test_freeze():
 
     hub.freeze(False)
 
-    hub['value4'] | op.sink()
+    hub['value4'] | op.Sink()
     hub.assign('value5', StatefulPublisher(0))
     hub['value6'].emit(1)
 
@@ -112,8 +112,8 @@ def test_assign_subscribe_emit(factory):
     mock_sink1 = mock.Mock()
     mock_sink2 = mock.Mock()
 
-    dispose_value1 = hub['value1'] | op.sink(mock_sink1)
-    dispose_value2 = hub['value2'] | op.sink(mock_sink2)
+    dispose_value1 = hub['value1'] | op.Sink(mock_sink1)
+    dispose_value2 = hub['value2'] | op.Sink(mock_sink2)
 
     assert len(value1._subscriptions) == 1
     assert len(hub['value1']._subscriptions) == 1
@@ -132,14 +132,14 @@ def test_assign_subscribe_emit(factory):
     assert value1.get() == 1
 
     mock_sink1b = mock.Mock()
-    dispose_value1b = hub['value1'] | op.sink(mock_sink1b)
+    dispose_value1b = hub['value1'] | op.Sink(mock_sink1b)
     mock_sink1b.assert_called_once_with(1)
 
     dispose_value1.dispose()
     dispose_value1b.dispose()
 
     mock_sink2b = mock.Mock()
-    hub['value2'] | op.sink(mock_sink2b)
+    hub['value2'] | op.Sink(mock_sink2b)
     mock_sink2b.assert_not_called()
 
     assert len(value1._subscriptions) == 0
@@ -155,7 +155,7 @@ def test_subscribe_emit_assign(factory):
     mock_sink = mock.Mock()
     mock_sink2 = mock.Mock()
 
-    disposable = hub['value1'] | op.sink(mock_sink)
+    disposable = hub['value1'] | op.Sink(mock_sink)
 
     mock_sink.assert_not_called()
 
@@ -172,8 +172,8 @@ def test_subscribe_emit_assign(factory):
 
     assert len(hub['value1']._subscriptions) == 0
 
-    hub['value1'] | op.sink(mock_sink)
-    hub['value1'] | op.sink(mock_sink2)
+    hub['value1'] | op.Sink(mock_sink)
+    hub['value1'] | op.Sink(mock_sink2)
 
     value = Value(0)
 

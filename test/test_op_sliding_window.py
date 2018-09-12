@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from broqer import Publisher, NONE
-from broqer.op import SlidingWindow, sink
+from broqer.op import SlidingWindow, Sink
 
 from .helper import check_single_operator
 
@@ -22,7 +22,7 @@ def test_flush():
     mock = Mock()
 
     dut = SlidingWindow(p, 3)
-    dut | sink(mock)
+    dut | Sink(mock)
 
     mock.assert_not_called()
     p.notify(1)

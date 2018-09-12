@@ -7,7 +7,7 @@ Usage:
 >>> s = Subject()
 
 >>> filtered_publisher = s | op.filter_(lambda v:v>0)
->>> _disposable = filtered_publisher | op.sink(print)
+>>> _disposable = filtered_publisher | op.Sink(print)
 
 >>> s.emit(1)
 1
@@ -19,7 +19,7 @@ Also possible with additional args and kwargs:
 
 >>> import operator
 >>> filtered_publisher = s | op.filter_(operator.and_, 0x01)
->>> _disposable = filtered_publisher | op.sink(print)
+>>> _disposable = filtered_publisher | op.Sink(print)
 >>> s.emit(100)
 >>> s.emit(101)
 101

@@ -67,7 +67,7 @@ async def test_map_async():
     async def _map(v):
         return v
 
-    disposable = p | op.map_async(_map) | op.sink(mock_sink)
+    disposable = p | op.map_async(_map) | op.Sink(mock_sink)
 
     mock_sink.side_effect = ZeroDivisionError('FAIL')
 
@@ -87,7 +87,7 @@ async def test_map_async():
         raise ValueError()
 
     p2 = Publisher()
-    disposable = p2 | op.map_async(_fail) | op.sink(mock_sink)
+    disposable = p2 | op.map_async(_fail) | op.Sink(mock_sink)
     p2.notify(2)
 
     await asyncio.sleep(0.01)

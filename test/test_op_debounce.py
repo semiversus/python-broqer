@@ -68,7 +68,7 @@ async def test_debounce():
 
     default_error_handler.set(mock_error_handler)
 
-    disposable = p | op.debounce(0.1) | op.sink(mock_sink)
+    disposable = p | op.debounce(0.1) | op.Sink(mock_sink)
 
     mock_sink.side_effect = ZeroDivisionError('FAIL')
 
@@ -93,7 +93,7 @@ async def test_debounce():
     # test reset
     mock_sink.reset_mock()
     debounce = p | op.debounce(0.1)
-    disposable = debounce | op.sink(mock_sink)
+    disposable = debounce | op.Sink(mock_sink)
     p.notify(1)
     await asyncio.sleep(0.05)
     debounce.reset()
@@ -106,7 +106,7 @@ async def test_debounce():
     mock_sink.reset_mock()
     mock_sink.side_effect = None
     debounce = p | op.debounce(0, False)
-    disposable = debounce | op.sink(mock_sink)
+    disposable = debounce | op.Sink(mock_sink)
     p.notify(True)
     await asyncio.sleep(0.05)
     debounce.reset()
@@ -120,7 +120,7 @@ async def test_debounce():
 
     disposable.dispose()
 
-    debounce | op.sink()
+    debounce | op.Sink()
 
     p.notify(True)
 

@@ -9,7 +9,7 @@ Usage:
 >>> s2 = Subject()
 
 >>> switch_publisher = choose | op.switch({'a':s1, 'b':s2})
->>> _d = switch_publisher | op.sink(print)
+>>> _d = switch_publisher | op.Sink(print)
 
 >>> s1.emit(1)
 >>> s2.emit(2)
@@ -26,7 +26,7 @@ Also using switch as if-then-else construct is possible.
 This is working because False is correpsonding to integer 0, True is 1
 
 >>> if_publisher = choose | op.switch([s1, s2])
->>> _d = if_publisher | op.sink(print)
+>>> _d = if_publisher | op.Sink(print)
 
 >>> s1.emit(1)
 >>> s2.emit(2)

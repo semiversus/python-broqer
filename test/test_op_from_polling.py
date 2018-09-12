@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 
-from broqer.op import FromPolling, sink
+from broqer.op import FromPolling, Sink
 from .eventloop import VirtualTimeEventLoop
 
 @pytest.yield_fixture()
@@ -21,7 +21,7 @@ async def test_polling():
     with pytest.raises(ValueError):
         dut.get()
 
-    disposable = dut | sink(mock)
+    disposable = dut | Sink(mock)
 
     mock.assert_called_once_with(0)
 
@@ -40,7 +40,7 @@ async def test_polling():
     mock.assert_not_called()
 
     # resubscribe
-    disposable = dut | sink(mock)
+    disposable = dut | Sink(mock)
 
 @pytest.mark.parametrize('args, kwargs, result_vector', [
     ((), {}, (1, 2, 3, 4, 5)),
@@ -56,7 +56,7 @@ async def test_with_args(args, kwargs, result_vector):
 
     dut = FromPolling(0.1, poll, *args, **kwargs)
     mock = Mock()
-    dut | sink(mock)
+    dut | Sink(mock)
 
     await asyncio.sleep(0.05)
 
@@ -69,7 +69,7 @@ async def test_with_args(args, kwargs, result_vector):
     mock.reset_mock()
 
     mock2 = Mock()
-    dut | sink(mock2)
+    dut | Sink(mock2)
     await asyncio.sleep(0.1)
     mock2.assert_called_once_with(result_vector[-1])
 
@@ -79,7 +79,7 @@ async def test_errorhandler():
     mock_errorhandler = Mock()
 
     dut = FromPolling(0.1, lambda:0, error_callback=mock_errorhandler)
-    dut | sink(mock)
+    dut | Sink(mock)
 
     await asyncio.sleep(0.05)
 

@@ -20,7 +20,7 @@ def test_operator_with_publishers():
 
     mock_sink = mock.Mock()
 
-    o | op.sink(mock_sink)
+    o | op.Sink(mock_sink)
     assert len(o.subscriptions) == 1
     mock_sink.assert_called_once_with(1)
     mock_sink.reset_mock()
@@ -44,7 +44,7 @@ def test_operator_with_constant():
 
     mock_sink = mock.Mock()
 
-    o | op.sink(mock_sink)
+    o | op.Sink(mock_sink)
     assert len(o.subscriptions) == 1
     mock_sink.assert_called_once_with(2)
     mock_sink.reset_mock()
@@ -68,7 +68,7 @@ def test_operator_with_constant_r():
 
     mock_sink = mock.Mock()
 
-    o | op.sink(mock_sink)
+    o | op.Sink(mock_sink)
     assert len(o.subscriptions) == 1
     mock_sink.assert_called_once_with(0)
     mock_sink.reset_mock()
@@ -117,11 +117,11 @@ def test_with_publisher(operator, l_value, r_value, result):
     mock_sink_o6 = mock.Mock()
     mock_sink_o9 = mock.Mock()
 
-    o3 | op.sink(mock_sink_o3)
-    o4 | op.sink(mock_sink_o4)
-    o5 | op.sink(mock_sink_o5)
-    o6 | op.sink(mock_sink_o6)
-    o9 | op.sink(mock_sink_o9)
+    o3 | op.Sink(mock_sink_o3)
+    o4 | op.Sink(mock_sink_o4)
+    o5 | op.Sink(mock_sink_o5)
+    o6 | op.Sink(mock_sink_o6)
+    o9 | op.Sink(mock_sink_o9)
 
     for output in (o1, o2, o3, o4, o5, o6, o7, o9):
         assert isinstance(output, Publisher)

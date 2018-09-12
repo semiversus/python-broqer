@@ -7,7 +7,7 @@ Usage:
 >>> s = Subject()
 
 >>> partitioned_publisher = s | op.partition(3)
->>> _d = partitioned_publisher | op.sink(print, 'Partition:')
+>>> _d = partitioned_publisher | op.Sink(print, 'Partition:')
 
 >>> s.emit(1)
 >>> s.emit(2)

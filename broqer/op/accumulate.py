@@ -7,7 +7,7 @@
 ...     return state, sum(state)/len(state)
 
 >>> lowpass = s | op.accumulate(moving_average, init=[0]*3)
->>> lowpass | op.sink(print)
+>>> lowpass | op.Sink(print)
 <...>
 >>> s.emit(3)
 1.0
