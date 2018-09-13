@@ -113,6 +113,7 @@ class Topic(Publisher, Subscriber):
         Publisher.__init__(self)
         self._subject = None  # type: Publisher
         self._path = path
+        self._hub = hub
         self.assignment_future = None
         self._pre_assign_emit = None  # type: list
 
@@ -202,6 +203,11 @@ class Topic(Publisher, Subscriber):
     def path(self) -> str:
         """ topic path used as key in the hub """
         return self._path
+
+    @property
+    def hub(self) -> 'Hub':
+        """ reference to hub """
+        return self._hub
 
 
 class MetaTopic(Topic):
