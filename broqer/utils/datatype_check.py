@@ -1,3 +1,4 @@
+""" Implements DTRegistry and common DTs """
 import asyncio
 from typing import Any
 
@@ -6,6 +7,7 @@ from broqer.hub import Hub, MetaTopic
 
 
 def resolve_meta_key(hub, key, meta):
+    """ resolve a value when it's a string and starts with '>' """
     if key not in meta:
         return None
     value = meta[key]
@@ -18,10 +20,13 @@ def resolve_meta_key(hub, key, meta):
 
 
 class DT:
+    """ base class for a datatype """
     def cast(self, topic, value):  # pylint: disable=no-self-use,W0613
+        """ casting a string to the appropriate datatype """
         return value
 
     def check(self, topic, value):  # pylint: disable=no-self-use,W0613
+        """ checking the value if it fits into the given specification """
         pass
 
 
@@ -44,6 +49,7 @@ class NumberDT(DT):
 
 
 class IntegerDT(NumberDT):
+    """ Datatype to represant integers """
     def cast(self, topic, value):
         return int(value)
 
@@ -54,6 +60,7 @@ class IntegerDT(NumberDT):
 
 
 class FloatDT(NumberDT):
+    """ Datatype for floating point numbers """
     def cast(self, topic, value):
         return float(value)
 
@@ -64,24 +71,25 @@ class FloatDT(NumberDT):
 
 
 class DTTopic(MetaTopic):
+    """ Topic with additional datatype check functionality """
     def __init__(self, hub: Hub, path: str) -> None:
         MetaTopic.__init__(self, hub, path)
-        self._hub = hub
 
     def cast(self, value):
-        '''Will cast value to the given datatype. It will not check the
+        """Will cast value to the given datatype. It will not check the
         value.
-        '''
+        """
         return self._hub.topic_factory.cast(self, value)
 
     def check(self, value):
-        '''Check the value against the datatype and limits defined in meta
+        """Check the value against the datatype and limits defined in meta
         dictionary. The value has to be in the appropriate datatype (may use
         cast before)
-        '''
+        """
         self._hub.topic_factory.check(self, value)
 
     def checked_emit(self, value: Any) -> asyncio.Future:
+        """ casting and checking in one call """
 
         assert isinstance(self._subject, Subscriber), \
             'Topic has to be a subscriber'
@@ -90,12 +98,9 @@ class DTTopic(MetaTopic):
         self.check(value)
         return self._subject.emit(value, who=self)
 
-    @property
-    def hub(self):
-        return self._hub
-
 
 class DTRegistry:
+    """ Registry used as topic factory for hub """
     def __init__(self):
         self._datatypes = {
             'none': DT(),
@@ -105,12 +110,14 @@ class DTRegistry:
         }
 
     def add_datatype(self, name: str, datatype: DT):
+        """ register the datatype with it's name """
         self._datatypes[name] = datatype
 
     def __call__(self, hub: Hub, path: str) -> DTTopic:
         return DTTopic(hub, path)
 
     def cast(self, topic, value):
+        """ cast a string to the value based on the datatype """
         datatype_key = topic.meta.get('datatype', 'none')
         result = self._datatypes[datatype_key].cast(topic, value)
         validate_dt = topic.meta.get('validate', None)
@@ -119,6 +126,7 @@ class DTRegistry:
         return result
 
     def check(self, topic, value):
+        """ checking the value if it fits into the given specification """
         datatype_key = topic.meta.get('datatype', 'none')
         self._datatypes[datatype_key].check(topic, value)
         validate_dt = topic.meta.get('validate', None)

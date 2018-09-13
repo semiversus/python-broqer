@@ -46,7 +46,7 @@ def test_datatype_check(meta, values, cast_results, check_results, str_results):
 
     hub = Hub(topic_factory=dt_registry)
 
-    value = hub.assign('value', Value(None), meta)
+    value = hub['value'].assign(Value(None), meta)
 
     assert len(values) == len(cast_results)  == len(check_results) == len(str_results)
 
@@ -80,7 +80,7 @@ def test_resolve_meta_key():
     hub = Hub()
 
     meta = {'lower_input_limit': '>value_minimum', 'upper_input_limit':'>blabla'}
-    hub.assign('value_minimum', Value(-2))
+    hub['value_minimum'].assign(Value(-2))
     assert resolve_meta_key(hub, 'lower_input_limit', meta) == -2
 
     with pytest.raises(KeyError):
@@ -101,7 +101,7 @@ def test_custom_datatype():
 
     hub.topic_factory.add_datatype('uppercase', UpperCaseDT() )
 
-    hub.assign('value', Value(''), meta={'datatype': 'uppercase'})
+    hub['value'].assign(Value(''), meta={'datatype': 'uppercase'})
 
     assert hub['value'].cast('This is a test') == 'THIS IS A TEST'
     assert hub['value'].check('THIS IS A TEST') is None
@@ -121,7 +121,7 @@ def test_validate():
 
     hub.topic_factory.add_datatype('even', EvenDT() )
 
-    hub.assign('value', Value(''), meta={'datatype': 'int', 'lower_input_limit':0, 'validate':'even'})
+    hub['value'].assign(Value(''), meta={'datatype': 'int', 'lower_input_limit':0, 'validate':'even'})
 
     assert hub['value'].cast('122') == 122
     assert hub['value'].check(122) is None

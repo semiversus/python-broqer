@@ -62,10 +62,10 @@ class Debounce(Operator):
     :param error_callback: error callback to be registered
     :param loop: asyncio loop to be used
     """
-    def __init__(self, publisher: Publisher, duetime: float,
+    def __init__(self,  # pylint: disable=too-many-arguments
+                 publisher: Publisher, duetime: float,
                  retrigger_value: Any = NONE,
-                 error_callback=default_error_handler,
-                 loop=None) -> None:
+                 error_callback=default_error_handler, loop=None) -> None:
         assert duetime >= 0, 'duetime has to be positive'
 
         Operator.__init__(self, publisher)
