@@ -14,6 +14,7 @@ install:
 script:
   - pipenv run flake8 broqer
   - pipenv run mypy broqer
+  - pipenv run pylint broqer
   - pipenv run rstcheck README.rst
   - pipenv run pytest
 
