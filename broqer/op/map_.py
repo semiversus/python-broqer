@@ -40,6 +40,13 @@ from broqer import Publisher, NONE
 from .operator import Operator, build_operator
 
 
+def _partial(function: Callable, *args, **kwargs) -> Callable:
+    """ apply partial when args and kwargs are defined """
+    if args or kwargs:
+        return partial(function, *args, **kwargs)
+    return function
+
+
 class Map(Operator):
     """ Apply ``map_func(*args, value, **kwargs)`` to each emitted value.
     :param publisher: source publisher
@@ -58,13 +65,7 @@ class Map(Operator):
         """
 
         Operator.__init__(self, publisher)
-
-        if args or kwargs:
-            self._map_func = \
-                partial(map_func, *args, **kwargs)  # type: Callable
-        else:
-            self._map_func = map_func  # type: Callable
-
+        self._map_func = _partial(map_func, *args, **kwargs)
         self._unpack = unpack
 
     def get(self):
