@@ -87,12 +87,12 @@ Got error
 """
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 
 from broqer import Publisher, default_error_handler
 
 from .operator import build_operator
 from .map_async import MapAsync, MODE
-from .map_ import _partial
 
 
 class MapThreaded(MapAsync):
@@ -115,7 +115,7 @@ class MapThreaded(MapAsync):
         MapAsync.__init__(self, publisher, self._thread_coro, mode=mode,
                           error_callback=error_callback, unpack=unpack)
 
-        self._map_func = _partial(map_func, *args, **kwargs)
+        self._map_func = partial(map_func, *args, **kwargs)
         self._loop = loop or asyncio.get_event_loop()
         self._executor = ThreadPoolExecutor()
 
