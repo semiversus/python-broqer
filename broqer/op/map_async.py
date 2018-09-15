@@ -117,6 +117,9 @@ class MapAsync(Operator):
     :param error_callback: error callback to be registered
     :param unpack: value from emits will be unpacked as (*value)
     :param \\*kwargs: keyword arguments to be used for calling map_coro
+
+    :ivar scheduled: Publisher emitting the value when coroutine is actually
+        started.
     """
     def __init__(self, publisher: Publisher, map_coro, *args,
                  mode=MODE.CONCURRENT, error_callback=default_error_handler,
@@ -133,68 +136,93 @@ class MapAsync(Operator):
         Operator.__init__(self, publisher)
         self._options = _Options(map_coro, mode, args, kwargs, error_callback,
                                  unpack)
+        # ._future is the reference to a running coroutine encapsulated as task
         self._future = None  # type: asyncio.Future
-        self._last_emit = None  # type: Any
+
+        # ._last_emit is used for LAST_DISTINCT and keeps the last emit from
+        # source publisher
+        self._last_emit = NONE  # type: Any
+
+        # .scheduled is a Publisher which is emitting the value of the source
+        # publisher when the coroutine is actually started
         self.scheduled = Publisher()
 
+        # queue is initialized with following sizes:
+        # Mode:                size:
+        # QUEUE                unlimited
+        # LAST, LAST_DISTINCT  1
+        # all others           no queue used
         if mode in (MODE.QUEUE, MODE.LAST, MODE.LAST_DISTINCT):
-            maxlen = (None if mode == MODE.QUEUE else 1)
+            maxlen = (None if mode is MODE.QUEUE else 1)
             self._queue = deque(maxlen=maxlen)  # type: MutableSequence
         else:  # no queue for CONCURRENT, INTERRUPT and SKIP
             self._queue = None
 
     def get(self):
+        # .get() is not supported for MapAsync
         Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> None:
         assert who is self._publisher, 'emit from non assigned publisher'
-        if self._options.mode == MODE.INTERRUPT and self._future is not None:
-            self._future.cancel()
 
-        if (self._options.mode in (MODE.INTERRUPT, MODE.CONCURRENT) or
-                self._future is None or self._future.done()):
+        # check if a coroutine is already running
+        if self._future is not None and not self._future.done():
+            # append to queue if a queue is used in this mode
+            if self._queue is not None:
+                self._queue.append(value)
+                return
+            # cancel the future if INTERRUPT mode is used
+            if self._options.mode is MODE.INTERRUPT:
+                self._future.cancel()
+            # in SKIP mode just do nothin with this emit
+            elif self._options.mode is MODE.SKIP:
+                return
 
-            self._last_emit = value
-            self.scheduled.notify(value)
-            if self._options.unpack:
-                coro = self._options.map_coro(*value, *self._options.args,
-                                              **self._options.kwargs)
-            else:
-                coro = self._options.map_coro(value, *self._options.args,
-                                              **self._options.kwargs)
-            self._future = asyncio.ensure_future(coro)
-            self._future.add_done_callback(self._future_done)
-        elif self._options.mode in (MODE.QUEUE, MODE.LAST, MODE.LAST_DISTINCT):
-            self._queue.append(value)
+        # start the coroutine
+        self._run_coro(value)
 
     def _future_done(self, future):
+        """ will be called when the coroutine is done """
         try:
-            result = future.result()
+            # notify the subscribers (except result is an exception or NONE)
+            result = future.result()  # may raise exception
+            if result is not NONE:
+                self.notify(result)  # may also raise exception
         except asyncio.CancelledError:
-            pass
+            assert self._options.mode is MODE.INTERRUPT, 'cancellation should'\
+                ' only be possible in INTERRUPT mode'
         except Exception:  # pylint: disable=broad-except
             self._options.error_callback(*sys.exc_info())
-        else:
-            if result is not NONE:
-                try:
-                    self.notify(result)
-                except Exception:  # pylint: disable=broad-except
-                    self._options.error_callback(*sys.exc_info())
 
+        # check if queue is present and something is in the queue
         if self._queue:
             value = self._queue.popleft()  # pylint: disable=E1111
-            if self._options.mode == MODE.LAST_DISTINCT and \
-                    value == self._last_emit:
-                return
-            self.scheduled.notify(value)
-            if self._options.unpack:
-                future = self._options.map_coro(*value, *self._options.args,
-                                                **self._options.kwargs)
-            else:
-                future = self._options.map_coro(value, *self._options.args,
-                                                **self._options.kwargs)
-            self._future = asyncio.ensure_future(future)
-            self._future.add_done_callback(self._future_done)
+
+        # start the coroutine
+        self._run_coro(value)
+
+    def _run_coro(self, value):
+        """ start the coroutine as task """
+
+        # when LAST_DISTINCT is used only start coroutine when value changed
+        if self._options.mode is MODE.LAST_DISTINCT and \
+                value == self._last_emit:
+            return
+
+        # store the value to be emitted for LAST_DISTINCT
+        self._last_emit = value
+
+        # publish the start of the coroutine
+        self.scheduled.notify(value)
+
+        # build the coroutine
+        values = value if self._options.unpack else (value,)
+        coro = self._options.map_coro(*values, *self._options.args,
+                                      **self._options.kwargs)
+
+        # create a task out of it and add ._future_done as callback
+        self._future = asyncio.ensure_future(coro)
+        self._future.add_done_callback(self._future_done)
 
 
 map_async = build_operator(MapAsync)  # pylint: disable=invalid-name

@@ -120,6 +120,8 @@ class MapThreaded(MapAsync):
         self._executor = ThreadPoolExecutor()
 
     async def _thread_coro(self, *args):
+        """ Coroutine called by MapAsync. It's wrapping the call of
+        run_in_executor to run the synchronous function as thread """
         return await self._loop.run_in_executor(
             self._executor, self._map_func, *args)
 
