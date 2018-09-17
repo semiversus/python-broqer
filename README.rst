@@ -17,6 +17,10 @@ Python Broqer
 .. image:: https://img.shields.io/github/license/semiversus/python-broqer.svg
   :target: https://en.wikipedia.org/wiki/MIT_License
 
++--------------------------------------------------------------------------------+
+| **Broqer 1.0.0 will be released soon (till end of october 2018) - stay tuned** |
++--------------------------------------------------------------------------------+
+
 Initial focus on embedded systems *Broqer* can be used wherever continuous streams of data have to be processed - and they are everywhere. Watch out!
 
 .. image:: https://cdn.rawgit.com/semiversus/python-broqer/7beb7379/docs/logo.svg
@@ -29,8 +33,8 @@ Synopsis
 - Source is hosted on GitHub.com_
 - Documentation is hosted on ReadTheDocs.com_
 - Tested on Python 3.5, 3.6 and 3.7
-- Compact library (<1000 lines of code) and well documented (>1000 lines of comments)
-- Fully unit tested with pytest_, coding style checked with flake8_, static type checked with mypy_, static code checked with pylint_
+- Compact library (~1000 lines of code) and well documented
+- Unit tested with pytest_, coding style checked with flake8_, static type checked with mypy_, static code checked with pylint_
 - Operators known from ReactiveX_ and other streaming frameworks (like distinct_, combine_latest_, ...)
 - Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
 - Publishers are *awaitable* (e.g. ``await adc_raw``)
@@ -64,6 +68,10 @@ is able to observe changes the publisher is emitting.
 Observer pattern
 ----------------
 
+Subscribing to a publisher is done via the `|` - here used as a pipe. A simple
+subscriber is `op.Sink` which is calling a function with optional positional
+and keyword arguments.
+
 .. code-block:: python
 
     >>> from broqer import Value, op
@@ -79,6 +87,9 @@ Observer pattern
 Combining publishers
 --------------------
 
+You're able to create publishers on the fly by combining two publishers with
+the common operators (like `+`, `>`, `<<`, ...).
+
 .. code-block:: python
 
     >>> from broqer import Value, op
@@ -86,13 +97,39 @@ Combining publishers
     >>> b = Value(3)
 
     >>> c = a * 3 > b  # create a new publisher via operator overloading
-    >>> c | op.Sink(print, 'c =')
-    c = False
+    >>> c | op.Sink(print, 'c:')
+    c: False
 
     >>> a.emit(1)  # will not change the state of c
     >>> a.emit(2)
-    c = True
+    c: True
 
+Asyncio Support
+---------------
+
+A lot of operators are made for asynchronous operations. You're able to debounce
+and throttle emits (via `op.debounce` and `op.throttle`), sample and delay (via
+`op.Sample` and `op.Delay`) or start coroutines and when finishing the result
+will be emitted.
+
+    >>> async def long_running_coro(value):
+    ...     await asyncio.sleep(3)
+    ...     return value + 1
+    ...
+    >>> a = Value(0)
+    >>> a | op.map_async(long_running_coro) | op.Sink(print, 'Result:')
+
+After 3 seconds the result will be:
+
+    Result:0
+
+`map_async` supports various modes how to handle a new emit when a coroutine
+is running. Default is a concurrent run of coroutines, but also various queue
+or interrupt mode is available.
+
+Every publisher can be awaited in coroutines:
+
+    await signal_publisher
 
 Install
 =======
@@ -102,12 +139,6 @@ Install
     pip install broqer
 
 .. marker-for-api
-
-How it works
-============
-
-Basically it's based on the observable pattern - an object you can register on and you will be informed as
-soon the state has changed. The observable are called ``Publishers``.
 
 API
 ===
