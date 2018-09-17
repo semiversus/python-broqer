@@ -121,15 +121,15 @@ class Publisher():
         return apply(self)
 
     def __await__(self):
-        """ Publishers are awaitable. This is done be applying the ToFuture
-        operator (see ToFuture for more information) """
-        from broqer.op import ToFuture  # lazy import due circular dependency
-        return ToFuture(self).__await__()
+        """ Publishers are awaitable and the future is done when the publisher
+        emits a value """
+        from broqer.op import OnEmitFuture  # due circular dependency
+        return (self | OnEmitFuture(timeout=None)).__await__()
 
-    def to_future(self, timeout=None):
+    def wait_for(self, timeout=None):
         """ When a timeout should be applied for awaiting use this method """
-        from broqer.op import ToFuture  # lazy import due circular dependency
-        return ToFuture(self, timeout)
+        from broqer.op import OnEmitFuture  # due circular dependency
+        return self | OnEmitFuture(timeout=timeout)
 
     def __bool__(self):
         """ A new Publisher is the result of a comparision between a publisher

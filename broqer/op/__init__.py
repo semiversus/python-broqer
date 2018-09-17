@@ -28,7 +28,7 @@ from .throttle import Throttle, throttle
 from .publishers.from_polling import FromPolling
 
 # subscribers
-from .subscribers.to_future import ToFuture, to_future
+from .subscribers.on_emit_future import OnEmitFuture
 from .subscribers.sink import Sink
 from .subscribers.trace import Trace
 from .subscribers.topic_mapper import TopicMapper
@@ -46,6 +46,6 @@ __all__ = [
     'replace', 'Sink', 'SlidingWindow', 'sliding_window', 'Switch',
     'switch', 'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
     'Sample', 'sample', 'MapAsync', 'map_async', 'MODE', 'MapThreaded',
-    'map_threaded', 'Throttle', 'throttle', 'ToFuture', 'to_future',
+    'map_threaded', 'Throttle', 'throttle', 'OnEmitFuture',
     'True_', 'true', 'False_', 'false', 'Trace', 'TopicMapper',
 ]

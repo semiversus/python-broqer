@@ -7,7 +7,7 @@ value = Subject()
 
 
 async def main():
-    print('Value: ', await (value | op.to_future()))
+    print('Value: ', await (value | op.OnEmitFuture()))
     print('Value: ', await value)
     print('Number of subscribers: %d' % len(value.subscriptions))
 

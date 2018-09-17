@@ -2,7 +2,7 @@ import asyncio
 import pytest
 
 from broqer import Publisher, StatefulPublisher
-from broqer.op import ToFuture
+from broqer.op import OnEmitFuture
 
 from .eventloop import VirtualTimeEventLoop
 
@@ -14,7 +14,7 @@ def event_loop():
 
 def test_publisher():
     p = Publisher()
-    future = ToFuture(p)
+    future = p | OnEmitFuture()
 
     assert not future.done()
 
@@ -26,7 +26,7 @@ def test_publisher():
 
 def test_stateful_publisher():
     p = StatefulPublisher(1)
-    future = ToFuture(p, timeout=1, loop=asyncio.get_event_loop())
+    future = p | OnEmitFuture(timeout=1, loop=asyncio.get_event_loop())
 
     assert future.result() == 1
 
@@ -36,7 +36,7 @@ def test_stateful_publisher():
 @pytest.mark.asyncio
 async def test_timeout():
     p = Publisher()
-    future = ToFuture(p, timeout=0.01)
+    future = p | OnEmitFuture(timeout=0.01)
     await asyncio.sleep(0.05)
 
     with pytest.raises(asyncio.TimeoutError):
@@ -45,7 +45,7 @@ async def test_timeout():
 @pytest.mark.asyncio
 async def test_cancel():
     p = Publisher()
-    future = ToFuture(p, timeout=0.01)
+    future = p | OnEmitFuture(timeout=0.01)
     future.cancel()
     p.notify(1)
 

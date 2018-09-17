@@ -7,7 +7,7 @@ from broqer import Publisher, SubscriptionError, Subscriber, Value, StatefulPubl
 from broqer.subject import Subject
 
 
-@pytest.mark.parametrize('cls', [Publisher])
+@pytest.mark.parametrize('cls', [Publisher, StatefulPublisher])
 def test_subscribe(cls):
     s1 = Subject()
     s2 = Subject()
@@ -51,7 +51,7 @@ def test_subscribe(cls):
         d2.dispose()
 
 
-@pytest.mark.parametrize('cls', [Publisher])
+@pytest.mark.parametrize('cls', [Publisher, StatefulPublisher])
 def test_chaining_operator(cls):
     publisher = cls()
 
@@ -67,10 +67,10 @@ async def test_await(cls, event_loop):
     publisher = cls()
 
     event_loop.call_soon(publisher.notify, 1)
-    assert await publisher == 1
+    assert (await publisher) == 1
 
     event_loop.call_soon(publisher.notify, 2)
-    assert await publisher.to_future() == 2
+    assert await publisher.wait_for() == 2
 
 @pytest.mark.asyncio
 async def test_future_return():
