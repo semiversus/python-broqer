@@ -28,6 +28,8 @@ class Publisher():
 
     When implementing a Publisher use the following methods:
     .notify(value) calls .emit(value) on all subscribers
+
+    :ivar _subscriptions: holding a list of subscribers
     """
     def __init__(self):
         self._subscriptions = list()
@@ -44,6 +46,9 @@ class Publisher():
         :raises SubscriptionError: if subscriber already subscribed
         """
 
+        # `subscriber in self._subscriptions` is not working because
+        # tuple.__contains__ is using __eq__ which is overwritten and returns
+        # a new publisher - not helpful here
         if any(subscriber is s for s in self._subscriptions):
             raise SubscriptionError('Subscriber already registered')
 
@@ -65,15 +70,15 @@ class Publisher():
         # work because list.remove(x) is doing comparision for equality.
         # Applied to publishers this will return another publisher instead of
         # a boolean result
-        for i, _s in enumerate(tuple(self._subscriptions)):
+        for i, _s in enumerate(self._subscriptions):
             if _s is subscriber:
                 self._subscriptions.pop(i)
                 return
         raise SubscriptionError('Subscriber is not registered')
 
-    def get(self):  # pylint: disable=useless-return, no-self-use
-        """Return the value of a (possibly simulated) subscription to this
-        publisher.
+    def get(self):  # pylint: disable=no-self-use
+        """Return the value of the publisher. This is only working for stateful
+        publishers. If publisher is stateless it will raise a ValueError.
 
         :raises ValueError: when the publisher is stateless.
         """
@@ -86,15 +91,16 @@ class Publisher():
         this method. If one futrue was returned that future will be returned.
         When multiple futures were returned a gathered future will be returned.
         """
-        results = tuple(s.emit(value, who=self) for s
-                        in tuple(self._subscriptions))
+        results = (s.emit(value, who=self) for s in self._subscriptions)
         futures = tuple(r for r in results if r is not None)
 
-        if futures:
-            if len(futures) == 1:
-                return futures[0]  # return the received single future
-            return asyncio.gather(*futures)
-        return None
+        if not futures:
+            return None
+
+        if len(futures) == 1:
+            return futures[0]  # return the received single future
+
+        return asyncio.gather(*futures)
 
     @property
     def subscriptions(self):
@@ -155,25 +161,31 @@ class StatefulPublisher(Publisher):
         self._state = init
 
     def subscribe(self, subscriber: 'Subscriber',
-                  prepend: bool = False) -> 'SubscriptionDisposable':
+                  prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend=prepend)
+
+        # if a state is defined emit it during .subscribe call
         if self._state is not NONE:
             subscriber.emit(self._state, who=self)
+
         return disposable
 
     def get(self):
+        """ Returns state if defined else it raises a ValueError """
         if self._state is not NONE:
             return self._state
-        return Publisher.get(self)
+        return Publisher.get(self)  # raises ValueError
 
     def notify(self, value: Any) -> asyncio.Future:
-        if self._state != value:
-            self._state = value
-            return Publisher.notify(self, value)
-        return None
+        """ Only notifies subscribers if state has changed """
+        if self._state == value:
+            return None
+
+        self._state = value
+        return Publisher.notify(self, value)
 
     def reset_state(self, value=NONE):
         """ resets the state. Behavior for .subscribe() and .get() will be
-        like a stateless Publisher.
+        like a stateless Publisher until next .emit()
         """
         self._state = value
