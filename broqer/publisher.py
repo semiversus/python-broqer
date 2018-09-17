@@ -77,7 +77,7 @@ class Publisher():
         raise SubscriptionError('Subscriber is not registered')
 
     def get(self):  # pylint: disable=no-self-use
-        """Return the value of the publisher. This is only working for stateful
+        """ Return the value of the publisher. This is only working for stateful
         publishers. If publisher is stateless it will raise a ValueError.
 
         :raises ValueError: when the publisher is stateless.
@@ -104,7 +104,7 @@ class Publisher():
 
     @property
     def subscriptions(self):
-        """ property returning a tuple with all current subscribers """
+        """ Property returning a tuple with all current subscribers """
         return tuple(self._subscriptions)
 
     def __or__(self, apply: Callable[

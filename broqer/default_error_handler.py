@@ -5,7 +5,7 @@ import traceback
 
 
 def _default_error_callback(exc_type, exc_value, exc_traceback):
-    """ default error callback is printing traceback of the exception
+    """ Default error callback is printing traceback of the exception
     """
     traceback.print_exception(exc_type, exc_value, exc_traceback)
 

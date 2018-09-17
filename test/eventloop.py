@@ -29,7 +29,7 @@ def _run_until_complete_cb(fut):
 
 
 def isfuture(obj):
-    """Check for a Future.
+    """ Check for a Future.
     This returns True when obj is a Future instance or is advertising
     itself as duck-type compatible by setting _asyncio_future_blocking.
     See comment in Future for more details.
@@ -52,7 +52,7 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
         self._time = 0
 
     def run_forever(self):
-        """Run until stop() is called."""
+        """ Run until stop() is called."""
         self._check_closed()
 
         if self.is_running():
@@ -69,7 +69,7 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
             self._thread_id = None
 
     def run_until_complete(self, future):
-        """Run the event loop until a Future is done.
+        """ Run the event loop until a Future is done.
         Return the Future's result, or raise its exception.
         """
         self._check_closed()
@@ -98,14 +98,14 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
         return future.result()
 
     def stop(self):
-        """Stop running the event loop.
+        """ Stop running the event loop.
         Every callback already scheduled will still run.  This simply informs
         run_forever to stop looping after a complete iteration.
         """
         self._stopping = True
 
     def close(self):
-        """Close the event loop.
+        """ Close the event loop.
         This clears the queues and shuts down the executor,
         but does not wait for the executor to finish.
         The event loop must not be running.
@@ -120,11 +120,11 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
         self._scheduled.clear()
 
     def is_closed(self):
-        """Returns True if the event loop was closed."""
+        """ Returns True if the event loop was closed."""
         return self._closed
 
     def is_running(self):
-        """Returns True if the event loop is running."""
+        """ Returns True if the event loop is running."""
         return (self._thread_id is not None)
 
     def call_later(self, delay, callback, *args):
@@ -164,11 +164,11 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
         return self._time
 
     def create_future(self):
-        """Create a Future object attached to the loop."""
+        """ Create a Future object attached to the loop."""
         return asyncio.Future(loop=self)
 
     def create_task(self, coro):
-        """Schedule a coroutine object.
+        """ Schedule a coroutine object.
         Return a task object."""
 
         self._check_closed()
@@ -178,7 +178,7 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
         return task
 
     def default_exception_handler(self, context):
-        """Default exception handler.
+        """ Default exception handler.
         This is called when an exception occurs and no exception
         handler is set, and can be called by a custom exception
         handler that wants to defer to the default behavior.
@@ -220,7 +220,7 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
         log.error('\n'.join(log_lines), exc_info=exc_info)
 
     def call_exception_handler(self, context):
-        """Call the current event loop's exception handler.
+        """ Call the current event loop's exception handler.
         The context argument is a dict containing the following keys:
         - 'message': Error message;
         - 'exception' (optional): Exception object;
@@ -323,6 +323,6 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
             raise RuntimeError('Event loop is closed')
 
     def _timer_handle_cancelled(self, handle):
-        """Notification that a TimerHandle has been cancelled."""
+        """ Notification that a TimerHandle has been cancelled."""
         if handle._scheduled:
             self._timer_cancelled_count += 1

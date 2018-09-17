@@ -36,8 +36,6 @@ Synopsis
 - Compact library (~1000 lines of code) and well documented
 - Unit tested with pytest_, coding style checked with flake8_, static type checked with mypy_, static code checked with pylint_
 - Operators known from ReactiveX_ and other streaming frameworks (like map_, combine_latest_, ...)
-- Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
-- Publishers are *awaitable* (e.g. ``await adc_raw``)
 - Broker functionality via Hub_
 
   + Centralised object to keep track of publishers and subscribers
@@ -62,7 +60,8 @@ Showcase
 ========
 
 In other frameworks Publisher_ are sometimes called ``Oberservable``. A subscriber
-is able to observe changes the publisher is emitting.
+is able to observe changes the publisher is emitting. With this basics you're
+able to use the observer pattern - let's see!
 
 Observer pattern
 ----------------

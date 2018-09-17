@@ -28,7 +28,7 @@ class Collector(Subscriber):
         return tuple(self._timestamp_vector)
 
     def reset(self):
-        """clear the result_vector"""
+        """ Clear the result_vector"""
         self._result_vector.clear()
         if self._loop is not None:
             self._timestamp_vector.clear()
@@ -42,7 +42,7 @@ class Collector(Subscriber):
 
     @property
     def last_result(self):
-        """returns the last last_result in result_vector"""
+        """ Returns the last last_result in result_vector"""
         return self._result_vector[-1]
 
     @property
