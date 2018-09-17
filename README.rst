@@ -112,6 +112,8 @@ and throttle emits (via `op.debounce` and `op.throttle`), sample and delay (via
 `op.Sample` and `op.Delay`) or start coroutines and when finishing the result
 will be emitted.
 
+.. code-block:: python
+
     >>> async def long_running_coro(value):
     ...     await asyncio.sleep(3)
     ...     return value + 1
@@ -128,6 +130,8 @@ is running. Default is a concurrent run of coroutines, but also various queue
 or interrupt mode is available.
 
 Every publisher can be awaited in coroutines:
+
+.. code-block:: python
 
     await signal_publisher
 
