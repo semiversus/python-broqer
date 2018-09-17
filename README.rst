@@ -35,7 +35,7 @@ Synopsis
 - Tested on Python 3.5, 3.6 and 3.7
 - Compact library (~1000 lines of code) and well documented
 - Unit tested with pytest_, coding style checked with flake8_, static type checked with mypy_, static code checked with pylint_
-- Operators known from ReactiveX_ and other streaming frameworks (like distinct_, combine_latest_, ...)
+- Operators known from ReactiveX_ and other streaming frameworks (like map_, combine_latest_, ...)
 - Supporting ``asyncio`` for time depended operations and using coroutines (e.g. map_async_, debounce_, ...)
 - Publishers are *awaitable* (e.g. ``await adc_raw``)
 - Broker functionality via Hub_
@@ -51,11 +51,10 @@ Synopsis
 .. _ReadTheDocs.com: http://python-broqer.readthedocs.io
 .. _ReactiveX: http://reactivex.io/
 
-.. _Hub: https://github.com/semiversus/python-broqer/blob/master/broqer/hub.py
+.. _Hub: https://github.com/semiversus/python-broqer/blob/master/broqer/hub/hub.py
 .. _debounce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/debounce.py
 .. _map_async: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_async.py
 .. _combine_latest: https://github.com/semiversus/python-broqer/blob/master/broqer/op/combine_latest.py
-.. _distinct: https://github.com/semiversus/python-broqer/blob/master/broqer/op/distinct.py
 
 .. marker-for-example
 
@@ -72,7 +71,7 @@ Subscribing to a publisher is done via the `|` - here used as a pipe. A simple
 subscriber is `op.Sink` which is calling a function with optional positional
 and keyword arguments.
 
-.. code-block:: python
+.. code-block:: python3
 
     >>> from broqer import Value, op
     >>> a = Value(5)  # create a value (publisher and subscriber with state)
@@ -90,7 +89,7 @@ Combining publishers
 You're able to create publishers on the fly by combining two publishers with
 the common operators (like `+`, `>`, `<<`, ...).
 
-.. code-block:: python
+.. code-block:: python3
 
     >>> from broqer import Value, op
     >>> a = Value(1)
@@ -112,7 +111,7 @@ and throttle emits (via `op.debounce` and `op.throttle`), sample and delay (via
 `op.Sample` and `op.Delay`) or start coroutines and when finishing the result
 will be emitted.
 
-.. code-block:: python
+.. code-block:: python3
 
     >>> async def long_running_coro(value):
     ...     await asyncio.sleep(3)
@@ -131,7 +130,7 @@ or interrupt mode is available.
 
 Every publisher can be awaited in coroutines:
 
-.. code-block:: python
+.. code-block:: python3
 
     await signal_publisher
 
@@ -173,8 +172,6 @@ Operators
 | catch_exception_ (\*exceptions)     | Catching exceptions of following operators in the pipelines                 |
 +-------------------------------------+-----------------------------------------------------------------------------+
 | combine_latest_ (\*publishers)      | Combine the latest emit of multiple publishers and emit the combination     |
-+-------------------------------------+-----------------------------------------------------------------------------+
-| distinct_ (\*init)                  | Only emit values which changed regarding to the cached state                |
 +-------------------------------------+-----------------------------------------------------------------------------+
 | filter_ (predicate, ...)            | Filters values based on a ``predicate`` function                            |
 +-------------------------------------+-----------------------------------------------------------------------------+
@@ -233,28 +230,28 @@ Subjects
 
 .. _Subject: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Value: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
-.. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/core.py
-.. _StatefulPublisher: https://github.com/semiversus/python-broqer/blob/master/broqer/core.py
-.. _Subscriber: https://github.com/semiversus/python-broqer/blob/master/broqer/core.py
+.. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
+.. _StatefulPublisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
+.. _Subscriber: https://github.com/semiversus/python-broqer/blob/master/broqer/subscriber.py
 .. _accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
 .. _cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
 .. _catch_exception: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
 .. _delay: https://github.com/semiversus/python-broqer/blob/master/broqer/op/delay.py
-.. _filter: https://github.com/semiversus/python-broqer/blob/master/broqer/op/filter.py
-.. _FromPolling: https://github.com/semiversus/python-broqer/blob/master/broqer/op/from_polling.py
+.. _filter: https://github.com/semiversus/python-broqer/blob/master/broqer/op/filter_.py
+.. _FromPolling: https://github.com/semiversus/python-broqer/blob/master/broqer/op/publishers/from_polling.py
 .. _map_threaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
-.. _map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map.py
+.. _map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_.py
 .. _merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py
 .. _partition: https://github.com/semiversus/python-broqer/blob/master/broqer/op/partition.py
 .. _reduce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/reduce.py
 .. _sample: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sample.py
-.. _Sink: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sink.py
+.. _Sink: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/sink.py
 .. _sliding_window: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sliding_window.py
 .. _switch: https://github.com/semiversus/python-broqer/blob/master/broqer/op/switch.py
 .. _throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py
-.. _OnEmitFuture: https://github.com/semiversus/python-broqer/blob/master/broqer/op/emit_future.py
-.. _Trace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sink/trace.py
-.. _TopicMapper: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sink/topic_mapper.py
+.. _OnEmitFuture: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/on_emit_future.py
+.. _Trace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/trace.py
+.. _TopicMapper: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/topic_mapper.py
 
 Credits
 =======
