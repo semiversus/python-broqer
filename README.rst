@@ -53,49 +53,53 @@ Synopsis
 .. _combine_latest: https://github.com/semiversus/python-broqer/blob/master/broqer/op/combine_latest.py
 .. _distinct: https://github.com/semiversus/python-broqer/blob/master/broqer/op/distinct.py
 
+.. marker-for-example
+
+Showcase
+========
+
+In other frameworks Publisher_ are sometimes called ``Oberservable``. A subscriber
+is able to observe changes the publisher is emitting.
+
+Observer pattern
+----------------
+
+.. code-block:: python
+
+    >>> from broqer import Value, op
+    >>> a = Value(5)  # create a value (publisher and subscriber with state)
+    >>> disposable = a | op.Sink(print, 'Change:')  # subscribe a callback
+    Change: 5
+
+    >>> a.emit(3)  # change the value
+    Change: 3
+
+    >>> disposable.dispose()  # unsubscribe
+
+Combining publishers
+--------------------
+
+.. code-block:: python
+
+    >>> from broqer import Value, op
+    >>> a = Value(1)
+    >>> b = Value(3)
+
+    >>> c = a * 3 > b  # create a new publisher via operator overloading
+    >>> c | op.Sink(print, 'c =')
+    c = False
+
+    >>> a.emit(1)  # will not change the state of c
+    >>> a.emit(2)
+    c = True
+
+
 Install
 =======
 
 .. code-block:: bash
 
     pip install broqer
-
-.. marker-for-example
-
-Example
-=======
-
-In the first example ``adc_raw`` is a *Publisher* emitting values from an analog digital converter. The value will
-be converted (scaled by factor 0.3), sampled and a moving average is applied. Filtering for values greater 1 will
-be printed (with the prefix 'Voltage too high:')
-
-.. code-block:: python
-
-    from broqer import op
-    import statistics
-
-    ( adc_raw
-      | op.map(lambda v:v*0.3) # apply a function with one argument returning to value multiplied by 0.3
-      | op.sample(0.1) # periodically emit the actual value every 0.1 seconds
-      | op.sliding_window(4) # append the value to a buffer with 4 elements (and drop the oldest value)
-      | op.map(statistics.mean) # use ``statistics.mean`` to calulate the average over the emitted sequence
-      | op.filter(lambda v:v>1) # emit only values greater 1
-      | op.Sink(print, 'Voltage too high:') # call ``print`` with 'Voltage too high:' and the value
-    )
-
-.. image:: https://cdn.rawgit.com/semiversus/python-broqer/ec5ddbbd/docs/example1.svg
-
-Output to ``stdout``:
-
-.. code::
-
-    Voltage too high: 1.25
-    Voltage too high: 1.5
-    Voltage too high: 1.75
-    Voltage too high: 2
-    Voltage too high: 2
-    Voltage too high: 2
-    Voltage too high: 2
 
 .. marker-for-api
 
@@ -113,14 +117,11 @@ Publishers
 
 A Publisher_ is the source for messages.
 
-+--------------------------+--------------------------------------------------------------+
-| Subject_ ()              | Source with ``.emit(*args)`` method to publish a new message |
-+--------------------------+--------------------------------------------------------------+
-| Value_ (\*init)          | Source with a state (initialized via ``init``)               |
-+--------------------------+--------------------------------------------------------------+
-
 Using ``asyncio`` event loop:
-
++------------------------------------+--------------------------------------------------------------------------+
+| Publisher_ ()                      | Basic publisher                                                          |
++------------------------------------+--------------------------------------------------------------------------+
+| StatefulPublisher_ (init)          | Publisher keeping an internal state                                      |
 +------------------------------------+--------------------------------------------------------------------------+
 | FromPolling_ (interval, func, ...) | Call ``func(*args, **kwargs)`` periodically and emit the returned values |
 +------------------------------------+--------------------------------------------------------------------------+
@@ -178,12 +179,27 @@ A Subscriber_ is the sink for messages.
 +----------------------------------+--------------------------------------------------------------+
 | Sink_ (func, \*args, \*\*kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
 +----------------------------------+--------------------------------------------------------------+
-| to_future_ (timeout=None)        | Build a future able to await for                             |
+| EmitFuture_ (timeout=None)       | Build a future able to await for                             |
 +----------------------------------+--------------------------------------------------------------+
+| TopicMapper_ (d)                 | Update a dictionary with changes from topics                 |
++----------------------------------+--------------------------------------------------------------+
+| Trace_ (d)                       | Debug output for publishers                                  |
++----------------------------------+--------------------------------------------------------------+
+
+
+Subjects
+--------
+
++--------------------------+--------------------------------------------------------------+
+| Subject_ ()              | Source with ``.emit(*args)`` method to publish a new message |
++--------------------------+--------------------------------------------------------------+
+| Value_ (\*init)          | Source with a state (initialized via ``init``)               |
++--------------------------+--------------------------------------------------------------+
 
 .. _Subject: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Value: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
 .. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/core.py
+.. _StatefulPublisher: https://github.com/semiversus/python-broqer/blob/master/broqer/core.py
 .. _Subscriber: https://github.com/semiversus/python-broqer/blob/master/broqer/core.py
 .. _accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
 .. _cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
@@ -201,7 +217,9 @@ A Subscriber_ is the sink for messages.
 .. _sliding_window: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sliding_window.py
 .. _switch: https://github.com/semiversus/python-broqer/blob/master/broqer/op/switch.py
 .. _throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py
-.. _to_future: https://github.com/semiversus/python-broqer/blob/master/broqer/op/to_future.py
+.. _EmitFuture: https://github.com/semiversus/python-broqer/blob/master/broqer/op/emit_future.py
+.. _Trace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sink/trace.py
+.. _TopicMapper: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sink/topic_mapper.py
 
 Credits
 =======
