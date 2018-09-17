@@ -217,7 +217,7 @@ Subjects
 .. _sliding_window: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sliding_window.py
 .. _switch: https://github.com/semiversus/python-broqer/blob/master/broqer/op/switch.py
 .. _throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py
-.. _EmitFuture: https://github.com/semiversus/python-broqer/blob/master/broqer/op/emit_future.py
+.. _OnEmitFuture: https://github.com/semiversus/python-broqer/blob/master/broqer/op/emit_future.py
 .. _Trace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sink/trace.py
 .. _TopicMapper: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sink/topic_mapper.py
 
