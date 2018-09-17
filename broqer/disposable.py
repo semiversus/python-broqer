@@ -28,11 +28,11 @@ class Disposable(metaclass=ABCMeta):
         """ .dispose() method has to be overwritten"""
 
     def __enter__(self):
-        """ called on entry of a new context """
+        """ Called on entry of a new context """
         return self
 
     def __exit__(self, _type, _value, _traceback):
-        """ called on exit of the context. .dispose() is called here """
+        """ Called on exit of the context. .dispose() is called here """
         self.dispose()
 
 
@@ -51,10 +51,10 @@ class SubscriptionDisposable(Disposable):
 
     @property
     def publisher(self) -> 'Publisher':
-        """ subscripted publisher """
+        """ Subscripted publisher """
         return self._publisher
 
     @property
     def subscriber(self) -> 'Subscriber':
-        """ subscriber used in this subscription """
+        """ Subscriber used in this subscription """
         return self._subscriber

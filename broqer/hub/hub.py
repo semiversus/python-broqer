@@ -162,7 +162,7 @@ class Topic(Publisher, Subscriber):
         return self._subject.emit(value, who=self)
 
     def assign(self, subject):
-        """ assigns the given subject to the topic """
+        """ Assigns the given subject to the topic """
         assert isinstance(subject, (Publisher, Subscriber))
 
         if self._subject is not None:
@@ -178,35 +178,35 @@ class Topic(Publisher, Subscriber):
             self.assignment_future.set_result(None)
 
     def freeze(self):
-        """ called by hub when hub is going to be frozen """
+        """ Called by hub when hub is going to be frozen """
         if self._subject is None:
             raise ValueError('Topic %r is not assigned' % self._path)
 
     @property
     def assigned(self) -> bool:
-        """ telling as boolean if topic is assigned with a publisher/subscriber
+        """ Telling as boolean if topic is assigned with a publisher/subscriber
         """
         return self._subject is not None
 
     @property
     def subject(self):
-        """ the assigned subject """
+        """ The assigned subject """
         return self._subject
 
     async def wait_for_assignment(self):
-        """ coroutine to wait until the assignment is finished """
+        """ Coroutine to wait until the assignment is finished """
         if not self.assigned:
             self.assignment_future = asyncio.get_event_loop().create_future()
             await self.assignment_future
 
     @property
     def path(self) -> str:
-        """ topic path used as key in the hub """
+        """ Topic path used as key in the hub """
         return self._path
 
     @property
     def hub(self) -> 'Hub':
-        """ reference to hub """
+        """ Reference to hub """
         return self._hub
 
 
@@ -223,7 +223,7 @@ class MetaTopic(Topic):
 
     @property
     def meta(self):
-        """ the meta dictionary """
+        """ The meta dictionary """
         return self._meta
 
 
@@ -265,13 +265,13 @@ class Hub:
 
     @property
     def topics(self):
-        """ ordered dictionary with path:topic ordered by path """
+        """ Ordered dictionary with path:topic ordered by path """
         topics_sorted = sorted(self._topics.items(), key=lambda t: t[0])
         return MappingProxyType(OrderedDict(topics_sorted))
 
     @property
     def topic_factory(self):
-        """ used topic_factory """
+        """ Used topic_factory """
         return self._topic_factory
 
 

@@ -39,12 +39,12 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
 
     @property
     def source_publishers(self):
-        """ tuple with all source publishers """
+        """ Tuple with all source publishers """
         return (self._publisher, )
 
     @abstractmethod
     def get(self):  # pylint: disable=useless-return, no-self-use
-        """ get value of operator """
+        """ Get value of operator """
 
 
 class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
@@ -82,12 +82,12 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
 
     @property
     def source_publishers(self):
-        """ tuple with all source publishers """
+        """ Tuple with all source publishers """
         return self._publishers
 
     @abstractmethod
     def get(self):  # pylint: disable=useless-return, no-self-use
-        """ get value of operator """
+        """ Get value of operator """
 
 
 def build_operator(operator_cls):

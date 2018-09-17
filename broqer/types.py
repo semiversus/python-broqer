@@ -2,5 +2,5 @@
 
 
 class NONE:  # pylint: disable=too-few-public-methods
-    """ marker class used for initialization of undefined state """
+    """ Marker class used for initialization of undefined state """
     pass

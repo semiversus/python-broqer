@@ -81,7 +81,7 @@ class Sample(Operator):
         return Publisher.get(self)  # raises ValueError
 
     def _periodic_callback(self):
-        """ will be started on first emit """
+        """ Will be started on first emit """
         try:
             self.notify(self._state)  # emit to all subscribers
         except Exception:  # pylint: disable=broad-except

@@ -50,7 +50,7 @@ class Map(Operator):
     """
     def __init__(self, publisher: Publisher, map_func: Callable[[Any], Any],
                  *args, unpack=False, **kwargs) -> None:
-        """ special care for return values:
+        """ Special care for return values:
               * return `None` (or nothing) if you don't want to return a result
               * return `None, ` if you want to return `None`
               * return `(a, b), ` to return a tuple as value

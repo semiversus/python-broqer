@@ -6,7 +6,7 @@ from broqer.op import Accumulate
 from .helper import check_single_operator, Collector
 
 def min_max_avg(state, input):
-    """emit minimum, maximum and average. Keep internal state with minimum,
+    """ Emit minimum, maximum and average. Keep internal state with minimum,
     maximum, sum and count of emits"""
     _min, _max, _sum, _count = state
     _min = min(_min, input)
@@ -16,7 +16,7 @@ def min_max_avg(state, input):
     return (_min, _max, _sum, _count), (_min, _max, _sum/_count)
 
 def distinct_elements(state, input):
-    """count how many distinct elements had been emitted yet"""
+    """ Count how many distinct elements had been emitted yet"""
     state = set(state)
     state.add(input)
     return state, len(state)

@@ -69,7 +69,7 @@ class SlidingWindow(Operator):
         return None
 
     def flush(self):
-        """ flush the queue - this will emit the current queue """
+        """ Flush the queue - this will emit the current queue """
         if not self._emit_partial and len(self._state) != self._state.maxlen:
             self.notify(tuple(self._state))
         self._state.clear()

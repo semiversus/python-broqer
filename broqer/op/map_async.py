@@ -182,7 +182,7 @@ class MapAsync(Operator):
         self._run_coro(value)
 
     def _future_done(self, future):
-        """ will be called when the coroutine is done """
+        """ Will be called when the coroutine is done """
         try:
             # notify the subscribers (except result is an exception or NONE)
             result = future.result()  # may raise exception
@@ -202,7 +202,7 @@ class MapAsync(Operator):
         self._run_coro(value)
 
     def _run_coro(self, value):
-        """ start the coroutine as task """
+        """ Start the coroutine as task """
 
         # when LAST_DISTINCT is used only start coroutine when value changed
         if self._options.mode is MODE.LAST_DISTINCT and \
