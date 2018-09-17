@@ -118,6 +118,7 @@ Publishers
 A Publisher_ is the source for messages.
 
 Using ``asyncio`` event loop:
+
 +------------------------------------+--------------------------------------------------------------------------+
 | Publisher_ ()                      | Basic publisher                                                          |
 +------------------------------------+--------------------------------------------------------------------------+
@@ -179,13 +180,12 @@ A Subscriber_ is the sink for messages.
 +----------------------------------+--------------------------------------------------------------+
 | Sink_ (func, \*args, \*\*kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
 +----------------------------------+--------------------------------------------------------------+
-| EmitFuture_ (timeout=None)       | Build a future able to await for                             |
+| OnEmitFuture_ (timeout=None)     | Build a future able to await for                             |
 +----------------------------------+--------------------------------------------------------------+
 | TopicMapper_ (d)                 | Update a dictionary with changes from topics                 |
 +----------------------------------+--------------------------------------------------------------+
 | Trace_ (d)                       | Debug output for publishers                                  |
 +----------------------------------+--------------------------------------------------------------+
-
 
 Subjects
 --------
