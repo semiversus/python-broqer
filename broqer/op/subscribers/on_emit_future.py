@@ -43,6 +43,8 @@ class OnEmitFuture(Subscriber, asyncio.Future):
         if timeout is not None:
             self._timeout_handle = loop.call_later(
                 timeout, self.set_exception, asyncio.TimeoutError)
+        else:
+            self._timeout_handle = None
 
         self._disposable = None
 
