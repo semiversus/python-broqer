@@ -34,7 +34,9 @@ def event_loop():
 ])
 @pytest.mark.asyncio
 async def test_with_publisher(duration, input_vector, output_vector, event_loop):
-    await check_async_operator_coro(Delay, (duration,), {}, input_vector, output_vector, loop=event_loop)
+    error_handler = Mock()
+    await check_async_operator_coro(Delay, (duration,), {'error_callback':error_handler}, input_vector, output_vector, loop=event_loop)
+    error_handler.assert_not_called()
 
 @pytest.mark.asyncio
 async def test_errorhandler():

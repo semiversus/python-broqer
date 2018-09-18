@@ -198,8 +198,8 @@ class MapAsync(Operator):
         if self._queue:
             value = self._queue.popleft()  # pylint: disable=E1111
 
-        # start the coroutine
-        self._run_coro(value)
+            # start the coroutine
+            self._run_coro(value)
 
     def _run_coro(self, value):
         """ Start the coroutine as task """

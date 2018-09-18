@@ -1,6 +1,7 @@
 import asyncio
 import time
 import pytest
+from unittest import mock
 
 from broqer import NONE
 from broqer.op import MapThreaded, MODE
@@ -32,5 +33,8 @@ def wait(v, duration=0.15):
 ])
 @pytest.mark.asyncio
 async def test_with_publisher(map_thread, args, kwargs, mode, input_vector, output_vector, event_loop):
-    await check_async_operator_coro(MapThreaded, (map_thread, *args), {'mode':mode, **kwargs}, input_vector, output_vector, loop=event_loop)
+    error_handler = mock.Mock()
+
+    await check_async_operator_coro(MapThreaded, (map_thread, *args), {'mode':mode, 'error_callback':error_handler, **kwargs}, input_vector, output_vector, loop=event_loop)
     await asyncio.sleep(0.2)
+    error_handler.assert_not_called()

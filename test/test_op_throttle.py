@@ -22,8 +22,10 @@ def event_loop():
 ])
 @pytest.mark.asyncio
 async def test_with_publisher(args, input_vector, output_vector, event_loop):
+    error_handler = mock.Mock()
     init = args[1:] if args[1:] else None
-    await check_async_operator_coro(Throttle, args, {}, input_vector, output_vector, has_state=True, loop=event_loop)
+    await check_async_operator_coro(Throttle, args, {'error_callback':error_handler}, input_vector, output_vector, has_state=True, loop=event_loop)
+    error_handler.assert_not_called()
 
 @pytest.mark.asyncio
 async def test_throttle():

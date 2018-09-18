@@ -52,8 +52,11 @@ async def _filter(a, b):
 ])
 @pytest.mark.asyncio
 async def test_with_publisher(map_coro, args, kwargs, mode, input_vector, output_vector, event_loop):
-    await check_async_operator_coro(MapAsync, (map_coro, *args), {'mode':mode, **kwargs}, input_vector, output_vector, has_state=None, loop=event_loop)
+    error_handler = mock.Mock()
+
+    await check_async_operator_coro(MapAsync, (map_coro, *args), {'mode':mode, 'error_callback':error_handler, **kwargs}, input_vector, output_vector, has_state=None, loop=event_loop)
     await asyncio.sleep(0.3)
+    error_handler.assert_not_called()
 
 @pytest.mark.asyncio
 async def test_map_async():
