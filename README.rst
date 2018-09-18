@@ -33,8 +33,7 @@ Synopsis
 - Source is hosted on GitHub.com_
 - Documentation is hosted on ReadTheDocs.com_
 - Tested on Python 3.5, 3.6 and 3.7
-- Compact library (~1000 lines of code) and well documented
-- Unit tested with pytest_, coding style checked with flake8_, static type checked with mypy_, static code checked with pylint_
+- Unit tested with pytest_, coding style checked with Flake8_, static type checked with mypy_, static code checked with Pylint_, documented with Sphinx_
 - Operators known from ReactiveX_ and other streaming frameworks (like Map_, CombineLatest_, ...)
 - Broker functionality via Hub_
 
@@ -42,9 +41,10 @@ Synopsis
   + Starting point to build applications with a microservice architecture
 
 .. _pytest: https://docs.pytest.org/en/latest
-.. _flake8: http://flake8.pycqa.org/en/latest/
+.. _Flake8: http://flake8.pycqa.org/en/latest/
 .. _mypy: http://mypy-lang.org/
-.. _pylint: https://www.pylint.org/
+.. _Pylint: https://www.pylint.org/
+.. _Sphinx: http://www.sphinx-doc.org
 .. _GitHub.com: https://github.com/semiversus/python-broqer
 .. _ReadTheDocs.com: http://python-broqer.readthedocs.io
 .. _ReactiveX: http://reactivex.io/
