@@ -21,7 +21,7 @@ def test_flush():
     p = Publisher()
     mock = Mock()
 
-    dut = SlidingWindow(p, 3)
+    dut = p | SlidingWindow(3)
     dut | Sink(mock)
 
     mock.assert_not_called()

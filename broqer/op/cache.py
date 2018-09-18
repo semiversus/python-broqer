@@ -2,7 +2,7 @@
 >>> from broqer import Subject, op
 >>> s = Subject()
 
->>> cached_publisher = s | op.cache(0)
+>>> cached_publisher = s | op.Cache(0)
 >>> _disposable = cached_publisher | op.Sink(print, sep=' - ')
 0
 
@@ -14,7 +14,7 @@ from typing import Any
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable, NONE
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class Cache(Operator):
@@ -22,12 +22,10 @@ class Cache(Operator):
 
     The ``Cache`` publisher is emitting a value on subscription.
 
-    :param publisher: source publisher
     :param init: initialization for state
     """
-    def __init__(self, publisher: Publisher,
-                 init: Any = NONE) -> None:
-        Operator.__init__(self, publisher)
+    def __init__(self, init: Any = NONE) -> None:
+        Operator.__init__(self)
         self._state = init
 
     def subscribe(self, subscriber: Subscriber,
@@ -64,6 +62,3 @@ class Cache(Operator):
             self._state = value
             return self.notify(value)
         return None
-
-
-cache = build_operator(Cache)  # pylint: disable=invalid-name

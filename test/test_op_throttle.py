@@ -38,7 +38,7 @@ async def test_throttle():
 
     default_error_handler.set(mock_error_handler)
 
-    disposable = p | op.throttle(0.1) | op.Sink(mock_sink)
+    disposable = p | op.Throttle(0.1) | op.Sink(mock_sink)
 
     mock_sink.side_effect = (None, ZeroDivisionError('FAIL'))
 
@@ -63,7 +63,7 @@ async def test_throttle():
     # test reset
     mock_sink.reset_mock()
     mock_sink.side_effect = None
-    throttle = p | op.throttle(0.1)
+    throttle = p | op.Throttle(0.1)
     disposable = throttle | op.Sink(mock_sink)
     p.notify(1)
     mock_sink.reset_mock()
@@ -78,7 +78,7 @@ async def test_throttle():
     # test reset again
     mock_sink.reset_mock()
     mock_sink.side_effect = None
-    throttle = p | op.throttle(0.1)
+    throttle = p | op.Throttle(0.1)
     disposable = throttle | op.Sink(mock_sink)
 
     # resubscribe

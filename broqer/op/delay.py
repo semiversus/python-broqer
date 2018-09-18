@@ -6,7 +6,7 @@ Usage:
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()
->>> s | op.delay(0.1) | op.Sink(print)
+>>> s | op.Delay(0.1) | op.Sink(print)
 <...>
 >>> s.emit(1)
 >>> s.emit(2)
@@ -25,21 +25,21 @@ from typing import Any
 
 from broqer import Publisher, default_error_handler
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class Delay(Operator):
     """ Emit every value delayed by the given time.
-    :param publisher: source publisher
+
     :param duration: time of delay in seconds
     :param error_callback: the error callback to be registered
     :param loop: asyncio event loop to use
     """
-    def __init__(self, publisher: Publisher, duration: float,
+    def __init__(self, duration: float,
                  error_callback=default_error_handler, loop=None) -> None:
         assert duration >= 0, 'delay has to be positive'
 
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
 
         self._duration = duration
         self._loop = loop or asyncio.get_event_loop()
@@ -57,6 +57,3 @@ class Delay(Operator):
             self.notify(value)
         except Exception:  # pylint: disable=broad-except
             self._error_callback(*sys.exc_info())
-
-
-delay = build_operator(Delay)  # pylint: disable=invalid-name

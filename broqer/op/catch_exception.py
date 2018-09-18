@@ -4,7 +4,7 @@
 
 Example with exception:
 
->>> disposable = s | op.map_(lambda s:1/s) | op.Sink(print)
+>>> disposable = s | op.Map(lambda s:1/s) | op.Sink(print)
 
 >>> s.emit(1)
 1.0
@@ -18,7 +18,7 @@ ZeroDivisionError: division by zero
 Now with ``catch_exception``:
 
 >>> excp = ZeroDivisionError
->>> s | op.catch_exception(excp) | op.map_(lambda s:1/s) | op.Sink(print)
+>>> s | op.CatchException(excp) | op.Map(lambda s:1/s) | op.Sink(print)
 <...>
 
 >>> s.emit(1)
@@ -31,18 +31,17 @@ from typing import Any
 
 from broqer import Publisher
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class CatchException(Operator):
     """ Catching exceptions of following operators in the pipelines
 
-    :param publisher: source publisher
     :param exceptions: Exception classes to be catched
     """
-    def __init__(self, publisher: Publisher, *exceptions) -> None:
+    def __init__(self, *exceptions) -> None:
         assert len(exceptions) >= 1, 'need at least one exception'
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
         self._exceptions = exceptions
 
     def get(self):
@@ -55,7 +54,3 @@ class CatchException(Operator):
         except self._exceptions:
             pass
         return None
-
-
-# pylint: disable=invalid-name
-catch_exception = build_operator(CatchException)

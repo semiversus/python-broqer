@@ -6,7 +6,7 @@ Usage:
 >>> from broqer import Subject, op
 >>> s = Subject()
 
->>> partitioned_publisher = s | op.partition(3)
+>>> partitioned_publisher = s | op.Partition(3)
 >>> _d = partitioned_publisher | op.Sink(print, 'Partition:')
 
 >>> s.emit(1)
@@ -23,18 +23,18 @@ from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher, Subscriber
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class Partition(Operator):
     """ Group ``size`` emits into one emit as tuple.
-    :param publisher: source publisher
+
     :param size: emits to be collected before emit
     """
-    def __init__(self, publisher: Publisher, size: int) -> None:
+    def __init__(self, size: int) -> None:
         # use size = 0 for unlimited partition size
         # (only make sense when using .flush() )
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
 
         self._queue = []  # type: MutableSequence
         self._size = size
@@ -65,6 +65,3 @@ class Partition(Operator):
         """ Emits the current queue and clears the queue """
         self.notify(tuple(self._queue))
         self._queue.clear()
-
-
-partition = build_operator(Partition)  # pylint: disable=invalid-name

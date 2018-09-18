@@ -5,7 +5,6 @@ from typing import Any as Any_
 from broqer import Publisher
 
 from .any_ import _MultiPredicate
-from .operator import build_operator
 
 
 class All(_MultiPredicate):
@@ -14,6 +13,3 @@ class All(_MultiPredicate):
                  predicate: Callable[[Any_], bool] = None) -> None:
         _MultiPredicate.__init__(self, *publishers, predicate=predicate)
         self.combination_operator = all
-
-
-all_ = build_operator(All)  # pylint: disable=invalid-name

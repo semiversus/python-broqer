@@ -94,7 +94,8 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
     else:
         sources = tuple(Publisher() for _ in input_vector[0])
 
-    dut = cls(*sources, *args, **kwargs)
+    dut = cls(*sources[1:], *args, **kwargs)
+    sources[0] | dut
 
     assert sources[0] in dut.source_publishers
 
@@ -274,7 +275,8 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     else:
         source = Publisher()
 
-    dut = cls(source, *args, **kwargs)
+    dut = cls(*args, **kwargs)
+    source | dut
 
     collector_permanent = Collector(loop=loop)
     collector_temporary = Collector(loop=loop)

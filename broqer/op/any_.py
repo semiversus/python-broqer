@@ -5,7 +5,7 @@ from typing import Any as Any_
 
 from broqer import Publisher, Subscriber, NONE
 
-from .operator import MultiOperator, build_operator
+from .operator import MultiOperator
 
 
 class _MultiPredicate(MultiOperator):
@@ -53,6 +53,12 @@ class _MultiPredicate(MultiOperator):
             return self.notify(self._state)
         return None
 
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        self._publishers = (publisher, *self._publishers)
+        self._partial.insert(0, None)
+        self._index.update({p: i for i, p in enumerate(self._publishers)})
+        return self
+
 
 class Any(_MultiPredicate):
     """ Applying any built in to source publishers"""
@@ -60,6 +66,3 @@ class Any(_MultiPredicate):
                  predicate: Callable[[Any_], bool] = None) -> None:
         _MultiPredicate.__init__(self, *publishers, predicate=predicate)
         self.combination_operator = any
-
-
-any_ = build_operator(Any)  # pylint: disable=invalid-name

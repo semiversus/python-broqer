@@ -26,7 +26,7 @@ async def test_with_publisher(interval, input_vector, output_vector, event_loop)
 @pytest.mark.asyncio
 async def test_sample():
     p = Publisher()
-    dut = Sample(p, 0.1)
+    dut = p | Sample(0.1)
 
     mock = Mock()
     disposable = dut | Sink(mock)
@@ -52,7 +52,7 @@ async def test_errorhandler():
 
     p = Publisher()
 
-    dut = Sample(p, 0.1, error_callback=mock_errorhandler)
+    dut = p | Sample(0.1, error_callback=mock_errorhandler)
     dut | Sink(mock)
 
     p.notify(1)

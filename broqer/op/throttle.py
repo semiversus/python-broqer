@@ -6,7 +6,7 @@ Usage:
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()
->>> throttle_publisher = s | op.throttle(0.1)
+>>> throttle_publisher = s | op.Throttle(0.1)
 >>> _d = throttle_publisher | op.Sink(print)
 >>> s.emit(1)
 1
@@ -31,21 +31,21 @@ from typing import Any  # noqa: F401
 
 from broqer import Publisher, default_error_handler, NONE
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class Throttle(Operator):
     """ Rate limit emits by the given time.
-    :param publisher: source publisher
+
     :param duration: time for throttling in seconds
     :param error_callback: the error callback to be registered
     :param loop: asyncio event loop to use
     """
-    def __init__(self, publisher: Publisher, duration: float,
+    def __init__(self, duration: float,
                  error_callback=default_error_handler, loop=None) -> None:
         assert duration >= 0, 'duration has to be positive'
 
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
 
         self._duration = duration
         self._loop = loop or asyncio.get_event_loop()
@@ -82,6 +82,3 @@ class Throttle(Operator):
             self._call_later_handler.cancel()
             self._call_later_handler = None
             self._wait_done_cb()
-
-
-throttle = build_operator(Throttle)  # pylint: disable=invalid-name

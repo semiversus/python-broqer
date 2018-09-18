@@ -46,19 +46,20 @@ class OnEmitFuture(Subscriber, asyncio.Future):
         else:
             self._timeout_handle = None
 
-        self._disposable = None
+        self._publisher = None
 
     def _cleanup(self, _future):
-        self._disposable.dispose()
+        self._publisher.unsubscribe(self)
+
         if self._timeout_handle is not None:
             self._timeout_handle.cancel()
 
-    def emit(self, value: Any,
-             who: Optional[Publisher] = None  # pylint: disable=unused-argument
-             ) -> None:
-        if not self.cancelled() and not self.done():
+    def emit(self, value: Any, who: Optional[Publisher] = None) -> None:
+        assert who is self._publisher
+        if not self.done():
             self.set_result(value)
 
-    def __call__(self, publisher: Publisher):
-        self._disposable = publisher.subscribe(self)
+    def __ror__(self, publisher: Publisher) -> Subscriber:
+        self._publisher = publisher
+        publisher.subscribe(self)
         return self

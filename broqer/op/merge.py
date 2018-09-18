@@ -7,7 +7,7 @@ Usage:
 >>> s1 = Subject()
 >>> s2 = Subject()
 
->>> _d = s1 | op.merge(s2) | op.Sink(print, 'Merge:')
+>>> _d = s1 | op.Merge(s2) | op.Sink(print, 'Merge:')
 >>> s1.emit(1)
 Merge: 1
 >>> s2.emit('abc')
@@ -18,7 +18,7 @@ from typing import Any
 
 from broqer import Publisher
 
-from .operator import MultiOperator, build_operator
+from .operator import MultiOperator
 
 
 class Merge(MultiOperator):
@@ -41,6 +41,3 @@ class Merge(MultiOperator):
             'emit from non assigned publisher'
 
         return self.notify(value)
-
-
-merge = build_operator(Merge)  # pylint: disable=invalid-name

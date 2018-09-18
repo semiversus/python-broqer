@@ -17,16 +17,16 @@ Python Broqer
 .. image:: https://img.shields.io/github/license/semiversus/python-broqer.svg
   :target: https://en.wikipedia.org/wiki/MIT_License
 
-+--------------------------------------------------------------------------------+
-| **Broqer 1.0.0 will be released soon (till end of october 2018) - stay tuned** |
-+--------------------------------------------------------------------------------+
-
 Initial focus on embedded systems *Broqer* can be used wherever continuous streams of data have to be processed - and they are everywhere. Watch out!
 
 .. image:: https://cdn.rawgit.com/semiversus/python-broqer/7beb7379/docs/logo.svg
 
 Synopsis
 ========
+
++--------------------------------------------------------------------------------+
+| **Broqer 1.0.0 will be released soon (till end of october 2018) - stay tuned** |
++--------------------------------------------------------------------------------+
 
 - Pure python implementation without dependencies
 - Under MIT license (2018 Günther Jena)
@@ -35,7 +35,7 @@ Synopsis
 - Tested on Python 3.5, 3.6 and 3.7
 - Compact library (~1000 lines of code) and well documented
 - Unit tested with pytest_, coding style checked with flake8_, static type checked with mypy_, static code checked with pylint_
-- Operators known from ReactiveX_ and other streaming frameworks (like map_, combine_latest_, ...)
+- Operators known from ReactiveX_ and other streaming frameworks (like Map_, CombineLatest_, ...)
 - Broker functionality via Hub_
 
   + Centralised object to keep track of publishers and subscribers
@@ -48,11 +48,7 @@ Synopsis
 .. _GitHub.com: https://github.com/semiversus/python-broqer
 .. _ReadTheDocs.com: http://python-broqer.readthedocs.io
 .. _ReactiveX: http://reactivex.io/
-
 .. _Hub: https://github.com/semiversus/python-broqer/blob/master/broqer/hub/hub.py
-.. _debounce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/debounce.py
-.. _map_async: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_async.py
-.. _combine_latest: https://github.com/semiversus/python-broqer/blob/master/broqer/op/combine_latest.py
 
 .. marker-for-example
 
@@ -117,7 +113,7 @@ result will be emitted.
     ...     return value + 1
     ...
     >>> a = Value(0)
-    >>> a | op.map_async(long_running_coro) | op.Sink(print, 'Result:')
+    >>> a | op.MapAsync(long_running_coro) | op.Sink(print, 'Result:')
 
 After 3 seconds the result will be:
 
@@ -125,7 +121,7 @@ After 3 seconds the result will be:
 
     Result: 0
 
-``map_async`` supports various modes how to handle a new emit when a coroutine
+``MapAsync`` supports various modes how to handle a new emit when a coroutine
 is running. Default is a concurrent run of coroutines, but also various queue
 or interrupt mode is available.
 
@@ -166,43 +162,43 @@ Operators
 ---------
 
 +-------------------------------------+-----------------------------------------------------------------------------+
-| accumulate_ (func, init)            | Apply ``func(value, state)`` which is returning new state and value to emit |
+| Accumulate_ (func, init)            | Apply ``func(value, state)`` which is returning new state and value to emit |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| cache_ (\*init)                     | Caching the emitted values to access it via ``.cache`` property             |
+| Cache_ (\*init)                     | Caching the emitted values to access it via ``.cache`` property             |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| catch_exception_ (\*exceptions)     | Catching exceptions of following operators in the pipelines                 |
+| CatchException_ (\*exceptions)      | Catching exceptions of following operators in the pipelines                 |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| combine_latest_ (\*publishers)      | Combine the latest emit of multiple publishers and emit the combination     |
+| CombineLatest_ (\*publishers)       | Combine the latest emit of multiple publishers and emit the combination     |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| filter_ (predicate, ...)            | Filters values based on a ``predicate`` function                            |
+| Filter_ (predicate, ...)            | Filters values based on a ``predicate`` function                            |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| map_ (map_func, \*args, \*\*kwargs) | Apply ``map_func(*args, value, **kwargs)`` to each emitted value            |
+| Map_ (map_func, \*args, \*\*kwargs) | Apply ``map_func(*args, value, **kwargs)`` to each emitted value            |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| merge_ (\*publishers)               | Merge emits of multiple publishers into one stream                          |
+| Merge_ (\*publishers)               | Merge emits of multiple publishers into one stream                          |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| partition_ (size)                   | Group ``size`` emits into one emit as tuple                                 |
+| Partition_ (size)                   | Group ``size`` emits into one emit as tuple                                 |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| reduce_ (func, init)                | Apply ``func`` to the current emitted value and the last result of ``func`` |
+| Reduce_ (func, init)                | Apply ``func`` to the current emitted value and the last result of ``func`` |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| sliding_window_ (size, ...)         | Group ``size`` emitted values overlapping                                   |
+| SlidingWindow_ (size, ...)          | Group ``size`` emitted values overlapping                                   |
 +-------------------------------------+-----------------------------------------------------------------------------+
-| switch_ (mapping)                   | Emit selected source mapped by ``mapping``                                  |
+| Switch_ (mapping)                   | Emit selected source mapped by ``mapping``                                  |
 +-------------------------------------+-----------------------------------------------------------------------------+
 
 Using ``asyncio`` event loop:
 
 +-------------------------------------+-------------------------------------------------------------------------+
-| debounce_ (duetime, \*reset_value)  | Emit a value only after a given idle time (emits meanwhile are skipped) |
+| Debounce_ (duetime, \*reset_value)  | Emit a value only after a given idle time (emits meanwhile are skipped) |
 +-------------------------------------+-------------------------------------------------------------------------+
-| delay_ (delay)                      | Emit every value delayed by the given time                              |
+| Delay_ (delay)                      | Emit every value delayed by the given time                              |
 +-------------------------------------+-------------------------------------------------------------------------+
-| map_async_ (map_coro, mode, ...)    | Apply ``map_coro`` to each emitted value allowing async processing      |
+| MapAsync_ (map_coro, mode, ...)     | Apply ``map_coro`` to each emitted value allowing async processing      |
 +-------------------------------------+-------------------------------------------------------------------------+
-| map_threaded_ (map_func, mode, ...) | Apply ``map_func`` to each emitted value allowing threaded processing   |
+| MapThreaded_ (map_func, mode, ...)  | Apply ``map_func`` to each emitted value allowing threaded processing   |
 +-------------------------------------+-------------------------------------------------------------------------+
-| sample_ (interval)                  | Emit the last received value periodically                               |
+| Sample_ (interval)                  | Emit the last received value periodically                               |
 +-------------------------------------+-------------------------------------------------------------------------+
-| throttle_ (duration)                | Rate limit emits by the given time                                      |
+| Throttle_ (duration)                | Rate limit emits by the given time                                      |
 +-------------------------------------+-------------------------------------------------------------------------+
 
 Subscribers
@@ -234,22 +230,25 @@ Subjects
 .. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
 .. _StatefulPublisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
 .. _Subscriber: https://github.com/semiversus/python-broqer/blob/master/broqer/subscriber.py
-.. _accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
-.. _cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
-.. _catch_exception: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
-.. _delay: https://github.com/semiversus/python-broqer/blob/master/broqer/op/delay.py
-.. _filter: https://github.com/semiversus/python-broqer/blob/master/broqer/op/filter_.py
+.. _Accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
+.. _Cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
+.. _CatchException: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
+.. _CombineLatest: https://github.com/semiversus/python-broqer/blob/master/broqer/op/combine_latest.py
+.. _Debounce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/debounce.py
+.. _Delay: https://github.com/semiversus/python-broqer/blob/master/broqer/op/delay.py
+.. _Filter: https://github.com/semiversus/python-broqer/blob/master/broqer/op/filter_.py
 .. _FromPolling: https://github.com/semiversus/python-broqer/blob/master/broqer/op/publishers/from_polling.py
-.. _map_threaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
-.. _map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_.py
-.. _merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py
-.. _partition: https://github.com/semiversus/python-broqer/blob/master/broqer/op/partition.py
-.. _reduce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/reduce.py
-.. _sample: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sample.py
+.. _MapAsync: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_async.py
+.. _MapThreaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
+.. _Map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_.py
+.. _Merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py
+.. _Partition: https://github.com/semiversus/python-broqer/blob/master/broqer/op/partition.py
+.. _Reduce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/reduce.py
+.. _Sample: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sample.py
 .. _Sink: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/sink.py
-.. _sliding_window: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sliding_window.py
-.. _switch: https://github.com/semiversus/python-broqer/blob/master/broqer/op/switch.py
-.. _throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py
+.. _SlidingWindow: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sliding_window.py
+.. _Switch: https://github.com/semiversus/python-broqer/blob/master/broqer/op/switch.py
+.. _Throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py
 .. _OnEmitFuture: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/on_emit_future.py
 .. _Trace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/trace.py
 .. _TopicMapper: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/topic_mapper.py

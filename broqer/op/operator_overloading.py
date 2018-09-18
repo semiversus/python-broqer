@@ -9,9 +9,10 @@ from broqer.op.operator import Operator
 
 class _MapConstant(Operator):
     def __init__(self, publisher: Publisher, value, operation) -> None:
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
         self._value = value
         self._operation = operation
+        self._publisher = publisher
 
     def get(self):
         return self._operation(self._publisher.get(), self._value)
@@ -26,9 +27,10 @@ class _MapConstant(Operator):
 
 class _MapConstantReverse(Operator):
     def __init__(self, publisher: Publisher, value, operation) -> None:
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
         self._value = value
         self._operation = operation
+        self._publisher = publisher
 
     def get(self):
         return self._operation(self._value, self._publisher.get())

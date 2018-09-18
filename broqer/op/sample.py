@@ -7,7 +7,7 @@ Usage:
 >>> from broqer import Subject, op
 >>> s = Subject()
 
->>> sample_publisher = s | op.sample(0.015)
+>>> sample_publisher = s | op.Sample(0.015)
 
 >>> _d = sample_publisher | op.Sink(print, 'Sample:')
 
@@ -46,21 +46,21 @@ from typing import Any  # noqa: F401
 from broqer import Publisher, Subscriber, \
                    default_error_handler, NONE
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class Sample(Operator):
     """ Emit the last received value periodically
-    :param publisher: source publisher
+
     :param interval: time in seconds between emits
     :param error_callback: the error callback to be registered
     :param loop: asyncio loop to use
     """
-    def __init__(self, publisher: Publisher, interval: float,
+    def __init__(self, interval: float,
                  error_callback=default_error_handler, loop=None) -> None:
         assert interval > 0, 'interval has to be positive'
 
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
 
         self._interval = interval
         self._call_later_handle = None
@@ -102,6 +102,3 @@ class Sample(Operator):
 
         if self._call_later_handle is None:
             self._periodic_callback()
-
-
-sample = build_operator(Sample)  # pylint: disable=invalid-name

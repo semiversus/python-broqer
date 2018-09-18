@@ -7,7 +7,7 @@ Usage:
 >>> import asyncio
 >>> from broqer import Subject, op
 >>> s = Subject()
->>> _d = s | op.debounce(0.1) | op.Sink(print)
+>>> _d = s | op.Debounce(0.1) | op.Sink(print)
 >>> s.emit(1)
 >>> s.emit(2)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.05))
@@ -18,7 +18,7 @@ Usage:
 
 When debounce is retriggered you can specify a value to emit:
 
->>> debounce_publisher = s | op.debounce(0.1, False)
+>>> debounce_publisher = s | op.Debounce(0.1, False)
 >>> _d = debounce_publisher | op.Sink(print)
 >>> s.emit(False)
 False
@@ -50,25 +50,24 @@ from typing import Any  # noqa
 
 from broqer import Publisher, Subscriber, default_error_handler, NONE
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class Debounce(Operator):
     """ Emit a value only after a given idle time (emits meanwhile are
     skipped). Debounce can also be used for a timeout functionality.
-    :param publisher: source publisher
+
     :param duetime: time in seconds to be waited for debounce
     :param retrigger_value: value used to emit when value has changed
     :param error_callback: error callback to be registered
     :param loop: asyncio loop to be used
     """
-    def __init__(self,  # pylint: disable=too-many-arguments
-                 publisher: Publisher, duetime: float,
+    def __init__(self, duetime: float,
                  retrigger_value: Any = NONE,
-                 error_callback=default_error_handler, loop=None) -> None:
+                 error_callback=default_error_handler, *, loop=None) -> None:
         assert duetime >= 0, 'duetime has to be positive'
 
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
 
         self.duetime = duetime
         self._retrigger_value = retrigger_value
@@ -137,6 +136,3 @@ class Debounce(Operator):
             self._next_state = self._retrigger_value
         if self._call_later_handler:
             self._call_later_handler.cancel()
-
-
-debounce = build_operator(Debounce)  # pylint: disable=invalid-name

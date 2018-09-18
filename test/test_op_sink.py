@@ -2,7 +2,7 @@ from unittest import mock
 import pytest
 
 from broqer import Disposable
-from broqer.op import Sink, cache, Sink, Trace
+from broqer.op import Cache, Sink, Trace
 from broqer.subject import Subject
 
 @pytest.mark.parametrize('operator_cls', [Sink, Trace])
@@ -72,7 +72,7 @@ def test_sink_on_subscription(operator):
     cb = mock.Mock()
 
     s = Subject()
-    sink_instance = s | cache(0) | operator(cb)
+    sink_instance = s | Cache(0) | operator(cb)
     assert isinstance(sink_instance, Disposable)
 
     cb.assert_called_with(0)

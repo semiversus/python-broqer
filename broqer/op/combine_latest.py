@@ -3,7 +3,7 @@
 >>> s1 = Subject()
 >>> s2 = Subject()
 
->>> combination = s1 | op.combine_latest(s2)
+>>> combination = s1 | op.CombineLatest(s2)
 >>> disposable = combination | op.Sink(print)
 
 CombineLatest is only emitting, when all values are collected:
@@ -27,7 +27,7 @@ from typing import Any, Dict, MutableSequence  # noqa: F401
 
 from broqer import Publisher, Subscriber, NONE, SubscriptionDisposable
 
-from .operator import MultiOperator, build_operator
+from .operator import MultiOperator
 
 
 class CombineLatest(MultiOperator):
@@ -42,6 +42,7 @@ class CombineLatest(MultiOperator):
         publishers. A stateless publisher without an emit will be hold as
         NONE.
     """
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, *publishers: Publisher, map_=None, emit_on=None,
                  allow_stateless=False) -> None:
         MultiOperator.__init__(self, *publishers)
@@ -77,9 +78,7 @@ class CombineLatest(MultiOperator):
         # .emit_on is a set of publishers. When a source publisher is emitting
         # and is not in this set the CombineLatest will not emit a value.
         # If emit_on is None all the publishers will be in the set.
-        if emit_on is None:
-            self._emit_on = publishers
-        elif isinstance(emit_on, Publisher):
+        if isinstance(emit_on, Publisher):
             self._emit_on = (emit_on,)
         else:
             self._emit_on = emit_on
@@ -114,7 +113,7 @@ class CombineLatest(MultiOperator):
         # check for statless publishers not in ._emit_on. If emit_on is missing
         # a stateless publisher it would never emit when this publisher is
         # emitting.
-        if _sp - set(self._emit_on):
+        if self._emit_on is not None and _sp - set(self._emit_on):
             raise ValueError('All stateless publishers have to be part of '
                              'emit_on')
 
@@ -158,7 +157,8 @@ class CombineLatest(MultiOperator):
 
         # if emits from stateful publishers are missing or source of this emit
         # is not one of emit_on -> don't evaluate and notify subscribers
-        if self._missing or all(who is not p for p in self._emit_on):
+        if self._missing or (self._emit_on is not None and
+                             all(who is not p for p in self._emit_on)):
             # stateless publishers don't keep their state in ._partial_state
             if self._stateless and self._stateless[index]:
                 self._partial_state[index] = NONE
@@ -191,5 +191,11 @@ class CombineLatest(MultiOperator):
 
         return self.notify(state)
 
-
-combine_latest = build_operator(CombineLatest)  # pylint: disable=invalid-name
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        self._publishers = (publisher, *self._publishers)
+        self._partial_state.insert(0, NONE)
+        self._missing.add(publisher)
+        if self._stateless is not None:
+            self._stateless = tuple(False for _ in self._publishers)
+        self._index.update({p: i for i, p in enumerate(self._publishers)})
+        return self

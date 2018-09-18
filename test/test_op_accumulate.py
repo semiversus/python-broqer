@@ -35,7 +35,7 @@ def test_with_publisher(args, kwargs, input_vector, output_vector):
 
 def test_reset():
     source = Publisher()
-    dut = Accumulate(source, distinct_elements, init=())
+    dut = source | Accumulate(distinct_elements, init=())
 
     collector = Collector()
     dut.subscribe(collector)

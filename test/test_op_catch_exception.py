@@ -13,7 +13,7 @@ def test_with_publisher(args, input_vector, output_vector):
 
 def test_exception():
     source = Publisher()
-    dut = CatchException(source, ValueError)
+    dut = source | CatchException(ValueError)
 
     class _Subscriber(Subscriber):
         exception = None

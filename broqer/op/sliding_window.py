@@ -6,7 +6,7 @@ Usage:
 >>> from broqer import Subject, op
 >>> s = Subject()
 
->>> window_publisher = s | op.sliding_window(3)
+>>> window_publisher = s | op.SlidingWindow(3)
 >>> _d = window_publisher | op.Sink(print, 'Sliding Window:')
 >>> s.emit(1)
 >>> s.emit(2)
@@ -27,20 +27,19 @@ from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher, Subscriber
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class SlidingWindow(Operator):
     """ Group ``size`` emitted values overlapping.
-    :param publisher: source publisher
+
     :param size: size of values to be collected before emit
     :param emit_partial: emit even if queue is not full
     """
-    def __init__(self, publisher: Publisher, size: int,
-                 emit_partial=False) -> None:
+    def __init__(self, size: int, emit_partial=False) -> None:
         assert size > 0, 'size has to be positive'
 
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
 
         self._state = deque(maxlen=size)  # type: MutableSequence
         self._emit_partial = emit_partial
@@ -73,6 +72,3 @@ class SlidingWindow(Operator):
         if not self._emit_partial and len(self._state) != self._state.maxlen:
             self.notify(tuple(self._state))
         self._state.clear()
-
-
-sliding_window = build_operator(SlidingWindow)  # pylint: disable=invalid-name

@@ -16,7 +16,7 @@ Usage:
 
 MODE: CONCURRENT (is default)
 
->>> _d = s | op.map_async(delay_add) | op.Sink()
+>>> _d = s | op.MapAsync(delay_add) | op.Sink()
 >>> s.emit(0)
 >>> s.emit(1)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
@@ -28,7 +28,7 @@ Finished with argument 1
 
 MODE: INTERRUPT
 
->>> _d = s | op.map_async(delay_add, mode=op.MODE.INTERRUPT) | op.Sink(print)
+>>> _d = s | op.MapAsync(delay_add, mode=op.MODE.INTERRUPT) | op.Sink(print)
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.005))
 Starting with argument 0
@@ -41,7 +41,7 @@ Finished with argument 1
 
 MODE: QUEUE
 
->>> _d = s | op.map_async(delay_add, mode=op.MODE.QUEUE) | op.Sink(print)
+>>> _d = s | op.MapAsync(delay_add, mode=op.MODE.QUEUE) | op.Sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.04))
@@ -55,7 +55,7 @@ Finished with argument 1
 
 MODE: LAST
 
->>> _d = s | op.map_async(delay_add, mode=op.MODE.LAST) | op.Sink(print)
+>>> _d = s | op.MapAsync(delay_add, mode=op.MODE.LAST) | op.Sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
 >>> s.emit(2)
@@ -70,7 +70,7 @@ Finished with argument 2
 
 MODE: SKIP
 
->>> _d = s | op.map_async(delay_add, mode=op.MODE.SKIP) | op.Sink(print)
+>>> _d = s | op.MapAsync(delay_add, mode=op.MODE.SKIP) | op.Sink(print)
 >>> s.emit(0)
 >>> s.emit(1)
 >>> s.emit(2)
@@ -85,7 +85,7 @@ Using error_callback:
 >>> def cb(*e):
 ...     print('Got error')
 
->>> _d = s | op.map_async(delay_add, error_callback=cb) | op.Sink(print)
+>>> _d = s | op.MapAsync(delay_add, error_callback=cb) | op.Sink(print)
 >>> s.emit('abc')
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
 Starting with argument abc
@@ -100,7 +100,7 @@ from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher, default_error_handler, NONE
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 MODE = Enum('MODE', 'CONCURRENT INTERRUPT QUEUE LAST LAST_DISTINCT SKIP')
 
@@ -110,7 +110,7 @@ _Options = namedtuple('_Options', 'map_coro mode args kwargs '
 
 class MapAsync(Operator):
     """ Apply ``map_coro`` to each emitted value allowing async processing
-    :param publisher: source publisher
+
     :param map_coro: coroutine to be applied on emit
     :param \\*args: variable arguments to be used for calling map_coro
     :param mode: behavior when a value is currently processed
@@ -121,8 +121,8 @@ class MapAsync(Operator):
     :ivar scheduled: Publisher emitting the value when coroutine is actually
         started.
     """
-    def __init__(self, publisher: Publisher, map_coro, *args,
-                 mode=MODE.CONCURRENT, error_callback=default_error_handler,
+    def __init__(self, map_coro, *args, mode=MODE.CONCURRENT,
+                 error_callback=default_error_handler,
                  unpack: bool = False, **kwargs) -> None:
         """
         mode uses one of the following enumerations:
@@ -133,7 +133,7 @@ class MapAsync(Operator):
             * LAST_DISTINCT - like LAST but only when value has changed
             * SKIP - skip values emitted during coroutine is running
         """
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
         self._options = _Options(map_coro, mode, args, kwargs, error_callback,
                                  unpack)
         # ._future is the reference to a running coroutine encapsulated as task
@@ -196,7 +196,7 @@ class MapAsync(Operator):
 
         # check if queue is present and something is in the queue
         if self._queue:
-            value = self._queue.popleft()  # pylint: disable=E1111
+            value = self._queue.popleft()
 
             # start the coroutine
             self._run_coro(value)
@@ -223,6 +223,3 @@ class MapAsync(Operator):
         # create a task out of it and add ._future_done as callback
         self._future = asyncio.ensure_future(coro)
         self._future.add_done_callback(self._future_done)
-
-
-map_async = build_operator(MapAsync)  # pylint: disable=invalid-name

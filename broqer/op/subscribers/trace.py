@@ -1,5 +1,5 @@
 """ Implements Trace subscriber """
-from broqer import Publisher
+from broqer import Publisher, SubscriptionDisposable
 from broqer.op import Sink
 
 
@@ -12,5 +12,5 @@ class Trace(Sink):
     :param /**kwargs: keyword arguments used when calling callback
     :param unpack: value from emits will be unpacked as (*value)
     """
-    def __call__(self, publisher: Publisher):
+    def __ror__(self, publisher: Publisher) -> SubscriptionDisposable:
         return publisher.subscribe(self, prepend=True)

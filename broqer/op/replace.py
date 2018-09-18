@@ -6,7 +6,7 @@ from typing import Any
 
 from broqer import Publisher
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class Replace(Operator):
@@ -14,9 +14,8 @@ class Replace(Operator):
     :param publisher: source publisher
     :param value: replacing value to be emitted on emits to this operator
     """
-    def __init__(self, publisher: Publisher, value: Any) -> None:
-        Operator.__init__(self, publisher)
-
+    def __init__(self, value: Any) -> None:
+        Operator.__init__(self)
         self._value = value
 
     def get(self):
@@ -26,6 +25,3 @@ class Replace(Operator):
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who is self._publisher, 'emit from non assigned publisher'
         return self.notify(self._value)
-
-
-replace = build_operator(Replace)  # pylint: disable=invalid-name

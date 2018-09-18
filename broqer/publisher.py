@@ -1,7 +1,7 @@
 """ Implementing Publisher and StatefulPublisher """
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Union
+from typing import TYPE_CHECKING, Any, Union
 
 from broqer import NONE, SubscriptionDisposable
 
@@ -77,8 +77,9 @@ class Publisher():
         raise SubscriptionError('Subscriber is not registered')
 
     def get(self):  # pylint: disable=no-self-use
-        """ Return the value of the publisher. This is only working for stateful
-        publishers. If publisher is stateless it will raise a ValueError.
+        """ Return the value of the publisher. This is only working for
+        stateful publishers. If publisher is stateless it will raise a
+        ValueError.
 
         :raises ValueError: when the publisher is stateless.
         """
@@ -107,24 +108,9 @@ class Publisher():
         """ Property returning a tuple with all current subscribers """
         return tuple(self._subscriptions)
 
-    def __or__(self, apply: Callable[
-            ['Publisher'], Union['Publisher', SubscriptionDisposable]]) \
-            -> Union['Publisher', SubscriptionDisposable]:
-        """ Publishers can be "piped" to subscribers. This is usefull when
-        working with operators.
-
-        Example:
-        >>> from broqer import Publisher, op
-        >>> p = Publisher()
-        >>> disposable = p | op.Sink(print)
-
-        :param apply: A function taking the actual publisher as argument and
-            returning a new publisher when applied to an operator or a
-            SubscriptionDisposable when applied to a subscriber.
-        :return: A new publisher (for operators) or a SubscriptionDisposable (
-            for subscribers)
-        """
-        return apply(self)
+    def __or__(self, subscriber: 'Subscriber'
+               ) -> Union[SubscriptionDisposable, 'Publisher', 'Subscriber']:
+        return subscriber.__ror__(self)
 
     def __await__(self):
         """ Publishers are awaitable and the future is done when the publisher

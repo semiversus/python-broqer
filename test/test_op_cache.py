@@ -21,7 +21,7 @@ def test_with_publisher(args, input_vector, output_vector):
 
 def test_uninitialised_with_publisher():
     source = Publisher()
-    dut = Cache(source)
+    dut = source | Cache()
     cb = mock.Mock()
     dut | Sink(cb)
 
@@ -36,7 +36,7 @@ def test_uninitialised_with_publisher():
 
 def test_initialised_with_publisher():
     source = Publisher()
-    dut = Cache(source, 1)
+    dut = source | Cache(1)
     cb = mock.Mock()
     dut | Sink(cb)
 
@@ -51,7 +51,7 @@ def test_initialised_with_publisher():
 
 def test_uninitialised_with_stateful():
     source = StatefulPublisher(1)
-    dut = Cache(source)
+    dut = source | Cache()
     cb = mock.Mock()
     dut |Sink(cb)
 
@@ -66,7 +66,7 @@ def test_uninitialised_with_stateful():
 
 def test_initialised_with_stateful():
     source = StatefulPublisher(1)
-    dut = Cache(source, 2)
+    dut = source | Cache(2)
     cb = mock.Mock()
     dut | Sink(cb)
 

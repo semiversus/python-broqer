@@ -6,7 +6,7 @@
 ...     state=state[1:]+[value]
 ...     return state, sum(state)/len(state)
 
->>> lowpass = s | op.accumulate(moving_average, init=[0]*3)
+>>> lowpass = s | op.Accumulate(moving_average, init=[0]*3)
 >>> lowpass | op.Sink(print)
 <...>
 >>> s.emit(3)
@@ -23,23 +23,22 @@ from typing import Any, Callable, Tuple
 
 from broqer import Publisher, Subscriber, NONE
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class Accumulate(Operator):
     """ On each emit of source publisher a function gets called with state and
     received value as arguments and this returns a new state and value to emit.
 
-    :param publisher: source publisher
     :param func:
         Function taking two arguments: current state and new value. The return
         value is a tuple with (new state, result) where new state will be used
         for the next call and result will be emitted to subscribers.
     :param init: initialization for state
     """
-    def __init__(self, publisher: Publisher,
-                 func: Callable[[Any, Any], Tuple[Any, Any]], init) -> None:
-        Operator.__init__(self, publisher)
+    def __init__(self, func: Callable[[Any, Any], Tuple[Any, Any]],
+                 init) -> None:
+        Operator.__init__(self)
         self._acc_func = func
         self._state = init
         self._init = init
@@ -68,6 +67,3 @@ class Accumulate(Operator):
         :param state: new state to be set
         """
         self._state = state
-
-
-accumulate = build_operator(Accumulate)  # pylint: disable=invalid-name

@@ -6,7 +6,7 @@ Usage:
 >>> from broqer import Subject, op
 >>> s = Subject()
 
->>> filtered_publisher = s | op.filter_(lambda v:v>0)
+>>> filtered_publisher = s | op.Filter(lambda v:v>0)
 >>> _disposable = filtered_publisher | op.Sink(print)
 
 >>> s.emit(1)
@@ -18,7 +18,7 @@ Usage:
 Also possible with additional args and kwargs:
 
 >>> import operator
->>> filtered_publisher = s | op.filter_(operator.and_, 0x01)
+>>> filtered_publisher = s | op.Filter(operator.and_, 0x01)
 >>> _disposable = filtered_publisher | op.Sink(print)
 >>> s.emit(100)
 >>> s.emit(101)
@@ -31,7 +31,7 @@ from typing import Any, Callable
 
 from broqer import Publisher
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class Filter(Operator):
@@ -42,11 +42,10 @@ class Filter(Operator):
     :param unpack: value from emits will be unpacked as (*value)
     :param \\**kwargs: keyword arguments to be used for evaluating predicate
 """
-    def __init__(self, publisher: Publisher,
-                 predicate: Callable[[Any], bool],
+    def __init__(self, predicate: Callable[[Any], bool],
                  *args, unpack: bool = False, **kwargs) -> None:
 
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
 
         if args or kwargs:
             self._predicate = \
@@ -102,8 +101,3 @@ class False_(Operator):  # pylint: disable=invalid-name
         if not bool(value):
             return self.notify(value)
         return None
-
-
-filter_ = build_operator(Filter)  # pylint: disable=invalid-name
-true = build_operator(True_)  # pylint: disable=invalid-name
-false = build_operator(False_)  # pylint: disable=invalid-name

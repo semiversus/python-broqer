@@ -45,7 +45,7 @@ async def test_errorhandler():
 
     p = Publisher()
 
-    dut = Delay(p, 0.1, error_callback=mock_errorhandler)
+    dut = p | Delay(0.1, error_callback=mock_errorhandler)
     dut | Sink(mock)
 
     p.notify(1)

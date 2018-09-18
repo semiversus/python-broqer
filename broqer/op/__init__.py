@@ -1,28 +1,28 @@
 """ The op module contains all operators broqer offers """
 
 # synchronous operators
-from .any_ import Any, any_
-from .all_ import All, all_
-from .accumulate import Accumulate, accumulate
-from .cache import Cache, cache
-from .catch_exception import CatchException, catch_exception
-from .combine_latest import CombineLatest, combine_latest
-from .filter_ import Filter, True_, False_, filter_, true, false
-from .map_ import Map, map_
-from .merge import Merge, merge
-from .partition import Partition, partition
-from .reduce import Reduce, reduce
-from .replace import Replace, replace
-from .sliding_window import SlidingWindow, sliding_window
-from .switch import Switch, switch
+from .any_ import Any
+from .all_ import All
+from .accumulate import Accumulate
+from .cache import Cache
+from .catch_exception import CatchException
+from .combine_latest import CombineLatest
+from .filter_ import Filter, True_, False_
+from .map_ import Map
+from .merge import Merge
+from .partition import Partition
+from .reduce import Reduce
+from .replace import Replace
+from .sliding_window import SlidingWindow
+from .switch import Switch
 
 # using asyncio
-from .debounce import Debounce, debounce
-from .delay import Delay, delay
-from .sample import Sample, sample
-from .map_async import MapAsync, map_async, MODE
-from .map_threaded import MapThreaded, map_threaded
-from .throttle import Throttle, throttle
+from .debounce import Debounce
+from .delay import Delay
+from .sample import Sample
+from .map_async import MapAsync, MODE
+from .map_threaded import MapThreaded
+from .throttle import Throttle
 
 # publishers
 from .publishers.from_polling import FromPolling
@@ -39,13 +39,9 @@ from .operator_overloading import apply_operator_overloading
 apply_operator_overloading()
 
 __all__ = [
-    'Any', 'any_', 'All', 'all_', 'Accumulate', 'accumulate', 'Cache', 'cache',
-    'CatchException', 'catch_exception', 'CombineLatest', 'combine_latest',
-    'Filter', 'filter_', 'Map', 'map_', 'Merge',
-    'merge', 'Partition', 'partition', 'Reduce', 'reduce', 'Replace',
-    'replace', 'Sink', 'SlidingWindow', 'sliding_window', 'Switch',
-    'switch', 'Debounce', 'debounce', 'Delay', 'delay', 'FromPolling',
-    'Sample', 'sample', 'MapAsync', 'map_async', 'MODE', 'MapThreaded',
-    'map_threaded', 'Throttle', 'throttle', 'OnEmitFuture',
-    'True_', 'true', 'False_', 'false', 'Trace', 'TopicMapper',
+    'Any', 'All', 'Accumulate', 'Cache', 'CatchException', 'CombineLatest',
+    'Filter', 'Map', 'Merge', 'Partition', 'Reduce', 'Replace', 'Sink',
+    'SlidingWindow', 'Switch', 'Debounce', 'Delay', 'FromPolling', 'Sample',
+    'MapAsync', 'MODE', 'MapThreaded', 'Throttle', 'OnEmitFuture', 'True_',
+    'False_', 'Trace', 'TopicMapper',
 ]

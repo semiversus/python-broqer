@@ -16,7 +16,7 @@ Usage:
 
 Mode: CONCURRENT (is default)
 
->>> _d = s | op.map_threaded(delay_add) | op.Sink()
+>>> _d = s | op.MapThreaded(delay_add) | op.Sink()
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument 0
@@ -29,7 +29,7 @@ Finished with argument ...
 
 Mode: QUEUE
 
->>> _d = s | op.map_threaded(delay_add, mode=op.MODE.QUEUE) | op.Sink(print)
+>>> _d = s | op.MapThreaded(delay_add, mode=op.MODE.QUEUE) | op.Sink(print)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
@@ -45,7 +45,7 @@ Finished with argument 1
 
 Mode: LAST
 
->>> _d = s | op.map_threaded(delay_add, mode=op.MODE.LAST) | op.Sink(print)
+>>> _d = s | op.MapThreaded(delay_add, mode=op.MODE.LAST) | op.Sink(print)
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument 0
@@ -61,7 +61,7 @@ Finished with argument 2
 
 Mode: SKIP
 
->>> _d = s | op.map_threaded(delay_add, mode=op.MODE.SKIP) | op.Sink(print)
+>>> _d = s | op.MapThreaded(delay_add, mode=op.MODE.SKIP) | op.Sink(print)
 >>> s.emit(0)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument 0
@@ -77,7 +77,7 @@ Using error_callback:
 >>> def cb(*e):
 ...     print('Got error')
 
->>> _d = s | op.map_threaded(delay_add, error_callback=cb) | op.Sink(print)
+>>> _d = s | op.MapThreaded(delay_add, error_callback=cb) | op.Sink(print)
 >>> s.emit('abc')
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.001))
 Starting with argument abc
@@ -89,15 +89,14 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
-from broqer import Publisher, default_error_handler
+from broqer import default_error_handler
 
-from .operator import build_operator
 from .map_async import MapAsync, MODE
 
 
 class MapThreaded(MapAsync):
     """ Apply ``map_func`` to each emitted value allowing threaded processing.
-    :param publisher: source publisher
+
     :param map_func: function called to apply
     :param \\*args: variable arguments to be used for calling map_coro
     :param mode: behavior when a value is currently processed
@@ -105,14 +104,14 @@ class MapThreaded(MapAsync):
     :param unpack: value from emits will be unpacked as (*value)
     :param \\**kwargs: keyword arguments to be used for calling map_coro
     """
-    def __init__(self, publisher: Publisher, map_func, *args,
+    def __init__(self, map_func, *args,
                  mode: MODE = MODE.CONCURRENT,  # type: ignore
                  error_callback=default_error_handler,
                  unpack: bool = False, loop=None, **kwargs) -> None:
 
         assert mode != MODE.INTERRUPT, 'mode INTERRUPT is not supported'
 
-        MapAsync.__init__(self, publisher, self._thread_coro, mode=mode,
+        MapAsync.__init__(self, self._thread_coro, mode=mode,
                           error_callback=error_callback, unpack=unpack)
 
         self._map_func = partial(map_func, *args, **kwargs)
@@ -124,6 +123,3 @@ class MapThreaded(MapAsync):
         run_in_executor to run the synchronous function as thread """
         return await self._loop.run_in_executor(
             self._executor, self._map_func, *args)
-
-
-map_threaded = build_operator(MapThreaded)  # pylint: disable=invalid-name

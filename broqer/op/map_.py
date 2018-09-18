@@ -6,7 +6,7 @@ Usage:
 >>> from broqer import Subject, op
 >>> s = Subject()
 
->>> mapped_publisher = s | op.map_(lambda v:v*2)
+>>> mapped_publisher = s | op.Map(lambda v:v*2)
 >>> _disposable = mapped_publisher | op.Sink(print)
 
 >>> s.emit(1)
@@ -20,13 +20,13 @@ Usage:
 Also possible with additional args and kwargs:
 
 >>> import operator
->>> mapped_publisher = s | op.map_(operator.add, 3)
+>>> mapped_publisher = s | op.Map(operator.add, 3)
 >>> _disposable = mapped_publisher | op.Sink(print)
 >>> s.emit(100)
 103
 >>> _disposable.dispose()
 
->>> _disposable = s | op.map_(print, 'Output:') | op.Sink(print, 'EMITTED')
+>>> _disposable = s | op.Map(print, 'Output:') | op.Sink(print, 'EMITTED')
 >>> s.emit(1)
 Output: 1
 EMITTED None
@@ -37,18 +37,18 @@ from typing import Any, Callable
 
 from broqer import Publisher, NONE
 
-from .operator import Operator, build_operator
+from .operator import Operator
 
 
 class Map(Operator):
     """ Apply ``map_func(*args, value, **kwargs)`` to each emitted value.
-    :param publisher: source publisher
+
     :param map_func: function to be applied for each emit
     :param \\*args: variable arguments to be used for calling map_func
     :param unpack: value from emits will be unpacked as (*value)
     :param \\**kwargs: keyword arguments to be used for calling map_func
     """
-    def __init__(self, publisher: Publisher, map_func: Callable[[Any], Any],
+    def __init__(self, map_func: Callable[[Any], Any],
                  *args, unpack=False, **kwargs) -> None:
         """ Special care for return values:
               * return `None` (or nothing) if you don't want to return a result
@@ -57,7 +57,7 @@ class Map(Operator):
               * every other return value will be unpacked
         """
 
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
         self._map_func = partial(map_func, *args, **kwargs)
         self._unpack = unpack
 
@@ -86,6 +86,3 @@ class Map(Operator):
             return self.notify(result)
 
         return None
-
-
-map_ = build_operator(Map)  # pylint: disable=invalid-name

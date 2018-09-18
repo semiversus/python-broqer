@@ -51,16 +51,6 @@ def test_subscribe(cls):
         d2.dispose()
 
 
-@pytest.mark.parametrize('cls', [Publisher, StatefulPublisher])
-def test_chaining_operator(cls):
-    publisher = cls()
-
-    build_cb = mock.Mock()
-    publisher | build_cb
-
-    build_cb.assert_called_with(publisher)
-
-
 @pytest.mark.asyncio
 @pytest.mark.parametrize('cls', [Publisher])
 async def test_await(cls, event_loop):

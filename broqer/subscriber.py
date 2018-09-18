@@ -1,9 +1,9 @@
 """ Implementing the Subscriber class """
 import asyncio
 from abc import ABCMeta, abstractmethod
-from typing import Any
+from typing import Any, Union
 
-from broqer import Publisher  # noqa: F401
+from broqer import Publisher, SubscriptionDisposable  # noqa: F401
 
 
 class Subscriber(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
@@ -17,5 +17,6 @@ class Subscriber(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
         :param who: reference to which publisher is emitting
         """
 
-    def __call__(self, publisher: Publisher):
+    def __ror__(self, publisher: Publisher
+                ) -> Union[SubscriptionDisposable, Publisher, 'Subscriber']:
         return publisher.subscribe(self)

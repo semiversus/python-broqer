@@ -1,11 +1,11 @@
-""" Module implementing Operator, MultiOperator and build_operator.
+""" Module implementing Operator, MultiOperator.
 """
 from abc import abstractmethod
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 
-class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
+class Operator(Subscriber, Publisher):
     """ Base class for operators depending on a single publisher. This
     publisher will be subscribed as soon as this operator is subscribed the
     first time.
@@ -13,10 +13,10 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
     On unsubscription of the last subscriber the dependent publisher will also
     be unsubscripted.
     """
-    def __init__(self, publisher: Publisher) -> None:
+    def __init__(self) -> None:
         Publisher.__init__(self)
         Subscriber.__init__(self)
-        self._publisher = publisher
+        self._publisher = None  # type: Publisher
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
@@ -29,7 +29,7 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
             except ValueError:
                 pass
             else:
-                subscriber.emit(value, who=self)  # pylint: disable=E1133
+                subscriber.emit(value, who=self)
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
@@ -43,11 +43,17 @@ class Operator(Publisher, Subscriber):  # pylint: disable=abstract-method
         return (self._publisher, )
 
     @abstractmethod
-    def get(self):  # pylint: disable=useless-return, no-self-use
+    def get(self):
         """ Get value of operator """
 
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        assert self._publisher is None, \
+            'Operator can only be connected to one publisher'
+        self._publisher = publisher
+        return self
 
-class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
+
+class MultiOperator(Publisher, Subscriber):
     """ Base class for operators depending on multiple publishers. Like
     Operator all publishers will be subscribed on first subscription to this
     operator. Accordingly all publishers get unsubscribed on unsubscription
@@ -71,7 +77,7 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
             except ValueError:
                 pass
             else:
-                subscriber.emit(value, who=self)  # pylint: disable=E1133
+                subscriber.emit(value, who=self)
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
@@ -86,20 +92,9 @@ class MultiOperator(Publisher, Subscriber):  # pylint: disable=abstract-method
         return self._publishers
 
     @abstractmethod
-    def get(self):  # pylint: disable=useless-return, no-self-use
+    def get(self):
         """ Get value of operator """
 
-
-def build_operator(operator_cls):
-    """ This function is taking an operator class and is returning a function
-    to be called when used in a pipeline. _op function is a closure to add
-    arguments to the class initialisation.
-
-    The resulting function takes a publisher as argument and returns a new
-    publisher corresponding the operator functionality.
-    """
-    def _op(*args, **kwargs):
-        def _build(publisher):
-            return operator_cls(publisher, *args, **kwargs)
-        return _build
-    return _op
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        self._publishers = (publisher, *self._publishers)
+        return self

@@ -19,7 +19,7 @@ def test_partition():
     mock = Mock()
     p = Publisher()
 
-    dut = Partition(p,3)
+    dut = p | Partition(3)
     dut | Sink(mock)
     p.notify(1)
     p.notify(2)
