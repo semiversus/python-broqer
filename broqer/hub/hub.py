@@ -68,30 +68,6 @@ Another feature is defining meta data as dictionary to a hub topic:
 >>> _ = hub['value3'].assign(Value(0), meta={'maximum':10})
 >>> hub['value3'].meta
 {'maximum': 10}
-
-Wait for assignment
--------------------
-
-It's also possible to wait for an assignment:
-
->>> import asyncio
-
->>> _f2 = asyncio.ensure_future(hub['value4'].wait_for_assignment())
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
->>> _f2.done()
-False
-
->>> _ = hub['value4'].assign(Value(0))
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
->>> _f2.done()
-True
-
-When already assigned it will not wait at all:
-
->>> _f2 = asyncio.ensure_future(hub['value4'].wait_for_assignment())
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
->>> _f2.done()
-True
 """
 import asyncio
 from collections import OrderedDict
@@ -114,14 +90,16 @@ class Topic(Publisher, Subscriber):
         self._subject = None  # type: Publisher
         self._path = path
         self._hub = hub
-        self.assignment_future = None
         self._pre_assign_emit = None  # type: list
 
-    def subscribe(self, subscriber: 'Subscriber',
+    def subscribe(self, subscriber: Subscriber,
                   prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if self._subject is not None:
+            assert isinstance(self, Publisher), 'Topic %r has to be a ' \
+                'Publisher when using .subscribe()' % self._path
+
             if len(self._subscriptions) == 1:
                 self._subject.subscribe(self)
             else:
@@ -142,40 +120,51 @@ class Topic(Publisher, Subscriber):
     def get(self):
         try:
             return self._subject.get()
-        except AttributeError:  # if self._subject is None
-            raise ValueError('Topic is not yet assigned')
+        except AttributeError:  # if self._subject is None or not a Publisher
+            raise ValueError('Topic %r is not yet assigned or is not a '
+                             'Publisher' % self._path)
 
     def emit(self, value: Any,
              who: Optional[Publisher] = None) -> asyncio.Future:
+
         if self._subject is None:
+            # if yet unassigned store the emit for later replay
             if self._pre_assign_emit is None:
                 self._pre_assign_emit = []
             self._pre_assign_emit.append(value)
             return None
 
+        assert isinstance(self._subject, Subscriber), \
+            'Topic %r has to be a Subscriber when using .emit()' % self._path
+
+        # notify all subscribers when the source of the .emit is the subject
         if who is self._subject:
             return self.notify(value)
 
-        assert isinstance(self._subject, Subscriber), \
-            'Topic has to be a subscriber'
-
+        # otherwise pass this .emit to the subject
         return self._subject.emit(value, who=self)
 
     def assign(self, subject):
         """ Assigns the given subject to the topic """
         assert isinstance(subject, (Publisher, Subscriber))
 
+        # check if not already assigned
         if self._subject is not None:
             raise SubscriptionError('Topic %r already assigned' % self._path)
+
         self._subject = subject
+
+        # subscribe to subject if topic has subscriptions
         if self._subscriptions:
             self._subject.subscribe(self)
+
+        # if topic received emits before assignment replay those emits
         if self._pre_assign_emit is not None:
             for value in self._pre_assign_emit:
                 self._subject.emit(value, who=self)
             self._pre_assign_emit = None
-        if self.assignment_future is not None:
-            self.assignment_future.set_result(None)
+
+        return subject
 
     def freeze(self):
         """ Called by hub when hub is going to be frozen """
@@ -192,12 +181,6 @@ class Topic(Publisher, Subscriber):
     def subject(self):
         """ The assigned subject """
         return self._subject
-
-    async def wait_for_assignment(self):
-        """ Coroutine to wait until the assignment is finished """
-        if not self.assigned:
-            self.assignment_future = asyncio.get_event_loop().create_future()
-            await self.assignment_future
 
     @property
     def path(self) -> str:

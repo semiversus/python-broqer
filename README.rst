@@ -66,8 +66,8 @@ able to use the observer pattern - let's see!
 Observer pattern
 ----------------
 
-Subscribing to a publisher is done via the `|` - here used as a pipe. A simple
-subscriber is `op.Sink` which is calling a function with optional positional
+Subscribing to a publisher is done via the ``|`` - here used as a pipe. A simple
+subscriber is ``op.Sink`` which is calling a function with optional positional
 and keyword arguments.
 
 .. code-block:: python3
@@ -86,7 +86,7 @@ Combining publishers
 --------------------
 
 You're able to create publishers on the fly by combining two publishers with
-the common operators (like `+`, `>`, `<<`, ...).
+the common operators (like ``+``, ``>``, ``<<``, ...).
 
 .. code-block:: python3
 
@@ -106,9 +106,9 @@ Asyncio Support
 ---------------
 
 A lot of operators are made for asynchronous operations. You're able to debounce
-and throttle emits (via `op.debounce` and `op.throttle`), sample and delay (via
-`op.Sample` and `op.Delay`) or start coroutines and when finishing the result
-will be emitted.
+and throttle emits (via ``op.Debounce`` and ``op.Throttle``), sample and delay
+(via ``op.Sample`` and ``op.Delay``) or start coroutines and when finishing the
+result will be emitted.
 
 .. code-block:: python3
 
@@ -121,9 +121,11 @@ will be emitted.
 
 After 3 seconds the result will be:
 
-    Result:0
+.. code-block:: bash
 
-`map_async` supports various modes how to handle a new emit when a coroutine
+    Result: 0
+
+``map_async`` supports various modes how to handle a new emit when a coroutine
 is running. Default is a concurrent run of coroutines, but also various queue
 or interrupt mode is available.
 

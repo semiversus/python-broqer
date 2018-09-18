@@ -178,22 +178,6 @@ def test_subscribe_emit_assign(factory):
     hub['value1'].assign(value)
     mock_sink.calls(mock.call(0), mock.call(1), mock.call(2))
 
-@pytest.mark.asyncio
-async def test_wait_for_assignment(event_loop):
-    hub = Hub()
-
-    assign_future = asyncio.ensure_future(hub['value1'].wait_for_assignment())
-    assert not assign_future.done()
-    await asyncio.sleep(0.001)
-    assert not assign_future.done()
-    hub['value1'].assign(Value(0))
-    await asyncio.sleep(0.001)
-    assert assign_future.done()
-
-    assign_future = asyncio.ensure_future(hub['value1'].wait_for_assignment())
-    await asyncio.sleep(0.001)
-    assert assign_future.done()
-
 def test_meta_topic():
     hub = Hub(topic_factory=MetaTopic)
     assert hub['value1'].meta == dict()
