@@ -14,6 +14,7 @@ Usage:
 >>> asyncio.get_event_loop().run_until_complete(s | op.OnEmitFuture(0.05) )
 Traceback (most recent call last):
 ...
+...TimeoutError
 
 #>>> _ = asyncio.get_event_loop().call_later(0.05, s.emit, (1, 2))
 #>>> asyncio.get_event_loop().run_until_complete(s)
