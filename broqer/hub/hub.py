@@ -134,12 +134,12 @@ class Topic(Publisher, Subscriber):
             self._pre_assign_emit.append(value)
             return None
 
-        assert isinstance(self._subject, Subscriber), \
-            'Topic %r has to be a Subscriber when using .emit()' % self._path
-
         # notify all subscribers when the source of the .emit is the subject
         if who is self._subject:
             return self.notify(value)
+
+        assert isinstance(self._subject, Subscriber), \
+            'Topic %r has to be a Subscriber when using .emit()' % self._path
 
         # otherwise pass this .emit to the subject
         return self._subject.emit(value, who=self)
