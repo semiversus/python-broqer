@@ -20,6 +20,7 @@
 """
 import asyncio
 from typing import Any, Callable, Tuple
+from functools import wraps
 
 from broqer import Publisher, Subscriber, NONE
 
@@ -67,3 +68,10 @@ class Accumulate(Operator):
         :param state: new state to be set
         """
         self._state = state
+
+
+def accumulate(function):
+    @wraps(function)
+    def wrapper_accumulate_function(init):
+        return Accumulate(function, init)
+    return wrapper_accumulate_function

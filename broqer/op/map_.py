@@ -32,7 +32,7 @@ Output: 1
 EMITTED None
 """
 import asyncio
-from functools import partial
+from functools import partial, wraps
 from typing import Any, Callable
 
 from broqer import Publisher, NONE
@@ -49,7 +49,7 @@ class Map(Operator):
     :param \\**kwargs: keyword arguments to be used for calling map_func
     """
     def __init__(self, map_func: Callable[[Any], Any],
-                 *args, unpack=False, **kwargs) -> None:
+                 *args, unpack: bool = False, **kwargs) -> None:
         """ Special care for return values:
               * return `None` (or nothing) if you don't want to return a result
               * return `None, ` if you want to return `None`
@@ -86,3 +86,17 @@ class Map(Operator):
             return self.notify(result)
 
         return None
+
+
+def map_(callback):
+    @wraps(callback)
+    def wrapper_map_function(*args, **kwargs):
+        return Map(callback, *args, unpack=False, **kwargs)
+    return wrapper_map_function
+
+
+def map_unpacked(callback):
+    @wraps(callback)
+    def wrapper_map_function(*args, **kwargs):
+        return Map(callback, *args, unpack=True, **kwargs)
+    return wrapper_map_function

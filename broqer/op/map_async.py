@@ -96,6 +96,7 @@ import asyncio
 from collections import deque, namedtuple
 from enum import Enum
 import sys
+from functools import wraps
 from typing import Any, MutableSequence  # noqa: F401
 
 from broqer import Publisher, default_error_handler, NONE
@@ -223,3 +224,27 @@ class MapAsync(Operator):
         # create a task out of it and add ._future_done as callback
         self._future = asyncio.ensure_future(coro)
         self._future.add_done_callback(self._future_done)
+
+
+def map_async(coroutine=None, mode=MODE.CONCURRENT):
+    def _map_async_unpacked(coroutine):
+        @wraps(coroutine)
+        def _wrapper(*args, error_callback=default_error_handler, **kwargs):
+            return MapAsync(coroutine, *args, unpack=False, mode=mode,
+                            error_callback=error_callback, **kwargs)
+        return _wrapper
+    if coroutine:
+        return _map_async_unpacked(coroutine)
+    return _map_async_unpacked
+
+
+def map_async_unpacked(coroutine=None, mode=MODE.CONCURRENT):
+    def _map_async_unpacked(coroutine):
+        @wraps(coroutine)
+        def _wrapper(*args, error_callback=default_error_handler, **kwargs):
+            return MapAsync(coroutine, *args, unpack=True, mode=mode,
+                            error_callback=error_callback, **kwargs)
+        return _wrapper
+    if coroutine:
+        return _map_async_unpacked(coroutine)
+    return _map_async_unpacked

@@ -27,6 +27,7 @@ Reseting (or just setting) the state is also possible:
 Reduce: 1234
 """
 from typing import Any, Callable
+from functools import wraps
 
 from .accumulate import Accumulate
 
@@ -40,8 +41,15 @@ class Reduce(Accumulate):
     :param init: initialisation used as "first result" for the first call of
         ``func`` on first emit.
     """
-    def __init__(self, func: Callable[[Any, Any], Any], init) -> None:
+    def __init__(self, func: Callable[[Any, Any], Any], init: Any) -> None:
         def _func(state, value):
             result = func(state, value)
             return (result, result)  # new state and result is the same
         Accumulate.__init__(self, _func, init)
+
+
+def reduce(function):
+    @wraps(function)
+    def _wrapper(init: Any):
+        return Reduce(function, init)
+    return _wrapper

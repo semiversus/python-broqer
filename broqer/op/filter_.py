@@ -26,7 +26,7 @@ Also possible with additional args and kwargs:
 
 """
 import asyncio
-from functools import partial
+from functools import partial, wraps
 from typing import Any, Callable
 
 from broqer import Publisher
@@ -101,3 +101,17 @@ class False_(Operator):  # pylint: disable=invalid-name
         if not bool(value):
             return self.notify(value)
         return None
+
+
+def filter_(predicate):
+    @wraps(predicate)
+    def wrapper_filter_function(*args, **kwargs):
+        return Filter(predicate, *args, unpack=False, **kwargs)
+    return wrapper_filter_function
+
+
+def filter_unpacked(predicate):
+    @wraps(predicate)
+    def wrapper_filter_function(*args, **kwargs):
+        return Filter(predicate, *args, unpack=True, **kwargs)
+    return wrapper_filter_function

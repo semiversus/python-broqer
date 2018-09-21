@@ -3,15 +3,15 @@
 # synchronous operators
 from .any_ import Any
 from .all_ import All
-from .accumulate import Accumulate
+from .accumulate import Accumulate, accumulate
 from .cache import Cache
 from .catch_exception import CatchException
 from .combine_latest import CombineLatest
-from .filter_ import Filter, True_, False_
-from .map_ import Map
+from .filter_ import Filter, True_, False_, filter_, filter_unpacked
+from .map_ import Map, map_, map_unpacked
 from .merge import Merge
 from .partition import Partition
-from .reduce import Reduce
+from .reduce import Reduce, reduce
 from .replace import Replace
 from .sliding_window import SlidingWindow
 from .switch import Switch
@@ -20,8 +20,8 @@ from .switch import Switch
 from .debounce import Debounce
 from .delay import Delay
 from .sample import Sample
-from .map_async import MapAsync, MODE
-from .map_threaded import MapThreaded
+from .map_async import MapAsync, MODE, map_async, map_async_unpacked
+from .map_threaded import MapThreaded, map_threaded, map_threaded_unpacked
 from .throttle import Throttle
 
 # publishers
@@ -43,5 +43,7 @@ __all__ = [
     'Filter', 'Map', 'Merge', 'Partition', 'Reduce', 'Replace', 'Sink',
     'SlidingWindow', 'Switch', 'Debounce', 'Delay', 'FromPolling', 'Sample',
     'MapAsync', 'MODE', 'MapThreaded', 'Throttle', 'OnEmitFuture', 'True_',
-    'False_', 'Trace', 'TopicMapper',
+    'False_', 'Trace', 'TopicMapper', 'map_', 'map_unpacked',
+    'filter_', 'filter_unpacked', 'accumulate', 'reduce', 'map_async',
+    'map_async_unpacked', 'map_threaded', 'map_threaded_unpacked'
 ]

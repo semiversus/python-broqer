@@ -32,7 +32,7 @@ Synopsis
 - Under MIT license (2018 Günther Jena)
 - Source is hosted on GitHub.com_
 - Documentation is hosted on ReadTheDocs.com_
-- Tested on Python 3.5, 3.6, 3.7, 3.8-dev
+- Tested on Python 3.5, 3.6, 3.7 and 3.8-dev
 - Unit tested with pytest_, coding style checked with Flake8_, static type checked with mypy_, static code checked with Pylint_, documented with Sphinx_
 - Operators known from ReactiveX_ and other streaming frameworks (like Map_, CombineLatest_, ...)
 - Broker functionality via Hub_
@@ -55,7 +55,7 @@ Synopsis
 Showcase
 ========
 
-In other frameworks Publisher_ are sometimes called ``Oberservable``. A subscriber
+In other frameworks Publisher_ are sometimes called `Oberservable`. A subscriber
 is able to observe changes the publisher is emitting. With this basics you're
 able to use the observer pattern - let's see!
 
@@ -78,8 +78,8 @@ and keyword arguments.
 
     >>> disposable.dispose()  # unsubscribe
 
-Combining publishers
---------------------
+Combine publishers with operators
+---------------------------------
 
 You're able to create publishers on the fly by combining two publishers with
 the common operators (like ``+``, ``>``, ``<<``, ...).
@@ -130,6 +130,42 @@ Every publisher can be awaited in coroutines:
 .. code-block:: python3
 
     await signal_publisher
+
+``Map`` and ``Filter`` decorators
+---------------------------------
+
+Make your own operators on the fly with map_callback and filter_callback decorators:
+
+.. code-block:: python3
+
+    >>> @map
+    ... def count_vowels(s):
+    ...     return sum([s.count(v) for v in 'aeiou'])
+
+    >>> msg = Value('Hello World!)
+    >>> msg | count_vowels() | Sink(print, 'Number of vowels:')
+    Number of vowels: 3
+    >>> msg.emit('Wahuuu')
+    Number of vowels: 4
+
+You can even make configurable ``Map`` s and ``Filter`` s:
+
+.. code-block:: python3
+
+    >>> import re
+    >>> @filter
+    ... def filter_pattern(pattern, s):
+    ...     return re.search(pattern, s) is not None
+
+    >>> msg = Value('Cars passed: 135!')
+    >>> msg | filter_pattern('[0-9]*') | Sink(print)
+    Cars passed: 135!
+    >>> msg.emit('No cars have passed')
+    >>> msg.emit('Only 1 car has passed')
+    Only 1 car has passed
+
+Decorators are also available for ``Accumulate``, ``MapAsync``, ``MapThreaded``
+and ``Reduce``.
 
 Install
 =======

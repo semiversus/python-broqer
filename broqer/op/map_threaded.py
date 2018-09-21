@@ -87,7 +87,7 @@ Got error
 """
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from functools import partial
+from functools import partial, wraps
 
 from broqer import default_error_handler
 
@@ -123,3 +123,27 @@ class MapThreaded(MapAsync):
         run_in_executor to run the synchronous function as thread """
         return await self._loop.run_in_executor(
             self._executor, self._map_func, *args)
+
+
+def map_threaded(function=None, mode=MODE.CONCURRENT):
+    def _map_threaded_unpacked(function):
+        @wraps(function)
+        def _wrapper(*args, error_callback=default_error_handler, **kwargs):
+            return MapThreaded(function, *args, unpack=False, mode=mode,
+                               error_callback=error_callback, **kwargs)
+        return _wrapper
+    if function:
+        return _map_threaded_unpacked(function)
+    return _map_threaded_unpacked
+
+
+def map_threaded_unpacked(function=None, mode=MODE.CONCURRENT):
+    def _map_threaded_unpacked(function):
+        @wraps(function)
+        def _wrapper(*args, error_callback=default_error_handler, **kwargs):
+            return MapThreaded(function, *args, unpack=True, mode=mode,
+                               error_callback=error_callback, **kwargs)
+        return _wrapper
+    if function:
+        return _map_threaded_unpacked(function)
+    return _map_threaded_unpacked
