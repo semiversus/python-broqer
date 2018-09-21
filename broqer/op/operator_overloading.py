@@ -48,7 +48,8 @@ def apply_operator_overloading():
     for method in ('__lt__', '__le__', '__eq__', '__ne__', '__ge__', '__gt__',
                    '__add__', '__and__', '__lshift__', '__mod__', '__mul__',
                    '__pow__', '__rshift__', '__sub__', '__xor__', '__concat__',
-                   '__contains__', '__getitem__'):
+                   '__contains__', '__getitem__', '__floordiv__',
+                   '__truediv__'):
         def _op(operand_left, operand_right, operation=method):
             from broqer.op import CombineLatest
 
@@ -65,7 +66,9 @@ def apply_operator_overloading():
                             ('__rmod__', '__mod__'), ('__rmul__', '__mul__'),
                             ('__rpow__', '__pow__'),
                             ('__rrshift__', '__rshift__'),
-                            ('__rsub__', '__sub__'), ('__rxor__', '__xor__')):
+                            ('__rsub__', '__sub__'), ('__rxor__', '__xor__'),
+                            ('__rfloordiv__', '__floordiv__'),
+                            ('__rtruediv__', '__truediv__')):
         def _op(operand_left, operand_right, operation=_method):
             return _MapConstantReverse(operand_left, operand_right,
                                        getattr(operator, operation))
