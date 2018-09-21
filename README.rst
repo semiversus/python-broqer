@@ -134,7 +134,7 @@ Every publisher can be awaited in coroutines:
 ``Map`` and ``Filter`` decorators
 ---------------------------------
 
-Make your own operators on the fly with map_callback and filter_callback decorators:
+Make your own operators on the fly with ``map`` and ``filter`` decorators:
 
 .. code-block:: python3
 
