@@ -103,15 +103,15 @@ class False_(Operator):  # pylint: disable=invalid-name
         return None
 
 
-def filter_(predicate):
-    @wraps(predicate)
-    def wrapper_filter_function(*args, **kwargs):
-        return Filter(predicate, *args, unpack=False, **kwargs)
-    return wrapper_filter_function
+def build_filter(predicate: Callable[[Any], bool] = None,
+                 unpack: bool = False):
+    def _build_filter(predicate: Callable[[Any], bool]):
+        @wraps(predicate)
+        def _wrapper(*args, **kwargs) -> Filter:
+            return Filter(predicate, *args, unpack=unpack, **kwargs)
+        return _wrapper
 
+    if predicate:
+        return _build_filter(predicate)
 
-def filter_unpacked(predicate):
-    @wraps(predicate)
-    def wrapper_filter_function(*args, **kwargs):
-        return Filter(predicate, *args, unpack=True, **kwargs)
-    return wrapper_filter_function
+    return _build_filter

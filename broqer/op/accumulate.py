@@ -70,7 +70,7 @@ class Accumulate(Operator):
         self._state = state
 
 
-def accumulate(function):
+def build_accumulate(function):
     @wraps(function)
     def wrapper_accumulate_function(init):
         return Accumulate(function, init)

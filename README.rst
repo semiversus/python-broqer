@@ -138,7 +138,7 @@ Make your own operators on the fly with ``map`` and ``filter`` decorators:
 
 .. code-block:: python3
 
-    >>> @map
+    >>> @build_map
     ... def count_vowels(s):
     ...     return sum([s.count(v) for v in 'aeiou'])
 
@@ -153,7 +153,8 @@ You can even make configurable ``Map`` s and ``Filter`` s:
 .. code-block:: python3
 
     >>> import re
-    >>> @filter
+
+    >>> @build_filter
     ... def filter_pattern(pattern, s):
     ...     return re.search(pattern, s) is not None
 
@@ -164,8 +165,8 @@ You can even make configurable ``Map`` s and ``Filter`` s:
     >>> msg.emit('Only 1 car has passed')
     Only 1 car has passed
 
-Decorators are also available for ``Accumulate``, ``MapAsync``, ``MapThreaded``
-and ``Reduce``.
+Decorators are also available for ``Accumulate``, ``MapAsync``, ``MapThreaded``,
+``Reduce`` and ``Sink``.
 
 Install
 =======

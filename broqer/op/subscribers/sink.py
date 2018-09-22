@@ -22,7 +22,7 @@ Sink:(1, 2)
 >>> len(s.subscriptions)
 0
 """
-from functools import partial
+from functools import partial, wraps
 from typing import Any, Callable, Optional
 
 from broqer import Subscriber, Publisher
@@ -57,3 +57,17 @@ class Sink(Subscriber):  # pylint: disable=too-few-public-methods
                 self._callback(*value)
             else:
                 self._callback(value)
+
+
+def build_sink(function: Callable[..., None] = None,
+               unpack: bool = False):
+    def _build_sink(function: Callable[..., None]):
+        @wraps(function)
+        def _wrapper(*args, **kwargs) -> Sink:
+            return Sink(function, *args, unpack=unpack, **kwargs)
+        return _wrapper
+
+    if function:
+        return _build_sink(function)
+
+    return _build_sink

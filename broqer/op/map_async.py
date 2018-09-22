@@ -226,25 +226,14 @@ class MapAsync(Operator):
         self._future.add_done_callback(self._future_done)
 
 
-def map_async(coroutine=None, mode=MODE.CONCURRENT):
-    def _map_async_unpacked(coroutine):
-        @wraps(coroutine)
-        def _wrapper(*args, error_callback=default_error_handler, **kwargs):
-            return MapAsync(coroutine, *args, unpack=False, mode=mode,
-                            error_callback=error_callback, **kwargs)
+def build_map_async(coro=None, mode=MODE.CONCURRENT, unpack: bool = False):
+    def _build_map_async(coro):
+        @wraps(coro)
+        def _wrapper(*args, **kwargs) -> MapAsync:
+            return MapAsync(coro, *args, mode=mode, unpack=unpack, **kwargs)
         return _wrapper
-    if coroutine:
-        return _map_async_unpacked(coroutine)
-    return _map_async_unpacked
 
+    if coro:
+        return _build_map_async(coro)
 
-def map_async_unpacked(coroutine=None, mode=MODE.CONCURRENT):
-    def _map_async_unpacked(coroutine):
-        @wraps(coroutine)
-        def _wrapper(*args, error_callback=default_error_handler, **kwargs):
-            return MapAsync(coroutine, *args, unpack=True, mode=mode,
-                            error_callback=error_callback, **kwargs)
-        return _wrapper
-    if coroutine:
-        return _map_async_unpacked(coroutine)
-    return _map_async_unpacked
+    return _build_map_async

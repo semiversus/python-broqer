@@ -88,15 +88,15 @@ class Map(Operator):
         return None
 
 
-def map_(callback):
-    @wraps(callback)
-    def wrapper_map_function(*args, **kwargs):
-        return Map(callback, *args, unpack=False, **kwargs)
-    return wrapper_map_function
+def build_map(function: Callable[[Any], Any] = None,
+              unpack: bool = False):
+    def _build_map(function: Callable[[Any], Any]):
+        @wraps(function)
+        def _wrapper(*args, **kwargs) -> Map:
+            return Map(function, *args, unpack=unpack, **kwargs)
+        return _wrapper
 
+    if function:
+        return _build_map(function)
 
-def map_unpacked(callback):
-    @wraps(callback)
-    def wrapper_map_function(*args, **kwargs):
-        return Map(callback, *args, unpack=True, **kwargs)
-    return wrapper_map_function
+    return _build_map

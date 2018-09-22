@@ -48,7 +48,7 @@ class Reduce(Accumulate):
         Accumulate.__init__(self, _func, init)
 
 
-def reduce(function):
+def build_reduce(function):
     @wraps(function)
     def _wrapper(init: Any):
         return Reduce(function, init)

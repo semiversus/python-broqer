@@ -125,25 +125,16 @@ class MapThreaded(MapAsync):
             self._executor, self._map_func, *args)
 
 
-def map_threaded(function=None, mode=MODE.CONCURRENT):
-    def _map_threaded_unpacked(function):
+def build_map_threaded(function=None, mode=MODE.CONCURRENT,
+                       unpack: bool = False):
+    def _build_map_threaded(function):
         @wraps(function)
-        def _wrapper(*args, error_callback=default_error_handler, **kwargs):
-            return MapThreaded(function, *args, unpack=False, mode=mode,
-                               error_callback=error_callback, **kwargs)
+        def _wrapper(*args, **kwargs) -> MapThreaded:
+            return MapThreaded(function, *args, mode=mode, unpack=unpack,
+                               **kwargs)
         return _wrapper
-    if function:
-        return _map_threaded_unpacked(function)
-    return _map_threaded_unpacked
 
-
-def map_threaded_unpacked(function=None, mode=MODE.CONCURRENT):
-    def _map_threaded_unpacked(function):
-        @wraps(function)
-        def _wrapper(*args, error_callback=default_error_handler, **kwargs):
-            return MapThreaded(function, *args, unpack=True, mode=mode,
-                               error_callback=error_callback, **kwargs)
-        return _wrapper
     if function:
-        return _map_threaded_unpacked(function)
-    return _map_threaded_unpacked
+        return _build_map_threaded(function)
+
+    return _build_map_threaded
