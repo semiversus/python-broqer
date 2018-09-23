@@ -59,7 +59,7 @@ class Sink(Subscriber):  # pylint: disable=too-few-public-methods
                 self._callback(value)
 
 
-def build_sink(function: Callable[..., None] = None,
+def build_sink(function: Callable[..., None] = None, *,
                unpack: bool = False):
     """ Decorator to wrap a function to return a Sink subscriber.
 
@@ -69,6 +69,8 @@ def build_sink(function: Callable[..., None] = None,
     def _build_sink(function: Callable[..., None]):
         @wraps(function)
         def _wrapper(*args, **kwargs) -> Sink:
+            if 'unpack' in kwargs:
+                raise TypeError('"unpack" has to be defined by decorator')
             return Sink(function, *args, unpack=unpack, **kwargs)
         return _wrapper
 

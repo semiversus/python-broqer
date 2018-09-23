@@ -83,7 +83,8 @@ def build_accumulate(function: Callable[[Any, Any], Tuple[Any, Any]] = None, *,
         @wraps(function)
         def _wrapper(init=NONE) -> Accumulate:
             init = _init if init is NONE else init
-            assert init is not NONE, 'init argument has to be defined'
+            if init is NONE:
+                raise TypeError('init argument has to be defined')
             return Accumulate(function, init=init)
         return _wrapper
 

@@ -238,9 +238,10 @@ def build_map_async(coro=None, *, mode=None, unpack: bool = False):
     def _build_map_async(coro):
         @wraps(coro)
         def _wrapper(*args, mode=None, **kwargs) -> MapAsync:
+            if 'unpack' in kwargs:
+                raise TypeError('"unpack" has to be defined by decorator')
             if mode is None:
-                assert _mode is not None, 'mode has to be defined'
-                mode = _mode
+                mode = MODE.CONCURRENT if _mode is None else _mode
             return MapAsync(coro, *args, mode=mode, unpack=unpack, **kwargs)
         return _wrapper
 

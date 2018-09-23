@@ -139,9 +139,10 @@ def build_map_threaded(function: Callable[[Any], Any] = None,
     def _build_map_threaded(function: Callable[[Any], Any]):
         @wraps(function)
         def _wrapper(*args, mode=None, **kwargs) -> MapThreaded:
+            if 'unpack' in kwargs:
+                raise TypeError('"unpack" has to be defined by decorator')
             if mode is None:
-                assert _mode is not None, 'mode has to be defined'
-                mode = _mode
+                mode = MODE.CONCURRENT if _mode is None else _mode
             return MapThreaded(function, *args, mode=mode, unpack=unpack,
                                **kwargs)
         return _wrapper

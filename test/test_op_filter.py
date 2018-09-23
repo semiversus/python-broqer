@@ -1,7 +1,8 @@
 import pytest
+from unittest import mock
 
-from broqer import NONE
-from broqer.op import Filter, True_, False_
+from broqer import NONE, StatefulPublisher, NONE
+from broqer.op import Filter, True_, False_, build_filter, Sink
 
 from .helper import check_single_operator
 
@@ -30,3 +31,37 @@ def test_true(input_vector, output_vector):
 ])
 def test_false(input_vector, output_vector):
     check_single_operator(False_, (), {}, input_vector, output_vector)
+
+@pytest.mark.parametrize('build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, exception', [
+    (None, (), {}, (), {}, None),
+    (None, (), {'unpack':True}, (), {'unpack':True}, TypeError),
+    (None, (), {'foo':True}, (), {'foo':True}, None),
+    ({'unpack':True}, (), {}, (), {'unpack':True}, None),
+    ({'unpack':False}, (), {}, (), {'unpack':False}, None),
+    (None, (1,2,3), {'a':4}, (1,2,3), {'a':4}, None),
+])
+def test_build(build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, exception):
+    mock_cb = mock.Mock()
+    ref_mock_cb = mock.Mock()
+
+    try:
+        if build_kwargs is None:
+            dut = build_filter(mock_cb)(*init_args, **init_kwargs)
+        else:
+            dut = build_filter(**build_kwargs)(mock_cb)(*init_args, **init_kwargs)
+    except Exception as e:
+        assert isinstance(e, exception)
+        return
+    else:
+        assert exception is None
+
+    reference = Filter(ref_mock_cb, *ref_args, **ref_kwargs)
+
+    assert dut._unpack == reference._unpack
+
+    v = StatefulPublisher((1,2))
+    v | dut | Sink()
+    v | reference | Sink()
+
+    assert mock_cb.mock_calls == ref_mock_cb.mock_calls
+    assert len(mock_cb.mock_calls) == 1

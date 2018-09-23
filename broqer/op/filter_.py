@@ -103,7 +103,7 @@ class False_(Operator):  # pylint: disable=invalid-name
         return None
 
 
-def build_filter(predicate: Callable[[Any], bool] = None,
+def build_filter(predicate: Callable[[Any], bool] = None, *,
                  unpack: bool = False):
     """ Decorator to wrap a function to return a Filter operator.
 
@@ -113,6 +113,8 @@ def build_filter(predicate: Callable[[Any], bool] = None,
     def _build_filter(predicate: Callable[[Any], bool]):
         @wraps(predicate)
         def _wrapper(*args, **kwargs) -> Filter:
+            if 'unpack' in kwargs:
+                raise TypeError('"unpack" has to be defined by decorator')
             return Filter(predicate, *args, unpack=unpack, **kwargs)
         return _wrapper
 

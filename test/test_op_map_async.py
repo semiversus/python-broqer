@@ -3,8 +3,8 @@ import asyncio
 import pytest
 from unittest import mock
 
-from broqer import NONE
-from broqer.op import MapAsync, MODE
+from broqer import NONE, StatefulPublisher
+from broqer.op import MapAsync, MODE, build_map_async, Sink
 
 from .helper import check_async_operator_coro
 from .eventloop import VirtualTimeEventLoop
@@ -100,3 +100,46 @@ async def test_map_async():
     print(mock_error_handler.mock_calls)
     mock_error_handler.assert_called_once_with(ValueError, mock.ANY, mock.ANY)
     mock_sink.assert_not_called()
+
+
+@pytest.mark.parametrize('build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, exception', [
+    (None, (), {}, (), {}, None),
+    (None, (), {'unpack':True}, (), {}, TypeError),
+    ({'mode':MODE.LAST}, (), {}, (), {'mode':MODE.LAST}, None),
+    ({'mode':MODE.LAST}, (), {'mode':MODE.QUEUE}, (), {'mode':MODE.QUEUE}, None),
+    (None, (), {'mode':MODE.QUEUE}, (), {'mode':MODE.QUEUE}, None),
+    (None, (1,2), {'mode':MODE.QUEUE, 'foo':3}, (1,2), {'mode':MODE.QUEUE, 'foo':3}, None),
+    ({'mode':MODE.LAST, 'unpack':True}, (), {}, (), {'mode':MODE.LAST, 'unpack':True}, None),
+])
+def test_build(build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, exception):
+    mock_cb = mock.Mock()
+    ref_mock_cb = mock.Mock()
+
+    async def mock_cb_coro(*args, **kwargs):
+        mock_cb(*args, **kwargs)
+
+    async def ref_mock_cb_coro(*args, **kwargs):
+        ref_mock_cb(*args, **kwargs)
+
+    try:
+        if build_kwargs is None:
+            dut = build_map_async(mock_cb_coro)(*init_args, **init_kwargs)
+        else:
+            dut = build_map_async(**build_kwargs)(mock_cb_coro)(*init_args, **init_kwargs)
+    except Exception as e:
+        assert isinstance(e, exception)
+        return
+    else:
+        assert exception is None
+
+    reference = MapAsync(ref_mock_cb_coro, *ref_args, **ref_kwargs)
+
+    assert dut._options[1:] == reference._options[1:]  # don't compare coro
+
+    v = StatefulPublisher((1,2))
+    v | dut | Sink()
+    v | reference | Sink()
+
+    asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
+    assert mock_cb.mock_calls == ref_mock_cb.mock_calls
+    assert len(mock_cb.mock_calls) == 1

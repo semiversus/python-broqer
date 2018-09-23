@@ -98,6 +98,8 @@ def build_map(function: Callable[[Any], Any] = None,
     def _build_map(function: Callable[[Any], Any]):
         @wraps(function)
         def _wrapper(*args, **kwargs) -> Map:
+            if 'unpack' in kwargs:
+                raise TypeError('"unpack" has to be defined by decorator')
             return Map(function, *args, unpack=unpack, **kwargs)
         return _wrapper
 

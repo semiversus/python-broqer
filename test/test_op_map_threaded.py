@@ -3,8 +3,8 @@ import time
 import pytest
 from unittest import mock
 
-from broqer import NONE
-from broqer.op import MapThreaded, MODE
+from broqer import NONE, StatefulPublisher
+from broqer.op import MapThreaded, MODE, Sink, build_map_threaded
 
 from .helper import check_async_operator_coro
 
@@ -38,3 +38,39 @@ async def test_with_publisher(map_thread, args, kwargs, mode, input_vector, outp
     await check_async_operator_coro(MapThreaded, (map_thread, *args), {'mode':mode, 'error_callback':error_handler, **kwargs}, input_vector, output_vector, loop=event_loop)
     await asyncio.sleep(0.2)
     error_handler.assert_not_called()
+
+@pytest.mark.parametrize('build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, exception', [
+    (None, (), {}, (), {}, None),
+    (None, (), {'unpack':True}, (), {}, TypeError),
+    ({'mode':MODE.LAST}, (), {}, (), {'mode':MODE.LAST}, None),
+    ({'mode':MODE.LAST}, (), {'mode':MODE.QUEUE}, (), {'mode':MODE.QUEUE}, None),
+    (None, (), {'mode':MODE.QUEUE}, (), {'mode':MODE.QUEUE}, None),
+    (None, (1,2), {'mode':MODE.QUEUE, 'foo':3}, (1,2), {'mode':MODE.QUEUE, 'foo':3}, None),
+    ({'mode':MODE.LAST, 'unpack':True}, (), {}, (), {'mode':MODE.LAST, 'unpack':True}, None),
+])
+def test_build(build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, exception):
+    mock_cb = mock.Mock()
+    ref_mock_cb = mock.Mock()
+
+    try:
+        if build_kwargs is None:
+            dut = build_map_threaded(mock_cb)(*init_args, **init_kwargs)
+        else:
+            dut = build_map_threaded(**build_kwargs)(mock_cb)(*init_args, **init_kwargs)
+    except Exception as e:
+        assert isinstance(e, exception)
+        return
+    else:
+        assert exception is None
+
+    reference = MapThreaded(ref_mock_cb, *ref_args, **ref_kwargs)
+
+    assert dut._options[1:] == reference._options[1:]  # don't compare coro
+
+    v = StatefulPublisher((1,2))
+    v | dut | Sink()
+    v | reference | Sink()
+
+    asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
+    assert mock_cb.mock_calls == ref_mock_cb.mock_calls
+    assert len(mock_cb.mock_calls) == 1

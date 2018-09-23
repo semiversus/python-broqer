@@ -1,7 +1,8 @@
 import pytest
+from unittest import mock
 
-from broqer import Publisher
-from broqer.op import Accumulate
+from broqer import Publisher, StatefulPublisher
+from broqer.op import Accumulate, build_accumulate, Sink
 
 from .helper import check_single_operator, Collector
 
@@ -51,3 +52,42 @@ def test_reset():
     source.notify(1)
     source.notify(2)
     assert collector.result_vector == (2, 3)
+
+
+@pytest.mark.parametrize('build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, exception', [
+    (None, (), {}, (), {}, TypeError),
+    (None, (), {'init':0}, (0,), {}, None),
+    (None, (0,), {}, (), {'init':0}, None),
+    ({'init':0}, (), {}, (), {'init':0}, None),
+    ({'init':0}, (1,), {}, (), {'init':1}, None),
+    ({'init':0}, (), {'init':1}, (), {'init':1}, None),
+    ({'foo':0}, (), {}, (), {'init':0}, TypeError),
+    (None, (), {'foo':3}, (), {'init':0}, TypeError),
+])
+def test_build(build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, exception):
+    mock_cb = mock.Mock(return_value=(0,0))
+    ref_mock_cb = mock.Mock(return_value=(0,0))
+
+    try:
+        if build_kwargs is None:
+            dut = build_accumulate(mock_cb)(*init_args, **init_kwargs)
+        else:
+            dut = build_accumulate(**build_kwargs)(mock_cb)(*init_args, **init_kwargs)
+    except Exception as e:
+        assert isinstance(e, exception)
+        return
+    else:
+        assert exception is None
+
+    reference = Accumulate(ref_mock_cb, *ref_args, **ref_kwargs)
+
+    assert dut._init == reference._init
+    assert dut._state == reference._state
+    assert dut._result == reference._result
+
+    v = StatefulPublisher(1)
+    v | dut | Sink()
+    v | reference | Sink()
+
+    assert mock_cb.mock_calls == ref_mock_cb.mock_calls
+    assert len(mock_cb.mock_calls) == 1
