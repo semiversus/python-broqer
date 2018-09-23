@@ -226,10 +226,21 @@ class MapAsync(Operator):
         self._future.add_done_callback(self._future_done)
 
 
-def build_map_async(coro=None, mode=MODE.CONCURRENT, unpack: bool = False):
+def build_map_async(coro=None, *, mode=None, unpack: bool = False):
+    """ Decorator to wrap a coroutine to return a MapAsync operator.
+
+    :param coro: coroutine to be wrapped
+    :param mode: behavior when a value is currently processed
+    :param unpack: value from emits will be unpacked (*value)
+    """
+    _mode = mode
+
     def _build_map_async(coro):
         @wraps(coro)
-        def _wrapper(*args, **kwargs) -> MapAsync:
+        def _wrapper(*args, mode=None, **kwargs) -> MapAsync:
+            if mode is None:
+                assert _mode is not None, 'mode has to be defined'
+                mode = _mode
             return MapAsync(coro, *args, mode=mode, unpack=unpack, **kwargs)
         return _wrapper
 

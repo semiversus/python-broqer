@@ -90,6 +90,11 @@ class Map(Operator):
 
 def build_map(function: Callable[[Any], Any] = None,
               unpack: bool = False):
+    """ Decorator to wrap a function to return a Map operator.
+
+    :param function: function to be wrapped
+    :param unpack: value from emits will be unpacked (*value)
+    """
     def _build_map(function: Callable[[Any], Any]):
         @wraps(function)
         def _wrapper(*args, **kwargs) -> Map:

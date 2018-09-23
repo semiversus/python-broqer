@@ -29,6 +29,8 @@ Reduce: 1234
 from typing import Any, Callable
 from functools import wraps
 
+from broqer import NONE
+
 from .accumulate import Accumulate
 
 
@@ -48,8 +50,24 @@ class Reduce(Accumulate):
         Accumulate.__init__(self, _func, init)
 
 
-def build_reduce(function):
-    @wraps(function)
-    def _wrapper(init: Any):
-        return Reduce(function, init)
-    return _wrapper
+def build_reduce(function: Callable[[Any, Any], Any] = None, *,
+                 init: Any = NONE):
+    """ Decorator to wrap a function to return a Reduce operator.
+
+    :param function: function to be wrapped
+    :param init: optional initialization for state
+    """
+    _init = init
+
+    def _build_reduce(function: Callable[[Any, Any], Any]):
+        @wraps(function)
+        def _wrapper(init=NONE) -> Reduce:
+            init = _init if init is NONE else init
+            assert init is not NONE, 'init argument has to be defined'
+            return Reduce(function, init=init)
+        return _wrapper
+
+    if function:
+        return _build_reduce(function)
+
+    return _build_reduce

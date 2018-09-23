@@ -86,6 +86,7 @@ Got error
 >>> _d.dispose()
 """
 import asyncio
+from typing import Callable, Any
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
 
@@ -104,7 +105,7 @@ class MapThreaded(MapAsync):
     :param unpack: value from emits will be unpacked as (*value)
     :param \\**kwargs: keyword arguments to be used for calling map_coro
     """
-    def __init__(self, map_func, *args,
+    def __init__(self, map_func: Callable[[Any], Any], *args,
                  mode: MODE = MODE.CONCURRENT,  # type: ignore
                  error_callback=default_error_handler,
                  unpack: bool = False, loop=None, **kwargs) -> None:
@@ -125,11 +126,22 @@ class MapThreaded(MapAsync):
             self._executor, self._map_func, *args)
 
 
-def build_map_threaded(function=None, mode=MODE.CONCURRENT,
-                       unpack: bool = False):
-    def _build_map_threaded(function):
+def build_map_threaded(function: Callable[[Any], Any] = None,
+                       mode=MODE.CONCURRENT, unpack: bool = False):
+    """ Decorator to wrap a function to return a MapThreaded operator.
+
+    :param function: function to be wrapped
+    :param mode: behavior when a value is currently processed
+    :param unpack: value from emits will be unpacked (*value)
+    """
+    _mode = mode
+
+    def _build_map_threaded(function: Callable[[Any], Any]):
         @wraps(function)
-        def _wrapper(*args, **kwargs) -> MapThreaded:
+        def _wrapper(*args, mode=None, **kwargs) -> MapThreaded:
+            if mode is None:
+                assert _mode is not None, 'mode has to be defined'
+                mode = _mode
             return MapThreaded(function, *args, mode=mode, unpack=unpack,
                                **kwargs)
         return _wrapper

@@ -38,7 +38,7 @@ class Accumulate(Operator):
     :param init: initialization for state
     """
     def __init__(self, func: Callable[[Any, Any], Tuple[Any, Any]],
-                 init) -> None:
+                 init: Any) -> None:
         Operator.__init__(self)
         self._acc_func = func
         self._state = init
@@ -70,8 +70,24 @@ class Accumulate(Operator):
         self._state = state
 
 
-def build_accumulate(function):
-    @wraps(function)
-    def wrapper_accumulate_function(init):
-        return Accumulate(function, init)
-    return wrapper_accumulate_function
+def build_accumulate(function: Callable[[Any, Any], Tuple[Any, Any]] = None, *,
+                     init: Any = NONE):
+    """ Decorator to wrap a function to return an Accumulate operator.
+
+    :param function: function to be wrapped
+    :param init: optional initialization for state
+    """
+    _init = init
+
+    def _build_accumulate(function: Callable[[Any, Any], Tuple[Any, Any]]):
+        @wraps(function)
+        def _wrapper(init=NONE) -> Accumulate:
+            init = _init if init is NONE else init
+            assert init is not NONE, 'init argument has to be defined'
+            return Accumulate(function, init=init)
+        return _wrapper
+
+    if function:
+        return _build_accumulate(function)
+
+    return _build_accumulate
