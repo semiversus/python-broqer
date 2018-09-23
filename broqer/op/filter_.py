@@ -46,13 +46,7 @@ class Filter(Operator):
                  *args, unpack: bool = False, **kwargs) -> None:
 
         Operator.__init__(self)
-
-        if args or kwargs:
-            self._predicate = \
-                partial(predicate, *args, **kwargs)  # type: Callable
-        else:
-            self._predicate = predicate  # type: Callable
-
+        self._predicate = partial(predicate, *args, **kwargs)  # type: Callable
         self._unpack = unpack
 
     def get(self):
