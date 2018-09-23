@@ -23,8 +23,8 @@ def distinct_elements(state, input):
     return state, len(state)
 
 @pytest.mark.parametrize('args, kwargs, input_vector, output_vector', [
-    ((), {'func':lambda a,b:(a+b,a+b), 'init':0}, (0, 1, 2, 3), (0, 1, 3, 6)),
-    ((), {'func':lambda a,b:(a+b,a), 'init':0}, (0, 1, 2, 3), (0, 0, 1, 3)),
+    ((), {'function':lambda a,b:(a+b,a+b), 'init':0}, (0, 1, 2, 3), (0, 1, 3, 6)),
+    ((), {'function':lambda a,b:(a+b,a), 'init':0}, (0, 1, 2, 3), (0, 0, 1, 3)),
     ((lambda a,b:(a+b,a+b),), {'init':0}, (0, 1, 2, 3), (0, 1, 3, 6)),
     ((lambda a,b:(a+b,a+b), 0), {}, (0, 1, 2, 3), (0, 1, 3, 6)),
     ((min_max_avg, (0, 0, 0, 0)), {}, (0, 2, 1, -1, -2, 0, 3), ((0, 0, 0), (0, 2, 1), (0, 2, 1), (-1, 2, 0.5), (-2, 2, 0), (-2, 2, 0), (-2, 3, 3/7))),

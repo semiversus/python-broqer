@@ -29,34 +29,34 @@ from broqer import Subscriber, Publisher
 
 
 class Sink(Subscriber):  # pylint: disable=too-few-public-methods
-    """ Apply ``callback(*args, value, **kwargs)`` to each emitted value. It's
-    also possible to omit ``callback`` - in this case it's acting as dummy
+    """ Apply ``function(*args, value, **kwargs)`` to each emitted value. It's
+    also possible to omit ``function`` - in this case it's acting as dummy
     subscriber
 
-    :param callback: function to be called when source publisher emits
-    :param \\*args: variable arguments to be used for calling callback
+    :param function: function to be called when source publisher emits
+    :param \\*args: variable arguments to be used for calling function
     :param unpack: value from emits will be unpacked as (*value)
-    :param \\**kwargs: keyword arguments to be used for calling callback
+    :param \\**kwargs: keyword arguments to be used for calling function
     """
     def __init__(self,  # pylint: disable=keyword-arg-before-vararg
-                 callback: Optional[Callable[..., None]] = None,
+                 function: Optional[Callable[..., None]] = None,
                  *args, unpack=False, **kwargs) -> None:
-        if callback is None:
-            self._callback = None  # type: Callable
+        if function is None:
+            self._function = None  # type: Callable
         elif args or kwargs:
-            self._callback = \
-                partial(callback, *args, **kwargs)  # type: Callable
+            self._function = \
+                partial(function, *args, **kwargs)  # type: Callable
         else:
-            self._callback = callback  # type: Callable
+            self._function = function  # type: Callable
 
         self._unpack = unpack
 
     def emit(self, value: Any, who: Publisher):
-        if self._callback:
+        if self._function:
             if self._unpack:
-                self._callback(*value)
+                self._function(*value)
             else:
-                self._callback(value)
+                self._function(value)
 
 
 def build_sink(function: Callable[..., None] = None, *,

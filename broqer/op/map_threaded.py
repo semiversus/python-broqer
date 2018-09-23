@@ -1,5 +1,5 @@
 """
-Apply ``map_func`` to each emitted value allowing threaded processing
+Apply ``function`` to each emitted value allowing threaded processing
 
 Usage:
 
@@ -96,16 +96,16 @@ from .map_async import MapAsync, MODE
 
 
 class MapThreaded(MapAsync):
-    """ Apply ``map_func`` to each emitted value allowing threaded processing.
+    """ Apply ``function`` to each emitted value allowing threaded processing.
 
-    :param map_func: function called to apply
-    :param \\*args: variable arguments to be used for calling map_coro
+    :param function: function called to apply
+    :param \\*args: variable arguments to be used for calling function
     :param mode: behavior when a value is currently processed
     :param error_callback: error callback to be registered
     :param unpack: value from emits will be unpacked as (*value)
-    :param \\**kwargs: keyword arguments to be used for calling map_coro
+    :param \\**kwargs: keyword arguments to be used for calling function
     """
-    def __init__(self, map_func: Callable[[Any], Any], *args,
+    def __init__(self, function: Callable[[Any], Any], *args,
                  mode: MODE = MODE.CONCURRENT,  # type: ignore
                  error_callback=default_error_handler,
                  unpack: bool = False, loop=None, **kwargs) -> None:
@@ -115,7 +115,7 @@ class MapThreaded(MapAsync):
         MapAsync.__init__(self, self._thread_coro, mode=mode,
                           error_callback=error_callback, unpack=unpack)
 
-        self._map_func = partial(map_func, *args, **kwargs)
+        self._function = partial(function, *args, **kwargs)
         self._loop = loop or asyncio.get_event_loop()
         self._executor = ThreadPoolExecutor()
 
@@ -123,7 +123,7 @@ class MapThreaded(MapAsync):
         """ Coroutine called by MapAsync. It's wrapping the call of
         run_in_executor to run the synchronous function as thread """
         return await self._loop.run_in_executor(
-            self._executor, self._map_func, *args)
+            self._executor, self._function, *args)
 
 
 def build_map_threaded(function: Callable[[Any], Any] = None,

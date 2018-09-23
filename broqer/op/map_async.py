@@ -1,5 +1,5 @@
 """
-Apply ``map_coro`` to each emitted value allowing async processing
+Apply ``coro`` to each emitted value allowing async processing
 
 Usage:
 
@@ -105,24 +105,24 @@ from .operator import Operator
 
 MODE = Enum('MODE', 'CONCURRENT INTERRUPT QUEUE LAST LAST_DISTINCT SKIP')
 
-_Options = namedtuple('_Options', 'map_coro mode args kwargs '
+_Options = namedtuple('_Options', 'coro mode args kwargs '
                                   'error_callback unpack')
 
 
 class MapAsync(Operator):
-    """ Apply ``map_coro`` to each emitted value allowing async processing
+    """ Apply ``coro`` to each emitted value allowing async processing
 
-    :param map_coro: coroutine to be applied on emit
-    :param \\*args: variable arguments to be used for calling map_coro
+    :param coro: coroutine to be applied on emit
+    :param \\*args: variable arguments to be used for calling coro
     :param mode: behavior when a value is currently processed
     :param error_callback: error callback to be registered
     :param unpack: value from emits will be unpacked as (*value)
-    :param \\*kwargs: keyword arguments to be used for calling map_coro
+    :param \\*kwargs: keyword arguments to be used for calling coro
 
     :ivar scheduled: Publisher emitting the value when coroutine is actually
         started.
     """
-    def __init__(self, map_coro, *args, mode=MODE.CONCURRENT,
+    def __init__(self, coro, *args, mode=MODE.CONCURRENT,
                  error_callback=default_error_handler,
                  unpack: bool = False, **kwargs) -> None:
         """
@@ -135,7 +135,7 @@ class MapAsync(Operator):
             * SKIP - skip values emitted during coroutine is running
         """
         Operator.__init__(self)
-        self._options = _Options(map_coro, mode, args, kwargs, error_callback,
+        self._options = _Options(coro, mode, args, kwargs, error_callback,
                                  unpack)
         # ._future is the reference to a running coroutine encapsulated as task
         self._future = None  # type: asyncio.Future
@@ -218,8 +218,8 @@ class MapAsync(Operator):
 
         # build the coroutine
         values = value if self._options.unpack else (value,)
-        coro = self._options.map_coro(*values, *self._options.args,
-                                      **self._options.kwargs)
+        coro = self._options.coro(*values, *self._options.args,
+                                  **self._options.kwargs)
 
         # create a task out of it and add ._future_done as callback
         self._future = asyncio.ensure_future(coro)

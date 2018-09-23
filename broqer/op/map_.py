@@ -1,5 +1,5 @@
 """
-Apply ``map_func(*args, value, **kwargs)`` to each emitted value
+Apply ``function(*args, value, **kwargs)`` to each emitted value
 
 Usage:
 
@@ -41,14 +41,14 @@ from .operator import Operator
 
 
 class Map(Operator):
-    """ Apply ``map_func(*args, value, **kwargs)`` to each emitted value.
+    """ Apply ``function(*args, value, **kwargs)`` to each emitted value.
 
-    :param map_func: function to be applied for each emit
-    :param \\*args: variable arguments to be used for calling map_func
+    :param function: function to be applied for each emit
+    :param \\*args: variable arguments to be used for calling function
     :param unpack: value from emits will be unpacked as (*value)
-    :param \\**kwargs: keyword arguments to be used for calling map_func
+    :param \\**kwargs: keyword arguments to be used for calling function
     """
-    def __init__(self, map_func: Callable[[Any], Any],
+    def __init__(self, function: Callable[[Any], Any],
                  *args, unpack: bool = False, **kwargs) -> None:
         """ Special care for return values:
               * return `None` (or nothing) if you don't want to return a result
@@ -58,16 +58,16 @@ class Map(Operator):
         """
 
         Operator.__init__(self)
-        self._map_func = partial(map_func, *args, **kwargs)
+        self._function = partial(function, *args, **kwargs)
         self._unpack = unpack
 
     def get(self):
         value = self._publisher.get()  # may raise ValueError
 
         if self._unpack:
-            result = self._map_func(*value)
+            result = self._function(*value)
         else:
-            result = self._map_func(value)
+            result = self._function(value)
 
         if result is NONE:
             Publisher.get(self)  # raises ValueError
@@ -78,9 +78,9 @@ class Map(Operator):
         assert who is self._publisher, 'emit from non assigned publisher'
 
         if self._unpack:
-            result = self._map_func(*value)
+            result = self._function(*value)
         else:
-            result = self._map_func(value)
+            result = self._function(value)
 
         if result is not NONE:
             return self.notify(result)

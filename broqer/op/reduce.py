@@ -1,5 +1,6 @@
 """
-Apply ``func`` to the current emitted value and the last result of ``func``
+Apply ``function`` to the current emitted value and the last result of
+``function``.
 
 Usage:
 
@@ -35,19 +36,19 @@ from .accumulate import Accumulate
 
 
 class Reduce(Accumulate):
-    """ Apply ``func`` to the current emitted value and the last result of
-    ``func``.
+    """ Apply ``function`` to the current emitted value and the last result of
+    ``function``.
 
-    :param func: function taking the emitted value and the last result of the
-        last run.
+    :param function: function taking the emitted value and the last result of
+        the last run.
     :param init: initialisation used as "first result" for the first call of
-        ``func`` on first emit.
+        ``function`` on first emit.
     """
-    def __init__(self, func: Callable[[Any, Any], Any], init: Any) -> None:
-        def _func(state, value):
-            result = func(state, value)
+    def __init__(self, function: Callable[[Any, Any], Any], init: Any) -> None:
+        def _function(state, value):
+            result = function(state, value)
             return (result, result)  # new state and result is the same
-        Accumulate.__init__(self, _func, init)
+        Accumulate.__init__(self, _function, init)
 
 
 def build_reduce(function: Callable[[Any, Any], Any] = None, *,

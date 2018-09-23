@@ -31,16 +31,16 @@ class Accumulate(Operator):
     """ On each emit of source publisher a function gets called with state and
     received value as arguments and this returns a new state and value to emit.
 
-    :param func:
+    :param function:
         Function taking two arguments: current state and new value. The return
         value is a tuple with (new state, result) where new state will be used
         for the next call and result will be emitted to subscribers.
     :param init: initialization for state
     """
-    def __init__(self, func: Callable[[Any, Any], Tuple[Any, Any]],
+    def __init__(self, function: Callable[[Any, Any], Tuple[Any, Any]],
                  init: Any) -> None:
         Operator.__init__(self)
-        self._acc_func = func
+        self._function = function
         self._state = init
         self._init = init
         self._result = NONE
@@ -55,11 +55,11 @@ class Accumulate(Operator):
         if self._result is not NONE:
             return self._result
         value = self._publisher.get()  # may be raises ValueError
-        return self._acc_func(self._init, value)[1]
+        return self._function(self._init, value)[1]
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         assert who is self._publisher, 'emit from non assigned publisher'
-        self._state, self._result = self._acc_func(self._state, value)
+        self._state, self._result = self._function(self._state, value)
         return self.notify(self._result)
 
     def reset(self, state: Any) -> None:
