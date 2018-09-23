@@ -1,8 +1,8 @@
 language: python
 python:
-  - 3.7
-  - 3.6
   - 3.5
+  - 3.6
+  - 3.7
   - 3.8-dev
 
 dist: xenial
@@ -20,7 +20,7 @@ script:
   - pipenv run pytest
 
 after_success:
-  - pipenv run codecov
+  -  if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then pipenv run codecov; fi
 
 deploy:
   provider: pypi
