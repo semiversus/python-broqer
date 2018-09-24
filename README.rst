@@ -232,6 +232,8 @@ Operators
 +-------------------------------------+-----------------------------------------------------------------------------+
 | Reduce_ (func, init)                | Apply ``func`` to the current emitted value and the last result of ``func`` |
 +-------------------------------------+-----------------------------------------------------------------------------+
+| Replace_ (value)                    | Replace each received value by the given value                              |
++-------------------------------------+-----------------------------------------------------------------------------+
 | SlidingWindow_ (size, ...)          | Group ``size`` emitted values overlapping                                   |
 +-------------------------------------+-----------------------------------------------------------------------------+
 | Switch_ (mapping)                   | Emit selected source mapped by ``mapping``                                  |
@@ -296,6 +298,7 @@ Subjects
 .. _Merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py
 .. _Partition: https://github.com/semiversus/python-broqer/blob/master/broqer/op/partition.py
 .. _Reduce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/reduce.py
+.. _Replace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/replace.py
 .. _Sample: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sample.py
 .. _Sink: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/sink.py
 .. _SlidingWindow: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sliding_window.py
