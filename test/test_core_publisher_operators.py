@@ -239,3 +239,31 @@ def test_getitem():
 
     v2.emit(1)
     assert o.get() == 'b'
+
+from collections import Counter
+import math
+
+@pytest.mark.parametrize('operator, value, result', [
+    (operator.neg, -5, 5), (operator.neg, 'ab', TypeError), (operator.pos, -5, -5),
+    (operator.pos, Counter({'a':0, 'b':1}), Counter({'b':1})), (operator.abs, -5, 5),
+    (operator.invert, 5, -6), (round, 5.2, 5), (round, 5.8, 6), (math.trunc, -5.2, -5),
+    (math.floor, -5.2, -6), (math.ceil, -5.2, -5)
+])
+def test_unary_operators(operator, value, result):
+    v = StatefulPublisher(value)
+
+    try:
+        value_applied = operator(v).get()
+    except Exception as e:
+        assert isinstance(e, result)
+    else:
+        assert value_applied == result
+
+    cb = mock.Mock()
+
+    try:
+        operator(v) | op.Sink(cb)
+    except Exception as e:
+        assert isinstance(e, result)
+    else:
+        assert cb.mock_called_once_with(result)
