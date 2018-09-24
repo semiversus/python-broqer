@@ -98,6 +98,21 @@ the common operators (like ``+``, ``>``, ``<<``, ...).
     >>> a.emit(2)
     c: True
 
+Also fancy stuff like getting item by index or key is possible:
+
+.. code-block:: python3
+
+    >>> i = Value('a')
+    >>> d = Value({'a':100, 'b':200, 'c':300})
+
+    >>> d[i] | op.Sink(print, 'r:')
+    r: 100
+
+    >>> i.emit('c')
+    r: 300
+    >>> d.emit({'c':123})
+    r: 123
+
 Asyncio Support
 ---------------
 
