@@ -29,7 +29,6 @@ from .publishers.from_polling import FromPolling
 from .subscribers.on_emit_future import OnEmitFuture
 from .subscribers.sink import Sink, build_sink
 from .subscribers.trace import Trace
-from .subscribers.topic_mapper import TopicMapper
 
 # enable operator overloading
 from .operator_overloading import apply_operator_overloading

@@ -2,7 +2,7 @@ import pytest
 import types
 
 from broqer import Hub, Subject, Value
-from broqer.utils.datatype_check import DTRegistry, resolve_meta_key, DT
+from broqer.hub.utils.datatype_check import DTRegistry, resolve_meta_key, DT
 
 @pytest.mark.parametrize('meta,values,cast_results,check_results,str_results', [
     ({},

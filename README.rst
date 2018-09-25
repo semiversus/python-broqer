@@ -265,7 +265,7 @@ A Subscriber_ is the sink for messages.
 +----------------------------------+--------------------------------------------------------------+
 | OnEmitFuture_ (timeout=None)     | Build a future able to await for                             |
 +----------------------------------+--------------------------------------------------------------+
-| TopicMapper_ (d)                 | Update a dictionary with changes from topics                 |
+| hub.utils.TopicMapper_ (d)       | Update a dictionary with changes from topics                 |
 +----------------------------------+--------------------------------------------------------------+
 | Trace_ (d)                       | Debug output for publishers                                  |
 +----------------------------------+--------------------------------------------------------------+

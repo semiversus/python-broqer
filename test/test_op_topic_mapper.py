@@ -2,7 +2,7 @@ from unittest import mock
 import pytest
 
 from broqer import Disposable, Hub, Value
-from broqer.op import TopicMapper
+from broqer.hub.utils import TopicMapper
 from broqer.subject import Subject
 
 
