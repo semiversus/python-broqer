@@ -306,7 +306,7 @@ Subjects
 .. _Throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py
 .. _OnEmitFuture: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/on_emit_future.py
 .. _Trace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/trace.py
-.. _TopicMapper: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/topic_mapper.py
+.. _hub.utils.TopicMapper: https://github.com/semiversus/python-broqer/blob/master/broqer/hub/utils/topic_mapper.py
 
 Credits
 =======
