@@ -4,7 +4,7 @@
 from .accumulate import Accumulate, build_accumulate
 from .cache import Cache
 from .catch_exception import CatchException
-from .combine_latest import CombineLatest
+from .combine_latest import CombineLatest, build_combine_latest
 from .filter_ import Filter, True_, False_, build_filter
 from .map_ import Map, build_map
 from .merge import Merge
@@ -40,7 +40,7 @@ __all__ = [
     'Filter', 'Map', 'Merge', 'Partition', 'Reduce', 'Replace', 'Sink',
     'SlidingWindow', 'Switch', 'Debounce', 'Delay', 'FromPolling', 'Sample',
     'MapAsync', 'MODE', 'MapThreaded', 'Throttle', 'OnEmitFuture', 'True_',
-    'False_', 'Trace', 'build_map', 'build_reduce',
+    'False_', 'Trace', 'build_map', 'build_reduce', 'build_combine_latest',
     'build_filter', 'build_accumulate', 'build_map_async',
     'build_map_threaded', 'build_sink'
 ]

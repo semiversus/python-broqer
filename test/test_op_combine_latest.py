@@ -1,6 +1,7 @@
 import pytest
+from unittest import mock
 
-from broqer.op import CombineLatest, Sink
+from broqer.op import CombineLatest, Sink, build_combine_latest
 from broqer import Publisher, StatefulPublisher, Subject, NONE
 
 from .helper import check_multi_operator, Collector
@@ -241,3 +242,37 @@ def test_no_publishers():
     dut.subscribe(collector)
 
     assert collector.result_vector == ((),)
+
+@pytest.mark.parametrize('build_kwargs, ref_kwargs, exception', [
+    (None, {}, None),
+    ({'allow_stateless':False}, {}, None),
+    ({'allow_stateless':True}, {'allow_stateless':True}, None),
+    ({'emit_on':None}, {}, None),
+    ({'foo':None}, {}, TypeError),
+])
+def test_build(build_kwargs, ref_kwargs, exception):
+    mock_cb = mock.Mock()
+    ref_mock_cb = mock.Mock()
+
+    publishers = (StatefulPublisher(0), StatefulPublisher(1), Publisher())
+
+    try:
+        if build_kwargs is None:
+            dut = build_combine_latest(mock_cb)(*publishers)
+        else:
+            dut = build_combine_latest(**build_kwargs)(mock_cb)(*publishers)
+    except Exception as e:
+        assert isinstance(e, exception)
+        return
+    else:
+        assert exception is None
+
+    reference = CombineLatest( *publishers, map_=ref_mock_cb, **ref_kwargs)
+
+    assert dut._partial_state == reference._partial_state
+    assert dut._missing == reference._missing
+    assert dut._stateless == reference._stateless
+    assert dut._index == reference._index
+    assert dut._emit_on == reference._emit_on
+
+    assert mock_cb.mock_calls == ref_mock_cb.mock_calls

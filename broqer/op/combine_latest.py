@@ -23,7 +23,8 @@ Second sink: (1, 3)
 
 """
 import asyncio
-from typing import Any, Dict, MutableSequence  # noqa: F401
+from functools import wraps
+from typing import Any, Dict, MutableSequence, Callable  # noqa: F401
 
 from broqer import Publisher, Subscriber, NONE, SubscriptionDisposable
 
@@ -43,8 +44,8 @@ class CombineLatest(MultiOperator):
         NONE.
     """
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, *publishers: Publisher, map_=None, emit_on=None,
-                 allow_stateless=False) -> None:
+    def __init__(self, *publishers: Publisher, map_: Callable[..., Any] = None,
+                 emit_on=None, allow_stateless=False) -> None:
         MultiOperator.__init__(self, *publishers)
 
         # ._partial_state is a list keeping the latest emitted values from
@@ -199,3 +200,27 @@ class CombineLatest(MultiOperator):
             self._stateless = tuple(False for _ in self._publishers)
         self._index.update({p: i for i, p in enumerate(self._publishers)})
         return self
+
+
+def build_combine_latest(map_: Callable[..., Any] = None, *, emit_on=None,
+                         allow_stateless=False):
+    """ Decorator to wrap a function to return a CombineLatest operator.
+
+    :param emit_on: publisher or list of publishers - only emitting result when
+        emit comes from one of this list. If None, emit on any source
+        publisher.
+    :param allow_stateless: when True evaluation is also done for stateless
+        publishers. A stateless publisher without an emit will be hold as
+        NONE.
+    """
+    def _build_combine_latest(map_: Callable[..., Any]):
+        @wraps(map_)
+        def _wrapper(*publishers) -> CombineLatest:
+            return CombineLatest(*publishers, map_=map_, emit_on=emit_on,
+                                 allow_stateless=allow_stateless)
+        return _wrapper
+
+    if map_:
+        return _build_combine_latest(map_)
+
+    return _build_combine_latest
