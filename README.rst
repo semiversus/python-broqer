@@ -146,10 +146,12 @@ Every publisher can be awaited in coroutines:
 
     await signal_publisher
 
-``Map`` and ``Filter`` decorators
----------------------------------
+Function decorators
+-------------------
 
-Make your own operators on the fly with ``map`` and ``filter`` decorators:
+Make your own operators on the fly with function decorators. Decorators are
+available for ``Accumulate``, ``CombineLatest``, ``Filter``, ``Map``, ``MapAsync``,
+``MapThreaded``, ``Reduce`` and ``Sink``.
 
 .. code-block:: python3
 
@@ -179,9 +181,7 @@ You can even make configurable ``Map`` s and ``Filter`` s:
     >>> msg.emit('No cars have passed')
     >>> msg.emit('Only 1 car has passed')
     Only 1 car has passed
-
-Decorators are also available for ``Accumulate``, ``MapAsync``, ``MapThreaded``,
-``Reduce`` and ``Sink``.
+    
 
 Install
 =======
