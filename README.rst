@@ -78,8 +78,8 @@ and keyword arguments.
 
     >>> disposable.dispose()  # unsubscribe
 
-Combine publishers with operators
----------------------------------
+Combine publishers with arithmetic operators
+--------------------------------------------
 
 You're able to create publishers on the fly by combining two publishers with
 the common operators (like ``+``, ``>``, ``<<``, ...).
@@ -181,7 +181,7 @@ You can even make configurable ``Map`` s and ``Filter`` s:
     >>> msg.emit('No cars have passed')
     >>> msg.emit('Only 1 car has passed')
     Only 1 car has passed
-    
+
 
 Install
 =======
