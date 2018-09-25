@@ -33,13 +33,28 @@ from broqer.hub.utils.datatype_check import DTRegistry, resolve_meta_key, DT
     ({'datatype': 'float'},
      (1.0, -1, True, None, 'abc', {'a':1.23}, ' 123 ', 1.99),
      (1.0, -1.0, 1.0, TypeError, ValueError, TypeError, 123.0, 1.99),
-     (None, ValueError, ValueError, ValueError, ValueError, ValueError, ValueError, None),
+     (None, None, None, ValueError, ValueError, ValueError, ValueError, None),
      ('1.0', '-1.0', '1.0', TypeError, ValueError, TypeError, '123.0', '1.99')),
     ({'datatype': 'float', 'lower_input_limit':-10, 'upper_input_limit':10},
      (1.0, -1, -10.0, 10, -11.0, 11, False, -7.99),
      (1.0, -1.0, -10.0, 10.0, -11.0, 11.0, 0.0, -7.99),
-     (None, ValueError, None, ValueError, ValueError, ValueError, ValueError, None),
+     (None, None, None, None, ValueError, ValueError, None, None),
      ('1.0', '-1.0', '-10.0', '10.0', '-11.0', '11.0', '0.0', '-7.99')),
+    ({'datatype': 'boolean'},
+     (1, 0, '1', '0', 'True', 'False', True, False, 'true', 'false', ''),
+     (True, False, True, False, True, False, True, False, TypeError, TypeError, TypeError),
+     (None, None, None, None, None, None, None, None, None, None, None),
+     ('True', 'False', 'True', 'False', 'True', 'False', 'True', 'False', TypeError, TypeError, TypeError)),
+    ({'datatype': 'list'},
+     ([1,2,3], (1,2,3), '[1, 2, 3]', '(1, 2, 3)', 'abc', '123', 123),
+     ([1,2,3], (1,2,3), [1,2,3], (1,2,3), ValueError, TypeError, TypeError),
+     (None, None, None, None, None, None, None),
+     ('[1, 2, 3]', '(1, 2, 3)', '[1, 2, 3]', '(1, 2, 3)', TypeError, TypeError, TypeError)),
+    ({'datatype': 'list', 'minimum_size':2, 'maximum_size':4, 'item_datatype': 'float'},
+     ([1], (1,2), [1,2,3], (1,2,3,4), [1,2,3,4,5], (1, 2, 'ab')),
+     ([1], (1,2), [1,2,3], (1,2,3,4), [1,2,3,4,5], (1, 2, 'ab')),
+     (ValueError, None, None, None, ValueError, ValueError),
+     ('[1]', '(1, 2)', '[1, 2, 3]', '(1, 2, 3, 4)', '[1, 2, 3, 4, 5]', '(1, 2, \'ab\')')),
 ])
 def test_datatype_check(meta, values, cast_results, check_results, str_results):
     dt_registry = DTRegistry()
@@ -60,6 +75,7 @@ def test_datatype_check(meta, values, cast_results, check_results, str_results):
         except TypeError:
             casted_value = hub['value'].cast(value)
             assert casted_value == cast_result
+            assert str(hub['value'].cast(value)) == str_result
 
         if check_result is not None:
             with pytest.raises(check_result):
