@@ -68,7 +68,15 @@ class Filter(Operator):
 
 
 class True_(Operator):  # pylint: disable=invalid-name
-    """ Filters all emits which evaluates for True """
+    """ Filters all emits which evaluates for True.
+
+    This operator can be used in the pipline style (v | True_()) or as
+    standalone operation (True_(v)).
+    """
+    def __init__(self, publisher: Publisher = None) -> None:
+        Operator.__init__(self)
+        self._publisher = publisher
+
     def get(self):
         value = self._publisher.get()  # may raise ValueError
         if bool(value):
@@ -83,7 +91,14 @@ class True_(Operator):  # pylint: disable=invalid-name
 
 
 class False_(Operator):  # pylint: disable=invalid-name
-    """ Filters all emits which evaluates for False """
+    """ Filters all emits which evaluates for False.
+
+    This operator can be used in the pipline style (v | False_()) or as
+    standalone operation (False_(v))."""
+    def __init__(self, publisher: Publisher = None) -> None:
+        Operator.__init__(self)
+        self._publisher = publisher
+
     def get(self):
         value = self._publisher.get()  # may raise ValueError
         if not bool(value):

@@ -55,15 +55,15 @@ Synopsis
 Showcase
 ========
 
-In other frameworks Publisher_ are sometimes called `Oberservable`. A subscriber
+In other frameworks *Publisher* are sometimes called *Oberservable*. A subscriber
 is able to observe changes the publisher is emitting. With this basics you're
 able to use the observer pattern - let's see!
 
 Observer pattern
 ----------------
 
-Subscribing to a publisher is done via the ``|`` - here used as a pipe. A simple
-subscriber is ``op.Sink`` which is calling a function with optional positional
+Subscribing to a publisher is done via the ``|`` operator - here used as a pipe.
+A simple subscriber is ``op.Sink`` which is calling a function with optional positional
 and keyword arguments.
 
 .. code-block:: python3
