@@ -1,10 +1,18 @@
 Subscribers
 ===========
 
-sink
+Sink
 ----
-.. automodule:: broqer.op.sink
+.. autoclass:: broqer.op.Sink
 
-to_future
----------
-.. automodule:: broqer.op.to_future
+OnEmitFuture
+------------
+.. autoclass:: broqer.op.OnEmitFuture
+
+Trace
+-----
+.. autoclass:: broqer.op.Trace
+
+TopicMapper
+-----------
+.. autoclass:: broqer.hub.utils.TopicMapper

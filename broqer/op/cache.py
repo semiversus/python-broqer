@@ -18,7 +18,7 @@ from .operator import Operator
 
 
 class Cache(Operator):
-    """ Caching the emitted values.
+    """ Caching the emitted values (make a stateless publisher stateful)
 
     The ``Cache`` publisher is emitting a value on subscription.
 

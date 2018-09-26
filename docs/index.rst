@@ -9,6 +9,7 @@ Content
 
    introduction.rst
    publishers.rst
-   operators.rst
    subscribers.rst
+   operators.rst
+   subjects.rst
    hub.rst

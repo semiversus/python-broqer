@@ -1,22 +1,14 @@
 Publishers
 ==========
 
-Subject
--------
-.. autoclass:: broqer.subject.Subject
+Publisher
+---------
+.. autoclass:: broqer.Publisher
 
-Value
------
-.. autoclass:: broqer.subject.Value
-
-from_iterable
--------------
-.. automodule:: broqer.op.from_iterable
+StatefulPublisher
+-----------------
+.. autoclass:: broqer.StatefulPublisher
 
 from_polling
 ------------
 .. automodule:: broqer.op.from_polling
-
-just
-----
-.. automodule:: broqer.op.just

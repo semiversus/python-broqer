@@ -27,7 +27,3 @@ Examples of sources for asynchronous data streams:
 * merge streams in various ways
 * process contained data
 * ...
-
-Why Broqer?
------------
-
