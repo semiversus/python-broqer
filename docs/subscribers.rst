@@ -1,6 +1,10 @@
 Subscribers
 ===========
 
+Subscriber
+----------
+.. autoclass:: broqer.Subscriber
+
 Sink
 ----
 .. autoclass:: broqer.op.Sink
