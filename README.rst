@@ -21,6 +21,8 @@ Initial focus on embedded systems *Broqer* can be used wherever continuous strea
 
 .. image:: https://cdn.rawgit.com/semiversus/python-broqer/7beb7379/docs/logo.svg
 
+.. header
+
 Synopsis
 ========
 
@@ -232,7 +234,7 @@ Broqer was inspired by:
 .. _Trace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/trace.py
 .. _hub.utils.TopicMapper: https://github.com/semiversus/python-broqer/blob/master/broqer/hub/utils/topic_mapper.py
 
-.. api-start
+.. api
 
 API
 ===

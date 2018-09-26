@@ -1,5 +1,5 @@
 .. include:: ../README.rst
-  :end-before: api-start
+  :end-before: header
 
 =======
 Content
@@ -14,3 +14,7 @@ Content
    operators.rst
    subjects.rst
    hub.rst
+
+.. include:: ../README.rst
+  :start-after: header
+  :end-before: api
