@@ -9,6 +9,6 @@ StatefulPublisher
 -----------------
 .. autoclass:: broqer.StatefulPublisher
 
-from_polling
-------------
-.. automodule:: broqer.op.from_polling
+FromPolling
+-----------
+.. autoclass:: broqer.op.FromPolling

@@ -50,8 +50,6 @@ Synopsis
 .. _ReactiveX: http://reactivex.io/
 .. _Hub: https://github.com/semiversus/python-broqer/blob/master/broqer/hub/hub.py
 
-.. marker-for-example
-
 Showcase
 ========
 
@@ -190,7 +188,51 @@ Install
 
     pip install broqer
 
-.. marker-for-api
+Credits
+=======
+
+Broqer was inspired by:
+
+* RxPY_: Reactive Extension for Python (by Børge Lanes and Dag Brattli)
+* aioreactive_: Async/Await reactive tools for Python (by Dag Brattli)
+* streamz_: build pipelines to manage continuous streams of data (by Matthew Rocklin)
+* MQTT_: M2M connectivity protocol
+* Florian Feurstein: spending hours of discussion, coming up with great ideas and help me understand the concepts!
+
+.. _RxPY: https://github.com/ReactiveX/RxPY
+.. _aioreactive: https://github.com/dbrattli/aioreactive
+.. _streamz: https://github.com/mrocklin/streamz
+.. _MQTT: http://mqtt.org/
+.. _Subject: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
+.. _Value: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
+.. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
+.. _StatefulPublisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
+.. _Subscriber: https://github.com/semiversus/python-broqer/blob/master/broqer/subscriber.py
+.. _Accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
+.. _Cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
+.. _CatchException: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
+.. _CombineLatest: https://github.com/semiversus/python-broqer/blob/master/broqer/op/combine_latest.py
+.. _Debounce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/debounce.py
+.. _Delay: https://github.com/semiversus/python-broqer/blob/master/broqer/op/delay.py
+.. _Filter: https://github.com/semiversus/python-broqer/blob/master/broqer/op/filter_.py
+.. _FromPolling: https://github.com/semiversus/python-broqer/blob/master/broqer/op/publishers/from_polling.py
+.. _MapAsync: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_async.py
+.. _MapThreaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
+.. _Map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_.py
+.. _Merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py
+.. _Partition: https://github.com/semiversus/python-broqer/blob/master/broqer/op/partition.py
+.. _Reduce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/reduce.py
+.. _Replace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/replace.py
+.. _Sample: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sample.py
+.. _Sink: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/sink.py
+.. _SlidingWindow: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sliding_window.py
+.. _Switch: https://github.com/semiversus/python-broqer/blob/master/broqer/op/switch.py
+.. _Throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py
+.. _OnEmitFuture: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/on_emit_future.py
+.. _Trace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/trace.py
+.. _hub.utils.TopicMapper: https://github.com/semiversus/python-broqer/blob/master/broqer/hub/utils/topic_mapper.py
+
+.. api-start
 
 API
 ===
@@ -279,47 +321,3 @@ Subjects
 | Value_ (\*init)          | Source with a state (initialized via ``init``)               |
 +--------------------------+--------------------------------------------------------------+
 
-.. _Subject: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
-.. _Value: https://github.com/semiversus/python-broqer/blob/master/broqer/subject.py
-.. _Publisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
-.. _StatefulPublisher: https://github.com/semiversus/python-broqer/blob/master/broqer/publisher.py
-.. _Subscriber: https://github.com/semiversus/python-broqer/blob/master/broqer/subscriber.py
-.. _Accumulate: https://github.com/semiversus/python-broqer/blob/master/broqer/op/accumulate.py
-.. _Cache: https://github.com/semiversus/python-broqer/blob/master/broqer/op/cache.py
-.. _CatchException: https://github.com/semiversus/python-broqer/blob/master/broqer/op/catch_exception.py
-.. _CombineLatest: https://github.com/semiversus/python-broqer/blob/master/broqer/op/combine_latest.py
-.. _Debounce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/debounce.py
-.. _Delay: https://github.com/semiversus/python-broqer/blob/master/broqer/op/delay.py
-.. _Filter: https://github.com/semiversus/python-broqer/blob/master/broqer/op/filter_.py
-.. _FromPolling: https://github.com/semiversus/python-broqer/blob/master/broqer/op/publishers/from_polling.py
-.. _MapAsync: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_async.py
-.. _MapThreaded: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_threaded.py
-.. _Map: https://github.com/semiversus/python-broqer/blob/master/broqer/op/map_.py
-.. _Merge: https://github.com/semiversus/python-broqer/blob/master/broqer/op/merge.py
-.. _Partition: https://github.com/semiversus/python-broqer/blob/master/broqer/op/partition.py
-.. _Reduce: https://github.com/semiversus/python-broqer/blob/master/broqer/op/reduce.py
-.. _Replace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/replace.py
-.. _Sample: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sample.py
-.. _Sink: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/sink.py
-.. _SlidingWindow: https://github.com/semiversus/python-broqer/blob/master/broqer/op/sliding_window.py
-.. _Switch: https://github.com/semiversus/python-broqer/blob/master/broqer/op/switch.py
-.. _Throttle: https://github.com/semiversus/python-broqer/blob/master/broqer/op/throttle.py
-.. _OnEmitFuture: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/on_emit_future.py
-.. _Trace: https://github.com/semiversus/python-broqer/blob/master/broqer/op/subscribers/trace.py
-.. _hub.utils.TopicMapper: https://github.com/semiversus/python-broqer/blob/master/broqer/hub/utils/topic_mapper.py
-
-Credits
-=======
-
-Broqer was inspired by:
-
-* RxPY_: Reactive Extension for Python (by Børge Lanes and Dag Brattli)
-* aioreactive_: Async/Await reactive tools for Python (by Dag Brattli)
-* streamz_: build pipelines to manage continuous streams of data (by Matthew Rocklin)
-* MQTT_: M2M connectivity protocol
-* Florian Feurstein: spending hours of discussion, coming up with great ideas and help me understand the concepts!
-
-.. _RxPY: https://github.com/ReactiveX/RxPY
-.. _aioreactive: https://github.com/dbrattli/aioreactive
-.. _streamz: https://github.com/mrocklin/streamz
-.. _MQTT: http://mqtt.org/
