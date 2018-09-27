@@ -102,8 +102,8 @@ class MapThreaded(MapAsync):
     :param \\*args: variable arguments to be used for calling function
     :param mode: behavior when a value is currently processed
     :param error_callback: error callback to be registered
-    :param unpack: value from emits will be unpacked as (*value)
-    :param \\**kwargs: keyword arguments to be used for calling function
+    :param unpack: value from emits will be unpacked as (\\*value)
+    :param \\*\\*kwargs: keyword arguments to be used for calling function
     """
     def __init__(self, function: Callable[[Any], Any], *args,
                  mode: MODE = MODE.CONCURRENT,  # type: ignore

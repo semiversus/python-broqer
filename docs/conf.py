@@ -29,7 +29,7 @@ latex_documents = [
 
 from sphinx.ext import autodoc
 
-class SimpleDocumenter(autodoc.ClassDocumenter):
+class ClassDocDocumenter(autodoc.ClassDocumenter):
     objtype = "classdoc"
 
     #do not indent the content
@@ -38,3 +38,6 @@ class SimpleDocumenter(autodoc.ClassDocumenter):
     #do not add a header to the docstring
     def add_directive_header(self, sig):
         pass
+
+def setup(app):
+    app.add_autodocumenter(ClassDocDocumenter)

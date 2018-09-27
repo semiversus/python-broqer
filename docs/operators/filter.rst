@@ -9,4 +9,4 @@ Definition
 Usage
 -----
 
-.. automodule:: broqer.op.filter
+.. automodule:: broqer.op.filter_

@@ -9,4 +9,4 @@ Definition
 Usage
 -----
 
-.. automodule:: broqer.op.map
+.. automodule:: broqer.op.map_

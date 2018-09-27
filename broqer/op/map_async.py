@@ -116,8 +116,8 @@ class MapAsync(Operator):
     :param \\*args: variable arguments to be used for calling coro
     :param mode: behavior when a value is currently processed
     :param error_callback: error callback to be registered
-    :param unpack: value from emits will be unpacked as (*value)
-    :param \\*kwargs: keyword arguments to be used for calling coro
+    :param unpack: value from emits will be unpacked as (\\*value)
+    :param \\*\\*kwargs: keyword arguments to be used for calling coro
 
     :ivar scheduled: Publisher emitting the value when coroutine is actually
         started.
