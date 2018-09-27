@@ -22,12 +22,14 @@ class Publisher():
     publisher/subscriber are referenced as observable/observer.
 
     As information receiver use following method to interact with Publisher
-    .subscribe(subscriber) to subscribe for events on this publisher
-    .unsubscribe(subscriber) to unsubscribe
-    .get() to get the current state (will raise ValueError if not stateful)
+
+    * ``.subscribe(subscriber)`` to subscribe for events on this publisher
+    * ``.unsubscribe(subscriber)`` to unsubscribe
+    * ``.get()`` to get the current state (will raise ValueError if not stateful)
 
     When implementing a Publisher use the following methods:
-    .notify(value) calls .emit(value) on all subscribers
+
+    * ``.notify(value)`` calls .emit(value) on all subscribers
 
     :ivar _subscriptions: holding a list of subscribers
     """

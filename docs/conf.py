@@ -26,3 +26,15 @@ latex_documents = [
     (master_doc, 'python-broqer.tex', 'python-broqer Documentation',
      u'Günther Jena', 'manual'),
 ]
+
+from sphinx.ext import autodoc
+
+class SimpleDocumenter(autodoc.ClassDocumenter):
+    objtype = "classdoc"
+
+    #do not indent the content
+    content_indent = ""
+
+    #do not add a header to the docstring
+    def add_directive_header(self, sig):
+        pass
