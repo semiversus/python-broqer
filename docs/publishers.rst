@@ -1,8 +1,6 @@
 Publishers
 ==========
 
-.. autoclassdoc:: broqer.Publisher
-
 Publisher
 ---------
 .. autoclass:: broqer.Publisher
