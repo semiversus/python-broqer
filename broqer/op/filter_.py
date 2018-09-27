@@ -39,8 +39,8 @@ class Filter(Operator):
     :param publisher: source publisher
     :param predicate: function to evaluate the filtering
     :param \\*args: variable arguments to be used for evaluating predicate
-    :param unpack: value from emits will be unpacked as (*value)
-    :param \\**kwargs: keyword arguments to be used for evaluating predicate
+    :param unpack: value from emits will be unpacked (\\*value)
+    :param \\*\\*kwargs: keyword arguments to be used for evaluating predicate
 """
     def __init__(self, predicate: Callable[[Any], bool],
                  *args, unpack: bool = False, **kwargs) -> None:

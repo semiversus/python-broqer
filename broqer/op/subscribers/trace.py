@@ -8,9 +8,9 @@ class Trace(Sink):
     it will use the prepend flag to be the first callback called when the
     publisher of interest is emitting.
     :param callback: optional function to call
-    :param /*args: arguments used additionally when calling callback
-    :param /**kwargs: keyword arguments used when calling callback
-    :param unpack: value from emits will be unpacked as (*value)
+    :param \\*args: arguments used additionally when calling callback
+    :param \\*\\*kwargs: keyword arguments used when calling callback
+    :param unpack: value from emits will be unpacked (\\*value)
     """
     def __ror__(self, publisher: Publisher) -> SubscriptionDisposable:
         return publisher.subscribe(self, prepend=True)
