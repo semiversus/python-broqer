@@ -5,6 +5,12 @@ import pytest
 
 from broqer import Subscriber, Publisher, SubscriptionDisposable, NONE
 
+def is_exception(e):
+    try:
+        return issubclass(e, Exception)
+    except:
+        return False
+
 class Collector(Subscriber):
     def __init__(self, loop=None):
         Subscriber.__init__(self)
@@ -154,16 +160,24 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
         stored_collector_permanent_len = len(collector_permanent)
         stored_collector_temporary_len = len(collector_temporary)
 
-        for source, v_emit in zip(sources, v_emits):
-            if v_emit is not NONE:
-                source.notify(v_emit)
+        if is_exception(v_result):
+            with pytest.raises(v_result):
+                for source, v_emit in zip(sources, v_emits):
+                    if v_emit is not NONE:
+                        source.notify(v_emit)
+        else:
+            for source, v_emit in zip(sources, v_emits):
+                if v_emit is not NONE:
+                    source.notify(v_emit)
 
         try:
             stored_result = dut.get()
         except ValueError:
             stored_result = None
 
-        if v_result is NONE:
+        if is_exception(v_result):
+            continue
+        elif v_result is NONE:
             with dut.subscribe(collector_temporary):
                 pass
             if has_state is None:

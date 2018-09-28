@@ -3,6 +3,7 @@ import types
 
 from broqer import Hub, Subject, Value
 from broqer.hub.utils.datatype_check import DTRegistry, resolve_meta_key, DT
+from .helper import is_exception
 
 @pytest.mark.parametrize('meta,values,cast_results,check_results,str_results', [
     ({},
@@ -68,11 +69,10 @@ def test_datatype_check(meta, values, cast_results, check_results, str_results):
     for value, cast_result, check_result, str_result in zip(values, cast_results, check_results, str_results):
         print('Testing', value, ', cast_result:', cast_result, ', check_result:', check_result, ', str_result:', str_result)
 
-        try:
-            if issubclass(cast_result, Exception):
-                with pytest.raises(cast_result):
-                    hub['value'].cast(value)
-        except TypeError:
+        if is_exception(cast_result):
+            with pytest.raises(cast_result):
+                hub['value'].cast(value)
+        else:
             casted_value = hub['value'].cast(value)
             assert casted_value == cast_result
             assert str(hub['value'].cast(value)) == str_result
@@ -83,14 +83,12 @@ def test_datatype_check(meta, values, cast_results, check_results, str_results):
         else:
             assert hub['value'].check(value) is None
 
-        try:
-            if issubclass(cast_result, Exception):
+        if is_exception(cast_result):
                 with pytest.raises(cast_result):
                     hub['value'].checked_emit(value)
-        except TypeError:
-            if check_result is None:
-                assert hub['value'].checked_emit(value) is None
-                assert hub['value'].get() == cast_result
+        elif check_result is None:
+            assert hub['value'].checked_emit(value) is None
+            assert hub['value'].get() == cast_result
 
 def test_resolve_meta_key():
     hub = Hub()
