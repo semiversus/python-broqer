@@ -45,7 +45,7 @@ class Map(Operator):
 
     :param function: function to be applied for each emit
     :param \\*args: variable arguments to be used for calling function
-    :param unpack: value from emits will be unpacked as (*value)
+    :param unpack: value from emits will be unpacked (\\*value)
     :param \\**kwargs: keyword arguments to be used for calling function
     """
     def __init__(self, function: Callable[[Any], Any],

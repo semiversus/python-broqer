@@ -35,8 +35,8 @@ class Sink(Subscriber):  # pylint: disable=too-few-public-methods
 
     :param function: function to be called when source publisher emits
     :param \\*args: variable arguments to be used for calling function
-    :param unpack: value from emits will be unpacked as (*value)
-    :param \\**kwargs: keyword arguments to be used for calling function
+    :param unpack: value from emits will be unpacked (\\*value)
+    :param \\*\\*kwargs: keyword arguments to be used for calling function
     """
     def __init__(self,  # pylint: disable=keyword-arg-before-vararg
                  function: Optional[Callable[..., None]] = None,
