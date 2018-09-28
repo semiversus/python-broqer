@@ -36,7 +36,6 @@ from .operator import Operator
 
 class Filter(Operator):
     """ Filters values based on a ``predicate`` function
-    :param publisher: source publisher
     :param predicate: function to evaluate the filtering
     :param \\*args: variable arguments to be used for evaluating predicate
     :param unpack: value from emits will be unpacked (\\*value)

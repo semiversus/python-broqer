@@ -41,33 +41,61 @@ This is working because False is correpsonding to integer 0, True is 1
 import asyncio
 from typing import Any, Dict
 
-from broqer import Publisher
+from broqer import Publisher, NONE
 
 from .operator import Operator
 
 
 class Switch(Operator):
     """ Emit a publisher mapped by ``mapping``
-    :param selection_publisher: publisher which is choosing
-    :param publisher_mapping: dictionary with value:Publisher mapping
+    :param mapping: dictionary with value:(Publisher|constant) mapping
+    :param default: value emitted if key is not found
     """
-    def __init__(self, publisher_mapping: Dict[Any, Publisher]) -> None:
+    def __init__(self, mapping: Dict[Any, Any], default: Any = NONE) -> None:
         Operator.__init__(self)
+        self._key = NONE  # type: Any
         self._selected_publisher = None  # type: Publisher
-        self._mapping = publisher_mapping
+        self._mapping = mapping
+        self._default = default
 
     def get(self):
         selection = self._publisher.get()  # may raises ValueError
-        return self._mapping[selection].get()  # may raises ValueError
+        try:
+            item = self._mapping[selection]
+        except (IndexError, KeyError, TypeError):
+            if self._default is NONE:
+                Publisher.get(self)  # raises ValueError
+            item = self._default
+        if isinstance(item, Publisher):
+            return item.get()  # may raises ValueError
+        return item
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        if who is self._publisher:
-            if self._mapping[value] is not self._selected_publisher:
-                if self._selected_publisher is not None:
-                    self._selected_publisher.unsubscribe(self)  # type: ignore
-                self._selected_publisher = self._mapping[value]
-                self._selected_publisher.subscribe(self)  # type: ignore
+        if who is not self._publisher:
+            assert who is self._selected_publisher, \
+                'emit from not selected publisher'
+            return self.notify(value)
+
+        if value is self._key:
             return None
-        assert who is self._selected_publisher, \
-            'emit from not selected publisher'
-        return self.notify(value)
+
+        if self._selected_publisher is not None:
+            self._selected_publisher.unsubscribe(self)
+        self._selected_publisher = None
+
+        try:
+            item = self._mapping[value]
+        except (IndexError, KeyError, TypeError):
+            if self._default is NONE:
+                raise ValueError('Key %r and default not defined' % value)
+            item = self._default
+
+        self._key = value
+
+        if isinstance(item, Publisher):
+            self._selected_publisher = item
+            item.subscribe(self)
+        else:
+            return self.notify(item)
+
+        return None
