@@ -106,3 +106,33 @@ def apply_operator_overloading():
             return _MapUnary(operand, operation)
 
         setattr(Publisher, method, _op_unary)
+
+
+class Str(_MapUnary):
+    def __init__(self, publisher: Publisher):
+        _MapUnary.__init__(self, publisher, str)
+
+
+class Bool(_MapUnary):
+    def __init__(self, publisher: Publisher):
+        _MapUnary.__init__(self, publisher, bool)
+
+
+class Int(_MapUnary):
+    def __init__(self, publisher: Publisher):
+        _MapUnary.__init__(self, publisher, int)
+
+
+class Float(_MapUnary):
+    def __init__(self, publisher: Publisher):
+        _MapUnary.__init__(self, publisher, float)
+
+
+class Repr(_MapUnary):
+    def __init__(self, publisher: Publisher):
+        _MapUnary.__init__(self, publisher, repr)
+
+
+class Len(_MapUnary):
+    def __init__(self, publisher: Publisher):
+        _MapUnary.__init__(self, publisher, len)
