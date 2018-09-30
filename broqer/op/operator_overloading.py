@@ -1,10 +1,12 @@
 """ This module enables the operator overloading of publishers """
 import asyncio
-import operator
 import math
+import operator
+from functools import partial
 from typing import Any
 
 from broqer import Publisher
+from broqer.op import CombineLatest
 from broqer.op.operator import Operator
 
 
@@ -74,8 +76,6 @@ def apply_operator_overloading():
             '__pow__', '__rshift__', '__sub__', '__xor__', '__concat__',
             '__getitem__', '__floordiv__', '__truediv__'):
         def _op(operand_left, operand_right, operation=method):
-            from broqer.op import CombineLatest
-
             if isinstance(operand_right, Publisher):
                 return CombineLatest(operand_left, operand_right,
                                      map_=getattr(operator, operation))
@@ -109,30 +109,58 @@ def apply_operator_overloading():
 
 
 class Str(_MapUnary):
+    """ Implementing the functionality of str() for publishers. """
     def __init__(self, publisher: Publisher) -> None:
         _MapUnary.__init__(self, publisher, str)
 
 
 class Bool(_MapUnary):
+    """ Implementing the functionality of bool() for publishers. """
     def __init__(self, publisher: Publisher) -> None:
         _MapUnary.__init__(self, publisher, bool)
 
 
 class Int(_MapUnary):
+    """ Implementing the functionality of int() for publishers. """
     def __init__(self, publisher: Publisher) -> None:
         _MapUnary.__init__(self, publisher, int)
 
 
 class Float(_MapUnary):
+    """ Implementing the functionality of float() for publishers. """
     def __init__(self, publisher: Publisher) -> None:
         _MapUnary.__init__(self, publisher, float)
 
 
 class Repr(_MapUnary):
+    """ Implementing the functionality of repr() for publishers. """
     def __init__(self, publisher: Publisher) -> None:
         _MapUnary.__init__(self, publisher, repr)
 
 
 class Len(_MapUnary):
+    """ Implementing the functionality of len() for publishers. """
     def __init__(self, publisher: Publisher) -> None:
         _MapUnary.__init__(self, publisher, len)
+
+
+def _in(item, container):
+    return item in container
+
+
+class In(CombineLatest):
+    """ Implementing the functionality of ``in`` operator for publishers.
+    :param item: publisher or constant to check for availability in container.
+    :param container: container (publisher or constant)
+    """
+    def __init__(self, item: Any, container: Any) -> None:
+        if isinstance(item, Publisher) and isinstance(container, Publisher):
+            CombineLatest.__init__(self, item, container, map_=_in)
+        elif isinstance(item, Publisher):
+            function = partial(_in, container=container)
+            CombineLatest.__init__(self, item, map_=function)
+        else:
+            assert isinstance(container, Publisher), \
+                'item or container has to be a publisher'
+            function = partial(_in, item)
+            CombineLatest.__init__(self, container, map_=function)

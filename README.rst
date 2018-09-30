@@ -113,6 +113,10 @@ Also fancy stuff like getting item by index or key is possible:
     >>> d.emit({'c':123})
     r: 123
 
+Some python built in functions can't return Publishers (e.g. ``len()`` needs to
+return an integer). For this cases special functions are defined in broqer: ``Str``,
+``Int``, ``Float``, ``Len`` and ``In`` (for ``x in y``).
+
 Asyncio Support
 ---------------
 
