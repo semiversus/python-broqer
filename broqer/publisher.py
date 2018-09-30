@@ -17,9 +17,10 @@ class SubscriptionError(ValueError):
 
 
 class Publisher():
-    """ In broqer a subscriber can subscribe to a Publisher. Subscribers
-    are notified about emitted values from the publisher. In other frameworks
-    publisher/subscriber are referenced as observable/observer.
+    """ In broqer a subscriber can subscribe to a publisher. After subscription
+    the subscriber is notified about emitted values from the publisher. In
+    other frameworks *publisher*/*subscriber* are referenced as
+    *observable*/*observer*.
 
     As information receiver use following method to interact with Publisher
 

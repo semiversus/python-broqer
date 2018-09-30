@@ -11,9 +11,9 @@ def _default_error_callback(exc_type, exc_value, exc_traceback):
 
 
 class DefaultErrorHandler:
-    """ DefaultErrorHandler object is a callable which is calling a registred
+    """ DefaultErrorHandler object is a callable which is calling a registered
     callback and is used for handling exceptions when asynchronous operators
-    receiving an exception during .emit(). The callback can be registred via
+    receiving an exception during .emit(). The callback can be registered via
     the .set(callback) method. The default callback is _default_error_callback
     which is dumping the traceback of the exception.
     """

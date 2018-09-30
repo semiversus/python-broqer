@@ -192,6 +192,9 @@ class Topic(Publisher, Subscriber):
         """ Reference to hub """
         return self._hub
 
+    def __repr__(self):
+        return 'Topic(%r)' % self._path
+
 
 class MetaTopic(Topic):
     """ MetaTopic is adding a meta dictionary to each topic """
