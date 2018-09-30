@@ -56,6 +56,16 @@ from .helper import is_exception
      ([1], (1,2), [1,2,3], (1,2,3,4), [1,2,3,4,5], (1, 2, 'ab')),
      (ValueError, None, None, None, ValueError, ValueError),
      ('[1]', '(1, 2)', '[1, 2, 3]', '(1, 2, 3, 4)', '[1, 2, 3, 4, 5]', '(1, 2, \'ab\')')),
+    ({'datatype': 'table'},
+     ([], [1], [[]], [[1,2,3],[4,5,6],[7,8,9]], [[1,2], 'ab'], [[1,2], [1]], 123, '[]'),
+     ([], [1], [[]], [[1,2,3],[4,5,6],[7,8,9]], [[1,2], 'ab'], [[1,2], [1]], TypeError, []),
+     (None, ValueError, None, None, ValueError, ValueError, TypeError, ValueError),
+     ('[]', '[1]', '[[]]', '[[1, 2, 3], [4, 5, 6], [7, 8, 9]]', "[[1, 2], 'ab']", '[[1, 2], [1]]', 'None', '[]')),
+    ({'datatype': 'table', 'minimum_rows':1, 'maximum_rows':2, 'minimum_cols':1, 'maximum_cols':1},
+     ([], [[],[],[]], [[],[]], [[1,2],[1,2]]),
+     ([], [[],[],[]], [[],[]], [[1, 2],[1, 2]]),
+     (ValueError, ValueError, ValueError, ValueError),
+     ('[]', '[[], [], []]', '[[], []]', '[[1, 2], [1, 2]]')),
 ])
 def test_datatype_check(meta, values, cast_results, check_results, str_results):
     dt_registry = DTRegistry()

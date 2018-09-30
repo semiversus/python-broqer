@@ -117,6 +117,47 @@ class ListDT(DT):
                                      (index, value, item_dt_str))
 
 
+class TableDT(DT):
+    """ Datatype for tables """
+
+    def cast(self, topic, value):
+        if isinstance(value, str):
+            value = literal_eval(value)
+        if isinstance(value, (list, tuple)):
+            return value
+        raise TypeError('Value %r is not a table' % value)
+
+    def check(self, topic, value):
+        minimum_rows = resolve_meta_key(topic.hub, 'minimum_rows', topic.meta)
+        if minimum_rows is not None and len(value) < minimum_rows:
+            raise ValueError('Value %r needs to have at least %d rows' %
+                             (value, minimum_rows))
+
+        maximum_rows = resolve_meta_key(topic.hub, 'maximum_rows', topic.meta)
+        if maximum_rows is not None and len(value) > maximum_rows:
+            raise ValueError('Value %r needs to have at most %d rows' %
+                             (value, maximum_rows))
+
+        minimum_cols = resolve_meta_key(topic.hub, 'minimum_cols', topic.meta)
+        if minimum_cols is not None and value \
+                and len(value[0]) < minimum_cols:
+            raise ValueError('Value %r needs to have at least %d columns' %
+                             (value, minimum_cols))
+
+        maximum_cols = resolve_meta_key(topic.hub, 'maximum_cols', topic.meta)
+        if maximum_cols is not None and value and \
+                len(value[0]) > maximum_cols:
+            raise ValueError('Value %r needs to have at most %d columns' %
+                             (value, maximum_cols))
+
+        if value:
+            for row in value:
+                if not isinstance(row, (tuple, list)):
+                    raise ValueError('Rows have to be tuples or lists')
+                if len(row) != len(value[0]):
+                    raise ValueError('Number of columns have to be uniform')
+
+
 class DTTopic(MetaTopic):
     """ Topic with additional datatype check functionality """
     def __init__(self, hub: Hub, path: str) -> None:
@@ -155,6 +196,7 @@ class DTRegistry:
             'float': FloatDT(),
             'boolean': BooleanDT(),
             'list': ListDT(),
+            'table': TableDT(),
             'str': DT()
         }
 
