@@ -298,3 +298,62 @@ def test_in_operator():
     assert dut1.get() == False
     assert dut2.get() == False
     assert dut3.get() == False
+
+def test_getattr_method():
+    p = StatefulPublisher()
+
+    dut1 = p.split()
+    dut2 = p.split(',')
+    dut3 = p.split(sep = '!')
+
+    mock1 = mock.Mock()
+    mock2 = mock.Mock()
+    mock3 = mock.Mock()
+
+    dut1 | op.Sink(mock1)
+    dut2 | op.Sink(mock2)
+    dut3 | op.Sink(mock3)
+
+    with pytest.raises(ValueError):
+        dut1.get()
+    
+    with pytest.raises(ValueError):
+        dut2.get()
+    
+    with pytest.raises(ValueError):
+        dut3.get()
+    
+    mock1.assert_not_called()
+    mock2.assert_not_called()
+    mock3.assert_not_called()
+    
+    p.notify('This is just a test, honestly!')
+
+    assert dut1.get() == ['This', 'is', 'just', 'a', 'test,', 'honestly!']
+    assert dut2.get() == ['This is just a test', ' honestly!']
+    assert dut3.get() == ['This is just a test, honestly', '']
+
+    mock1.assert_called_once_with(['This', 'is', 'just', 'a', 'test,', 'honestly!'])
+    mock2.assert_called_once_with(['This is just a test', ' honestly!'])
+    mock3.assert_called_once_with(['This is just a test, honestly', ''])
+
+def test_getattr_attribute():
+    p = StatefulPublisher()
+    class Foo:
+        def __init__(self, a=5):
+            self.a = a
+
+    dut = p.a
+    m = mock.Mock()
+    dut | op.Sink(m)
+
+    with pytest.raises(ValueError):
+        dut.get()
+    
+    m.assert_not_called()
+    
+    p.notify(Foo(3))
+
+    assert dut.get() == 3
+
+    m.assert_called_once_with(3)

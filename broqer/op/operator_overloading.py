@@ -63,6 +63,37 @@ class _MapUnary(Operator):
         return self.notify(result)
 
 
+class _GetAttr(Operator):
+    def __init__(self, publisher: Publisher, attribute_name) -> None:
+        Operator.__init__(self)
+        self._attribute_name = attribute_name
+        self._publisher = publisher
+        self._args = None
+        self._kwargs = None
+
+    def get(self):
+        value = self._publisher.get()  # may raise ValueError
+        attribute = getattr(value, self._attribute_name)
+        if self._args is None:
+            return attribute
+        return attribute(*self._args, **self._kwargs)
+
+    def __call__(self, *args, **kwargs):
+        self._args = args
+        self._kwargs = kwargs
+        return self
+
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+        assert who is self._publisher, 'emit from non assigned publisher'
+
+        attribute = getattr(value, self._attribute_name)
+
+        if self._args is None:
+            return self.notify(attribute)
+
+        return self.notify(attribute(*self._args, **self._kwargs))
+
+
 def apply_operator_overloading():
     """ Function to apply operator overloading to Publisher class """
     # operator overloading is (unfortunately) not working for the following
@@ -106,6 +137,11 @@ def apply_operator_overloading():
             return _MapUnary(operand, operation)
 
         setattr(Publisher, method, _op_unary)
+
+    def _getattr(publisher, method_name):
+        return _GetAttr(publisher, method_name)
+
+    setattr(Publisher, '__getattr__', _getattr)
 
 
 class Str(_MapUnary):
