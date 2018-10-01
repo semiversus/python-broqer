@@ -7,6 +7,7 @@ project = 'broqer'
 copyright = u'2018, Günther Jena'
 author = u'Günther Jena'
 version = '0.9.0'
+github_url = 'https://github.com/semiversus/python-broqer'
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -20,6 +21,15 @@ source_suffix = '.rst'
 
 html_theme = 'sphinx_rtd_theme'
 htmlhelp_basename = 'broqer'
+
+html_context = {
+  "display_github": True, # Add 'Edit on Github' link instead of 'View page source'
+  "github_user": "semiversus",
+  "github_repo": project,
+  "github_version": "master",
+  "conf_py_path": "/docs/",
+  "source_suffix": source_suffix,
+}
 
 latex_documents = [
     (master_doc, 'python-broqer.tex', 'python-broqer Documentation',

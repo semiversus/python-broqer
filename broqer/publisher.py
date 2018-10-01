@@ -27,7 +27,7 @@ class Publisher():
     * ``.subscribe(subscriber)`` to subscribe for events on this publisher
     * ``.unsubscribe(subscriber)`` to unsubscribe
     * ``.get()`` to get the current state (will raise ValueError if not
-        stateful)
+      stateful)
 
     When implementing a Publisher use the following methods:
 
