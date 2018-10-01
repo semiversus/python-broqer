@@ -35,8 +35,8 @@ class NumberDT(DT):
     """ Datatype for general numbers
 
     Recognized meta keys:
-    * lower_input_limit: check the value against minimum (below->Exception)
-    * upper_input_limit: check against maximum (above raises an Exception)
+    - lower_input_limit: check the value against minimum (below->Exception)
+    - upper_input_limit: check against maximum (above raises an Exception)
     """
 
     def check(self, topic, value):
