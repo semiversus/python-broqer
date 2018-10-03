@@ -287,7 +287,7 @@ def test_in_operator():
     dut3 = op.In(pi, cc)
     with pytest.raises(AssertionError):
         op.In(ci, cc)
-    
+
     assert dut1.get() == True
     assert dut2.get() == True
     assert dut3.get() == True
@@ -316,17 +316,17 @@ def test_getattr_method():
 
     with pytest.raises(ValueError):
         dut1.get()
-    
+
     with pytest.raises(ValueError):
         dut2.get()
-    
+
     with pytest.raises(ValueError):
         dut3.get()
-    
+
     mock1.assert_not_called()
     mock2.assert_not_called()
     mock3.assert_not_called()
-    
+
     p.notify('This is just a test, honestly!')
 
     assert dut1.get() == ['This', 'is', 'just', 'a', 'test,', 'honestly!']
@@ -349,11 +349,30 @@ def test_getattr_attribute():
 
     with pytest.raises(ValueError):
         dut.get()
-    
+
     m.assert_not_called()
-    
+
     p.notify(Foo(3))
 
     assert dut.get() == 3
 
     m.assert_called_once_with(3)
+
+@pytest.mark.parametrize('operator, values, result', [
+    (op.All, (False, False, False), False),
+    (op.All, (False, True, False), False),
+    (op.All, (True, True, True), True),
+    (op.Any, (False, False, False), False),
+    (op.Any, (False, True, False), True),
+    (op.Any, (True, True, True), True),
+    (op.BitwiseAnd, (0, 5, 15), 0),
+    (op.BitwiseAnd, (7, 14, 255), 6),
+    (op.BitwiseAnd, (3,), 3),
+    (op.BitwiseOr, (0, 5, 8), 13),
+    (op.BitwiseOr, (7, 14, 255), 255),
+    (op.BitwiseOr, (3,), 3),
+])
+def test_multi_operators(operator, values, result):
+    sources = [StatefulPublisher(v) for v in values]
+    dut = operator(*sources)
+    assert dut.get() == result

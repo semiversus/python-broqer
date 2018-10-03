@@ -2,8 +2,8 @@
 import asyncio
 import math
 import operator
-from functools import partial
-from typing import Any
+from functools import partial, reduce
+from typing import Any as Any_
 
 from broqer import Publisher
 from broqer.op import CombineLatest
@@ -20,7 +20,7 @@ class _MapConstant(Operator):
     def get(self):
         return self._operation(self._publisher.get(), self._value)
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
         assert who is self._publisher, 'emit from non assigned publisher'
 
         result = self._operation(value, self._value)
@@ -38,7 +38,7 @@ class _MapConstantReverse(Operator):
     def get(self):
         return self._operation(self._value, self._publisher.get())
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
         assert who is self._publisher, 'emit from non assigned publisher'
 
         result = self._operation(self._value, value)
@@ -55,7 +55,7 @@ class _MapUnary(Operator):
     def get(self):
         return self._operation(self._publisher.get())
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
         assert who is self._publisher, 'emit from non assigned publisher'
 
         result = self._operation(value)
@@ -83,7 +83,7 @@ class _GetAttr(Operator):
         self._kwargs = kwargs
         return self
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
         assert who is self._publisher, 'emit from non assigned publisher'
 
         attribute = getattr(value, self._attribute_name)
@@ -189,7 +189,7 @@ class In(CombineLatest):
     :param item: publisher or constant to check for availability in container.
     :param container: container (publisher or constant)
     """
-    def __init__(self, item: Any, container: Any) -> None:
+    def __init__(self, item: Any_, container: Any_) -> None:
         if isinstance(item, Publisher) and isinstance(container, Publisher):
             CombineLatest.__init__(self, item, container, map_=_in)
         elif isinstance(item, Publisher):
@@ -200,3 +200,57 @@ class In(CombineLatest):
                 'item or container has to be a publisher'
             function = partial(_in, item)
             CombineLatest.__init__(self, container, map_=function)
+
+
+def _all(*items):
+    return all(items)
+
+
+class All(CombineLatest):
+    """ Implement the functionality of ``all`` operator for publishers.
+    One big difference is that ``all`` takes an iterator and ``All`` take a
+    variable amount of publishers as arguments.
+    :param publishers: Publishers evaluated for all to be True
+    """
+    def __init__(self, *publishers: Any_) -> None:
+        CombineLatest.__init__(self, *publishers, map_=_all)
+
+
+def _any(*items):
+    return any(items)
+
+
+class Any(CombineLatest):
+    """ Implement the functionality of ``any`` operator for publishers.
+    One big difference is that ``any`` takes an iterator and ``Any`` take a
+    variable amount of publishers as arguments.
+    :param publishers: Publishers evaluated for one to be True
+    """
+    def __init__(self, *publishers: Any_) -> None:
+        CombineLatest.__init__(self, *publishers, map_=_any)
+
+
+def _bitwise_or(*items):
+    return reduce(operator.or_, items)
+
+
+class BitwiseOr(CombineLatest):
+    """ Implement the functionality of bitwise or (``|``) operator for
+    publishers.
+    :param publishers: Publishers evaluated for bitwise or
+    """
+    def __init__(self, *publishers: Any_) -> None:
+        CombineLatest.__init__(self, *publishers, map_=_bitwise_or)
+
+
+def _bitwise_and(*items):
+    return reduce(operator.and_, items)
+
+
+class BitwiseAnd(CombineLatest):
+    """ Implement the functionality of bitwise and (``&``) operator for
+    publishers.
+    :param publishers: Publishers evaluated for bitwise and
+    """
+    def __init__(self, *publishers: Any_) -> None:
+        CombineLatest.__init__(self, *publishers, map_=_bitwise_and)

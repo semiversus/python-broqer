@@ -32,7 +32,7 @@ from .subscribers.trace import Trace
 
 # enable operator overloading
 from .operator_overloading import apply_operator_overloading, Str, Bool, Int, \
-    Float, Repr, Len, In
+    Float, Repr, Len, In, All, Any, BitwiseAnd, BitwiseOr
 
 apply_operator_overloading()
 
@@ -44,5 +44,5 @@ __all__ = [
     'False_', 'Trace', 'build_map', 'build_reduce', 'build_combine_latest',
     'build_filter', 'build_accumulate', 'build_map_async',
     'build_map_threaded', 'build_sink', 'Str', 'Bool', 'Int', 'Float', 'Repr',
-    'Len', 'In'
+    'Len', 'In', 'All', 'Any', 'BitwiseAnd', 'BitwiseOr'
 ]
