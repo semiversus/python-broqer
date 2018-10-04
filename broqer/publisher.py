@@ -175,7 +175,10 @@ class StatefulPublisher(Publisher):
         return Publisher.notify(self, value)
 
     def reset_state(self, value=NONE):
-        """ Resets the state. Behavior for .subscribe() and .get() will be
-        like a stateless Publisher until next .emit()
+        """ Resets the state. If value argument is not used, the behavior for
+        .subscribe() and .get() will be like a stateless Publisher until next
+        .emit() . Calling this method will not trigger an emit.
+
+        :param value: Optional value to set the internal state
         """
         self._state = value
