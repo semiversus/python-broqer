@@ -1,7 +1,8 @@
 import pytest
+from unittest import mock
 
 from broqer import StatefulPublisher, NONE
-from broqer.op import Switch
+from broqer.op import Switch, Sink
 
 from .helper import check_single_operator
 
@@ -14,3 +15,38 @@ from .helper import check_single_operator
 ])
 def test_with_publisher(mapping, kwargs, input_vector, output_vector):
     check_single_operator(Switch, (mapping,), kwargs, input_vector, output_vector, has_state=None)
+
+
+@pytest.mark.parametrize('subscribe_all', [True, False])
+def test_subscribe_all(subscribe_all):
+    p_select = StatefulPublisher('a')
+    p1 = StatefulPublisher(0)
+    p2 = StatefulPublisher(1)
+    dut = Switch({'a': p1, 'b': p2, 'c': 2}, subscribe_all=subscribe_all)
+
+    assert not p_select.subscriptions
+    assert not p1.subscriptions
+    assert not p2.subscriptions
+    assert not dut.subscriptions
+
+    mock_cb = mock.Mock()
+    disposable = p_select | dut | Sink(mock_cb)
+
+    assert len(dut.subscriptions) == 1
+    assert len(p_select.subscriptions) == 1
+    assert len(p1.subscriptions) == 1
+    assert len(p2.subscriptions) == (1 if subscribe_all else 0)
+
+    p_select.notify('b')
+
+    assert len(dut.subscriptions) == 1
+    assert len(p_select.subscriptions) == 1
+    assert len(p1.subscriptions) == (1 if subscribe_all else 0)
+    assert len(p2.subscriptions) == 1
+
+    disposable.dispose()
+
+    assert not p_select.subscriptions
+    assert not p1.subscriptions
+    assert not p2.subscriptions
+    assert not dut.subscriptions
