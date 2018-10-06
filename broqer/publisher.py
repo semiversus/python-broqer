@@ -95,6 +95,10 @@ class Publisher():
         will be collected. If no future was returned None will be returned by
         this method. If one futrue was returned that future will be returned.
         When multiple futures were returned a gathered future will be returned.
+
+        :param value: value to be emitted to subscribers
+        :returns: a future if at least one subscriber has returned a future,
+            elsewise None
         """
         results = (s.emit(value, who=self) for s in self._subscriptions)
         futures = tuple(r for r in results if r is not None)
@@ -123,7 +127,10 @@ class Publisher():
         return (self | OnEmitFuture(timeout=None)).__await__()
 
     def wait_for(self, timeout=None):
-        """ When a timeout should be applied for awaiting use this method """
+        """ When a timeout should be applied for awaiting use this method.
+        :param timeout: optional timeout in seconds.
+        :returns: a future returning the emitted value
+        """
         from broqer.op import OnEmitFuture  # due circular dependency
         return self | OnEmitFuture(timeout=timeout)
 
@@ -161,13 +168,24 @@ class StatefulPublisher(Publisher):
         return disposable
 
     def get(self):
-        """ Returns state if defined else it raises a ValueError """
+        """ Returns state if defined else it raises a ValueError. See also
+        Publisher.get().
+
+        :raises ValueError: if this publisher is not initialized and has not
+            received any emits.
+        """
         if self._state is not NONE:
             return self._state
         return Publisher.get(self)  # raises ValueError
 
     def notify(self, value: Any) -> asyncio.Future:
-        """ Only notifies subscribers if state has changed """
+        """ Only notifies subscribers if state has changed. See also
+        Publisher.notify().
+
+        :param value: value to be emitted to subscribers
+        :returns: a future if at least one subscriber has returned a future,
+            elsewise None
+        """
         if self._state == value:
             return None
 
