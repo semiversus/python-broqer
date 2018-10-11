@@ -205,3 +205,4 @@ def test_sub_hub():
     sub_hub['value3'].assign(Value(3))
 
     assert hub['prefix.value3'] is sub_hub['value3']
+    assert sub_hub.prefix == 'prefix'

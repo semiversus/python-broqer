@@ -271,3 +271,8 @@ class SubHub:  # pylint: disable=too-few-public-methods
 
     def __getitem__(self, topic: str) -> Topic:
         return self._hub[self._prefix + topic]
+
+    @property
+    def prefix(self):
+        """ the prefix of this sub hub """
+        return self._prefix[:-1]
