@@ -7,7 +7,7 @@ Usage:
 >>> s1 = Subject()
 >>> s2 = Subject()
 
->>> _d = s1 | op.Merge(s2) | op.Sink(print, 'Merge:')
+>>> _d = op.Merge(s1, s2) | op.Sink(print, 'Merge:')
 >>> s1.emit(1)
 Merge: 1
 >>> s2.emit('abc')
@@ -37,7 +37,11 @@ class Merge(MultiOperator):
         Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert any(who is p for p in self._publishers), \
-            'emit from non assigned publisher'
+        if all(who is not p for p in self._publishers):
+            raise ValueError('Emit from non assigned publisher')
 
         return self.notify(value)
+
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        self._publishers = (publisher, *self._publishers)
+        return self

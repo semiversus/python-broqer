@@ -57,7 +57,9 @@ class Cache(Operator):
         Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
+
         if self._state != value:
             self._state = value
             return self.notify(value)

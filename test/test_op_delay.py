@@ -52,3 +52,7 @@ async def test_errorhandler():
     await asyncio.sleep(0.15)
     mock.assert_called_once_with(1)
     mock_errorhandler.assert_called_once_with(ZeroDivisionError, ANY, ANY)
+
+def test_argument_check():
+    with pytest.raises(ValueError):
+        Delay(-1)

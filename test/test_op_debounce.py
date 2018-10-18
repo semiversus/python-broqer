@@ -132,3 +132,7 @@ async def test_debounce():
     await debounce | op.True_()
     mock_sink.assert_called_once_with(True)
 
+    # test argument check
+    with pytest.raises(ValueError):
+        op.Debounce(-1)
+

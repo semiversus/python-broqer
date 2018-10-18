@@ -14,5 +14,7 @@ class TopicMapper(Subscriber):  # pylint: disable=too-few-public-methods
         self._mapping = mapping
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert isinstance(who, Topic)
+        if not isinstance(who, Topic):
+            raise TypeError('Emitting subject has to be a hub topic')
+
         self._mapping[who.path] = value

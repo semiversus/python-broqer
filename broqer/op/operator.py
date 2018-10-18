@@ -47,8 +47,9 @@ class Operator(Subscriber, Publisher):
         """ Get value of operator """
 
     def __ror__(self, publisher: Publisher) -> Publisher:
-        assert self._publisher is None, \
-            'Operator can only be connected to one publisher'
+        if self._publisher is not None:
+            raise ValueError('Operator can only be connected to one publisher')
+
         self._publisher = publisher
         return self
 
@@ -94,7 +95,3 @@ class MultiOperator(Publisher, Subscriber):
     @abstractmethod
     def get(self):
         """ Get value of operator """
-
-    def __ror__(self, publisher: Publisher) -> Publisher:
-        self._publishers = (publisher, *self._publishers)
-        return self

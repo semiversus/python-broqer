@@ -43,7 +43,8 @@ class Throttle(Operator):
     """
     def __init__(self, duration: float,
                  error_callback=default_error_handler, loop=None) -> None:
-        assert duration >= 0, 'duration has to be positive'
+        if duration < 0:
+            raise ValueError('Duration has to be bigger than zero')
 
         Operator.__init__(self)
 
@@ -57,7 +58,9 @@ class Throttle(Operator):
         Publisher.get(self)
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
+
         if self._call_later_handler is None:
             self._last_state = value
             self._wait_done_cb()

@@ -65,7 +65,9 @@ class Debounce(Operator):
     def __init__(self, duetime: float,
                  retrigger_value: Any = NONE,
                  error_callback=default_error_handler, *, loop=None) -> None:
-        assert duetime >= 0, 'duetime has to be positive'
+
+        if duetime < 0:
+            raise ValueError('duetime has to be positive')
 
         Operator.__init__(self)
 
@@ -92,7 +94,8 @@ class Debounce(Operator):
         return self._state
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
 
         if value == self._next_state:
             # skip if emit will result in the same value as the scheduled one

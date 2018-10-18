@@ -51,7 +51,9 @@ class OnEmitFuture(Subscriber, asyncio.Future):
             self._timeout_handle.cancel()
 
     def emit(self, value: Any, who: Optional[Publisher] = None) -> None:
-        assert who is self._publisher
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
+
         if not self.done():
             self.set_result(value)
 

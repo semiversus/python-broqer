@@ -42,5 +42,6 @@ def test_flush():
     dut.flush()
     mock.assert_called_once_with( (1,2,3) )
 
-
-
+def test_argument_check():
+    with pytest.raises(ValueError):
+        SlidingWindow(-1)

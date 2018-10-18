@@ -58,7 +58,9 @@ class Accumulate(Operator):
         return self._function(self._init, value)[1]
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
+
         self._state, self._result = self._function(self._state, value)
         return self.notify(self._result)
 
@@ -84,7 +86,7 @@ def build_accumulate(function: Callable[[Any, Any], Tuple[Any, Any]] = None, *,
         def _wrapper(init=NONE) -> Accumulate:
             init = _init if init is NONE else init
             if init is NONE:
-                raise TypeError('init argument has to be defined')
+                raise TypeError('"init" argument has to be defined')
             return Accumulate(function, init=init)
         return _wrapper
 

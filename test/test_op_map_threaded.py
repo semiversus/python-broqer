@@ -74,3 +74,7 @@ def test_build(build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, excep
     asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
     assert mock_cb.mock_calls == ref_mock_cb.mock_calls
     assert len(mock_cb.mock_calls) == 1
+
+def test_argument_check():
+    with pytest.raises(ValueError):
+        MapThreaded(lambda v:v, mode=MODE.INTERRUPT)

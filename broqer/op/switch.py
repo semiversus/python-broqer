@@ -103,7 +103,9 @@ class Switch(Operator):
         if who is not self._publisher:
             if who is self._selected_publisher:
                 return self.notify(value)
-            assert self._publishers, 'emit from not selected publisher'
+            if not self._publishers:
+                raise ValueError('Emit from not selected publisher')
+
             return None
 
         if value is self._key:

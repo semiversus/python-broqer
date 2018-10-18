@@ -21,7 +21,8 @@ class _MapConstant(Operator):
         return self._operation(self._publisher.get(), self._value)
 
     def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
 
         result = self._operation(value, self._value)
 
@@ -39,7 +40,8 @@ class _MapConstantReverse(Operator):
         return self._operation(self._value, self._publisher.get())
 
     def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
 
         result = self._operation(self._value, value)
 
@@ -56,7 +58,8 @@ class _MapUnary(Operator):
         return self._operation(self._publisher.get())
 
     def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
 
         result = self._operation(value)
 
@@ -84,7 +87,8 @@ class _GetAttr(Operator):
         return self
 
     def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
 
         attribute = getattr(value, self._attribute_name)
 
@@ -196,8 +200,8 @@ class In(CombineLatest):
             function = partial(_in, container=container)
             CombineLatest.__init__(self, item, map_=function)
         else:
-            assert isinstance(container, Publisher), \
-                'item or container has to be a publisher'
+            if not isinstance(container, Publisher):
+                raise TypeError('Item or container has to be a publisher')
             function = partial(_in, item)
             CombineLatest.__init__(self, container, map_=function)
 

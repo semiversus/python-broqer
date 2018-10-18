@@ -1,7 +1,7 @@
 import pytest
 import types
 
-from broqer import Hub, Subject, Value
+from broqer import Hub, Subject, Value, Publisher
 from broqer.hub.utils.datatype_check import DTRegistry, resolve_meta_key, DT
 from .helper import is_exception
 
@@ -155,3 +155,8 @@ def test_validate():
 
     with pytest.raises(ValueError):
         hub['value'].check(-2)
+
+    hub['value2'].assign(Publisher())
+
+    with pytest.raises(TypeError):
+        hub['value2'].checked_emit(0)

@@ -179,8 +179,8 @@ class DTTopic(MetaTopic):
     def checked_emit(self, value: Any) -> asyncio.Future:
         """ Casting and checking in one call """
 
-        assert isinstance(self._subject, Subscriber), \
-            'Topic has to be a subscriber'
+        if not isinstance(self._subject, Subscriber):
+            raise TypeError('Topic %r has to be a subscriber' % self._path)
 
         value = self.cast(value)
         self.check(value)

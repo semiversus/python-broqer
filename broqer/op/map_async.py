@@ -164,7 +164,8 @@ class MapAsync(Operator):
         Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
 
         # check if a coroutine is already running
         if self._future is not None and not self._future.done():
@@ -190,8 +191,7 @@ class MapAsync(Operator):
             if result is not NONE:
                 self.notify(result)  # may also raise exception
         except asyncio.CancelledError:
-            assert self._options.mode is MODE.INTERRUPT, 'cancellation should'\
-                ' only be possible in INTERRUPT mode'
+            pass
         except Exception:  # pylint: disable=broad-except
             self._options.error_callback(*sys.exc_info())
 

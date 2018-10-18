@@ -28,6 +28,12 @@ def test_operator_with_publishers():
     v2.emit(3)
     mock_sink.assert_called_once_with(4)
 
+    with pytest.raises(ValueError):
+        o.emit(0, who=Publisher())
+
+    with pytest.raises(ValueError):
+        Value(1) | o
+
 def test_operator_with_constant():
     v1 = Value(0)
     v2 = 1
@@ -52,6 +58,12 @@ def test_operator_with_constant():
     v1.emit(3)
     mock_sink.assert_called_once_with(4)
 
+    with pytest.raises(ValueError):
+        Value(1) | o
+
+    with pytest.raises(ValueError):
+        o.emit(0, who=Publisher())
+
 def test_operator_with_constant_r():
     v1 = 1
     v2 = Value(0)
@@ -75,6 +87,12 @@ def test_operator_with_constant_r():
 
     v2.emit(3)
     mock_sink.assert_called_once_with(-2)
+
+    with pytest.raises(ValueError):
+        Value(1) | o
+
+    with pytest.raises(ValueError):
+        o.emit(0, who=Publisher())
 
 @pytest.mark.parametrize('operator, l_value, r_value, result', [
     (operator.lt, 0, 1, True), (operator.lt, 1, 0, False), (operator.lt, 1, 1, False), (operator.lt, 1, 'foo', TypeError),
@@ -275,6 +293,12 @@ def test_unary_operators(operator, value, result):
     else:
         assert cb.mock_called_once_with(result)
 
+    with pytest.raises(ValueError):
+        Value(1) | operator(v)
+
+    with pytest.raises(ValueError):
+        operator(v).emit(0, who=Publisher())
+
 def test_in_operator():
     pi = Value(1)
     ci = 1
@@ -285,7 +309,7 @@ def test_in_operator():
     dut1 = op.In(pi, pc)
     dut2 = op.In(ci, pc)
     dut3 = op.In(pi, cc)
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         op.In(ci, cc)
 
     assert dut1.get() == True
@@ -357,6 +381,9 @@ def test_getattr_attribute():
     assert dut.get() == 3
 
     m.assert_called_once_with(3)
+
+    with pytest.raises(ValueError):
+        dut.emit(0, who=Publisher())
 
 @pytest.mark.parametrize('operator, values, result', [
     (op.All, (False, False, False), False),

@@ -40,7 +40,9 @@ class CatchException(Operator):
     :param exceptions: Exception classes to be catched
     """
     def __init__(self, *exceptions) -> None:
-        assert len(exceptions) >= 1, 'need at least one exception'
+        if not exceptions:
+            raise ValueError('Need at least one exception')
+
         Operator.__init__(self)
         self._exceptions = exceptions
 
@@ -48,7 +50,9 @@ class CatchException(Operator):
         return self._publisher.get()
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
+
         try:
             return self.notify(value)
         except self._exceptions:

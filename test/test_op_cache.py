@@ -49,6 +49,9 @@ def test_initialised_with_publisher():
     source.notify(2)
     cb.assert_called_once_with(2)
 
+    with pytest.raises(ValueError):
+        Publisher() | dut
+
 def test_uninitialised_with_stateful():
     source = StatefulPublisher(1)
     dut = source | Cache()

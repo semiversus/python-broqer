@@ -3,7 +3,7 @@ import asyncio
 import pytest
 from unittest import mock
 
-from broqer import NONE, StatefulPublisher
+from broqer import NONE, StatefulPublisher, default_error_handler, Publisher
 from broqer.op import MapAsync, MODE, build_map_async, Sink
 
 from .helper import check_async_operator_coro
@@ -60,9 +60,6 @@ async def test_with_publisher(map_coro, args, kwargs, mode, input_vector, output
 
 @pytest.mark.asyncio
 async def test_map_async():
-    import asyncio
-    from broqer import default_error_handler, Publisher, op
-
     p = Publisher()
     mock_sink = mock.Mock()
     mock_error_handler = mock.Mock()
@@ -72,7 +69,7 @@ async def test_map_async():
     async def _map(v):
         return v
 
-    disposable = p | op.MapAsync(_map) | op.Sink(mock_sink)
+    disposable = p | MapAsync(_map) | Sink(mock_sink)
 
     mock_sink.side_effect = ZeroDivisionError('FAIL')
 
@@ -92,7 +89,7 @@ async def test_map_async():
         raise ValueError()
 
     p2 = Publisher()
-    disposable = p2 | op.MapAsync(_fail) | op.Sink(mock_sink)
+    disposable = p2 | MapAsync(_fail) | Sink(mock_sink)
     p2.notify(2)
 
     await asyncio.sleep(0.01)
