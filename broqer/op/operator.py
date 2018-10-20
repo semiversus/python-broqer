@@ -1,6 +1,10 @@
 """ Module implementing Operator, MultiOperator.
 """
+import asyncio
 from abc import abstractmethod
+from functools import reduce
+from operator import or_
+from typing import Any
 
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
@@ -95,3 +99,30 @@ class MultiOperator(Publisher, Subscriber):
     @abstractmethod
     def get(self):
         """ Get value of operator """
+
+
+class OperatorConcat(Operator):
+    """ This class is generator a new operator by concatenation of other
+    operators.
+
+    :param operators: the operators to concatenate
+    """
+    def __init__(self, *operators):
+        Operator.__init__(self)
+        self._operators = operators
+
+    def get(self):
+        return self._publisher.get()  # may raises ValueError
+
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+        return self.notify(value)
+
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        Operator.__ror__(self, publisher)
+
+        # concat each operator in the following step
+        reduce(or_, self._operators, publisher)
+
+        # the source publisher is the last operator in the chain
+        self._publisher = self._operators[-1]
+        return self
