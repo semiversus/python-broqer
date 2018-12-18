@@ -31,8 +31,8 @@ def event_loop():
 
     # short glitches
     ((0.1,),
-     ((0, False), (0.2, True), (0.25, False), (0.4, True), (0.6, False), (0.65, True)),
-     ((0.1, False), (0.5, True))),
+     ((0, False), (0.2, True), (0.25, False), (0.4, True), (0.6, False), (0.65, True), (0.7, False)),
+     ((0.1, False), (0.5, True), (0.8, False))),
 
     # same with retrigger False
     ((0.1, False),
@@ -51,6 +51,8 @@ def event_loop():
     ((0.1, True), ((0, False), (0.05, False), (0.10, False), (0.15, True), (0.2, True), (0.25, True)), ((0, True), (0.1, False), (0.15, True))), # retrigger
     ((0.1,), ((0, True), (0.15, True), (0.2, True), (0.25, False), (0.3, False)), ((0.1, True), (0.35, False))),
     ((0.1,), ((0, 0), (0.05, 1), (0.1, 1.0), (0.3, 2)), ((0.15, 1), (0.4, 2))),
+
+    ((0.1, False), ((0, True), (0.01, True), (0.2, False), (0.21, True), (0.22, True)), ((0, False), (0.1, True), (0.2, False), (0.31, True))),
 ])
 @pytest.mark.asyncio
 async def test_with_publisher(args, input_vector, output_vector, event_loop):

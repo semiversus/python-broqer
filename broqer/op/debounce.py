@@ -86,6 +86,7 @@ class Debounce(Operator):
             self._next_state = NONE
             if self._call_later_handler:
                 self._call_later_handler.cancel()
+                self._call_later_handler = None
 
     def get(self):
         if self._retrigger_value is not NONE and (
@@ -103,6 +104,7 @@ class Debounce(Operator):
 
         if self._call_later_handler:
             self._call_later_handler.cancel()
+            self._call_later_handler = None
 
         if self._retrigger_value is not NONE and \
            self._state != self._retrigger_value:
@@ -139,3 +141,4 @@ class Debounce(Operator):
             self._next_state = self._retrigger_value
         if self._call_later_handler:
             self._call_later_handler.cancel()
+            self._call_later_handler = None
