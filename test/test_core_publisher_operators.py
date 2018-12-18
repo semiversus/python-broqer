@@ -325,6 +325,7 @@ def test_in_operator():
 
 def test_getattr_method():
     p = StatefulPublisher()
+    p.inherit_type(str)
 
     dut1 = p.split()
     dut2 = p.split(',')
@@ -364,8 +365,12 @@ def test_getattr_method():
 def test_getattr_attribute():
     p = StatefulPublisher()
     class Foo:
+        a = None
+
         def __init__(self, a=5):
             self.a = a
+
+    p.inherit_type(Foo)
 
     dut = p.a
     m = mock.Mock()
@@ -384,6 +389,9 @@ def test_getattr_attribute():
 
     with pytest.raises(ValueError):
         dut.emit(0, who=Publisher())
+
+    with pytest.raises(AttributeError):
+        dut.assnign(5)
 
 @pytest.mark.parametrize('operator, values, result', [
     (op.All, (False, False, False), False),

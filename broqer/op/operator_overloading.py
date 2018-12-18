@@ -142,8 +142,11 @@ def apply_operator_overloading():
 
         setattr(Publisher, method, _op_unary)
 
-    def _getattr(publisher, method_name):
-        return _GetAttr(publisher, method_name)
+    def _getattr(publisher, attribute_name):
+        if not publisher.inherited_type or \
+           not hasattr(publisher.inherited_type, attribute_name):
+            raise AttributeError('Attribute %r not found' % attribute_name)
+        return _GetAttr(publisher, attribute_name)
 
     setattr(Publisher, '__getattr__', _getattr)
 

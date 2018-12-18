@@ -1,7 +1,7 @@
 """ Implementing Publisher and StatefulPublisher """
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Union, TypeVar, Type
 
 from broqer import NONE, SubscriptionDisposable
 
@@ -14,6 +14,9 @@ class SubscriptionError(ValueError):
     already subscribed) or on unsubscribe when subscriber is not subscribed
     """
     pass
+
+
+TInherit = TypeVar('TInherit')
 
 
 class Publisher():
@@ -34,8 +37,10 @@ class Publisher():
     - ``.notify(value)`` calls .emit(value) on all subscribers
 
     :ivar _subscriptions: holding a list of subscribers
+    :ivar _inherited_type: type class for method lookup
     """
     def __init__(self):
+        self._inherited_type = None
         self._subscriptions = list()
 
     def subscribe(self, subscriber: 'Subscriber',
@@ -142,6 +147,19 @@ class Publisher():
         """
         raise ValueError('Evaluation of comparison of publishers is not '
                          'supported')
+
+    def inherit_type(self, type_cls: Type[TInherit]) \
+            -> Union[TInherit, 'Publisher']:
+        """ enables the usage of method and attribute overloading for this
+        publisher.
+        """
+        self._inherited_type = type_cls
+        return self
+
+    @property
+    def inherited_type(self):
+        """ Property inherited_type returns used type class (or None) """
+        return self._inherited_type
 
 
 class StatefulPublisher(Publisher):
