@@ -48,7 +48,7 @@ async def test_cancel_on_unsubscribe():
     dut = FromPolling(0.1, mock)
 
     disposable = dut | Sink()
-    mock.assert_called_once()
+    assert mock.call_count == 1
 
     await asyncio.sleep(0.25)
     assert mock.call_count == 3
@@ -64,7 +64,7 @@ async def test_once():
     dut = FromPolling(None, mock, error_callback=err_mock)
 
     disposable = dut | Sink()
-    mock.assert_called_once()
+    assert mock.call_count == 1
 
     await asyncio.sleep(0.25)
     assert mock.call_count == 1
