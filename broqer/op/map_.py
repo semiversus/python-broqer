@@ -51,10 +51,10 @@ class Map(Operator):
     def __init__(self, function: Callable[[Any], Any],
                  *args, unpack: bool = False, **kwargs) -> None:
         """ Special care for return values:
-              * return `None` (or nothing) if you don't want to return a result
-              * return `None, ` if you want to return `None`
-              * return `(a, b), ` to return a tuple as value
-              * every other return value will be unpacked
+              - return `None` (or nothing) if you don't want to return a result
+              - return `None, ` if you want to return `None`
+              - return `(a, b), ` to return a tuple as value
+              - every other return value will be unpacked
         """
 
         Operator.__init__(self)
@@ -75,7 +75,8 @@ class Map(Operator):
         return result
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
 
         if self._unpack:
             result = self._function(*value)

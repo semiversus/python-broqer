@@ -37,7 +37,8 @@ class SlidingWindow(Operator):
     :param emit_partial: emit even if queue is not full
     """
     def __init__(self, size: int, emit_partial=False) -> None:
-        assert size > 0, 'size has to be positive'
+        if size <= 0:
+            raise ValueError('Size has to be positive')
 
         Operator.__init__(self)
 
@@ -60,7 +61,9 @@ class SlidingWindow(Operator):
         return Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
+
         self._state.append(value)
         if self._emit_partial or \
                 len(self._state) == self._state.maxlen:  # type: ignore

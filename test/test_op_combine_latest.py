@@ -20,7 +20,7 @@ def test_with_publisher(kwargs, input_vector, output_vector):
 def test_emit_on():
     source = Publisher()
     source2 = Publisher()
-    dut = source | CombineLatest(source2, emit_on=source2)
+    dut = CombineLatest(source, source2, emit_on=source2)
     dut2 = CombineLatest(source, source2, emit_on=(source, source2))
     dut3 = CombineLatest(source, source2, emit_on=source, map_=lambda a,b:a+b)
 
@@ -43,7 +43,7 @@ def test_allow_stateless():
     source1 = StatefulPublisher(0)
     source2 = Publisher()
 
-    dut = source1 | CombineLatest(source2, allow_stateless=True)
+    dut = CombineLatest(source1, source2, allow_stateless=True)
     with pytest.raises(ValueError):
         dut.get()
 

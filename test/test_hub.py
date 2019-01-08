@@ -2,7 +2,7 @@ import asyncio
 from unittest import mock
 import pytest
 
-from broqer import Hub, op, Value, Subject, SubHub, StatefulPublisher
+from broqer import Hub, op, Value, Subject, SubHub, StatefulPublisher, Publisher
 from broqer.hub import Topic, MetaTopic
 
 def test_hub_topics():
@@ -145,8 +145,30 @@ def test_assign_subscribe_emit(factory):
     assert len(value1._subscriptions) == 0
     assert len(hub['value1']._subscriptions) == 0
 
+@pytest.mark.parametrize('factory', [Topic, MetaTopic])
+def test_type_checks(factory):
+    hub = Hub(topic_factory=factory)
+
+    # test unassigned topic .get
     with pytest.raises(ValueError):
-        hub['value3'].get()
+        hub['value1'].get()
+
+    # test subscribing to a subscriber
+    hub['value2'].assign(op.Sink())
+
+    with pytest.raises(TypeError):
+        hub['value2'] | op.Sink()
+
+    # test emiting to a publisher
+    hub['value3'].assign(Publisher())
+
+    with pytest.raises(TypeError):
+        hub['value3'].emit(0)
+
+    # test assigning of non Publisher or Subscriber
+
+    with pytest.raises(TypeError):
+        hub['value4'].assign(None)
 
 @pytest.mark.parametrize('factory', [Topic, MetaTopic])
 def test_subscribe_emit_assign(factory):
@@ -205,3 +227,10 @@ def test_sub_hub():
     sub_hub['value3'].assign(Value(3))
 
     assert hub['prefix.value3'] is sub_hub['value3']
+    assert sub_hub.prefix == 'prefix'
+
+    with pytest.raises(ValueError):
+        SubHub(hub, '')
+
+    with pytest.raises(ValueError):
+        SubHub(hub, 'test.')

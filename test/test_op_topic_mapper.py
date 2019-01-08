@@ -27,3 +27,6 @@ def test_topic_mapper():
 
     hub['topic1'].emit(1)
     assert d == {'topic1':1, 'topic2':2}
+
+    with pytest.raises(TypeError):
+        Value(0) | mapper_instance

@@ -28,6 +28,12 @@ def test_operator_with_publishers():
     v2.emit(3)
     mock_sink.assert_called_once_with(4)
 
+    with pytest.raises(ValueError):
+        o.emit(0, who=Publisher())
+
+    with pytest.raises(ValueError):
+        Value(1) | o
+
 def test_operator_with_constant():
     v1 = Value(0)
     v2 = 1
@@ -52,6 +58,12 @@ def test_operator_with_constant():
     v1.emit(3)
     mock_sink.assert_called_once_with(4)
 
+    with pytest.raises(ValueError):
+        Value(1) | o
+
+    with pytest.raises(ValueError):
+        o.emit(0, who=Publisher())
+
 def test_operator_with_constant_r():
     v1 = 1
     v2 = Value(0)
@@ -75,6 +87,12 @@ def test_operator_with_constant_r():
 
     v2.emit(3)
     mock_sink.assert_called_once_with(-2)
+
+    with pytest.raises(ValueError):
+        Value(1) | o
+
+    with pytest.raises(ValueError):
+        o.emit(0, who=Publisher())
 
 @pytest.mark.parametrize('operator, l_value, r_value, result', [
     (operator.lt, 0, 1, True), (operator.lt, 1, 0, False), (operator.lt, 1, 1, False), (operator.lt, 1, 'foo', TypeError),
@@ -275,6 +293,12 @@ def test_unary_operators(operator, value, result):
     else:
         assert cb.mock_called_once_with(result)
 
+    with pytest.raises(ValueError):
+        Value(1) | operator(v)
+
+    with pytest.raises(ValueError):
+        operator(v).emit(0, who=Publisher())
+
 def test_in_operator():
     pi = Value(1)
     ci = 1
@@ -285,9 +309,9 @@ def test_in_operator():
     dut1 = op.In(pi, pc)
     dut2 = op.In(ci, pc)
     dut3 = op.In(pi, cc)
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         op.In(ci, cc)
-    
+
     assert dut1.get() == True
     assert dut2.get() == True
     assert dut3.get() == True
@@ -301,6 +325,7 @@ def test_in_operator():
 
 def test_getattr_method():
     p = StatefulPublisher()
+    p.inherit_type(str)
 
     dut1 = p.split()
     dut2 = p.split(',')
@@ -316,17 +341,17 @@ def test_getattr_method():
 
     with pytest.raises(ValueError):
         dut1.get()
-    
+
     with pytest.raises(ValueError):
         dut2.get()
-    
+
     with pytest.raises(ValueError):
         dut3.get()
-    
+
     mock1.assert_not_called()
     mock2.assert_not_called()
     mock3.assert_not_called()
-    
+
     p.notify('This is just a test, honestly!')
 
     assert dut1.get() == ['This', 'is', 'just', 'a', 'test,', 'honestly!']
@@ -340,8 +365,12 @@ def test_getattr_method():
 def test_getattr_attribute():
     p = StatefulPublisher()
     class Foo:
+        a = None
+
         def __init__(self, a=5):
             self.a = a
+
+    p.inherit_type(Foo)
 
     dut = p.a
     m = mock.Mock()
@@ -349,11 +378,36 @@ def test_getattr_attribute():
 
     with pytest.raises(ValueError):
         dut.get()
-    
+
     m.assert_not_called()
-    
+
     p.notify(Foo(3))
 
     assert dut.get() == 3
 
     m.assert_called_once_with(3)
+
+    with pytest.raises(ValueError):
+        dut.emit(0, who=Publisher())
+
+    with pytest.raises(AttributeError):
+        dut.assnign(5)
+
+@pytest.mark.parametrize('operator, values, result', [
+    (op.All, (False, False, False), False),
+    (op.All, (False, True, False), False),
+    (op.All, (True, True, True), True),
+    (op.Any, (False, False, False), False),
+    (op.Any, (False, True, False), True),
+    (op.Any, (True, True, True), True),
+    (op.BitwiseAnd, (0, 5, 15), 0),
+    (op.BitwiseAnd, (7, 14, 255), 6),
+    (op.BitwiseAnd, (3,), 3),
+    (op.BitwiseOr, (0, 5, 8), 13),
+    (op.BitwiseOr, (7, 14, 255), 255),
+    (op.BitwiseOr, (3,), 3),
+])
+def test_multi_operators(operator, values, result):
+    sources = [StatefulPublisher(v) for v in values]
+    dut = operator(*sources)
+    assert dut.get() == result

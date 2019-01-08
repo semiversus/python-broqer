@@ -116,7 +116,8 @@ Also fancy stuff like getting item by index or key is possible:
 
 Some python built in functions can't return Publishers (e.g. ``len()`` needs to
 return an integer). For this cases special functions are defined in broqer: ``Str``,
-``Int``, ``Float``, ``Len`` and ``In`` (for ``x in y``).
+``Int``, ``Float``, ``Len`` and ``In`` (for ``x in y``). Also other functions
+for convenience are available: ``All``, ``Any``, ``BitwiseAnd`` and ``BitwiseOr``.
 
 Attribute access on a publisher is building a publisher where the actual attribute
 access is done on emitting values:
@@ -126,7 +127,7 @@ access is done on emitting values:
     >>> i = Value('Attribute access made REACTIVE')
     >>> i.lower().strip(sep=' ') | op.Sink(print)
     ['attribute', 'access', 'made', 'reactive']
-    
+
     >>> i.emit('Reactive and pythonic')
     ['reactive', 'and', 'pythonic']
 
@@ -339,4 +340,3 @@ Subjects
 +--------------------------+--------------------------------------------------------------+
 | Value_ (\*init)          | Source with a state (initialized via ``init``)               |
 +--------------------------+--------------------------------------------------------------+
-

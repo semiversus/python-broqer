@@ -35,8 +35,8 @@ class NumberDT(DT):
     """ Datatype for general numbers
 
     Recognized meta keys:
-    * lower_input_limit: check the value against minimum (below->Exception)
-    * upper_input_limit: check against maximum (above raises an Exception)
+    - lower_input_limit: check the value against minimum (below->Exception)
+    - upper_input_limit: check against maximum (above raises an Exception)
     """
 
     def check(self, topic, value):
@@ -179,8 +179,8 @@ class DTTopic(MetaTopic):
     def checked_emit(self, value: Any) -> asyncio.Future:
         """ Casting and checking in one call """
 
-        assert isinstance(self._subject, Subscriber), \
-            'Topic has to be a subscriber'
+        if not isinstance(self._subject, Subscriber):
+            raise TypeError('Topic %r has to be a subscriber' % self._path)
 
         value = self.cast(value)
         self.check(value)

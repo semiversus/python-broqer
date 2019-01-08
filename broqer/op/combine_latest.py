@@ -3,7 +3,7 @@
 >>> s1 = Subject()
 >>> s2 = Subject()
 
->>> combination = s1 | op.CombineLatest(s2)
+>>> combination = op.CombineLatest(s1, s2)
 >>> disposable = combination | op.Sink(print)
 
 CombineLatest is only emitting, when all values are collected:
@@ -145,8 +145,8 @@ class CombineLatest(MultiOperator):
         return result
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        assert any(who is p for p in self._publishers), \
-            'emit from non assigned publisher'
+        if all(who is not p for p in self._publishers):
+            raise ValueError('Emit from non assigned publisher')
 
         # remove source publisher from ._missing
         self._missing.discard(who)
@@ -191,15 +191,6 @@ class CombineLatest(MultiOperator):
             return None
 
         return self.notify(state)
-
-    def __ror__(self, publisher: Publisher) -> Publisher:
-        self._publishers = (publisher, *self._publishers)
-        self._partial_state.insert(0, NONE)
-        self._missing.add(publisher)
-        if self._stateless is not None:
-            self._stateless = tuple(False for _ in self._publishers)
-        self._index.update({p: i for i, p in enumerate(self._publishers)})
-        return self
 
 
 def build_combine_latest(map_: Callable[..., Any] = None, *, emit_on=None,

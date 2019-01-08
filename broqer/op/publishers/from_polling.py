@@ -38,7 +38,8 @@ from broqer import Publisher, Subscriber, SubscriptionDisposable, \
 class FromPolling(Publisher):
     """ Call ``func(*args, **kwargs)`` periodically and emit the returned
     values.
-    :param interval: periodic interval in seconds
+    :param interval: periodic interval in seconds. Use None if it should poll
+        only once on first subscription
     :param poll_func: function to be called
     :param \\*args: variable arguments to be used for calling poll_func
     :param error_callback: error callback to be registered
@@ -64,22 +65,31 @@ class FromPolling(Publisher):
     def subscribe(self, subscriber: Subscriber,
                   prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend)
-        if self._call_later_handler is None:
+        if self._interval is None:
+            try:
+                result = self._poll_func()
+                subscriber.emit(result, who=self)
+            except Exception:  # pylint: disable=broad-except
+                self._error_callback(*sys.exc_info())
+        elif self._call_later_handler is None:
             self._poll_callback()
         return disposable
+
+    def unsubscribe(self, subscriber: Subscriber) -> None:
+        Publisher.unsubscribe(self, subscriber)
+        if not self._subscriptions and self._call_later_handler:
+            self._call_later_handler.cancel()
+            self._call_later_handler = None
 
     def get(self):
         Publisher.get(self)  # raises ValueError
 
     def _poll_callback(self):
-        if self._subscriptions:
-            try:
-                result = self._poll_func()
-                self.notify(result)
-            except Exception:  # pylint: disable=broad-except
-                self._error_callback(*sys.exc_info())
+        try:
+            result = self._poll_func()
+            self.notify(result)
+        except Exception:  # pylint: disable=broad-except
+            self._error_callback(*sys.exc_info())
 
-            self._call_later_handler = self._loop.call_later(
-                self._interval, self._poll_callback)
-        else:
-            self._call_later_handler = None
+        self._call_later_handler = self._loop.call_later(
+            self._interval, self._poll_callback)

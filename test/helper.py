@@ -85,10 +85,10 @@ def check_single_operator(cls, args, kwargs, input_vector, output_vector, initia
     check_operator(cls, args, kwargs, input_vector, output_vector, initial_state, has_state, stateful=True)
 
 def check_multi_operator(cls, kwargs, input_vector, output_vector, initial_state=None, has_state=False):
-    check_operator(cls, (), kwargs, input_vector, output_vector, initial_state, has_state, stateful=False)
-    check_operator(cls, (), kwargs, input_vector, output_vector, initial_state, has_state, stateful=True)
+    check_operator(cls, (), kwargs, input_vector, output_vector, initial_state, has_state, stateful=False, multi=True)
+    check_operator(cls, (), kwargs, input_vector, output_vector, initial_state, has_state, stateful=True, multi=True)
 
-def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state=None, has_state=False, stateful=False):
+def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state=None, has_state=False, stateful=False, multi=False):
     # setup
     first_input = input_vector[0]
     first_result = output_vector[0]
@@ -100,10 +100,13 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
     else:
         sources = tuple(Publisher() for _ in input_vector[0])
 
-    dut = cls(*sources[1:], *args, **kwargs)
-    sources[0] | dut
+    if multi:
+        dut = cls(*sources, *args, **kwargs)
+    else:
+        dut = cls(*args, **kwargs)
+        sources[0] | dut
 
-    assert sources[0] in dut.source_publishers
+    assert any((sources[0] is p) for p in dut.source_publishers)
 
     collector_permanent = Collector()
     collector_temporary = Collector()
@@ -268,7 +271,7 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
 
     # check emit from wrong publisher
     wrong_publisher = Publisher()
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         dut.emit(first_input, who=wrong_publisher)
     with pytest.raises( (AssertionError, TypeError) ):
         dut.emit(first_input)
@@ -405,3 +408,10 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
         assert dut.get() == stored_result
     except ValueError:
         assert stored_result is None
+
+    # check emit from wrong publisher
+    wrong_publisher = Publisher()
+    with pytest.raises(ValueError):
+        dut.emit(first_input_value, who=wrong_publisher)
+    with pytest.raises( (AssertionError, TypeError) ):
+        dut.emit(first_input_value)

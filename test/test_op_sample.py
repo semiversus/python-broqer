@@ -58,3 +58,7 @@ async def test_errorhandler():
     p.notify(1)
     mock.assert_called_once_with(1)
     mock_errorhandler.assert_called_once_with(ZeroDivisionError, ANY, ANY)
+
+def test_argument_check():
+    with pytest.raises(ValueError):
+        Sample(-1)

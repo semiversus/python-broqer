@@ -97,8 +97,9 @@ class Topic(Publisher, Subscriber):
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if self._subject is not None:
-            assert isinstance(self, Publisher), 'Topic %r has to be a ' \
-                'Publisher when using .subscribe()' % self._path
+            if not isinstance(self._subject, Publisher):
+                raise TypeError('Topic %r has to be a Publisher when using'
+                                ' .subscribe()' % self._path)
 
             if len(self._subscriptions) == 1:
                 self._subject.subscribe(self)
@@ -138,15 +139,17 @@ class Topic(Publisher, Subscriber):
         if who is self._subject:
             return self.notify(value)
 
-        assert isinstance(self._subject, Subscriber), \
-            'Topic %r has to be a Subscriber when using .emit()' % self._path
+        if not isinstance(self._subject, Subscriber):
+            raise TypeError('Topic %r has to be a Subscriber when using'
+                            ' .emit()' % self._path)
 
         # otherwise pass this .emit to the subject
         return self._subject.emit(value, who=self)
 
     def assign(self, subject):
         """ Assigns the given subject to the topic """
-        assert isinstance(subject, (Publisher, Subscriber))
+        if not isinstance(subject, (Publisher, Subscriber)):
+            raise TypeError('Assignee has to be Publisher or Subscriber')
 
         # check if not already assigned
         if self._subject is not None:
@@ -265,9 +268,19 @@ class SubHub:  # pylint: disable=too-few-public-methods
     """ SubHub is adding a prefix to each topic access """
     def __init__(self, hub: Hub, prefix: str) -> None:
         self._hub = hub
-        assert not prefix.endswith('.'), 'Prefix should not end with \'.\''
-        assert prefix, 'Prefix should not be empty'
+
+        if prefix.endswith('.'):
+            raise ValueError('Prefix should not end with \'.\'')
+
+        if not prefix:
+            raise ValueError('Prefix should not be empty')
+
         self._prefix = prefix + '.'
 
     def __getitem__(self, topic: str) -> Topic:
         return self._hub[self._prefix + topic]
+
+    @property
+    def prefix(self):
+        """ the prefix of this sub hub """
+        return self._prefix[:-1]

@@ -58,7 +58,8 @@ class Sample(Operator):
     """
     def __init__(self, interval: float,
                  error_callback=default_error_handler, loop=None) -> None:
-        assert interval > 0, 'interval has to be positive'
+        if interval <= 0:
+            raise ValueError('Interval has to be bigger than zero.')
 
         Operator.__init__(self)
 
@@ -96,7 +97,8 @@ class Sample(Operator):
             self._call_later_handle = None
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
 
         self._state = value
 

@@ -51,3 +51,11 @@ async def test_cancel():
 
     with pytest.raises(asyncio.CancelledError):
         future.result()
+
+def test_wrong_source():
+    p = Publisher()
+    on_emit_future = OnEmitFuture()
+    p | on_emit_future
+
+    with pytest.raises(ValueError):
+        on_emit_future.emit(0, who=Publisher())

@@ -127,12 +127,12 @@ class MapAsync(Operator):
                  unpack: bool = False, **kwargs) -> None:
         """
         mode uses one of the following enumerations:
-            * CONCURRENT - just run coroutines concurrent
-            * INTERRUPT - cancel running and call for new value
-            * QUEUE - queue the value(s) and call after coroutine is finished
-            * LAST - use last emitted value after coroutine is finished
-            * LAST_DISTINCT - like LAST but only when value has changed
-            * SKIP - skip values emitted during coroutine is running
+            - CONCURRENT - just run coroutines concurrent
+            - INTERRUPT - cancel running and call for new value
+            - QUEUE - queue the value(s) and call after coroutine is finished
+            - LAST - use last emitted value after coroutine is finished
+            - LAST_DISTINCT - like LAST but only when value has changed
+            - SKIP - skip values emitted during coroutine is running
         """
         Operator.__init__(self)
         self._options = _Options(coro, mode, args, kwargs, error_callback,
@@ -164,7 +164,8 @@ class MapAsync(Operator):
         Publisher.get(self)  # raises ValueError
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
 
         # check if a coroutine is already running
         if self._future is not None:
@@ -192,8 +193,6 @@ class MapAsync(Operator):
             if result is not NONE:
                 self.notify(result)  # may also raise exception
         except asyncio.CancelledError:
-            assert self._options.mode is MODE.INTERRUPT, 'cancellation should'\
-                ' only be possible in INTERRUPT mode'
             return
         except Exception:  # pylint: disable=broad-except
             self._options.error_callback(*sys.exc_info())

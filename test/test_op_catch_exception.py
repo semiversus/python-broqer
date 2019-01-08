@@ -36,3 +36,6 @@ def test_exception():
     subscriber.exception = ZeroDivisionError()
     with pytest.raises(ZeroDivisionError):
         source.notify(3)
+
+    with pytest.raises(ValueError):
+        CatchException()

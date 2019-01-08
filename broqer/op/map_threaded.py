@@ -110,7 +110,8 @@ class MapThreaded(MapAsync):
                  error_callback=default_error_handler,
                  unpack: bool = False, loop=None, **kwargs) -> None:
 
-        assert mode != MODE.INTERRUPT, 'mode INTERRUPT is not supported'
+        if mode is MODE.INTERRUPT:
+            raise ValueError('Mode INTERRUPT is not supported')
 
         MapAsync.__init__(self, self._thread_coro, mode=mode,
                           error_callback=error_callback, unpack=unpack)

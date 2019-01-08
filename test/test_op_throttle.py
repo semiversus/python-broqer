@@ -109,5 +109,6 @@ async def test_throttle():
     p.notify(4)
     mock_sink.assert_called_once_with(4)
 
-
-
+def test_argument_check():
+    with pytest.raises(ValueError):
+        Throttle(-1)

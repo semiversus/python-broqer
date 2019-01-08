@@ -36,11 +36,50 @@ async def test_polling():
     # unsubscribe
     mock.reset_mock()
     disposable.dispose()
-    await asyncio.sleep(0.1)
+    await asyncio.sleep(0.3)
     mock.assert_not_called()
 
     # resubscribe
     disposable = dut | Sink(mock)
+
+@pytest.mark.asyncio
+async def test_cancel_on_unsubscribe():
+    mock = Mock()
+    dut = FromPolling(0.1, mock)
+
+    disposable = dut | Sink()
+    assert mock.call_count == 1
+
+    await asyncio.sleep(0.25)
+    assert mock.call_count == 3
+
+    disposable.dispose()
+    await asyncio.sleep(0.3)
+    assert mock.call_count == 3
+
+@pytest.mark.asyncio
+async def test_once():
+    mock = Mock()
+    err_mock = Mock()
+    dut = FromPolling(None, mock, error_callback=err_mock)
+
+    disposable = dut | Sink()
+    assert mock.call_count == 1
+
+    await asyncio.sleep(0.25)
+    assert mock.call_count == 1
+
+    disposable.dispose()
+    await asyncio.sleep(0.3)
+    assert mock.call_count == 1
+    err_mock.assert_not_called()
+
+    mock.reset_mock()
+    mock.side_effect = ValueError
+    disposable = dut | Sink()
+    assert mock.call_count == 1
+    assert err_mock.call_count == 1
+
 
 @pytest.mark.parametrize('args, kwargs, result_vector', [
     ((), {}, (1, 2, 3, 4, 5)),

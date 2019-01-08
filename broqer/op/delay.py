@@ -37,7 +37,9 @@ class Delay(Operator):
     """
     def __init__(self, duration: float,
                  error_callback=default_error_handler, loop=None) -> None:
-        assert duration >= 0, 'delay has to be positive'
+
+        if duration < 0:
+            raise ValueError('delay has to be positive')
 
         Operator.__init__(self)
 
@@ -49,7 +51,9 @@ class Delay(Operator):
         return Publisher.get(self)  # will raise ValueError
 
     def emit(self, value: Any, who: Publisher) -> None:
-        assert who is self._publisher, 'emit from non assigned publisher'
+        if who is not self._publisher:
+            raise ValueError('Emit from non assigned publisher')
+
         self._loop.call_later(self._duration, self._delayed, value)
 
     def _delayed(self, value):

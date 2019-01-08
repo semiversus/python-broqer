@@ -41,22 +41,51 @@ This is working because False is correpsonding to integer 0, True is 1
 import asyncio
 from typing import Any, Dict
 
-from broqer import Publisher, NONE
+from broqer import Publisher, NONE, SubscriptionDisposable, Subscriber
 
 from .operator import Operator
 
 
 class Switch(Operator):
-    """ Emit a publisher mapped by ``mapping``
+    """ Forwards emits from a selected publisher (mapped by ``mapping``).
+
     :param mapping: dictionary with value:(Publisher|constant) mapping
     :param default: value emitted if key is not found
+    :param subscribe_all: if True all publishers are subscribed on operator
+        subscription. Otherwise only the selected publisher will be subscribed.
     """
-    def __init__(self, mapping: Dict[Any, Any], default: Any = NONE) -> None:
+    def __init__(self, mapping: Dict[Any, Any], default: Any = NONE,
+                 subscribe_all=False) -> None:
         Operator.__init__(self)
         self._key = NONE  # type: Any
         self._selected_publisher = None  # type: Publisher
         self._mapping = mapping
         self._default = default
+        if subscribe_all:
+            self._publishers = tuple(p for p in mapping.values()
+                                     if isinstance(p, Publisher))
+        else:
+            self._publishers = None
+
+    def subscribe(self, subscriber: 'Subscriber',
+                  prepend: bool = False) -> SubscriptionDisposable:
+        disposable = Operator.subscribe(self, subscriber, prepend=prepend)
+
+        if len(self._subscriptions) == 1 and self._publishers:
+            for publisher in self._publishers:
+                publisher.subscribe(self)
+
+        return disposable
+
+    def unsubscribe(self, subscriber: Subscriber) -> None:
+        Operator.unsubscribe(self, subscriber)
+        if not self._subscriptions:
+            if self._publishers:
+                for publisher in self._publishers:
+                    publisher.unsubscribe(self)
+            elif self._selected_publisher is not None:
+                self._selected_publisher.unsubscribe(self)
+                self._selected_publisher = None
 
     def get(self):
         selection = self._publisher.get()  # may raises ValueError
@@ -72,14 +101,17 @@ class Switch(Operator):
 
     def emit(self, value: Any, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
-            assert who is self._selected_publisher, \
-                'emit from not selected publisher'
-            return self.notify(value)
+            if who is self._selected_publisher:
+                return self.notify(value)
+            if not self._publishers:
+                raise ValueError('Emit from not selected publisher')
+
+            return None
 
         if value is self._key:
             return None
 
-        if self._selected_publisher is not None:
+        if self._selected_publisher is not None and not self._publishers:
             self._selected_publisher.unsubscribe(self)
         self._selected_publisher = None
 
@@ -94,7 +126,8 @@ class Switch(Operator):
 
         if isinstance(item, Publisher):
             self._selected_publisher = item
-            item.subscribe(self)
+            if not self._publishers:
+                item.subscribe(self)
         else:
             return self.notify(item)
 
