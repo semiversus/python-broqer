@@ -172,8 +172,10 @@ class MapAsync(Operator):
             if self._queue is not None:
                 self._queue.append(value)
                 return
+
             # cancel the future if INTERRUPT mode is used
-            if self._options.mode is MODE.INTERRUPT and not self._future.done():
+            if self._options.mode is MODE.INTERRUPT and \
+                    not self._future.done():
                 self._future.cancel()
             # in SKIP mode just do nothin with this emit
             elif self._options.mode is MODE.SKIP:
