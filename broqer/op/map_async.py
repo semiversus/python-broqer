@@ -167,13 +167,13 @@ class MapAsync(Operator):
         assert who is self._publisher, 'emit from non assigned publisher'
 
         # check if a coroutine is already running
-        if self._future is not None and not self._future.done():
+        if self._future is not None:
             # append to queue if a queue is used in this mode
             if self._queue is not None:
                 self._queue.append(value)
                 return
             # cancel the future if INTERRUPT mode is used
-            if self._options.mode is MODE.INTERRUPT:
+            if self._options.mode is MODE.INTERRUPT and not self._future.done():
                 self._future.cancel()
             # in SKIP mode just do nothin with this emit
             elif self._options.mode is MODE.SKIP:
@@ -192,6 +192,7 @@ class MapAsync(Operator):
         except asyncio.CancelledError:
             assert self._options.mode is MODE.INTERRUPT, 'cancellation should'\
                 ' only be possible in INTERRUPT mode'
+            return
         except Exception:  # pylint: disable=broad-except
             self._options.error_callback(*sys.exc_info())
 
@@ -201,6 +202,8 @@ class MapAsync(Operator):
 
             # start the coroutine
             self._run_coro(value)
+        else:
+            self._future = None
 
     def _run_coro(self, value):
         """ Start the coroutine as task """
@@ -208,6 +211,7 @@ class MapAsync(Operator):
         # when LAST_DISTINCT is used only start coroutine when value changed
         if self._options.mode is MODE.LAST_DISTINCT and \
                 value == self._last_emit:
+            self._future = None
             return
 
         # store the value to be emitted for LAST_DISTINCT
