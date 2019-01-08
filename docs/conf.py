@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath('..'))
 project = 'broqer'
 copyright = u'2018, Günther Jena'
 author = u'Günther Jena'
-version = '0.9.0'
+version = '0.9.1-dev'
 
 extensions = [
     'sphinx.ext.autodoc',
