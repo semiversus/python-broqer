@@ -16,7 +16,7 @@ from . import op
 
 __author__ = 'Günther Jena'
 __email__ = 'guenther@jena.at'
-__version__ = '0.9.1'
+__version__ = '1.0.0-dev'
 
 __all__ = [
     'StatefulPublisher', 'Disposable', 'Publisher', 'Subscriber',
