@@ -393,6 +393,20 @@ def test_getattr_attribute():
     with pytest.raises(AttributeError):
         dut.assnign(5)
 
+def test_getattr_without_inherit():
+    p = StatefulPublisher()
+    class Foo:
+        a = None
+
+        def __init__(self, a=5):
+            self.a = a
+
+    with pytest.raises(AttributeError):
+        dut = p.a
+
+    with pytest.raises(AttributeError):
+        p.assnign(5)
+
 @pytest.mark.parametrize('operator, values, result', [
     (op.All, (False, False, False), False),
     (op.All, (False, True, False), False),
