@@ -20,7 +20,7 @@ class _MapConstant(Operator):
     def get(self):
         return self._operation(self._publisher.get(), self._value)
 
-    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any_, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 
@@ -39,7 +39,7 @@ class _MapConstantReverse(Operator):
     def get(self):
         return self._operation(self._value, self._publisher.get())
 
-    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any_, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 
@@ -57,7 +57,7 @@ class _MapUnary(Operator):
     def get(self):
         return self._operation(self._publisher.get())
 
-    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any_, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 
@@ -86,7 +86,7 @@ class _GetAttr(Operator):
         self._kwargs = kwargs
         return self
 
-    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any_, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 

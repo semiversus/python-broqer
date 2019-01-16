@@ -96,7 +96,7 @@ class Sample(Operator):
             self._state = NONE
             self._call_later_handle = None
 
-    def emit(self, value: Any, who: Publisher) -> None:
+    def emit_op(self, value: Any, who: Publisher) -> None:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 

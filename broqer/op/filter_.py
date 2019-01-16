@@ -55,7 +55,7 @@ class Filter(Operator):
             return value
         return Publisher.get(self)  # raises ValueError
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 
@@ -83,7 +83,7 @@ class True_(Operator):  # pylint: disable=invalid-name
             return value
         return Publisher.get(self)  # raises ValueError
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 
@@ -107,7 +107,7 @@ class False_(Operator):  # pylint: disable=invalid-name
             return value
         return Publisher.get(self)  # raises ValueError
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 

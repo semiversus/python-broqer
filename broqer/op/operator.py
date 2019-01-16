@@ -9,7 +9,15 @@ from typing import Any
 from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 
-class Operator(Subscriber, Publisher):
+class _EmitSink(Subscriber):  # pylint: disable=too-few-public-methods
+    def __init__(self, operator):
+        self._operator = operator
+
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+        return self._operator.emit_op(value, who=who)
+
+
+class Operator(Publisher):
     """ Base class for operators depending on a single publisher. This
     publisher will be subscribed as soon as this operator is subscribed the
     first time.
@@ -19,14 +27,14 @@ class Operator(Subscriber, Publisher):
     """
     def __init__(self) -> None:
         Publisher.__init__(self)
-        Subscriber.__init__(self)
+        self._emit_sink = _EmitSink(self)
         self._publisher = None  # type: Publisher
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend)
         if len(self._subscriptions) == 1:  # if this was the first subscription
-            self._publisher.subscribe(self)
+            self._publisher.subscribe(self._emit_sink)
         else:
             try:
                 value = self.get()
@@ -39,7 +47,7 @@ class Operator(Subscriber, Publisher):
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Publisher.unsubscribe(self, subscriber)
         if not self._subscriptions:
-            self._publisher.unsubscribe(self)
+            self._publisher.unsubscribe(self._emit_sink)
 
     @property
     def source_publishers(self):
@@ -50,6 +58,13 @@ class Operator(Subscriber, Publisher):
     def get(self):
         """ Get value of operator """
 
+    @abstractmethod
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
+        """ Send new value to the operator
+        :param value: value to be send
+        :param who: reference to which publisher is emitting
+        """
+
     def __ror__(self, publisher: Publisher) -> Publisher:
         if self._publisher is not None:
             raise ValueError('Operator can only be connected to one publisher')
@@ -58,7 +73,7 @@ class Operator(Subscriber, Publisher):
         return self
 
 
-class MultiOperator(Publisher, Subscriber):
+class MultiOperator(Publisher):
     """ Base class for operators depending on multiple publishers. Like
     Operator all publishers will be subscribed on first subscription to this
     operator. Accordingly all publishers get unsubscribed on unsubscription
@@ -66,7 +81,7 @@ class MultiOperator(Publisher, Subscriber):
     """
     def __init__(self, *publishers: Publisher) -> None:
         Publisher.__init__(self)
-        Subscriber.__init__(self)
+        self._emit_sink = _EmitSink(self)
         self._publishers = publishers
 
     def subscribe(self, subscriber: 'Subscriber',
@@ -75,7 +90,7 @@ class MultiOperator(Publisher, Subscriber):
         if len(self._subscriptions) == 1:  # if this was the first subscription
             for _publisher in self._publishers:
                 # subscribe to all dependent publishers
-                _publisher.subscribe(self)
+                _publisher.subscribe(self._emit_sink)
         else:
             try:
                 value = self.get()
@@ -89,7 +104,7 @@ class MultiOperator(Publisher, Subscriber):
         Publisher.unsubscribe(self, subscriber)
         if not self._subscriptions:
             for _publisher in self._publishers:
-                _publisher.unsubscribe(self)
+                _publisher.unsubscribe(self._emit_sink)
 
     @property
     def source_publishers(self):
@@ -99,6 +114,13 @@ class MultiOperator(Publisher, Subscriber):
     @abstractmethod
     def get(self):
         """ Get value of operator """
+
+    @abstractmethod
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
+        """ Send new value to the operator
+        :param value: value to be send
+        :param who: reference to which publisher is emitting
+        """
 
 
 class OperatorConcat(Operator):
@@ -114,7 +136,7 @@ class OperatorConcat(Operator):
     def get(self):
         return self._publisher.get()  # may raises ValueError
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
         return self.notify(value)
 
     def __ror__(self, publisher: Publisher) -> Publisher:

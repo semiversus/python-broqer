@@ -94,7 +94,7 @@ class Debounce(Operator):
             return self._retrigger_value
         return self._state
 
-    def emit(self, value: Any, who: Publisher) -> None:
+    def emit_op(self, value: Any, who: Publisher) -> None:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 

@@ -52,7 +52,7 @@ class Partition(Operator):
             return tuple(queue)
         return Publisher.get(self)  # raises ValueError
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 

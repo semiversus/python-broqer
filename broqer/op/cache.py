@@ -35,7 +35,7 @@ class Cache(Operator):
         old_state = self._state  # to check if .emit was called
 
         if len(self._subscriptions) == 1:  # if this was the first subscription
-            self._publisher.subscribe(self)
+            self._publisher.subscribe(self._emit_sink)
 
         try:
             value = self._publisher.get()
@@ -56,7 +56,7 @@ class Cache(Operator):
                 return self._state
         Publisher.get(self)  # raises ValueError
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 

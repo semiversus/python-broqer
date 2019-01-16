@@ -272,9 +272,9 @@ def check_operator(cls, args, kwargs, input_vector, output_vector, initial_state
     # check emit from wrong publisher
     wrong_publisher = Publisher()
     with pytest.raises(ValueError):
-        dut.emit(first_input, who=wrong_publisher)
+        dut.emit_op(first_input, who=wrong_publisher)
     with pytest.raises( (AssertionError, TypeError) ):
-        dut.emit(first_input)
+        dut.emit_op(first_input)
 
 JITTER = 0.03
 
@@ -412,6 +412,6 @@ async def check_operator_coro(cls, args, kwargs, input_vector, output_vector, in
     # check emit from wrong publisher
     wrong_publisher = Publisher()
     with pytest.raises(ValueError):
-        dut.emit(first_input_value, who=wrong_publisher)
+        dut.emit_op(first_input_value, who=wrong_publisher)
     with pytest.raises( (AssertionError, TypeError) ):
-        dut.emit(first_input_value)
+        dut.emit_op(first_input_value)

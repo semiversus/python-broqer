@@ -21,7 +21,7 @@ class Replace(Operator):
         self._publisher.get()  # may raises ValueError
         return self._value
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 

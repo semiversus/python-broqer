@@ -73,7 +73,7 @@ class Switch(Operator):
 
         if len(self._subscriptions) == 1 and self._publishers:
             for publisher in self._publishers:
-                publisher.subscribe(self)
+                publisher.subscribe(self._emit_sink)
 
         return disposable
 
@@ -82,9 +82,9 @@ class Switch(Operator):
         if not self._subscriptions:
             if self._publishers:
                 for publisher in self._publishers:
-                    publisher.unsubscribe(self)
+                    publisher.unsubscribe(self._emit_sink)
             elif self._selected_publisher is not None:
-                self._selected_publisher.unsubscribe(self)
+                self._selected_publisher.unsubscribe(self._emit_sink)
                 self._selected_publisher = None
 
     def get(self):
@@ -99,7 +99,7 @@ class Switch(Operator):
             return item.get()  # may raises ValueError
         return item
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
         if who is not self._publisher:
             if who is self._selected_publisher:
                 return self.notify(value)
@@ -112,7 +112,7 @@ class Switch(Operator):
             return None
 
         if self._selected_publisher is not None and not self._publishers:
-            self._selected_publisher.unsubscribe(self)
+            self._selected_publisher.unsubscribe(self._emit_sink)
         self._selected_publisher = None
 
         try:
@@ -127,7 +127,7 @@ class Switch(Operator):
         if isinstance(item, Publisher):
             self._selected_publisher = item
             if not self._publishers:
-                item.subscribe(self)
+                item.subscribe(self._emit_sink)
         else:
             return self.notify(item)
 

@@ -36,7 +36,7 @@ class Merge(MultiOperator):
                 pass
         Publisher.get(self)  # raises ValueError
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
         if all(who is not p for p in self._publishers):
             raise ValueError('Emit from non assigned publisher')
 
