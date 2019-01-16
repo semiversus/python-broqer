@@ -26,11 +26,6 @@ Initial focus on embedded systems *Broqer* can be used wherever continuous strea
 Synopsis
 ========
 
-+--------------------------------------------------------------------------------+
-| This is version 0.9 and is here to prepare version 1.0.                        |
-| **Broqer 1.0.0 will be released soon (till end of october 2018) - stay tuned** |
-+--------------------------------------------------------------------------------+
-
 - Pure python implementation without dependencies
 - Under MIT license (2018 Günther Jena)
 - Source is hosted on GitHub.com_
