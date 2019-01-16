@@ -9,6 +9,10 @@ Sink
 ----
 .. autoclass:: broqer.op.Sink
 
+SinkAsync
+---------
+.. autoclass:: broqer.op.SinkAsync
+
 OnEmitFuture
 ------------
 .. autoclass:: broqer.op.OnEmitFuture

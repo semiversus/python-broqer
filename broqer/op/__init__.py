@@ -29,6 +29,7 @@ from .publishers.from_polling import FromPolling
 from .subscribers.on_emit_future import OnEmitFuture
 from .subscribers.sink import Sink, build_sink
 from .subscribers.trace import Trace
+from .subscribers.sink_async import SinkAsync, build_sink_async
 
 # utils
 from .operator import OperatorConcat
@@ -45,7 +46,8 @@ __all__ = [
     'SlidingWindow', 'Switch', 'Debounce', 'Delay', 'FromPolling', 'Sample',
     'MapAsync', 'MODE', 'MapThreaded', 'Throttle', 'OnEmitFuture', 'True_',
     'False_', 'Trace', 'build_map', 'build_reduce', 'build_combine_latest',
-    'build_filter', 'build_accumulate', 'build_map_async',
+    'build_filter', 'build_accumulate', 'build_map_async', 'build_sink_async',
     'build_map_threaded', 'build_sink', 'Str', 'Bool', 'Int', 'Float', 'Repr',
-    'Len', 'In', 'All', 'Any', 'BitwiseAnd', 'BitwiseOr', 'OperatorConcat'
+    'Len', 'In', 'All', 'Any', 'BitwiseAnd', 'BitwiseOr', 'OperatorConcat',
+    'SinkAsync'
 ]

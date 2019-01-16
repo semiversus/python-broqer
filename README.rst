@@ -240,6 +240,7 @@ Broqer was inspired by:
 .. _Replace: https://python-broqer.readthedocs.io/en/latest/operators/replace.py
 .. _Sample: https://python-broqer.readthedocs.io/en/latest/operators/sample.py
 .. _Sink: https://python-broqer.readthedocs.io/en/latest/operators/subscribers/sink.py
+.. _SinkAsync: https://python-broqer.readthedocs.io/en/latest/operators/subscribers/sink_async.py
 .. _SlidingWindow: https://python-broqer.readthedocs.io/en/latest/operators/sliding_window.py
 .. _Switch: https://python-broqer.readthedocs.io/en/latest/operators/switch.py
 .. _Throttle: https://python-broqer.readthedocs.io/en/latest/operators/throttle.py
@@ -319,6 +320,8 @@ A Subscriber_ is the sink for messages.
 
 +----------------------------------+--------------------------------------------------------------+
 | Sink_ (func, \*args, \*\*kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
++----------------------------------+--------------------------------------------------------------+
+| SinkAsync_ (coro, ...)           | Start ``coro(*args, value, **kwargs)`` like MapAsync_        |
 +----------------------------------+--------------------------------------------------------------+
 | OnEmitFuture_ (timeout=None)     | Build a future able to await for                             |
 +----------------------------------+--------------------------------------------------------------+
