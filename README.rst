@@ -52,7 +52,7 @@ Showcase
 ========
 
 In other frameworks a *Publisher* is sometimes called *Oberservable*. A *Subscriber*
-is able to observe changes the publisher is emitting. With this basics you're
+is able to observe changes the publisher is emitting. With these basics you're
 able to use the observer pattern - let's see!
 
 Observer pattern
