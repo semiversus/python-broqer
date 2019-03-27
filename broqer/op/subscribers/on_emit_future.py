@@ -17,9 +17,9 @@ Usage:
 (1, 2)
 """
 import asyncio
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
-from broqer import Publisher, Subscriber
+from broqer import Publisher, Subscriber, SubscriptionDisposable
 
 
 class OnEmitFuture(Subscriber, asyncio.Future):
@@ -58,7 +58,8 @@ class OnEmitFuture(Subscriber, asyncio.Future):
         if not self.done():
             self.set_result(value)
 
-    def __ror__(self, publisher: Publisher) -> Subscriber:
+    def __ror__(self, publisher: Publisher
+                ) -> Union[SubscriptionDisposable, 'Publisher', 'Subscriber']:
         self._publisher = publisher
         publisher.subscribe(self)
         return self

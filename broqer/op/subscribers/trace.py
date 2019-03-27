@@ -1,9 +1,13 @@
 """ Implements Trace subscriber """
 from time import time
-from typing import Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 
 from broqer import Publisher, SubscriptionDisposable
 from broqer.op import Sink
+
+
+if TYPE_CHECKING:
+    from broqer import Subscriber  # noqa: F401 pylint: disable=unused-import
 
 
 class Trace(Sink):
@@ -26,7 +30,8 @@ class Trace(Sink):
         self._trace_handler(who, value, label=self._label)
         Sink.emit(self, value, who=who)
 
-    def __ror__(self, publisher: Publisher) -> SubscriptionDisposable:
+    def __ror__(self, publisher: Publisher
+                ) -> Union[SubscriptionDisposable, 'Publisher', 'Subscriber']:
         return publisher.subscribe(self, prepend=True)
 
     @classmethod
