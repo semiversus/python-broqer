@@ -28,7 +28,6 @@ class DT:
 
     def check(self, topic, value):  # pylint: disable=no-self-use,W0613
         """ Checking the value if it fits into the given specification """
-        pass
 
 
 class NumberDT(DT):

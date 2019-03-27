@@ -13,7 +13,6 @@ class SubscriptionError(ValueError):
     """ Special exception raised when subscription is failing (subscriber
     already subscribed) or on unsubscribe when subscriber is not subscribed
     """
-    pass
 
 
 TInherit = TypeVar('TInherit')
