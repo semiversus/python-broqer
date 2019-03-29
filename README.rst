@@ -116,7 +116,7 @@ for convenience are available: ``All``, ``Any``, ``BitwiseAnd`` and ``BitwiseOr`
 
 Attribute access on a publisher is building a publisher where the actual attribute
 access is done on emitting values. A publisher has to know, which type it should
-mimic - this is done via `.inherit_type(type)`.
+mimic - this is done via ``.inherit_type(type)``.
 
 .. code-block:: python3
 
