@@ -17,6 +17,9 @@ class _MapConstant(Operator):
         self._operation = operation
         self._publisher = publisher
 
+        if publisher.inherit_type is not None:
+            self.inherit_type(publisher.inherited_type)
+
     def get(self):
         return self._operation(self._publisher.get(), self._value)
 
@@ -36,6 +39,9 @@ class _MapConstantReverse(Operator):
         self._operation = operation
         self._publisher = publisher
 
+        if publisher.inherit_type is not None:
+            self.inherit_type(publisher.inherited_type)
+
     def get(self):
         return self._operation(self._value, self._publisher.get())
 
@@ -53,6 +59,9 @@ class _MapUnary(Operator):
         Operator.__init__(self)
         self._operation = operation
         self._publisher = publisher
+
+        if publisher.inherit_type is not None:
+            self.inherit_type(publisher.inherited_type)
 
     def get(self):
         return self._operation(self._publisher.get())
@@ -73,6 +82,9 @@ class _GetAttr(Operator):
         self._publisher = publisher
         self._args = None
         self._kwargs = None
+
+        if publisher.inherit_type is not None:
+            self.inherit_type(publisher.inherited_type)
 
     def get(self):
         value = self._publisher.get()  # may raise ValueError

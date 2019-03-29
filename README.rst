@@ -115,12 +115,14 @@ return an integer). For this cases special functions are defined in broqer: ``St
 for convenience are available: ``All``, ``Any``, ``BitwiseAnd`` and ``BitwiseOr``.
 
 Attribute access on a publisher is building a publisher where the actual attribute
-access is done on emitting values:
+access is done on emitting values. A publisher has to know, which type it should
+mimic - this is done via `.inherit_type(type)`.
 
 .. code-block:: python3
 
     >>> i = Value('Attribute access made REACTIVE')
-    >>> i.lower().strip(sep=' ') | op.Sink(print)
+    >>> i.inherit_type(str)
+    >>> i.lower().split(sep=' ') | op.Sink(print)
     ['attribute', 'access', 'made', 'reactive']
 
     >>> i.emit('Reactive and pythonic')
