@@ -10,7 +10,7 @@ def test_sink(operator_cls):
     cb = mock.Mock()
 
     s = Subject()
-    sink_instance = operator_cls(s, cb)
+    sink_instance = s | operator_cls(cb)
     assert isinstance(sink_instance, Disposable)
 
     assert not cb.called
@@ -39,7 +39,7 @@ def test_sink(operator_cls):
     assert not cb.called
 
 @pytest.mark.parametrize('operator_cls', [Sink, Trace])
-def test_sink(operator_cls):
+def test_sink2(operator_cls):
     cb = mock.Mock()
 
     s = Subject()

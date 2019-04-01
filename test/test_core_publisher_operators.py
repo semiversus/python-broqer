@@ -363,6 +363,28 @@ def test_getattr_method():
     mock2.assert_called_once_with(['This is just a test', ' honestly!'])
     mock3.assert_called_once_with(['This is just a test, honestly', ''])
 
+def test_inherit_getattr():
+    p = StatefulPublisher()
+    p.inherit_type(str)
+
+    dut = p.lower().split(' ')
+    m = mock.Mock()
+    dut | op.Sink(m)
+
+    p.notify('This is a TEST')
+    m.assert_called_once_with(['this', 'is', 'a', 'test'])
+
+def test_inherit_with_operators():
+    p = StatefulPublisher()
+    p.inherit_type(str)
+
+    dut = op.Len(('abc' + p + 'ghi').upper())
+    m = mock.Mock()
+    dut | op.Sink(m)
+
+    p.notify('def')
+    m.assert_called_once_with(9)
+
 def test_getattr_attribute():
     p = StatefulPublisher()
     class Foo:
