@@ -24,7 +24,7 @@ class Publisher():
     other frameworks *publisher*/*subscriber* are referenced as
     *observable*/*observer*.
 
-    As information receiver use following method to interact with Publisher
+    To receive information use following methods to interact with Publisher:
 
     - ``.subscribe(subscriber)`` to subscribe for events on this publisher
     - ``.unsubscribe(subscriber)`` to unsubscribe
