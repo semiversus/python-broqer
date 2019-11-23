@@ -2,12 +2,12 @@
 from time import time
 from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 
-from broqer import Publisher, SubscriptionDisposable
-from broqer.op import Sink
-
+from broqer.publisher import Publisher
+from broqer.disposable import SubscriptionDisposable
+from broqer.op.subscribers.sink import Sink
 
 if TYPE_CHECKING:
-    from broqer import Subscriber  # noqa: F401 pylint: disable=unused-import
+    from broqer.subscriber import Subscriber  # noqa: F401
 
 
 class Trace(Sink):

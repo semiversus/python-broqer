@@ -30,7 +30,7 @@ Reduce: 1234
 from typing import Any, Callable
 from functools import wraps
 
-from broqer import NONE
+from broqer.types import NONE
 
 from .accumulate import Accumulate
 

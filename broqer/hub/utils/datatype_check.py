@@ -3,8 +3,8 @@ import asyncio
 from ast import literal_eval
 from typing import Any
 
-from broqer import Subscriber
-from broqer.hub import Hub, MetaTopic
+from broqer.subscriber import Subscriber
+from broqer.hub.hub import Hub, MetaTopic
 
 
 def resolve_meta_key(hub, key, meta):

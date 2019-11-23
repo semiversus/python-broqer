@@ -35,7 +35,8 @@ import asyncio
 from functools import partial, wraps
 from typing import Any, Callable
 
-from broqer import Publisher, NONE
+from broqer.publisher import Publisher
+from broqer.types import NONE
 
 from .operator import Operator
 

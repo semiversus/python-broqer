@@ -29,7 +29,7 @@ import asyncio
 from functools import partial, wraps
 from typing import Any, Callable
 
-from broqer import Publisher
+from broqer.publisher import Publisher
 
 from .operator import Operator
 

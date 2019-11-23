@@ -1,8 +1,9 @@
 """ Implements TopicMapper """
 from typing import MutableMapping, Any
 
-from broqer import Subscriber, Publisher
-from broqer.hub import Topic
+from broqer.subscriber import Subscriber
+from broqer.publisher import Publisher
+from broqer.hub.hub import Topic
 
 
 class TopicMapper(Subscriber):  # pylint: disable=too-few-public-methods

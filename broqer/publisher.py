@@ -3,10 +3,11 @@
 import asyncio
 from typing import TYPE_CHECKING, Any, Union, TypeVar, Type
 
-from broqer import NONE, SubscriptionDisposable
+from .types import NONE
+from .disposable import SubscriptionDisposable
 
 if TYPE_CHECKING:
-    from broqer import Subscriber  # noqa: F401 pylint: disable=unused-import
+    from broqer.subscriber import Subscriber
 
 
 class SubscriptionError(ValueError):

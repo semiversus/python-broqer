@@ -74,8 +74,9 @@ from collections import OrderedDict
 from types import MappingProxyType
 from typing import Any, Optional, Dict  # noqa: F401
 
-from broqer import (Publisher, Subscriber, SubscriptionDisposable,
-                    SubscriptionError)
+from broqer.publisher import Publisher, SubscriptionError
+from broqer.subscriber import Subscriber
+from broqer.disposable import SubscriptionDisposable
 
 
 class Topic(Publisher, Subscriber):

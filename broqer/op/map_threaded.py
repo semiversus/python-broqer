@@ -90,7 +90,7 @@ from typing import Callable, Any
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
 
-from broqer import default_error_handler
+from broqer.default_error_handler import default_error_handler
 
 from .map_async import MapAsync, MODE
 

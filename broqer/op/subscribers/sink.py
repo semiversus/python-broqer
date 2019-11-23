@@ -25,7 +25,8 @@ Sink:(1, 2)
 from functools import partial, wraps
 from typing import Any, Callable, Optional
 
-from broqer import Subscriber, Publisher
+from broqer.publisher import Publisher
+from broqer.subscriber import Subscriber
 
 
 class Sink(Subscriber):  # pylint: disable=too-few-public-methods

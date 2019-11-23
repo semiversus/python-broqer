@@ -16,7 +16,7 @@ Merge: abc
 import asyncio
 from typing import Any
 
-from broqer import Publisher
+from broqer.publisher import Publisher
 
 from .operator import MultiOperator
 
