@@ -1,7 +1,7 @@
 from unittest import mock
 import pytest
 
-from broqer import Value, Publisher, op, StatefulPublisher, Subscriber
+from broqer import Value, Publisher, op, Subscriber
 import operator
 
 def test_operator_with_publishers():
@@ -21,7 +21,7 @@ def test_operator_with_publishers():
 
     mock_sink = mock.Mock()
 
-    o | op.Sink(mock_sink)
+    o.subscribe(op.Sink(mock_sink))
     assert len(o.subscriptions) == 1
     mock_sink.assert_called_once_with(1)
     mock_sink.reset_mock()
@@ -33,7 +33,7 @@ def test_operator_with_publishers():
         o.emit_op(0, who=Publisher())
 
     with pytest.raises(AttributeError):
-        Value(1) | o
+        Value(1).subscribe(o)
 
 def test_operator_with_constant():
     v1 = Value(0)
@@ -51,7 +51,7 @@ def test_operator_with_constant():
 
     mock_sink = mock.Mock()
 
-    o | op.Sink(mock_sink)
+    o.subscribe(op.Sink(mock_sink))
     assert len(o.subscriptions) == 1
     mock_sink.assert_called_once_with(2)
     mock_sink.reset_mock()
@@ -81,7 +81,7 @@ def test_operator_with_constant_r():
 
     mock_sink = mock.Mock()
 
-    o | op.Sink(mock_sink)
+    o.subscribe(op.Sink(mock_sink))
     assert len(o.subscriptions) == 1
     mock_sink.assert_called_once_with(0)
     mock_sink.reset_mock()
@@ -120,82 +120,35 @@ def test_operator_with_constant_r():
 def test_with_publisher(operator, l_value, r_value, result):
     vl = Value(l_value)
     vr = Value(r_value)
-    pl = Publisher()
-    pr = Publisher()
     cl = l_value
     cr = r_value
 
     o1 = operator(vl, vr)
     o2 = operator(vl, cr)
-    o3 = operator(vl, pr)
-
-    o4 = operator(pl, vr)
-    o5 = operator(pl, cr)
-    o6 = operator(pl, pr)
-
-    o7 = operator(cl, vr)
+    o3 = operator(cl, vr)
     try:
-        o8 = operator(cl, cr)
+        o4 = operator(cl, cr)
     except Exception as e:
         assert isinstance(e, result)
-        o8 = result  # to pass the following test
-
-    o9 = operator(cl, pr)
+        o4 = result  # to pass the following test
 
     mock_sink_o3 = mock.Mock()
-    mock_sink_o4 = mock.Mock()
-    mock_sink_o5 = mock.Mock()
-    mock_sink_o6 = mock.Mock()
-    mock_sink_o9 = mock.Mock()
 
-    o3 | op.Sink(mock_sink_o3)
-    o4 | op.Sink(mock_sink_o4)
-    o5 | op.Sink(mock_sink_o5)
-    o6 | op.Sink(mock_sink_o6)
-    o9 | op.Sink(mock_sink_o9)
+    try:
+        o3.subscribe(op.Sink(mock_sink_o3))
+    except Exception as e:
+        assert isinstance(e, result)
 
-    for output in (o1, o2, o3, o4, o5, o6, o7, o9):
+    for output in (o1, o2, o3):
         assert isinstance(output, Publisher)
 
-    assert o8 == result
+    assert o4 == result
 
-    for output in (o1, o2, o7):
+    for output in (o1, o2, o3):
         try:
             assert output.get() == result
         except Exception as e:
             assert isinstance(e, result)
-
-    for output in (o3, o4, o5, o6, o9):
-        with pytest.raises(ValueError):
-            output.get()
-
-    mock_sink_o3.assert_not_called()
-    mock_sink_o4.assert_not_called()
-    mock_sink_o5.assert_not_called()
-    mock_sink_o6.assert_not_called()
-    mock_sink_o9.assert_not_called()
-
-    try:
-        pl.notify(l_value)
-    except Exception as e:
-        assert isinstance(e, result)
-    else:
-        mock_sink_o3.assert_not_called()
-        mock_sink_o4.assert_called_once_with(result)
-        mock_sink_o5.assert_called_once_with(result)
-        mock_sink_o6.assert_not_called()
-        mock_sink_o9.assert_not_called()
-
-    try:
-        pr.notify(r_value)
-    except Exception as e:
-        assert isinstance(e, result)
-    else:
-        mock_sink_o3.assert_called_once_with(result)
-        mock_sink_o4.assert_called_once_with(result)
-        mock_sink_o5.assert_called_once_with(result)
-        mock_sink_o6.assert_called_once_with(result)
-        mock_sink_o9.assert_called_once_with(result)
 
 def test_wrong_comparision():
     p1 = Publisher()
@@ -224,7 +177,7 @@ def test_wrong_comparision():
         l.remove(p2)
 
 def test_mod_str():
-    v1 = StatefulPublisher('%.2f %d')
+    v1 = Publisher('%.2f %d')
     v2 = Value((0,0))
 
     o = v1%v2
@@ -236,7 +189,7 @@ def test_mod_str():
     assert o.get() == '1.00 3'
 
 def test_concat():
-    v1 = StatefulPublisher((1,2))
+    v1 = Publisher((1,2))
     v2 = Value((0,0))
 
     o = v1+v2
@@ -276,7 +229,7 @@ import math
     (op.Len, (), 0), (op.Len, [1,2,3], 3), (op.Len, 'abcde', 5), (op.Len, None, TypeError),
 ])
 def test_unary_operators(operator, value, result):
-    v = StatefulPublisher(value)
+    v = Publisher(value)
 
     try:
         value_applied = operator(v).get()
@@ -288,7 +241,7 @@ def test_unary_operators(operator, value, result):
     cb = mock.Mock()
 
     try:
-        operator(v) | op.Sink(cb)
+        operator(v).subscribe(op.Sink(cb))
     except Exception as e:
         assert isinstance(e, result)
     else:
@@ -325,7 +278,7 @@ def test_in_operator():
     assert dut3.get() == False
 
 def test_getattr_method():
-    p = StatefulPublisher()
+    p = Publisher('')
     p.inherit_type(str)
 
     dut1 = p.split()
@@ -336,22 +289,21 @@ def test_getattr_method():
     mock2 = mock.Mock()
     mock3 = mock.Mock()
 
-    dut1 | op.Sink(mock1)
-    dut2 | op.Sink(mock2)
-    dut3 | op.Sink(mock3)
+    dut1.subscribe(op.Sink(mock1))
+    dut2.subscribe(op.Sink(mock2))
+    dut3.subscribe(op.Sink(mock3))
 
-    with pytest.raises(ValueError):
-        dut1.get()
+    assert dut1.get() == []
+    assert dut2.get() == ['']
+    assert dut3.get() == ['']
 
-    with pytest.raises(ValueError):
-        dut2.get()
+    mock1.assert_called_once_with([])
+    mock2.assert_called_once_with([''])
+    mock3.assert_called_once_with([''])
 
-    with pytest.raises(ValueError):
-        dut3.get()
-
-    mock1.assert_not_called()
-    mock2.assert_not_called()
-    mock3.assert_not_called()
+    mock1.reset_mock()
+    mock2.reset_mock()
+    mock3.reset_mock()
 
     p.notify('This is just a test, honestly!')
 
@@ -364,51 +316,54 @@ def test_getattr_method():
     mock3.assert_called_once_with(['This is just a test, honestly', ''])
 
 def test_inherit_getattr():
-    p = StatefulPublisher()
+    p = Publisher('')
     p.inherit_type(str)
 
     dut = p.lower().split(' ')
     m = mock.Mock()
-    dut | op.Sink(m)
+    dut.subscribe(op.Sink(m))
+    m.assert_called_once_with([''])
+    m.reset_mock()
 
     p.notify('This is a TEST')
     m.assert_called_once_with(['this', 'is', 'a', 'test'])
 
 def test_inherit_with_operators():
-    p = StatefulPublisher()
+    p = Publisher('')
     p.inherit_type(str)
 
     dut = op.Len(('abc' + p + 'ghi').upper())
     m = mock.Mock()
-    dut | op.Sink(m)
+    dut.subscribe(op.Sink(m))
+    m.assert_called_once_with(6)
+    m.reset_mock()
 
     p.notify('def')
     m.assert_called_once_with(9)
 
 def test_getattr_attribute():
-    p = StatefulPublisher()
     class Foo:
         a = None
 
         def __init__(self, a=5):
             self.a = a
 
+    p = Publisher(Foo(3))
     p.inherit_type(Foo)
 
     dut = p.a
     m = mock.Mock()
-    dut | op.Sink(m)
-
-    with pytest.raises(ValueError):
-        dut.get()
-
-    m.assert_not_called()
-
-    p.notify(Foo(3))
-
-    assert dut.get() == 3
+    dut.subscribe(op.Sink(m))
 
     m.assert_called_once_with(3)
+    assert dut.get() == 3
+    m.reset_mock()
+
+    p.notify(Foo(4))
+
+    assert dut.get() == 4
+
+    m.assert_called_once_with(4)
 
     with pytest.raises(ValueError):
         dut.emit_op(0, who=Publisher())
@@ -417,7 +372,7 @@ def test_getattr_attribute():
         dut.assnign(5)
 
 def test_getattr_without_inherit():
-    p = StatefulPublisher()
+    p = Publisher()
     class Foo:
         a = None
 
@@ -445,6 +400,6 @@ def test_getattr_without_inherit():
     (op.BitwiseOr, (3,), 3),
 ])
 def test_multi_operators(operator, values, result):
-    sources = [StatefulPublisher(v) for v in values]
+    sources = [Publisher(v) for v in values]
     dut = operator(*sources)
     assert dut.get() == result

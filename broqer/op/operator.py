@@ -34,16 +34,11 @@ class Operator(Publisher):
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber, prepend)
+        disposable = Publisher.subscribe(self, subscriber, prepend, initial_emit=False)
+
         if len(self._subscriptions) == 1:  # if this was the first subscription
             self._publisher.subscribe(self._emit_sink)
-        else:
-            try:
-                value = self.get()
-            except ValueError:
-                pass
-            else:
-                subscriber.emit(value, who=self)
+
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
@@ -57,22 +52,21 @@ class Operator(Publisher):
         return (self._publisher, )
 
     @abstractmethod
-    def get(self):
-        """ Get value of operator """
-
-    @abstractmethod
-    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> None:
         """ Send new value to the operator
         :param value: value to be send
         :param who: reference to which publisher is emitting
         """
 
-    def __ror__(self, publisher: Publisher) -> Publisher:
+    def apply(self, publisher: Publisher) -> Publisher:
         if self._publisher is not None:
             raise ValueError('Operator can only be connected to one publisher')
 
         self._publisher = publisher
         return self
+
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        return self.apply(publisher)
 
 
 class MultiOperator(Publisher):
@@ -88,18 +82,13 @@ class MultiOperator(Publisher):
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber, prepend)
+        disposable = Publisher.subscribe(self, subscriber, prepend, initial_emit=False)
+
         if len(self._subscriptions) == 1:  # if this was the first subscription
             for _publisher in self._publishers:
                 # subscribe to all dependent publishers
                 _publisher.subscribe(self._emit_sink)
-        else:
-            try:
-                value = self.get()
-            except ValueError:
-                pass
-            else:
-                subscriber.emit(value, who=self)
+
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
@@ -114,11 +103,7 @@ class MultiOperator(Publisher):
         return self._publishers
 
     @abstractmethod
-    def get(self):
-        """ Get value of operator """
-
-    @abstractmethod
-    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> None:
         """ Send new value to the operator
         :param value: value to be send
         :param who: reference to which publisher is emitting
@@ -135,14 +120,11 @@ class OperatorConcat(Operator):
         Operator.__init__(self)
         self._operators = operators
 
-    def get(self):
-        return self._publisher.get()  # may raises ValueError
-
-    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit_op(self, value: Any, who: Publisher) -> None:
         return self.notify(value)
 
-    def __ror__(self, publisher: Publisher) -> Publisher:
-        Operator.__ror__(self, publisher)
+    def apply(self, publisher: Publisher) -> Publisher:
+        Operator.apply(self, publisher)
 
         # concat each operator in the following step
         reduce(or_, self._operators, publisher)

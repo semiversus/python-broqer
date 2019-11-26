@@ -2,7 +2,7 @@ import pytest
 import asyncio
 from unittest.mock import Mock, ANY
 
-from broqer import StatefulPublisher, Publisher, op, default_error_handler, NONE
+from broqer import Publisher, op, default_error_handler, NONE
 
 from .helper import check_async_operator_coro
 from .eventloop import VirtualTimeEventLoop
@@ -17,13 +17,13 @@ async def _foo_coro(v):
     return v
 
 @pytest.mark.parametrize('operator_cls, publisher, args', [
-    (op.Debounce, StatefulPublisher(True), (0,)),
-    (op.Delay, StatefulPublisher(True), (0,)),
-    (op.MapAsync, StatefulPublisher(True), (_foo_coro,)),
-    # (op.MapThreaded, (StatefulPublisher(True), lambda v:None)), # run_in_executor is not implemented in VirtualTimeEventLoop
+    (op.Debounce, Publisher(True), (0,)),
+    (op.Delay, Publisher(True), (0,)),
+    (op.MapAsync, Publisher(True), (_foo_coro,)),
+    # (op.MapThreaded, (Publisher(True), lambda v:None)), # run_in_executor is not implemented in VirtualTimeEventLoop
     (op.FromPolling, None, (0.1, lambda:None)),
-    (op.Sample, StatefulPublisher(True), (0.1,)),
-    (op.Throttle, StatefulPublisher(True), (0.1,)),
+    (op.Sample, Publisher(True), (0.1,)),
+    (op.Throttle, Publisher(True), (0.1,)),
 ])
 @pytest.mark.asyncio
 async def test_errorhandler(operator_cls, publisher, args, capsys):
@@ -35,7 +35,7 @@ async def test_errorhandler(operator_cls, publisher, args, capsys):
     else:
         dut = operator_cls(*args)
 
-    dut | op.Sink(mock)
+    dut.subscribe(op.Sink(mock))
 
     await asyncio.sleep(0.1)
 
@@ -52,7 +52,7 @@ async def test_errorhandler(operator_cls, publisher, args, capsys):
     else:
         dut = operator_cls(*args)
 
-    dut | op.Sink(mock)
+    dut.subscribe(op.Sink(mock))
 
     await asyncio.sleep(0.1)
 
@@ -67,8 +67,8 @@ async def test_errorhandler(operator_cls, publisher, args, capsys):
         dut = publisher | operator_cls(*args, error_callback=mock_errorhandler_custom)
     else:
         dut = operator_cls(*args, error_callback=mock_errorhandler_custom)
-    
-    dut | op.Sink(mock)
+
+    dut.subscribe(op.Sink(mock))
 
     await asyncio.sleep(0.1)
 

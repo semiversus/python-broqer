@@ -3,25 +3,22 @@ import asyncio
 
 import pytest
 
-from broqer import Publisher, SubscriptionError, Subscriber, Value, StatefulPublisher, op
-from broqer.subject import Subject
+from broqer import Publisher, SubscriptionError, Subscriber, Value, op, NONE
 
 
-@pytest.mark.parametrize('cls', [Publisher, StatefulPublisher])
-def test_subscribe(cls):
-    s1 = Subject()
-    s2 = Subject()
+def test_subscribe():
+    s1 = Value()
+    s2 = Value()
 
-    publisher = cls()
+    publisher = Publisher()
     assert len(publisher.subscriptions) == 0
 
-    with pytest.raises(ValueError):
-        publisher.get()
+    assert publisher.get() is NONE
 
     # subscribe first subscriber
     d1 = publisher.subscribe(s1)
     assert any(s1 is s for s in publisher.subscriptions)
-    # assert s2 not in publisher.subscriptions
+    assert not any(s2 is s for s in publisher.subscriptions)
     assert len(publisher.subscriptions) == 1
 
     # re - subscribe should fail
@@ -52,9 +49,8 @@ def test_subscribe(cls):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize('cls', [Publisher])
-async def test_await(cls, event_loop):
-    publisher = cls()
+async def test_await(event_loop):
+    publisher = Publisher()
 
     event_loop.call_soon(publisher.notify, 1)
     assert (await publisher) == 1
@@ -62,50 +58,17 @@ async def test_await(cls, event_loop):
     event_loop.call_soon(publisher.notify, 2)
     assert await publisher.wait_for() == 2
 
-@pytest.mark.asyncio
-async def test_future_return():
-    class S(Subscriber):
-        def __init__(self):
-            self.future = asyncio.get_event_loop().create_future()
-
-        def emit(self, value, who: Publisher) -> asyncio.Future:
-            return self.future
-
-    p = Publisher()
-    s1 = S()
-
-    p.subscribe(s1)
-
-    assert p.notify(None) is s1.future
-
-    s2 = S()
-
-    p.subscribe(s2)
-
-    gathered_future = p.notify(None)
-
-    await asyncio.sleep(0)
-    assert not gathered_future.done()
-
-    s1.future.set_result(1)
-    await asyncio.sleep(0)
-    assert not gathered_future.done()
-
-    s2.future.set_result(1)
-    await asyncio.sleep(0)
-    assert gathered_future.done()
-
 def test_stateful_publisher():
-    p = StatefulPublisher()
-    v = Value(0)
+    p = Publisher(0)
+    v = Value()
 
-    with pytest.raises(ValueError):
-        p.get()
+    assert p.get() is 0
+    assert v.get() is NONE
 
     mock_sink = mock.Mock()
 
-    disposable = p | v
-    v | op.Sink(mock_sink)
+    disposable = p.subscribe(v)
+    v.subscribe(op.Sink(mock_sink))
 
     mock_sink.assert_called_once_with(0)
     mock_sink.reset_mock()
@@ -117,17 +80,11 @@ def test_stateful_publisher():
     mock_sink.reset_mock()
 
     p.notify(1)
+
+    mock_sink.assert_called_once_with(1)
     assert p.get() == 1
-    mock_sink.assert_not_called()
+    mock_sink.reset_mock()
 
     p.notify(2)
     assert p.get() == 2
     mock_sink.assert_called_once_with(2)
-
-    p.reset_state()
-
-    with pytest.raises(ValueError):
-        p.get()
-
-    p.reset_state(3)
-    assert p.get() == 3

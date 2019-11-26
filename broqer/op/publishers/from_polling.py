@@ -66,7 +66,7 @@ class FromPolling(Publisher):
 
     def subscribe(self, subscriber: Subscriber,
                   prepend: bool = False) -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber, prepend)
+        disposable = Publisher.subscribe(self, subscriber, prepend, initial_emit=False)
         if self._interval is None:
             try:
                 result = self._poll_func()

@@ -1,7 +1,7 @@
 import pytest
 from unittest import mock
 
-from broqer import Publisher, StatefulPublisher
+from broqer import Publisher
 from broqer.op import Accumulate, build_accumulate, Sink
 
 from .helper import check_single_operator, Collector
@@ -85,7 +85,7 @@ def test_build(build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, excep
     assert dut._state == reference._state
     assert dut._result == reference._result
 
-    v = StatefulPublisher(1)
+    v = Publisher(1)
     v | dut | Sink()
     v | reference | Sink()
 

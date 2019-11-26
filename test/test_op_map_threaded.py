@@ -3,7 +3,7 @@ import time
 import pytest
 from unittest import mock
 
-from broqer import NONE, StatefulPublisher
+from broqer import NONE, Publisher
 from broqer.op import MapThreaded, MODE, Sink, build_map_threaded
 
 from .helper import check_async_operator_coro
@@ -67,9 +67,9 @@ def test_build(build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, excep
 
     assert dut._options[1:] == reference._options[1:]  # don't compare coro
 
-    v = StatefulPublisher((1,2))
-    v | dut | Sink()
-    v | reference | Sink()
+    v = Publisher((1,2))
+    (v | dut).subscribe(Sink())
+    (v | reference).subscribe(Sink())
 
     asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.01))
     assert mock_cb.mock_calls == ref_mock_cb.mock_calls

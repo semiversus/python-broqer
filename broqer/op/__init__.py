@@ -2,7 +2,6 @@
 
 # synchronous operators
 from .accumulate import Accumulate, build_accumulate
-from .cache import Cache
 from .catch_exception import CatchException
 from .combine_latest import CombineLatest, build_combine_latest
 from .filter_ import Filter, True_, False_, build_filter
@@ -41,7 +40,7 @@ from .operator_overloading import apply_operator_overloading, Str, Bool, Int, \
 apply_operator_overloading()
 
 __all__ = [
-    'Accumulate', 'Cache', 'CatchException', 'CombineLatest',
+    'Accumulate', 'CatchException', 'CombineLatest',
     'Filter', 'Map', 'Merge', 'Partition', 'Reduce', 'Replace', 'Sink',
     'SlidingWindow', 'Switch', 'Debounce', 'Delay', 'FromPolling', 'Sample',
     'MapAsync', 'MODE', 'MapThreaded', 'Throttle', 'OnEmitFuture', 'True_',

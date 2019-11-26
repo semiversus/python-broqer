@@ -1,9 +1,8 @@
 from unittest import mock
 import pytest
 
-from broqer import Disposable, StatefulPublisher
-from broqer.op import Cache, Sink, Trace, build_sink
-from broqer.subject import Subject
+from broqer import Disposable, Publisher
+from broqer.op import Sink, Trace, build_sink
 
 @pytest.mark.parametrize('operator_cls', [Sink, Trace])
 def test_sink(operator_cls):
@@ -71,8 +70,8 @@ def test_sink_without_function(operator_cls):
 def test_sink_on_subscription(operator):
     cb = mock.Mock()
 
-    s = Subject()
-    sink_instance = s | Cache(0) | operator(cb)
+    s = Value(0)
+    sink_instance = s.subscribe(operator(cb))
     assert isinstance(sink_instance, Disposable)
 
     cb.assert_called_with(0)
@@ -95,8 +94,8 @@ def test_sink_on_subscription(operator):
 def test_sink_partial(operator_cls):
     cb = mock.Mock()
 
-    s = Subject()
-    sink_instance = s | operator_cls(cb, 1, 2, 3, a=1)
+    s = Value()
+    sink_instance = s.subscribe(operator_cls(cb, 1, 2, 3, a=1))
     assert isinstance(sink_instance, Disposable)
 
     assert not cb.called
@@ -151,9 +150,9 @@ def test_build(build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, excep
 
     assert dut._unpack == reference._unpack
 
-    v = StatefulPublisher( (1,2) )
-    v | dut
-    v | reference
+    v = Publisher( (1,2) )
+    v.subscribe(dut)
+    v.subscribe(reference)
 
     assert mock_cb.mock_calls == ref_mock_cb.mock_calls
     assert len(mock_cb.mock_calls) == 1

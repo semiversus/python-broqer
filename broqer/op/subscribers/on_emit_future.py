@@ -30,11 +30,15 @@ class OnEmitFuture(Subscriber, asyncio.Future):
     :param timeout: timeout in seconds
     :param loop: asyncio loop to be used
     """
-    def __init__(self, timeout=None, loop=None):
-        asyncio.Future.__init__(self, loop=loop)
+    def __init__(self, publisher: Publisher, timeout=None, loop=None):
+        self._publisher = publisher
+
+        publisher.subscribe(self, initial_emit=False)
 
         if loop is None:
             loop = asyncio.get_event_loop()
+
+        asyncio.Future.__init__(self, loop=loop)
 
         self.add_done_callback(self._cleanup)
 
@@ -44,7 +48,6 @@ class OnEmitFuture(Subscriber, asyncio.Future):
         else:
             self._timeout_handle = None
 
-        self._publisher = None
 
     def _cleanup(self, _future):
         self._publisher.unsubscribe(self)
@@ -59,9 +62,3 @@ class OnEmitFuture(Subscriber, asyncio.Future):
 
         if not self.done():
             self.set_result(value)
-
-    def __ror__(self, publisher: Publisher
-                ) -> Union[SubscriptionDisposable, 'Publisher', 'Subscriber']:
-        self._publisher = publisher
-        publisher.subscribe(self)
-        return self

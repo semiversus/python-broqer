@@ -1,7 +1,7 @@
 import pytest
 from unittest import mock
 
-from broqer import NONE, StatefulPublisher
+from broqer import NONE, Publisher
 from broqer.op import Map, Sink, build_map
 
 from .helper import check_single_operator
@@ -49,9 +49,9 @@ def test_build(build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs, excep
 
     assert dut._unpack == reference._unpack
 
-    v = StatefulPublisher((1,2))
-    v | dut | Sink()
-    v | reference | Sink()
+    v = Publisher((1,2))
+    (v | dut).subscribe(Sink())
+    (v | reference).subscribe(Sink())
 
     assert mock_cb.mock_calls == ref_mock_cb.mock_calls
     assert len(mock_cb.mock_calls) == 1
