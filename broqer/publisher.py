@@ -51,8 +51,7 @@ class Publisher:
         self._subscriptions = list()
 
     def subscribe(self, subscriber: 'Subscriber',
-                  prepend: bool = False, initial_emit: bool = True
-                 ) -> SubscriptionDisposable:
+                  prepend: bool = False) -> SubscriptionDisposable:
         """ Subscribing the given subscriber.
 
         :param subscriber: subscriber to add
@@ -60,7 +59,6 @@ class Publisher:
             added at the end of a list. When prepend is True, it will be added
             in front of the list. This will habe an effect in the order the
             subscribers are called.
-        :param initial_emit: flag to emit the current state on subscription
         :raises SubscriptionError: if subscriber already subscribed
         """
 
@@ -77,7 +75,7 @@ class Publisher:
 
         disposable = SubscriptionDisposable(self, subscriber)
 
-        if initial_emit:
+        if self._state is not NONE:
             subscriber.emit(self._state, who=self)
 
         return disposable
@@ -117,20 +115,14 @@ class Publisher:
         """ Property returning a tuple with all current subscribers """
         return tuple(self._subscriptions)
 
-    def __await__(self):
-        """ Publishers are awaitable and the future is done when the publisher
-        emits a value """
-        from broqer.op import OnEmitFuture  # due circular dependency
-        return OnEmitFuture(self, timeout=None).__await__()
-
-    def wait_for(self, timeout=None, loop=None):
+    def wait(self, timeout: float, omit_first_emit=True, loop=None):
         """ When a timeout should be applied for awaiting use this method.
-        :param timeout: optional timeout in seconds.
+        :param timeout: timeout in seconds. Use None for infinite waiting
         :param loop: asyncio loop to be used
         :returns: a future returning the emitted value
         """
         from broqer.op import OnEmitFuture  # due circular dependency
-        return OnEmitFuture(self, timeout, loop)
+        return OnEmitFuture(self, timeout, omit_first_emit, loop)
 
     def __bool__(self):
         """ A new Publisher is the result of a comparision between a publisher

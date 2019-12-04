@@ -30,24 +30,23 @@ class OnEmitFuture(Subscriber, asyncio.Future):
     :param timeout: timeout in seconds
     :param loop: asyncio loop to be used
     """
-    def __init__(self, publisher: Publisher, timeout=None, loop=None):
-        self._publisher = publisher
-
-        publisher.subscribe(self, initial_emit=False)
-
+    def __init__(self, publisher: Publisher, timeout=None, omit_first_emit=False, loop=None):
         if loop is None:
             loop = asyncio.get_event_loop()
 
         asyncio.Future.__init__(self, loop=loop)
-
         self.add_done_callback(self._cleanup)
+
+        self._publisher = publisher
+
+        self._omit_first_emit = omit_first_emit
+        publisher.subscribe(self)
 
         if timeout is not None:
             self._timeout_handle = loop.call_later(
                 timeout, self.set_exception, asyncio.TimeoutError)
         else:
             self._timeout_handle = None
-
 
     def _cleanup(self, _future):
         self._publisher.unsubscribe(self)
@@ -59,6 +58,10 @@ class OnEmitFuture(Subscriber, asyncio.Future):
     def emit(self, value: Any, who: Optional[Publisher] = None) -> None:
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
+
+        if self._omit_first_emit:
+            self._omit_first_emit = False
+            return
 
         if not self.done():
             self.set_result(value)

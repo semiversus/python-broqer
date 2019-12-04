@@ -34,7 +34,7 @@ class Operator(Publisher):
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber, prepend, initial_emit=False)
+        disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if len(self._subscriptions) == 1:  # if this was the first subscription
             self._publisher.subscribe(self._emit_sink)
@@ -82,7 +82,7 @@ class MultiOperator(Publisher):
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber, prepend, initial_emit=False)
+        disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if len(self._subscriptions) == 1:  # if this was the first subscription
             for _publisher in self._publishers:

@@ -1,21 +1,21 @@
 """
->>> from broqer import Subject, op
->>> s = Subject()
+>>> from broqer import Value, op
+>>> v = Value(0)
 
 >>> def moving_average(state, value):
 ...     state=state[1:]+[value]
 ...     return state, sum(state)/len(state)
 
->>> lowpass = s | op.Accumulate(moving_average, init=[0]*3)
->>> lowpass | op.Sink(print)
+>>> lowpass = v | op.Accumulate(moving_average, init=[0]*3)
+>>> lowpass.subscribe(op.Sink(print))
 <...>
->>> s.emit(3)
+>>> v.emit(3)
 1.0
->>> s.emit(3)
+>>> v.emit(3)
 2.0
->>> s.emit(3)
+>>> v.emit(3)
 3.0
->>> s.emit(3)
+>>> v.emit(3)
 3.0
 """
 import asyncio
@@ -56,7 +56,7 @@ class Accumulate(Operator):
     def get(self) -> Any:
         if self._result is not NONE:
             return self._result
-        value = self._publisher.get()  # may be raises ValueError
+        value = self._publisher.get()
         return self._function(self._init, value)[1]
 
     def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:

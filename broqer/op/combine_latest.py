@@ -77,7 +77,9 @@ class CombineLatest(MultiOperator):
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
+            self._missing = set(self._publishers)
             self._partial_state[:] = [NONE for _ in self._partial_state]
+            self._state = NONE
 
     def get(self):
         if self._subscriptions:
@@ -142,8 +144,7 @@ def build_combine_latest(map_: Callable[..., Any] = None, *, emit_on=None,
     def _build_combine_latest(map_: Callable[..., Any]):
         @wraps(map_)
         def _wrapper(*publishers) -> CombineLatest:
-            return CombineLatest(*publishers, map_=map_, emit_on=emit_on,
-                                 allow_stateless=allow_stateless)
+            return CombineLatest(*publishers, map_=map_, emit_on=emit_on)
         return _wrapper
 
     if map_:

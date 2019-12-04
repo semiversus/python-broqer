@@ -48,6 +48,9 @@ class Filter(Operator):
         self._predicate = partial(predicate, *args, **kwargs)  # type: Callable
         self._unpack = unpack
 
+    def wait(self, timeout: float, omit_first_emit=False, loop=None):
+        return Operator.wait(self, timeout, omit_first_emit=omit_first_emit, loop=loop)
+
     def get(self):
         value = self._publisher.get()  # may raise ValueError
         if (self._unpack and self._predicate(*value)) or \
@@ -77,6 +80,9 @@ class True_(Operator):  # pylint: disable=invalid-name
         Operator.__init__(self)
         self._publisher = publisher
 
+    def wait(self, timeout: float, omit_first_emit=False, loop=None):
+        return Operator.wait(self, timeout, omit_first_emit=omit_first_emit, loop=loop)
+
     def get(self):
         value = self._publisher.get()  # may raise ValueError
         if bool(value):
@@ -100,6 +106,9 @@ class False_(Operator):  # pylint: disable=invalid-name
     def __init__(self, publisher: Publisher = None) -> None:
         Operator.__init__(self)
         self._publisher = publisher
+
+    def wait(self, timeout: float, omit_first_emit=False, loop=None):
+        return Operator.wait(self, timeout, omit_first_emit=omit_first_emit, loop=loop)
 
     def get(self):
         value = self._publisher.get()  # may raise ValueError
