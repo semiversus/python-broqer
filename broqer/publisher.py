@@ -44,11 +44,14 @@ class Publisher:
     :ivar _state: state of the publisher
     :ivar _inherited_type: type class for method lookup
     :ivar _subscriptions: holding a list of subscribers
+    :ivar _on_subscription_cb: callback with boolean as argument, telling
+                                if at least one subscription exists
     """
     def __init__(self, init=NONE):
         self._state = init
         self._inherited_type = None
         self._subscriptions = list()
+        self._on_subscription_cb = None
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
@@ -67,6 +70,9 @@ class Publisher:
         # a new publisher - not helpful here
         if any(subscriber is s for s in self._subscriptions):
             raise SubscriptionError('Subscriber already registered')
+
+        if not self._subscriptions and self._on_subscription_cb:
+            self._on_subscription_cb(True)
 
         if prepend:
             self._subscriptions.insert(0, subscriber)
@@ -95,6 +101,10 @@ class Publisher:
             if _s is subscriber:
                 self._subscriptions.pop(i)
                 return
+
+        if not self._subscriptions and self._on_subscription_cb:
+            self._on_subscription_cb(False)
+
         raise SubscriptionError('Subscriber is not registered')
 
     def get(self):
@@ -114,6 +124,17 @@ class Publisher:
     def subscriptions(self):
         """ Property returning a tuple with all current subscribers """
         return tuple(self._subscriptions)
+
+    def register_on_subscription_callback(self, cb):
+        """ This callback will be called, when the subscriptions are changing.
+        When a subscription is done and no subscription was present the callback
+        is called with True as argument. When after unsubscribe no subscription
+        is left, it will be called with False.
+
+        :param cb: callback(subscription: bool) to be called.
+        """
+        assert self._on_subscription_cb is None
+        self._on_subscription_cb = cb
 
     def wait(self, timeout: float, omit_first_emit=True, loop=None):
         """ When a timeout should be applied for awaiting use this method.
