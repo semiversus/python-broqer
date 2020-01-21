@@ -120,6 +120,12 @@ class Publisher:
         for s in self._subscriptions:
             s.emit(value, who=self)
 
+    def reset_state(self, value=NONE):
+        """ Resets the state. Calling this method will not trigger an emit.
+        :param value: Optional value to set the internal state
+        """
+        self._state = value
+
     @property
     def subscriptions(self):
         """ Property returning a tuple with all current subscribers """
