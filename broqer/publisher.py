@@ -94,7 +94,7 @@ class Publisher:
         """
         # here is a special implementation which is replacing the more
         # obvious one: self._subscriptions.remove(subscriber) - this will not
-        # work because list.remove(x) is doing comparision for equality.
+        # work because list.remove(x) is doing comparison for equality.
         # Applied to publishers this will return another publisher instead of
         # a boolean result
         for i, _s in enumerate(self._subscriptions):
