@@ -4,12 +4,12 @@ Build a future able to await for
 Usage:
 
 >>> import asyncio
->>> from broqer import Subject, op
->>> s = Subject()
+>>> from broqer import Value, op
+>>> s = Value()
 
 >>> _ = asyncio.get_event_loop().call_later(0.05, s.emit, 1)
 
->>> asyncio.get_event_loop().run_until_complete(s | op.OnEmitFuture() )
+>>> asyncio.get_event_loop().run_until_complete(op.OnEmitFuture(s) )
 1
 
 #>>> _ = asyncio.get_event_loop().call_later(0.05, s.emit, (1, 2))

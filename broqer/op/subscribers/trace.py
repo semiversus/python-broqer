@@ -30,10 +30,6 @@ class Trace(Sink):
         self._trace_handler(who, value, label=self._label)
         Sink.emit(self, value, who=who)
 
-    def __ror__(self, publisher: Publisher
-                ) -> Union[SubscriptionDisposable, 'Publisher', 'Subscriber']:
-        return publisher.subscribe(self, prepend=True)
-
     @classmethod
     def set_handler(cls, handler):
         """ Setting the handler for tracing information """

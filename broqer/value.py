@@ -3,7 +3,7 @@
 import asyncio
 from typing import Any, Optional
 
-from .publisher import Publisher
+from .publisher import Publisher, TValue, TValueNONE
 from .subscriber import Subscriber
 from .types import NONE
 
@@ -15,7 +15,7 @@ class Value(Publisher, Subscriber):
     >>> from broqer import op
 
     >>> s = Value(0)
-    >>> _d = s | op.Sink(print)
+    >>> _d = s.subscribe(op.Sink(print))
     0
     >>> s.emit(1)
     1
@@ -24,7 +24,13 @@ class Value(Publisher, Subscriber):
         Publisher.__init__(self, init)
         Subscriber.__init__(self)
 
-    def emit(self, value: Any,
+    def notify(self, value: Any) -> None:
+        raise NotImplementedError('Value doesn\'t support .notify(). Use .emit() instead')
+
+    def reset_state(self, value: TValueNONE = NONE) -> None:
+        raise NotImplementedError('Value doesn\'t support .reset_state()')
+
+    def emit(self, value: TValue,
              who: Optional[Publisher] = None  # pylint: disable=unused-argument
              ) -> asyncio.Future:
-        return self.notify(value)
+        return Publisher.notify(self, value)

@@ -1,25 +1,15 @@
 """ Module implementing Operator, MultiOperator.
 """
-import asyncio
 from abc import abstractmethod
 from functools import reduce
 from operator import or_
 from typing import Any
 
-from broqer.publisher import Publisher
-from broqer.disposable import SubscriptionDisposable
-from broqer.subscriber import Subscriber
+from broqer import NONE, Publisher, SubscriptionDisposable, Subscriber
+from broqer.publisher import TValue, TValueNONE
 
 
-class _EmitSink(Subscriber):  # pylint: disable=too-few-public-methods
-    def __init__(self, operator):
-        self._operator = operator
-
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
-        return self._operator.emit_op(value, who=who)
-
-
-class Operator(Publisher):
+class Operator(Publisher, Subscriber):
     """ Base class for operators depending on a single publisher. This
     publisher will be subscribed as soon as this operator is subscribed the
     first time.
@@ -29,47 +19,45 @@ class Operator(Publisher):
     """
     def __init__(self) -> None:
         Publisher.__init__(self)
-        self._emit_sink = _EmitSink(self)
-        self._publisher = None  # type: Publisher
+        Subscriber.__init__(self)
+        self._orginator = None  # type: Publisher
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if len(self._subscriptions) == 1:  # if this was the first subscription
-            self._publisher.subscribe(self._emit_sink)
+            self._orginator.subscribe(self)
 
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Publisher.unsubscribe(self, subscriber)
+
         if not self._subscriptions:
-            self._publisher.unsubscribe(self._emit_sink)
-
-    @property
-    def source_publishers(self):
-        """ Tuple with all source publishers """
-        return (self._publisher, )
-
-    @abstractmethod
-    def emit_op(self, value: Any, who: Publisher) -> None:
-        """ Send new value to the operator
-        :param value: value to be send
-        :param who: reference to which publisher is emitting
-        """
+            self._orginator.unsubscribe(self)
+            Publisher.reset_state(self)
 
     def apply(self, publisher: Publisher) -> Publisher:
-        if self._publisher is not None:
+        if self._orginator is not None:
             raise ValueError('Operator can only be connected to one publisher')
 
-        self._publisher = publisher
+        self._orginator = publisher
+        self.add_dependencies(self._orginator)
+
         return self
+
+    def notify(self, value: TValue) -> None:
+        raise NotImplementedError('Operator doesn\'t support .notify()')
+
+    def reset_state(self, value: TValueNONE = NONE) -> None:
+        raise NotImplementedError('Operator doesn\'t support .reset_state()')
 
     def __ror__(self, publisher: Publisher) -> Publisher:
         return self.apply(publisher)
 
 
-class MultiOperator(Publisher):
+class MultiOperator(Publisher, Subscriber):
     """ Base class for operators depending on multiple publishers. Like
     Operator all publishers will be subscribed on first subscription to this
     operator. Accordingly all publishers get unsubscribed on unsubscription
@@ -77,37 +65,33 @@ class MultiOperator(Publisher):
     """
     def __init__(self, *publishers: Publisher) -> None:
         Publisher.__init__(self)
-        self._emit_sink = _EmitSink(self)
-        self._publishers = publishers
+        Subscriber.__init__(self)
+        self._orginators = publishers  # type: Tuple[Publisher]
+        self.add_dependencies(*publishers)
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if len(self._subscriptions) == 1:  # if this was the first subscription
-            for _publisher in self._publishers:
+            for publisher in self._orginators:
                 # subscribe to all dependent publishers
-                _publisher.subscribe(self._emit_sink)
+                publisher.subscribe(self)
 
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Publisher.unsubscribe(self, subscriber)
         if not self._subscriptions:
-            for _publisher in self._publishers:
-                _publisher.unsubscribe(self._emit_sink)
+            for publisher in self._orginators:
+                publisher.unsubscribe(self)
+            Publisher.reset_state(self)
 
-    @property
-    def source_publishers(self):
-        """ Tuple with all source publishers """
-        return self._publishers
+    def notify(self, value: TValue) -> None:
+        raise NotImplementedError('Operator doesn\'t support .notify()')
 
-    @abstractmethod
-    def emit_op(self, value: Any, who: Publisher) -> None:
-        """ Send new value to the operator
-        :param value: value to be send
-        :param who: reference to which publisher is emitting
-        """
+    def reset_state(self, value: TValueNONE = NONE) -> None:
+        raise NotImplementedError('Operator doesn\'t support .reset_state()')
 
 
 class OperatorConcat(Operator):
@@ -120,15 +104,18 @@ class OperatorConcat(Operator):
         Operator.__init__(self)
         self._operators = operators
 
-    def emit_op(self, value: Any, who: Publisher) -> None:
-        return self.notify(value)
+    def emit(self, value: Any, who: Publisher) -> None:
+        return Publisher.notify(self, value)
 
     def apply(self, publisher: Publisher) -> Publisher:
-        Operator.apply(self, publisher)
-
         # concat each operator in the following step
-        reduce(or_, self._operators, publisher)
+        orginator = publisher
+
+        for operator in self._operators:
+            operator.apply(orginator)
+            orginator = operator
 
         # the source publisher is the last operator in the chain
-        self._publisher = self._operators[-1]
-        return self
+        Operator.apply(self, self._operators[-1])
+
+        return self._operators[-1]

@@ -14,7 +14,7 @@ def event_loop():
 
 def test_publisher():
     p = Publisher(1)
-    future = p | OnEmitFuture(timeout=1, loop=asyncio.get_event_loop())
+    future = OnEmitFuture(p, timeout=1, loop=asyncio.get_event_loop())
 
     assert future.result() == 1
 
@@ -24,7 +24,7 @@ def test_publisher():
 @pytest.mark.asyncio
 async def test_timeout():
     p = Publisher()
-    future = p | OnEmitFuture(timeout=0.01)
+    future = OnEmitFuture(p, timeout=0.01)
     await asyncio.sleep(0.05)
 
     with pytest.raises(asyncio.TimeoutError):
@@ -33,7 +33,7 @@ async def test_timeout():
 @pytest.mark.asyncio
 async def test_cancel():
     p = Publisher()
-    future = p | OnEmitFuture(timeout=0.01)
+    future = OnEmitFuture(p, timeout=0.01)
     future.cancel()
     p.notify(1)
 
@@ -42,8 +42,7 @@ async def test_cancel():
 
 def test_wrong_source():
     p = Publisher()
-    on_emit_future = OnEmitFuture()
-    p | on_emit_future
+    on_emit_future = OnEmitFuture(p)
 
     with pytest.raises(ValueError):
         on_emit_future.emit(0, who=Publisher())

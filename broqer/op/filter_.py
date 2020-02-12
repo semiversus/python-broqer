@@ -3,11 +3,11 @@ Filters values based on a ``predicate`` function
 
 Usage:
 
->>> from broqer import Subject, op
->>> s = Subject()
+>>> from broqer import Value, op
+>>> s = Value()
 
 >>> filtered_publisher = s | op.Filter(lambda v:v>0)
->>> _disposable = filtered_publisher | op.Sink(print)
+>>> _disposable = filtered_publisher.subscribe(op.Sink(print))
 
 >>> s.emit(1)
 1
@@ -19,7 +19,7 @@ Also possible with additional args and kwargs:
 
 >>> import operator
 >>> filtered_publisher = s | op.Filter(operator.and_, 0x01)
->>> _disposable = filtered_publisher | op.Sink(print)
+>>> _disposable = filtered_publisher.subscribe(op.Sink(print))
 >>> s.emit(100)
 >>> s.emit(101)
 101
@@ -29,6 +29,7 @@ import asyncio
 from functools import partial, wraps
 from typing import Any, Callable
 
+from broqer import NONE
 from broqer.publisher import Publisher
 
 from .operator import Operator
@@ -43,34 +44,35 @@ class Filter(Operator):
 """
     def __init__(self, predicate: Callable[[Any], bool],
                  *args, unpack: bool = False, **kwargs) -> None:
-
         Operator.__init__(self)
         self._predicate = partial(predicate, *args, **kwargs)  # type: Callable
         self._unpack = unpack
 
-    def wait(self, timeout: float, omit_first_emit=False, loop=None):
-        return Operator.wait(self, timeout, omit_first_emit=omit_first_emit, loop=loop)
-
     def get(self):
-        value = self._publisher.get()  # may raise ValueError
+        if self._subscriptions:
+            return self._state
+
+        value = self._orginator.get()
+
         if (self._unpack and self._predicate(*value)) or \
                 (not self._unpack and self._predicate(value)):
             return value
-        return Publisher.get(self)  # raises ValueError
 
-    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
-        if who is not self._publisher:
+        return NONE
+
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+        if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
         if self._unpack:
             if self._predicate(*value):
-                return self.notify(value)
+                return Publisher.notify(self, value)
         elif self._predicate(value):
-            return self.notify(value)
+            return Publisher.notify(self, value)
         return None
 
 
-class True_(Operator):  # pylint: disable=invalid-name
+class True_(Operator):
     """ Filters all emits which evaluates for True.
 
     This operator can be used in the pipline style (v | True_()) or as
@@ -78,50 +80,54 @@ class True_(Operator):  # pylint: disable=invalid-name
     """
     def __init__(self, publisher: Publisher = None) -> None:
         Operator.__init__(self)
-        self._publisher = publisher
-
-    def wait(self, timeout: float, omit_first_emit=False, loop=None):
-        return Operator.wait(self, timeout, omit_first_emit=omit_first_emit, loop=loop)
+        self._orginator = publisher
 
     def get(self):
-        value = self._publisher.get()  # may raise ValueError
+        if self._subscriptions:
+            return self._state
+
+        value = self._orginator.get()
+
         if bool(value):
             return value
-        return Publisher.get(self)  # raises ValueError
 
-    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
-        if who is not self._publisher:
+        return NONE
+
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+        if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
         if bool(value):
-            return self.notify(value)
+            return Publisher.notify(self, value)
         return None
 
 
-class False_(Operator):  # pylint: disable=invalid-name
+class False_(Operator):
     """ Filters all emits which evaluates for False.
 
     This operator can be used in the pipline style (v | False_()) or as
     standalone operation (False_(v))."""
     def __init__(self, publisher: Publisher = None) -> None:
         Operator.__init__(self)
-        self._publisher = publisher
-
-    def wait(self, timeout: float, omit_first_emit=False, loop=None):
-        return Operator.wait(self, timeout, omit_first_emit=omit_first_emit, loop=loop)
+        self._orginator = publisher
 
     def get(self):
-        value = self._publisher.get()  # may raise ValueError
+        if self._subscriptions:
+            return self._state
+
+        value = self._orginator.get()
+
         if not bool(value):
             return value
-        return Publisher.get(self)  # raises ValueError
 
-    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
-        if who is not self._publisher:
+        return NONE
+
+    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+        if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
         if not bool(value):
-            return self.notify(value)
+            return Publisher.notify(self, value)
         return None
 
 

@@ -1,7 +1,5 @@
 """ Implementing Publisher """
-
-import asyncio
-from typing import TYPE_CHECKING, Any, Union, TypeVar, Type
+from typing import TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable, List
 
 from .types import NONE
 from .disposable import SubscriptionDisposable
@@ -15,12 +13,10 @@ class SubscriptionError(ValueError):
     already subscribed) or on unsubscribe when subscriber is not subscribed
     """
 
-class GetException(ValueError):
-    """ Exception raised when .get() is not possible as no state is defined.
-    This is mainly used for operators like Filter.
-    """
 
-TInherit = TypeVar('TInherit')
+TInherit = TypeVar('TInherit')  # Type to inherited behavior from
+TValue = TypeVar('TValue')  # Type of publisher state and emitted value
+TValueNONE = Union[TValue, NONE]  # when type can be TValue or NONE
 
 
 class Publisher:
@@ -28,6 +24,11 @@ class Publisher:
     the subscriber is notified about emitted values from the publisher (
     starting with the current state). In other frameworks
     *publisher*/*subscriber* are referenced as *observable*/*observer*.
+
+    broqer.NONE is used as default initialisation. .get() will always
+    return the internal state (even when it's broqer.NONE). .subscribe() will
+    emit the actual state to the new subscriber only if it is something else
+    than broqer.NONE .
 
     To receive information use following methods to interact with Publisher:
 
@@ -46,12 +47,15 @@ class Publisher:
     :ivar _subscriptions: holding a list of subscribers
     :ivar _on_subscription_cb: callback with boolean as argument, telling
                                 if at least one subscription exists
+    :ivar _dependencies: list with publishers this publisher is (directly or
+                         indirectly) dependent on.
     """
-    def __init__(self, init=NONE):
+    def __init__(self, init: TValueNONE = NONE):
         self._state = init
         self._inherited_type = None
         self._subscriptions = list()
         self._on_subscription_cb = None
+        self._dependencies = ()  # type: Tuple[Publisher]
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
@@ -100,18 +104,19 @@ class Publisher:
         for i, _s in enumerate(self._subscriptions):
             if _s is subscriber:
                 self._subscriptions.pop(i)
-                return
 
-        if not self._subscriptions and self._on_subscription_cb:
-            self._on_subscription_cb(False)
+                if not self._subscriptions and self._on_subscription_cb:
+                    self._on_subscription_cb(False)
+
+                return
 
         raise SubscriptionError('Subscriber is not registered')
 
-    def get(self):
+    def get(self) -> TValueNONE:
         """ Return the state of the publisher. """
         return self._state
 
-    def notify(self, value: Any) -> asyncio.Future:
+    def notify(self, value: TValue) -> None:
         """ Calling .emit(value) on all subscribers and store state.
 
         :param value: value to be emitted to subscribers
@@ -120,36 +125,49 @@ class Publisher:
         for s in self._subscriptions:
             s.emit(value, who=self)
 
-    def reset_state(self, value=NONE):
+    def reset_state(self, value: TValueNONE = NONE) -> None:
         """ Resets the state. Calling this method will not trigger an emit.
+
         :param value: Optional value to set the internal state
         """
         self._state = value
 
     @property
-    def subscriptions(self):
+    def subscriptions(self) -> Tuple['Subscriber']:
         """ Property returning a tuple with all current subscribers """
         return tuple(self._subscriptions)
 
-    def register_on_subscription_callback(self, cb):
+    def register_on_subscription_callback(self, cb: Callable[[bool], None]) \
+            -> None:
         """ This callback will be called, when the subscriptions are changing.
-        When a subscription is done and no subscription was present the callback
-        is called with True as argument. When after unsubscribe no subscription
-        is left, it will be called with False.
+        When a subscription is done and no subscription was present the
+        callback is called with True as argument. When after unsubscribe no
+        subscription is left, it will be called with False.
 
         :param cb: callback(subscription: bool) to be called.
+        :raises ValueError: when a callback is already registrered
         """
-        assert self._on_subscription_cb is None
+        if self._on_subscription_cb is not None:
+            raise ValueError('A callback is already registered')
+
         self._on_subscription_cb = cb
 
-    def wait(self, timeout: float, omit_first_emit=True, loop=None):
-        """ When a timeout should be applied for awaiting use this method.
+    def wait(self, timeout: float, omit_subscription=True, loop=None):
+        """ Returns a asyncio.Future which will be done on first change of this
+        publisher.
+
         :param timeout: timeout in seconds. Use None for infinite waiting
+        :param omit_subscription: if True the first emit (which can be on the
+            subscription) will be ignored.
         :param loop: asyncio loop to be used
         :returns: a future returning the emitted value
         """
         from broqer.op import OnEmitFuture  # due circular dependency
-        return OnEmitFuture(self, timeout, omit_first_emit, loop)
+
+        if self._state is NONE:
+            omit_subscription = False
+
+        return OnEmitFuture(self, timeout, omit_subscription, loop)
 
     def __bool__(self):
         """ A new Publisher is the result of a comparision between a publisher
@@ -169,6 +187,14 @@ class Publisher:
         return self
 
     @property
-    def inherited_type(self):
+    def inherited_type(self) -> Type[TInherit]:
         """ Property inherited_type returns used type class (or None) """
         return self._inherited_type
+
+    @property
+    def dependencies(self) -> Tuple['Publisher']:
+        """ Returning a list of publishers this publisher is dependent on. """
+        return self._dependencies
+
+    def add_dependencies(self, *publishers: 'Publisher') -> None:
+        self._dependencies = self._dependencies + publishers

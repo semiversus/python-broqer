@@ -11,7 +11,7 @@ def test_operator_with_publishers():
     o = v1 + v2
 
     assert isinstance(o, Publisher)
-    assert not isinstance(o, Subscriber)
+    assert isinstance(o, Subscriber)
     assert o.get() == 0
 
     v1.emit(1)
@@ -30,9 +30,9 @@ def test_operator_with_publishers():
     mock_sink.assert_called_once_with(4)
 
     with pytest.raises(ValueError):
-        o.emit_op(0, who=Publisher())
+        o.emit(0, who=Publisher())
 
-    with pytest.raises(AttributeError):
+    with pytest.raises(ValueError):
         Value(1).subscribe(o)
 
 def test_operator_with_constant():
@@ -63,7 +63,7 @@ def test_operator_with_constant():
         Value(1) | o
 
     with pytest.raises(ValueError):
-        o.emit_op(0, who=Publisher())
+        o.emit(0, who=Publisher())
 
 def test_operator_with_constant_r():
     v1 = 1
@@ -93,7 +93,7 @@ def test_operator_with_constant_r():
         Value(1) | o
 
     with pytest.raises(ValueError):
-        o.emit_op(0, who=Publisher())
+        o.emit(0, who=Publisher())
 
 @pytest.mark.parametrize('operator, l_value, r_value, result', [
     (operator.lt, 0, 1, True), (operator.lt, 1, 0, False), (operator.lt, 1, 1, False), (operator.lt, 1, 'foo', TypeError),
@@ -251,7 +251,7 @@ def test_unary_operators(operator, value, result):
         Value(1) | operator(v)
 
     with pytest.raises(ValueError):
-        operator(v).emit_op(0, who=Publisher())
+        operator(v).emit(0, who=Publisher())
 
 def test_in_operator():
     pi = Value(1)
@@ -366,13 +366,15 @@ def test_getattr_attribute():
     m.assert_called_once_with(4)
 
     with pytest.raises(ValueError):
-        dut.emit_op(0, who=Publisher())
+        dut.emit(0, who=Publisher())
 
     with pytest.raises(AttributeError):
         dut.assnign(5)
 
+
 def test_getattr_without_inherit():
     p = Publisher()
+
     class Foo:
         a = None
 

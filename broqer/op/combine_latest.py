@@ -1,10 +1,10 @@
 """
->>> from broqer import Subject, op
->>> s1 = Subject()
->>> s2 = Subject()
+>>> from broqer import Value, op
+>>> s1 = Value()
+>>> s2 = Value()
 
 >>> combination = op.CombineLatest(s1, s2)
->>> disposable = combination | op.Sink(print)
+>>> disposable = combination.subscribe(op.Sink(print))
 
 CombineLatest is only emitting, when all values are collected:
 
@@ -17,16 +17,15 @@ CombineLatest is only emitting, when all values are collected:
 Subscribing to a CombineLatest with all values available is emitting the values
 immediate on subscription:
 
->>> combination | op.Sink(print, 'Second sink:')
+>>> combination.subscribe(op.Sink(print, 'Second sink:'))
 Second sink: (1, 3)
 <...>
 
 """
-import asyncio
 from functools import wraps
 from typing import Any, Dict, MutableSequence, Callable  # noqa: F401
 
-from broqer.publisher import Publisher, GetException
+from broqer.publisher import Publisher
 from broqer.subscriber import Subscriber
 from broqer.types import NONE
 from broqer.disposable import SubscriptionDisposable
@@ -77,28 +76,25 @@ class CombineLatest(MultiOperator):
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
-            self._missing = set(self._publishers)
+            self._missing = set(self._orginators)
             self._partial_state[:] = [NONE for _ in self._partial_state]
-            self._state = NONE
 
     def get(self):
         if self._subscriptions:
             return self._state
 
-        values = (p.get() for p in self._publishers)
+        values = tuple(p.get() for p in self._orginators)
+
+        if NONE in values:
+            return NONE
 
         if not self._map:
             return tuple(values)
 
-        result = self._map(*values)
+        return self._map(*values)
 
-        if result is NONE:
-            raise GetException('CombineLatest is using a map function returning broqer.NONE')
-
-        return result
-
-    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
-        if all(who is not p for p in self._publishers):
+    def emit(self, value: Any, who: Publisher) -> None:
+        if all(who is not p for p in self._orginators):
             raise ValueError('Emit from non assigned publisher')
 
         # remove source publisher from ._missing
@@ -127,19 +123,15 @@ class CombineLatest(MultiOperator):
 
         self._state = state
 
-        return self.notify(state)
+        return Publisher.notify(self, state)
 
 
-def build_combine_latest(map_: Callable[..., Any] = None, *, emit_on=None,
-                         allow_stateless=False):
+def build_combine_latest(map_: Callable[..., Any] = None, *, emit_on=None):
     """ Decorator to wrap a function to return a CombineLatest operator.
 
     :param emit_on: publisher or list of publishers - only emitting result when
         emit comes from one of this list. If None, emit on any source
         publisher.
-    :param allow_stateless: when True evaluation is also done for stateless
-        publishers. A stateless publisher without an emit will be hold as
-        NONE.
     """
     def _build_combine_latest(map_: Callable[..., Any]):
         @wraps(map_)

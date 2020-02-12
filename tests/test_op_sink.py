@@ -1,15 +1,15 @@
 from unittest import mock
 import pytest
 
-from broqer import Disposable, Publisher
+from broqer import Disposable, Publisher, Value
 from broqer.op import Sink, Trace, build_sink
 
 @pytest.mark.parametrize('operator_cls', [Sink, Trace])
 def test_sink(operator_cls):
     cb = mock.Mock()
 
-    s = Subject()
-    sink_instance = s | operator_cls(cb)
+    s = Value()
+    sink_instance = s.subscribe(operator_cls(cb))
     assert isinstance(sink_instance, Disposable)
 
     assert not cb.called
@@ -41,8 +41,8 @@ def test_sink(operator_cls):
 def test_sink2(operator_cls):
     cb = mock.Mock()
 
-    s = Subject()
-    sink_instance = s | operator_cls(cb, unpack=True)
+    s = Value()
+    sink_instance = s.subscribe(operator_cls(cb, unpack=True))
     assert isinstance(sink_instance, Disposable)
 
     # test various emits on source
@@ -59,8 +59,8 @@ def test_sink2(operator_cls):
 
 @pytest.mark.parametrize('operator_cls', [Sink, Trace])
 def test_sink_without_function(operator_cls):
-    s = Subject()
-    sink_instance = s | operator_cls()
+    s = Value()
+    sink_instance = s.subscribe(operator_cls())
     assert isinstance(sink_instance, Disposable)
     assert len(s.subscriptions) == 1
 

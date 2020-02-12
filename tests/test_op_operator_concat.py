@@ -1,22 +1,25 @@
 from unittest import mock
 
-from broqer import Publisher
-from broqer.op import OperatorConcat, Map, Reduce, Sink
+from broqer import Publisher, NONE
+from broqer.op import OperatorConcat, Map, Sink
 
 def test_operator_concat():
-    DUT = OperatorConcat(Map(lambda v:v/2), Reduce(lambda s,v:s+v, init=0))
+    DUT = OperatorConcat(Map(lambda v: v/2), Map(lambda v: v+1))
     mock_cb = mock.Mock()
 
-    p = Publisher(0)
+    p = Publisher()
 
-    p | DUT
-    assert DUT.get() == 0
+    o = p | DUT
+    assert o.get() == NONE
 
-    DUT.subscribe(Sink(mock_cb))
+    p.notify(0)
+    assert o.get() == 1.0
+
+    o.subscribe(Sink(mock_cb))
 
     for v in range(5):
         p.notify(v)
 
-    mock_cb.assert_has_calls([mock.call(0), mock.call(0.5), mock.call(1.5), mock.call(3), mock.call(5)])
+    mock_cb.assert_has_calls([mock.call(1.0), mock.call(1.5), mock.call(2.0), mock.call(2.5), mock.call(3.0)])
 
-    assert DUT.get() == 5
+    assert o.get() == 3.0

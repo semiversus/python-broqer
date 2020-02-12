@@ -4,12 +4,12 @@ possible to omit ``func`` - in this case it's acting as dummy subscriber
 
 Usage:
 
->>> from broqer import Subject, op
->>> s = Subject()
+>>> from broqer import Value, op
+>>> s = Value()
 
 >>> len(s.subscriptions)
 0
->>> _d = s | op.Sink(print, 'Sink', sep=':')
+>>> _d = s.subscribe(op.Sink(print, 'Sink', sep=':'))
 >>> len(s.subscriptions)
 1
 

@@ -15,21 +15,21 @@ class _MapConstant(Operator):
         Operator.__init__(self)
         self._value = value
         self._operation = operation
-        self._publisher = publisher
+        self._orginator = publisher
 
         if publisher.inherited_type is not None:
             self.inherit_type(publisher.inherited_type)
 
     def get(self):
-        return self._operation(self._publisher.get(), self._value)
+        return self._operation(self._orginator.get(), self._value)
 
-    def emit_op(self, value: Any_, who: Publisher) -> asyncio.Future:
-        if who is not self._publisher:
+    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+        if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
         result = self._operation(value, self._value)
 
-        return self.notify(result)
+        return Publisher.notify(self, result)
 
 
 class _MapConstantReverse(Operator):
@@ -37,56 +37,56 @@ class _MapConstantReverse(Operator):
         Operator.__init__(self)
         self._value = value
         self._operation = operation
-        self._publisher = publisher
+        self._orginator = publisher
 
         if publisher.inherited_type is not None:
             self.inherit_type(publisher.inherited_type)
 
     def get(self):
-        return self._operation(self._value, self._publisher.get())
+        return self._operation(self._value, self._orginator.get())
 
-    def emit_op(self, value: Any_, who: Publisher) -> asyncio.Future:
-        if who is not self._publisher:
+    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+        if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
         result = self._operation(self._value, value)
 
-        return self.notify(result)
+        return Publisher.notify(self, result)
 
 
 class _MapUnary(Operator):
     def __init__(self, publisher: Publisher, operation) -> None:
         Operator.__init__(self)
         self._operation = operation
-        self._publisher = publisher
+        self._orginator = publisher
 
         if publisher.inherited_type is not None:
             self.inherit_type(publisher.inherited_type)
 
     def get(self):
-        return self._operation(self._publisher.get())
+        return self._operation(self._orginator.get())
 
-    def emit_op(self, value: Any_, who: Publisher) -> asyncio.Future:
-        if who is not self._publisher:
+    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+        if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
         result = self._operation(value)
 
-        return self.notify(result)
+        return Publisher.notify(self, result)
 
 
 class _GetAttr(Operator):
     def __init__(self, publisher: Publisher, attribute_name) -> None:
         Operator.__init__(self)
         self._attribute_name = attribute_name
-        self._publisher = publisher
+        self._orginator = publisher
         self._args = None
         self._kwargs = None
 
         self.inherit_type(publisher.inherited_type)
 
     def get(self):
-        value = self._publisher.get()  # may raise ValueError
+        value = self._orginator.get()  # may raise ValueError
         attribute = getattr(value, self._attribute_name)
         if self._args is None:
             return attribute
@@ -97,16 +97,16 @@ class _GetAttr(Operator):
         self._kwargs = kwargs
         return self
 
-    def emit_op(self, value: Any_, who: Publisher) -> asyncio.Future:
-        if who is not self._publisher:
+    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+        if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
         attribute = getattr(value, self._attribute_name)
 
         if self._args is None:
-            return self.notify(attribute)
+            return Publisher.notify(self, attribute)
 
-        return self.notify(attribute(*self._args, **self._kwargs))
+        return Publisher.notify(self, attribute(*self._args, **self._kwargs))
 
 
 def apply_operator_overloading():
