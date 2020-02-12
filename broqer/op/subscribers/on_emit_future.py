@@ -17,11 +17,10 @@ Usage:
 (1, 2)
 """
 import asyncio
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from broqer.publisher import Publisher
 from broqer.subscriber import Subscriber
-from broqer.disposable import SubscriptionDisposable
 
 
 class OnEmitFuture(Subscriber, asyncio.Future):
@@ -30,7 +29,8 @@ class OnEmitFuture(Subscriber, asyncio.Future):
     :param timeout: timeout in seconds
     :param loop: asyncio loop to be used
     """
-    def __init__(self, publisher: Publisher, timeout=None, omit_first_emit=False, loop=None):
+    def __init__(self, publisher: Publisher, timeout=None,
+                 omit_first_emit=False, loop=None):
         if loop is None:
             loop = asyncio.get_event_loop()
 

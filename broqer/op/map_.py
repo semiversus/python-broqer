@@ -27,7 +27,8 @@ Also possible with additional args and kwargs:
 103
 >>> _disposable.dispose()
 
->>> _disposable = (s | op.Map(print, 'Output:')).subscribe(op.Sink(print, 'EMITTED'))
+>>> _disposable = (s | op.Map(print, 'Output:')).subscribe(\
+                                                op.Sink(print, 'EMITTED'))
 Output: 100
 EMITTED None
 >>> s.emit(1)

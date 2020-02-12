@@ -1,8 +1,5 @@
 """ Module implementing Operator, MultiOperator.
 """
-from abc import abstractmethod
-from functools import reduce
-from operator import or_
 from typing import Any
 
 from broqer import NONE, Publisher, SubscriptionDisposable, Subscriber

@@ -28,7 +28,6 @@ from typing import Any, Dict, MutableSequence, Callable  # noqa: F401
 from broqer.publisher import Publisher
 from broqer.subscriber import Subscriber
 from broqer.types import NONE
-from broqer.disposable import SubscriptionDisposable
 
 from .operator import MultiOperator
 

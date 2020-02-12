@@ -1,5 +1,5 @@
 """ Implementing Publisher """
-from typing import TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable, List
+from typing import TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable
 
 from .types import NONE
 from .disposable import SubscriptionDisposable

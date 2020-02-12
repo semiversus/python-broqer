@@ -25,7 +25,8 @@ class Value(Publisher, Subscriber):
         Subscriber.__init__(self)
 
     def notify(self, value: Any) -> None:
-        raise NotImplementedError('Value doesn\'t support .notify(). Use .emit() instead')
+        raise NotImplementedError('Value doesn\'t support .notify().'
+                                  ' Use .emit() instead')
 
     def reset_state(self, value: TValueNONE = NONE) -> None:
         raise NotImplementedError('Value doesn\'t support .reset_state()')
