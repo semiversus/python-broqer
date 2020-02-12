@@ -1,8 +1,8 @@
 import pytest
 
 from broqer import op, NONE
-from broqer.op.operator import Operator
-from tests.helper_single import check_get_method, check_subscription, check_dependencies
+from tests.helper_single import check_get_method, check_subscription, \
+                                check_dependencies
 
 
 test_vector = [
@@ -25,7 +25,8 @@ test_vector = [
     (op.build_filter(lambda a, b, c: a + b == c, unpack=True), (2,), {},
         ((0, 2), (0, 3), (-1.0, 1.0)),
         ((0, 2), NONE, (-1.0, 1.0))),
-    (lambda v: op.build_filter(unpack=True)(lambda a, b, c: a + b == c)(v), (2,), {},
+    (lambda v: op.build_filter(unpack=True)(lambda a, b, c: a + b == c)(v),
+        (2,), {},
         ((0, 2), (0, 3), (-1.0, 1.0)),
         ((0, 2), NONE, (-1.0, 1.0))),
     (op.True_, (), {},
@@ -43,8 +44,10 @@ test_vector = [
 ]
 
 
-@pytest.mark.parametrize('method', [check_get_method, check_subscription, check_dependencies])
-@pytest.mark.parametrize('o,args,kwargs,input_vector,output_vector', test_vector)
+@pytest.mark.parametrize('method', [check_get_method, check_subscription,
+                                    check_dependencies])
+@pytest.mark.parametrize('o,args,kwargs,input_vector,output_vector',
+                         test_vector)
 def test_operator(method, o, args, kwargs, input_vector, output_vector):
     operator = o(*args, **kwargs)
 

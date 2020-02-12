@@ -1,9 +1,8 @@
 """ Implementing Value """
 
-import asyncio
-from typing import Any, Optional
+from typing import Any
 
-from .publisher import Publisher, TValue, TValueNONE
+from .publisher import Publisher, TValueNONE
 from .subscriber import Subscriber
 from .types import NONE
 
@@ -31,7 +30,6 @@ class Value(Publisher, Subscriber):
     def reset_state(self, value: TValueNONE = NONE) -> None:
         raise NotImplementedError('Value doesn\'t support .reset_state()')
 
-    def emit(self, value: TValue,
-             who: Optional[Publisher] = None  # pylint: disable=unused-argument
-             ) -> asyncio.Future:
+    def emit(self, value: Any,
+             who: Publisher = None) -> None:  # pylint: disable=unused-argument
         return Publisher.notify(self, value)

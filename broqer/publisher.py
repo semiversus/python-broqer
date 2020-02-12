@@ -1,5 +1,6 @@
 """ Implementing Publisher """
-from typing import TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable
+from typing import TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable, \
+                   Optional, Generic
 
 from .types import NONE
 from .disposable import SubscriptionDisposable
@@ -17,9 +18,10 @@ class SubscriptionError(ValueError):
 TInherit = TypeVar('TInherit')  # Type to inherited behavior from
 TValue = TypeVar('TValue')  # Type of publisher state and emitted value
 TValueNONE = Union[TValue, NONE]  # when type can be TValue or NONE
+SubscriptionCBT = Callable[[bool], None]
 
 
-class Publisher:
+class Publisher(Generic[TInherit]):
     """ In broqer a subscriber can subscribe to a publisher. After subscription
     the subscriber is notified about emitted values from the publisher (
     starting with the current state). In other frameworks
@@ -52,10 +54,10 @@ class Publisher:
     """
     def __init__(self, init: TValueNONE = NONE):
         self._state = init
-        self._inherited_type = None
-        self._subscriptions = list()
-        self._on_subscription_cb = None
-        self._dependencies = ()  # type: Tuple[Publisher]
+        self._inherited_type = None  # type: Optional[Type[TInherit]]
+        self._subscriptions = list()  # type: List[Subscriber]
+        self._on_subscription_cb = None  # type: Optional[SubscriptionCBT]
+        self._dependencies = ()  # type: Tuple[Publisher, ...]
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
@@ -133,12 +135,11 @@ class Publisher:
         self._state = value
 
     @property
-    def subscriptions(self) -> Tuple['Subscriber']:
+    def subscriptions(self) -> Tuple['Subscriber', ...]:
         """ Property returning a tuple with all current subscribers """
         return tuple(self._subscriptions)
 
-    def register_on_subscription_callback(self, cb: Callable[[bool], None]) \
-            -> None:
+    def register_on_subscription_callback(self, cb: SubscriptionCBT) -> None:
         """ This callback will be called, when the subscriptions are changing.
         When a subscription is done and no subscription was present the
         callback is called with True as argument. When after unsubscribe no
@@ -187,12 +188,12 @@ class Publisher:
         return self
 
     @property
-    def inherited_type(self) -> Type[TInherit]:
+    def inherited_type(self) -> Optional[Type[TInherit]]:
         """ Property inherited_type returns used type class (or None) """
         return self._inherited_type
 
     @property
-    def dependencies(self) -> Tuple['Publisher']:
+    def dependencies(self) -> Tuple['Publisher', ...]:
         """ Returning a list of publishers this publisher is dependent on. """
         return self._dependencies
 

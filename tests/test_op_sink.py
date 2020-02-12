@@ -29,7 +29,7 @@ def test_sink(operator_cls):
     s.emit((1, 2))
     cb.assert_called_with((1, 2))
 
-    # testing dispose()
+    # testing dispose()s
     cb.reset_mock()
 
     sink_instance.dispose()
