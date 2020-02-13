@@ -21,7 +21,7 @@ TValueNONE = Union[TValue, NONE]  # when type can be TValue or NONE
 SubscriptionCBT = Callable[[bool], None]
 
 
-class Publisher(Generic[TInherit]):
+class Publisher:
     """ In broqer a subscriber can subscribe to a publisher. After subscription
     the subscriber is notified about emitted values from the publisher (
     starting with the current state). In other frameworks
@@ -153,7 +153,8 @@ class Publisher(Generic[TInherit]):
 
         self._on_subscription_cb = cb
 
-    def wait(self, timeout: float, omit_subscription=True, loop=None):
+    def as_future(self, timeout: float, omit_subscription: bool = True,
+                  loop=None):
         """ Returns a asyncio.Future which will be done on first change of this
         publisher.
 

@@ -49,23 +49,23 @@ def test_subscribe():
 
 @pytest.mark.asyncio
 async def test_await(event_loop):
-    """ Test .wait() method """
+    """ Test .as_future() method """
     publisher = Publisher()
 
     # test omit_subscription=False when publisher has no state. This should
     # wait for the first state change
     event_loop.call_soon(publisher.notify, 1)
-    assert await publisher.wait(timeout=1, omit_subscription=False) == 1
+    assert await publisher.as_future(timeout=1, omit_subscription=False) == 1
 
     # omit_subscription is defaulted to True, so the current state should not
     # be returned, instead it should wait for the first change
     event_loop.call_soon(publisher.notify, 2)
-    assert await publisher.wait(timeout=1) == 2
+    assert await publisher.as_future(timeout=1) == 2
 
     # when publisher has a state and omit_subscription is False it should
     # directly return publisher's state
     event_loop.call_soon(publisher.notify, 3)
-    assert await publisher.wait(timeout=1, omit_subscription=False) == 2
+    assert await publisher.as_future(timeout=1, omit_subscription=False) == 2
 
 
 @pytest.mark.parametrize('init', [0, 'Test', {'a':1}, None, (1,2,3), [1,2,3]])
