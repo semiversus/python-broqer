@@ -108,7 +108,7 @@ class CombineLatest(MultiOperator):
         # is not one of emit_on -> don't evaluate and notify subscribers
         if self._missing or (self._emit_on is not None and
                              all(who is not p for p in self._emit_on)):
-            return
+            return None
 
         # evaluate
         if self._map:

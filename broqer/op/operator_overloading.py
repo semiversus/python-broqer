@@ -1,5 +1,4 @@
 """ This module enables the operator overloading of publishers """
-import asyncio
 import math
 import operator
 from functools import partial, reduce
@@ -23,7 +22,7 @@ class _MapConstant(Operator):
     def get(self):
         return self._operation(self._orginator.get(), self._value)
 
-    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any_, who: Publisher) -> None:
         if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
@@ -45,7 +44,7 @@ class _MapConstantReverse(Operator):
     def get(self):
         return self._operation(self._value, self._orginator.get())
 
-    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any_, who: Publisher) -> None:
         if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
@@ -66,7 +65,7 @@ class _MapUnary(Operator):
     def get(self):
         return self._operation(self._orginator.get())
 
-    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any_, who: Publisher) -> None:
         if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
@@ -97,7 +96,7 @@ class _GetAttr(Operator):
         self._kwargs = kwargs
         return self
 
-    def emit(self, value: Any_, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any_, who: Publisher) -> None:
         if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 

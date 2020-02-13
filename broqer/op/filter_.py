@@ -25,7 +25,6 @@ Also possible with additional args and kwargs:
 101
 
 """
-import asyncio
 from functools import partial, wraps
 from typing import Any, Callable
 
@@ -60,7 +59,7 @@ class Filter(Operator):
 
         return NONE
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> None:
         if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
@@ -72,7 +71,7 @@ class Filter(Operator):
         return None
 
 
-class True_(Operator):
+class True_(Operator):  # pylint: disable=invalid-name
     """ Filters all emits which evaluates for True.
 
     This operator can be used in the pipline style (v | True_()) or as
@@ -93,7 +92,7 @@ class True_(Operator):
 
         return NONE
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> None:
         if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
@@ -102,7 +101,7 @@ class True_(Operator):
         return None
 
 
-class False_(Operator):
+class False_(Operator):  # pylint: disable=invalid-name
     """ Filters all emits which evaluates for False.
 
     This operator can be used in the pipline style (v | False_()) or as
@@ -122,7 +121,7 @@ class False_(Operator):
 
         return NONE
 
-    def emit(self, value: Any, who: Publisher) -> asyncio.Future:
+    def emit(self, value: Any, who: Publisher) -> None:
         if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 

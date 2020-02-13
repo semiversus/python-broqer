@@ -19,6 +19,6 @@ __version__ = '1.0.2'
 
 __all__ = [
     'Disposable', 'Publisher', 'Subscriber',
-    'SubscriptionDisposable', 'SubscriptionError', 'NONE', 'Hub',
-    'SubHub', 'Value', 'default_error_handler', 'op'
+    'SubscriptionDisposable', 'SubscriptionError', 'NONE',
+    'Value', 'default_error_handler', 'op'
 ]

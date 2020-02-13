@@ -7,7 +7,8 @@ from .map_ import Map, build_map
 
 # subscribers
 from .subscribers.on_emit_future import OnEmitFuture
-from .subscribers.sink import Sink, build_sink
+from .subscribers.sink import (Sink, build_sink, build_sink_factory,
+                               sink_property)
 from .subscribers.trace import Trace
 
 # utils
@@ -23,7 +24,8 @@ __all__ = [
     'CombineLatest',
     'Filter', 'Map', 'Sink',
     'OnEmitFuture', 'True_',
-    'False_', 'Trace', 'build_map', 'build_combine_latest',
+    'False_', 'Trace', 'build_map', 'build_combine_latest', 'sink_property',
     'build_filter', 'build_sink', 'Str', 'Bool', 'Int', 'Float', 'Repr',
-    'Len', 'In', 'All', 'Any', 'BitwiseAnd', 'BitwiseOr', 'OperatorConcat'
+    'Len', 'In', 'All', 'Any', 'BitwiseAnd', 'BitwiseOr', 'OperatorConcat',
+    'build_sink_factory'
 ]

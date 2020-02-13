@@ -1,6 +1,6 @@
 """ Implementing Publisher """
-from typing import TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable, \
-                   Optional, Generic
+from typing import (TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable,
+                    Optional, List)
 
 from .types import NONE
 from .disposable import SubscriptionDisposable
@@ -54,7 +54,7 @@ class Publisher:
     """
     def __init__(self, init: TValueNONE = NONE):
         self._state = init
-        self._inherited_type = None  # type: Optional[Type[TInherit]]
+        self._inherited_type = None  # type: Optional[Type]
         self._subscriptions = list()  # type: List[Subscriber]
         self._on_subscription_cb = None  # type: Optional[SubscriptionCBT]
         self._dependencies = ()  # type: Tuple[Publisher, ...]
@@ -124,8 +124,8 @@ class Publisher:
         :param value: value to be emitted to subscribers
         """
         self._state = value
-        for s in self._subscriptions:
-            s.emit(value, who=self)
+        for subscriber in self._subscriptions:
+            subscriber.emit(value, who=self)
 
     def reset_state(self, value: TValueNONE = NONE) -> None:
         """ Resets the state. Calling this method will not trigger an emit.
@@ -139,19 +139,20 @@ class Publisher:
         """ Property returning a tuple with all current subscribers """
         return tuple(self._subscriptions)
 
-    def register_on_subscription_callback(self, cb: SubscriptionCBT) -> None:
+    def register_on_subscription_callback(self,
+                                          callback: SubscriptionCBT) -> None:
         """ This callback will be called, when the subscriptions are changing.
         When a subscription is done and no subscription was present the
         callback is called with True as argument. When after unsubscribe no
         subscription is left, it will be called with False.
 
-        :param cb: callback(subscription: bool) to be called.
+        :param callback: callback(subscription: bool) to be called.
         :raises ValueError: when a callback is already registrered
         """
         if self._on_subscription_cb is not None:
             raise ValueError('A callback is already registered')
 
-        self._on_subscription_cb = cb
+        self._on_subscription_cb = callback
 
     def as_future(self, timeout: float, omit_subscription: bool = True,
                   loop=None):
@@ -164,7 +165,8 @@ class Publisher:
         :param loop: asyncio loop to be used
         :returns: a future returning the emitted value
         """
-        from broqer.op import OnEmitFuture  # due circular dependency
+        from broqer.op import \
+            OnEmitFuture  # pylint: disable=import-outside-toplevel
 
         if self._state is NONE:
             omit_subscription = False
@@ -180,7 +182,7 @@ class Publisher:
         raise ValueError('Evaluation of comparison of publishers is not '
                          'supported')
 
-    def inherit_type(self, type_cls: Type[TInherit]) \
+    def inherit_type(self, type_cls: Optional[Type]) \
             -> Union[TInherit, 'Publisher']:
         """ Enables the usage of method and attribute overloading for this
         publisher.
@@ -189,7 +191,7 @@ class Publisher:
         return self
 
     @property
-    def inherited_type(self) -> Optional[Type[TInherit]]:
+    def inherited_type(self) -> Optional[Type]:
         """ Property inherited_type returns used type class (or None) """
         return self._inherited_type
 
@@ -199,4 +201,9 @@ class Publisher:
         return self._dependencies
 
     def add_dependencies(self, *publishers: 'Publisher') -> None:
+        """ Add publishers which are directly or indirectly controlling the
+        behavior of this publisher
+
+        :param *publishers: variable argument list with publishers
+        """
         self._dependencies = self._dependencies + publishers

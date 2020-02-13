@@ -2,7 +2,7 @@ from unittest import mock
 import pytest
 
 from broqer import Disposable, Publisher, Value
-from broqer.op import Sink, Trace, build_sink
+from broqer.op import Sink, Trace, build_sink, build_sink_factory
 
 
 @pytest.mark.parametrize('operator_cls', [Sink, Trace])
@@ -147,9 +147,9 @@ def test_build(build_kwargs, init_args, init_kwargs, ref_args, ref_kwargs,
 
     try:
         if build_kwargs is None:
-            dut = build_sink(mock_cb)(*init_args, **init_kwargs)
+            dut = build_sink_factory(mock_cb)(*init_args, **init_kwargs)
         else:
-            dut = build_sink(**build_kwargs)(mock_cb)(*init_args,
+            dut = build_sink_factory(**build_kwargs)(mock_cb)(*init_args,
                                                       **init_kwargs)
     except Exception as e:
         assert isinstance(e, exception)

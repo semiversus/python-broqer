@@ -38,7 +38,7 @@ EMITTED None
 from functools import partial, wraps
 from typing import Any, Callable
 
-from broqer.publisher import Publisher, TValue
+from broqer.publisher import Publisher, TValue, TValueNONE
 from broqer.types import NONE
 
 from .operator import Operator
@@ -65,7 +65,9 @@ class Map(Operator):
         self._function = partial(function, *args, **kwargs)
         self._unpack = unpack
 
-    def get(self) -> TValue:
+    def get(self) -> TValueNONE:
+        assert isinstance(self._orginator, Publisher)
+
         if self._subscriptions:
             return self._state
 
@@ -75,6 +77,7 @@ class Map(Operator):
             return NONE
 
         if self._unpack:
+            assert isinstance(value, (list, tuple))
             return self._function(*value)
 
         return self._function(value)
@@ -84,12 +87,15 @@ class Map(Operator):
             raise ValueError('Emit from non assigned publisher')
 
         if self._unpack:
+            assert isinstance(value, (list, tuple))
             result = self._function(*value)
         else:
             result = self._function(value)
 
         if result is not NONE:
             return Publisher.notify(self, result)
+
+        return None
 
 
 def build_map(function: Callable[[Any], Any] = None,

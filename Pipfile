@@ -22,3 +22,4 @@ broqer = {editable = true,path = "."}
 pylint = "*"
 pathlib2 = "==2.3.2"
 pylama = "*"
+prospector = "*"

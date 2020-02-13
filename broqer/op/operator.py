@@ -1,6 +1,7 @@
 """ Module implementing Operator, MultiOperator.
 """
-from typing import Any
+from typing import Any, Optional
+from abc import abstractmethod
 
 from broqer import NONE, Publisher, SubscriptionDisposable, Subscriber
 from broqer.publisher import TValue, TValueNONE
@@ -17,10 +18,12 @@ class Operator(Publisher, Subscriber):
     def __init__(self) -> None:
         Publisher.__init__(self)
         Subscriber.__init__(self)
-        self._orginator = None  # type: Publisher
+        self._orginator = None  # type: Optional[Publisher]
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
+        assert isinstance(self._orginator, Publisher)
+
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if len(self._subscriptions) == 1:  # if this was the first subscription
@@ -29,6 +32,8 @@ class Operator(Publisher, Subscriber):
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
+        assert isinstance(self._orginator, Publisher)
+
         Publisher.unsubscribe(self, subscriber)
 
         if not self._subscriptions:
@@ -36,6 +41,7 @@ class Operator(Publisher, Subscriber):
             Publisher.reset_state(self)
 
     def apply(self, publisher: Publisher) -> Publisher:
+        """ Apply the operator to a publisher """
         if self._orginator is not None:
             raise ValueError('Operator can only be connected to one publisher')
 
@@ -45,13 +51,20 @@ class Operator(Publisher, Subscriber):
         return self
 
     def notify(self, value: TValue) -> None:
-        raise NotImplementedError('Operator doesn\'t support .notify()')
+        raise ValueError('Operator doesn\'t support .notify()')
 
     def reset_state(self, value: TValueNONE = NONE) -> None:
-        raise NotImplementedError('Operator doesn\'t support .reset_state()')
+        raise ValueError('Operator doesn\'t support .reset_state()')
 
     def __ror__(self, publisher: Publisher) -> Publisher:
         return self.apply(publisher)
+
+    @abstractmethod
+    def emit(self, value: Any, who: Publisher) -> None:
+        """ Send new value to the operator
+        :param value: value to be send
+        :param who: reference to which publisher is emitting
+        """
 
 
 class MultiOperator(Publisher, Subscriber):
@@ -63,7 +76,7 @@ class MultiOperator(Publisher, Subscriber):
     def __init__(self, *publishers: Publisher) -> None:
         Publisher.__init__(self)
         Subscriber.__init__(self)
-        self._orginators = publishers  # type: Tuple[Publisher]
+        self._orginators = publishers
         self.add_dependencies(*publishers)
 
     def subscribe(self, subscriber: 'Subscriber',
@@ -85,10 +98,17 @@ class MultiOperator(Publisher, Subscriber):
             Publisher.reset_state(self)
 
     def notify(self, value: TValue) -> None:
-        raise NotImplementedError('Operator doesn\'t support .notify()')
+        raise ValueError('Operator doesn\'t support .notify()')
 
     def reset_state(self, value: TValueNONE = NONE) -> None:
-        raise NotImplementedError('Operator doesn\'t support .reset_state()')
+        raise ValueError('Operator doesn\'t support .reset_state()')
+
+    @abstractmethod
+    def emit(self, value: Any, who: Publisher) -> None:
+        """ Send new value to the operator
+        :param value: value to be send
+        :param who: reference to which publisher is emitting
+        """
 
 
 class OperatorConcat(Operator):
