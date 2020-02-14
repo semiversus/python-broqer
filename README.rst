@@ -1,6 +1,6 @@
-===================
+=======================================
 Python Broqer 2.0RC0 (work in progress)
-===================
+=======================================
 
 .. image:: https://img.shields.io/pypi/v/broqer.svg
   :target: https://pypi.python.org/pypi/broqer
@@ -45,7 +45,6 @@ Synopsis
 .. _GitHub.com: https://github.com/semiversus/python-broqer
 .. _ReadTheDocs.com: http://python-broqer.readthedocs.io
 .. _ReactiveX: http://reactivex.io/
-.. _Hub: https://python-broqer.readthedocs.io/en/latest/hub.html
 
 Showcase
 ========
