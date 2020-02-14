@@ -9,8 +9,6 @@ dist: xenial
 sudo: true
 
 install:
-  - python3 -m venv .venv
-  - source .venv/bin/activate
   - pip install -r requirements_dev.txt
 
 script:
