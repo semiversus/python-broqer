@@ -34,7 +34,7 @@ def check_get_method(operator, input_vector, output_vector):
 
     assert o.get() == output_value
 
-    p.get.assert_called_once()
+    p.get.assert_called_once_with()
 
 
 def check_subscription(operator, input_vector, output_vector):

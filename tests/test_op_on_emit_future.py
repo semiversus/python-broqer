@@ -22,16 +22,16 @@ def test_publisher():
     assert future.result() == 1
 
 @pytest.mark.asyncio
-async def test_timeout():
+async def test_timeout(event_loop):
     p = Publisher()
     future = OnEmitFuture(p, timeout=0.01)
-    await asyncio.sleep(0.05)
+    await asyncio.sleep(0.05, loop=event_loop)
 
     with pytest.raises(asyncio.TimeoutError):
         future.result()
 
 @pytest.mark.asyncio
-async def test_cancel():
+async def test_cancel(event_loop):
     p = Publisher()
     future = OnEmitFuture(p, timeout=0.01)
     future.cancel()

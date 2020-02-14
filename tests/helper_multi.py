@@ -39,7 +39,7 @@ def check_get_method(operator, input_vector, output_vector):
     assert operator.get() == output_value
 
     for p in publishers:
-        p.get.assert_called_once()
+        p.get.assert_called_once_with()
 
 
 def check_subscription(operator, input_vector, output_vector):
