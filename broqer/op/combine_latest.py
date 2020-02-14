@@ -106,8 +106,9 @@ class CombineLatest(MultiOperator):
 
         # if emits from publishers are missing or source of this emit
         # is not one of emit_on -> don't evaluate and notify subscribers
-        if self._missing or (self._emit_on is not None and
-                             all(who is not p for p in self._emit_on)):
+
+        if self._missing or (self._emit_on is not None and all(
+                who is not p for p in self._emit_on)):
             return None
 
         # evaluate
