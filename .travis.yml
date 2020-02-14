@@ -3,23 +3,25 @@ python:
   - 3.5
   - 3.6
   - 3.7
+  - 3.8
 
 dist: xenial
 sudo: true
 
 install:
-  - pip install pipenv
-  - pipenv install --dev
+  - python3 -m venv .venv
+  - source .venv/bin/activate
+  - pip install -r requirements_dev.txt
 
 script:
-  - pipenv run flake8 broqer
-  - pipenv run mypy broqer --no-strict-optional
-  - ( pipenv run pylint broqer --disable=R0401; exit $(($? & 35)) )
-  - pipenv run rstcheck README.rst
-  - pipenv run pytest
+  - flake8 broqer
+  - mypy broqer --no-strict-optional
+  - ( pylint broqer --disable=R0401; exit $(($? & 35)) )
+  - rstcheck README.rst
+  - pytest
 
 after_success:
-  -  if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then pipenv run codecov; fi
+  -  if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then codecov; fi
 
 deploy:
   provider: pypi

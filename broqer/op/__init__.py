@@ -2,7 +2,7 @@
 
 # synchronous operators
 from .combine_latest import CombineLatest, build_combine_latest
-from .filter_ import Filter, True_, False_, build_filter
+from .filter_ import Filter, FilterTrue, FilterFalse, build_filter
 from .map_ import Map, build_map
 
 # subscribers
@@ -23,9 +23,10 @@ apply_operator_overloading()
 __all__ = [
     'CombineLatest',
     'Filter', 'Map', 'Sink',
-    'OnEmitFuture', 'True_',
-    'False_', 'Trace', 'build_map', 'build_combine_latest', 'sink_property',
-    'build_filter', 'build_sink', 'Str', 'Bool', 'Int', 'Float', 'Repr',
+    'OnEmitFuture', 'FilterTrue',
+    'FilterFalse', 'Trace', 'build_map', 'build_combine_latest',
+    'sink_property', 'build_filter', 'build_sink', 'Str', 'Bool', 'Int',
+    'Float', 'Repr',
     'Len', 'In', 'All', 'Any', 'BitwiseAnd', 'BitwiseOr', 'OperatorConcat',
     'build_sink_factory'
 ]

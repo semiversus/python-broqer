@@ -71,7 +71,7 @@ class Filter(Operator):
         return None
 
 
-class True_(Operator):  # pylint: disable=invalid-name
+class FilterTrue(Operator):  # pylint: disable=invalid-name
     """ Filters all emits which evaluates for True.
 
     This operator can be used in the pipline style (v | True_()) or as
@@ -101,7 +101,7 @@ class True_(Operator):  # pylint: disable=invalid-name
         return None
 
 
-class False_(Operator):  # pylint: disable=invalid-name
+class FilterFalse(Operator):  # pylint: disable=invalid-name
     """ Filters all emits which evaluates for False.
 
     This operator can be used in the pipline style (v | False_()) or as
