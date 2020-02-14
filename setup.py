@@ -32,6 +32,6 @@ setup(
     packages=find_packages(),
     test_suite='tests',
     url='https://github.com/semiversus/python-broqer',
-    version='1.0.2',
+    version='version='2.0.0-dev'',
     zip_safe=False,
 )

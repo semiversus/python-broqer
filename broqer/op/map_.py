@@ -3,11 +3,11 @@ Apply ``function(*args, value, **kwargs)`` to each emitted value
 
 Usage:
 
->>> from broqer import Subject, op
->>> s = Subject()
+>>> from broqer import Value, op
+>>> s = Value()
 
 >>> mapped_publisher = s | op.Map(lambda v:v*2)
->>> _disposable = mapped_publisher | op.Sink(print)
+>>> _disposable = mapped_publisher.subscribe(op.Sink(print))
 
 >>> s.emit(1)
 2
@@ -21,21 +21,24 @@ Also possible with additional args and kwargs:
 
 >>> import operator
 >>> mapped_publisher = s | op.Map(operator.add, 3)
->>> _disposable = mapped_publisher | op.Sink(print)
+>>> _disposable = mapped_publisher.subscribe(op.Sink(print))
+3
 >>> s.emit(100)
 103
 >>> _disposable.dispose()
 
->>> _disposable = s | op.Map(print, 'Output:') | op.Sink(print, 'EMITTED')
+>>> _disposable = (s | op.Map(print, 'Output:')).subscribe(\
+                                                op.Sink(print, 'EMITTED'))
+Output: 100
+EMITTED None
 >>> s.emit(1)
 Output: 1
 EMITTED None
 """
-import asyncio
 from functools import partial, wraps
 from typing import Any, Callable
 
-from broqer.publisher import Publisher
+from broqer.publisher import Publisher, TValue, TValueNONE
 from broqer.types import NONE
 
 from .operator import Operator
@@ -62,30 +65,35 @@ class Map(Operator):
         self._function = partial(function, *args, **kwargs)
         self._unpack = unpack
 
-    def get(self):
-        value = self._publisher.get()  # may raise ValueError
+    def get(self) -> TValueNONE:
+        assert isinstance(self._orginator, Publisher)
+
+        if self._subscriptions:
+            return self._state
+
+        value = self._orginator.get()
+
+        if value is NONE:
+            return NONE
 
         if self._unpack:
-            result = self._function(*value)
-        else:
-            result = self._function(value)
+            assert isinstance(value, (list, tuple))
+            return self._function(*value)
 
-        if result is NONE:
-            Publisher.get(self)  # raises ValueError
+        return self._function(value)
 
-        return result
-
-    def emit_op(self, value: Any, who: Publisher) -> asyncio.Future:
-        if who is not self._publisher:
+    def emit(self, value: TValue, who: Publisher) -> None:
+        if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
         if self._unpack:
+            assert isinstance(value, (list, tuple))
             result = self._function(*value)
         else:
             result = self._function(value)
 
         if result is not NONE:
-            return self.notify(result)
+            return Publisher.notify(self, result)
 
         return None
 

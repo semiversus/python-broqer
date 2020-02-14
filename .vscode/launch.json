@@ -4,15 +4,29 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
-            "name": "Python: PyTest",
+            "name": "Pytest (all tests)",
             "type": "python",
             "request": "launch",
+            "debugOptions": ["DebugStdLib"],
             "module": "pytest",
             "args": [
-                "-x",
+                "-xsv",
                 "--no-cov"
             ],
         },
+        {
+            "name": "Pytest (current file)",
+            "type": "python",
+            "request": "launch",
+            "debugOptions": ["DebugStdLib"],
+            "module": "pytest",
+            "args": [
+                "${file}",
+                "-xsv",
+                "--no-cov"
+            ],
+        }
     ]
 }

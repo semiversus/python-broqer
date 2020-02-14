@@ -1,7 +1,6 @@
-""" Implementing Publisher and StatefulPublisher """
-
-import asyncio
-from typing import TYPE_CHECKING, Any, Union, TypeVar, Type
+""" Implementing Publisher """
+from typing import (TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable,
+                    Optional, List)
 
 from .types import NONE
 from .disposable import SubscriptionDisposable
@@ -16,32 +15,49 @@ class SubscriptionError(ValueError):
     """
 
 
-TInherit = TypeVar('TInherit')
+TInherit = TypeVar('TInherit')  # Type to inherited behavior from
+TValue = TypeVar('TValue')  # Type of publisher state and emitted value
+TValueNONE = Union[TValue, NONE]  # when type can be TValue or NONE
+SubscriptionCBT = Callable[[bool], None]
 
 
-class Publisher():
+class Publisher:
     """ In broqer a subscriber can subscribe to a publisher. After subscription
-    the subscriber is notified about emitted values from the publisher. In
-    other frameworks *publisher*/*subscriber* are referenced as
-    *observable*/*observer*.
+    the subscriber is notified about emitted values from the publisher (
+    starting with the current state). In other frameworks
+    *publisher*/*subscriber* are referenced as *observable*/*observer*.
+
+    broqer.NONE is used as default initialisation. .get() will always
+    return the internal state (even when it's broqer.NONE). .subscribe() will
+    emit the actual state to the new subscriber only if it is something else
+    than broqer.NONE .
 
     To receive information use following methods to interact with Publisher:
 
     - ``.subscribe(subscriber)`` to subscribe for events on this publisher
     - ``.unsubscribe(subscriber)`` to unsubscribe
-    - ``.get()`` to get the current state (will raise ValueError if not
-      stateful)
+    - ``.get()`` to get the current state
 
     When implementing a Publisher use the following methods:
 
     - ``.notify(value)`` calls .emit(value) on all subscribers
 
-    :ivar _subscriptions: holding a list of subscribers
+    :param init: the initial state.
+
+    :ivar _state: state of the publisher
     :ivar _inherited_type: type class for method lookup
+    :ivar _subscriptions: holding a list of subscribers
+    :ivar _on_subscription_cb: callback with boolean as argument, telling
+                                if at least one subscription exists
+    :ivar _dependencies: list with publishers this publisher is (directly or
+                         indirectly) dependent on.
     """
-    def __init__(self):
-        self._inherited_type = None
-        self._subscriptions = list()
+    def __init__(self, init: TValueNONE = NONE):
+        self._state = init
+        self._inherited_type = None  # type: Optional[Type]
+        self._subscriptions = list()  # type: List[Subscriber]
+        self._on_subscription_cb = None  # type: Optional[SubscriptionCBT]
+        self._dependencies = ()  # type: Tuple[Publisher, ...]
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
@@ -61,12 +77,20 @@ class Publisher():
         if any(subscriber is s for s in self._subscriptions):
             raise SubscriptionError('Subscriber already registered')
 
+        if not self._subscriptions and self._on_subscription_cb:
+            self._on_subscription_cb(True)
+
         if prepend:
             self._subscriptions.insert(0, subscriber)
         else:
             self._subscriptions.append(subscriber)
 
-        return SubscriptionDisposable(self, subscriber)
+        disposable = SubscriptionDisposable(self, subscriber)
+
+        if self._state is not NONE:
+            subscriber.emit(self._state, who=self)
+
+        return disposable
 
     def unsubscribe(self, subscriber: 'Subscriber') -> None:
         """ Unsubscribe the given subscriber
@@ -76,68 +100,78 @@ class Publisher():
         """
         # here is a special implementation which is replacing the more
         # obvious one: self._subscriptions.remove(subscriber) - this will not
-        # work because list.remove(x) is doing comparision for equality.
+        # work because list.remove(x) is doing comparison for equality.
         # Applied to publishers this will return another publisher instead of
         # a boolean result
         for i, _s in enumerate(self._subscriptions):
             if _s is subscriber:
                 self._subscriptions.pop(i)
+
+                if not self._subscriptions and self._on_subscription_cb:
+                    self._on_subscription_cb(False)
+
                 return
+
         raise SubscriptionError('Subscriber is not registered')
 
-    def get(self):  # pylint: disable=no-self-use
-        """ Return the value of the publisher. This is only working for
-        stateful publishers. If publisher is stateless it will raise a
-        ValueError.
+    def get(self) -> TValueNONE:
+        """ Return the state of the publisher. """
+        return self._state
 
-        :raises ValueError: when the publisher is stateless.
-        """
-        raise ValueError('No value available')
-
-    def notify(self, value: Any) -> asyncio.Future:
-        """ Calling .emit(value) on all subscribers. A synchronouse subscriber
-        will just return None, a asynchronous one may returns a future. Futures
-        will be collected. If no future was returned None will be returned by
-        this method. If one futrue was returned that future will be returned.
-        When multiple futures were returned a gathered future will be returned.
+    def notify(self, value: TValue) -> None:
+        """ Calling .emit(value) on all subscribers and store state.
 
         :param value: value to be emitted to subscribers
-        :returns: a future if at least one subscriber has returned a future,
-            elsewise None
         """
-        results = (s.emit(value, who=self) for s in self._subscriptions)
-        futures = tuple(r for r in results if r is not None)
+        self._state = value
+        for subscriber in self._subscriptions:
+            subscriber.emit(value, who=self)
 
-        if not futures:
-            return None
+    def reset_state(self, value: TValueNONE = NONE) -> None:
+        """ Resets the state. Calling this method will not trigger an emit.
 
-        if len(futures) == 1:
-            return futures[0]  # return the received single future
-
-        return asyncio.gather(*futures)
+        :param value: Optional value to set the internal state
+        """
+        self._state = value
 
     @property
-    def subscriptions(self):
+    def subscriptions(self) -> Tuple['Subscriber', ...]:
         """ Property returning a tuple with all current subscribers """
         return tuple(self._subscriptions)
 
-    def __or__(self, subscriber: 'Subscriber'
-               ) -> Union[SubscriptionDisposable, 'Publisher', 'Subscriber']:
-        return subscriber.__ror__(self)
+    def register_on_subscription_callback(self,
+                                          callback: SubscriptionCBT) -> None:
+        """ This callback will be called, when the subscriptions are changing.
+        When a subscription is done and no subscription was present the
+        callback is called with True as argument. When after unsubscribe no
+        subscription is left, it will be called with False.
 
-    def __await__(self):
-        """ Publishers are awaitable and the future is done when the publisher
-        emits a value """
-        from broqer.op import OnEmitFuture  # due circular dependency
-        return (self | OnEmitFuture(timeout=None)).__await__()
+        :param callback: callback(subscription: bool) to be called.
+        :raises ValueError: when a callback is already registrered
+        """
+        if self._on_subscription_cb is not None:
+            raise ValueError('A callback is already registered')
 
-    def wait_for(self, timeout=None):
-        """ When a timeout should be applied for awaiting use this method.
-        :param timeout: optional timeout in seconds.
+        self._on_subscription_cb = callback
+
+    def as_future(self, timeout: float, omit_subscription: bool = True,
+                  loop=None):
+        """ Returns a asyncio.Future which will be done on first change of this
+        publisher.
+
+        :param timeout: timeout in seconds. Use None for infinite waiting
+        :param omit_subscription: if True the first emit (which can be on the
+            subscription) will be ignored.
+        :param loop: asyncio loop to be used
         :returns: a future returning the emitted value
         """
-        from broqer.op import OnEmitFuture  # due circular dependency
-        return self | OnEmitFuture(timeout=timeout)
+        from broqer.op import \
+            OnEmitFuture  # pylint: disable=import-outside-toplevel
+
+        if self._state is NONE:
+            omit_subscription = False
+
+        return OnEmitFuture(self, timeout, omit_subscription, loop)
 
     def __bool__(self):
         """ A new Publisher is the result of a comparision between a publisher
@@ -148,73 +182,28 @@ class Publisher():
         raise ValueError('Evaluation of comparison of publishers is not '
                          'supported')
 
-    def inherit_type(self, type_cls: Type[TInherit]) \
+    def inherit_type(self, type_cls: Optional[Type]) \
             -> Union[TInherit, 'Publisher']:
-        """ enables the usage of method and attribute overloading for this
+        """ Enables the usage of method and attribute overloading for this
         publisher.
         """
         self._inherited_type = type_cls
         return self
 
     @property
-    def inherited_type(self):
+    def inherited_type(self) -> Optional[Type]:
         """ Property inherited_type returns used type class (or None) """
         return self._inherited_type
 
+    @property
+    def dependencies(self) -> Tuple['Publisher', ...]:
+        """ Returning a list of publishers this publisher is dependent on. """
+        return self._dependencies
 
-class StatefulPublisher(Publisher):
-    """ A StatefulPublisher is keeping it's state. This changes the behavior
-    compared to a non-stateful Publisher:
-    - when subscribing the subscriber will be notified with the actual state
-    - .get() is returning the actual state
+    def add_dependencies(self, *publishers: 'Publisher') -> None:
+        """ Add publishers which are directly or indirectly controlling the
+        behavior of this publisher
 
-    :param init: the initial state. As long the state is NONE, the
-        behavior will be equal to a stateless Publisher.
-    """
-    def __init__(self, init=NONE):
-        Publisher.__init__(self)
-        self._state = init
-
-    def subscribe(self, subscriber: 'Subscriber',
-                  prepend: bool = False) -> SubscriptionDisposable:
-        disposable = Publisher.subscribe(self, subscriber, prepend=prepend)
-
-        # if a state is defined emit it during .subscribe call
-        if self._state is not NONE:
-            subscriber.emit(self._state, who=self)
-
-        return disposable
-
-    def get(self):
-        """ Returns state if defined else it raises a ValueError. See also
-        Publisher.get().
-
-        :raises ValueError: if this publisher is not initialized and has not
-            received any emits.
+        :param *publishers: variable argument list with publishers
         """
-        if self._state is not NONE:
-            return self._state
-        return Publisher.get(self)  # raises ValueError
-
-    def notify(self, value: Any) -> asyncio.Future:
-        """ Only notifies subscribers if state has changed. See also
-        Publisher.notify().
-
-        :param value: value to be emitted to subscribers
-        :returns: a future if at least one subscriber has returned a future,
-            elsewise None
-        """
-        if self._state == value:
-            return None
-
-        self._state = value
-        return Publisher.notify(self, value)
-
-    def reset_state(self, value=NONE):
-        """ Resets the state. If value argument is not used, the behavior for
-        .subscribe() and .get() will be like a stateless Publisher until next
-        .emit() . Calling this method will not trigger an emit.
-
-        :param value: Optional value to set the internal state
-        """
-        self._state = value
+        self._dependencies = self._dependencies + publishers

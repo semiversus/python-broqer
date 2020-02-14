@@ -1,0 +1,7 @@
+* publisher always initializes with state (default is NONE)
+* .subscribe always receives first emit
+* .subscribe argument to omit first emit? (e.g. await p)
+* .notify receives no futures
+* p.subscribe(s) or s.subscribe(p)?
+* forward or backward dependencies?
+* warnings for broqer 1.0.3: | subscriber

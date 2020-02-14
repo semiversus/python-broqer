@@ -14,6 +14,9 @@ class Disposable(metaclass=ABCMeta):
     returned on resource allocation. Calling .dispose() on the returned
     disposable is freeing the resource.
 
+    Note: Multiple calls to .dispose() have to be handled by the
+    implementation.
+
         >>> class MyDisposable(Disposable):
         ...     def dispose(self):
         ...         print('DISPOSED')
