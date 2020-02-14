@@ -1,5 +1,5 @@
 ===================
-Python Broqer
+Python Broqer 2.0RC0 (work in progress)
 ===================
 
 .. image:: https://img.shields.io/pypi/v/broqer.svg
@@ -33,7 +33,6 @@ Synopsis
 - Tested on Python 3.5, 3.6, 3.7 and 3.8
 - Unit tested with pytest_, coding style checked with Flake8_, static type checked with mypy_, static code checked with Pylint_, documented with Sphinx_
 - Operators known from ReactiveX_ and other streaming frameworks (like Map_, CombineLatest_, ...)
-- Broker functionality via Hub_
 
   + Centralised object to keep track of publishers and subscribers
   + Starting point to build applications with a microservice architecture
