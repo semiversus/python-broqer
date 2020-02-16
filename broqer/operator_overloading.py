@@ -1,15 +1,16 @@
 """ This module enables the operator overloading of publishers """
 import math
 import operator
-from functools import partial, reduce
 from typing import Any as Any_
 
+# pylint: disable=cyclic-import
+import broqer
 from broqer import Publisher
-from broqer.op.combine_latest import CombineLatest
-from broqer.op.operator import Operator
+from broqer.operator import Operator
 
 
-class _MapConstant(Operator):
+class MapConstant(Operator):
+    """ MapConstant TODO """
     def __init__(self, publisher: Publisher, value, operation) -> None:
         Operator.__init__(self)
         self._value = value
@@ -31,7 +32,8 @@ class _MapConstant(Operator):
         return Publisher.notify(self, result)
 
 
-class _MapConstantReverse(Operator):
+class MapConstantReverse(Operator):
+    """ MapConstantReverse TODO """
     def __init__(self, publisher: Publisher, value, operation) -> None:
         Operator.__init__(self)
         self._value = value
@@ -53,7 +55,8 @@ class _MapConstantReverse(Operator):
         return Publisher.notify(self, result)
 
 
-class _MapUnary(Operator):
+class MapUnary(Operator):
+    """ MapUnary TODO """
     def __init__(self, publisher: Publisher, operation) -> None:
         Operator.__init__(self)
         self._operation = operation
@@ -122,10 +125,11 @@ def apply_operator_overloading():
             '__getitem__', '__floordiv__', '__truediv__'):
         def _op(operand_left, operand_right, operation=method):
             if isinstance(operand_right, Publisher):
-                return CombineLatest(operand_left, operand_right,
-                                     map_=getattr(operator, operation))
-            return _MapConstant(operand_left, operand_right,
-                                getattr(operator, operation))
+                return broqer.op.CombineLatest(operand_left, operand_right,
+                                               map_=getattr(operator,
+                                                            operation))
+            return MapConstant(operand_left, operand_right,
+                               getattr(operator, operation))
 
         setattr(Publisher, method, _op)
 
@@ -137,8 +141,8 @@ def apply_operator_overloading():
             ('__rxor__', '__xor__'), ('__rfloordiv__', '__floordiv__'),
             ('__rtruediv__', '__truediv__')):
         def _op(operand_left, operand_right, operation=_method):
-            return _MapConstantReverse(operand_left, operand_right,
-                                       getattr(operator, operation))
+            return MapConstantReverse(operand_left, operand_right,
+                                      getattr(operator, operation))
 
         setattr(Publisher, method, _op)
 
@@ -148,7 +152,7 @@ def apply_operator_overloading():
             ('__round__', round), ('__trunc__', math.trunc),
             ('__floor__', math.floor), ('__ceil__', math.ceil)):
         def _op_unary(operand, operation=_method):
-            return _MapUnary(operand, operation)
+            return MapUnary(operand, operation)
 
         setattr(Publisher, method, _op_unary)
 
@@ -159,115 +163,3 @@ def apply_operator_overloading():
         return _GetAttr(publisher, attribute_name)
 
     setattr(Publisher, '__getattr__', _getattr)
-
-
-class Str(_MapUnary):
-    """ Implementing the functionality of str() for publishers. """
-    def __init__(self, publisher: Publisher) -> None:
-        _MapUnary.__init__(self, publisher, str)
-
-
-class Bool(_MapUnary):
-    """ Implementing the functionality of bool() for publishers. """
-    def __init__(self, publisher: Publisher) -> None:
-        _MapUnary.__init__(self, publisher, bool)
-
-
-class Int(_MapUnary):
-    """ Implementing the functionality of int() for publishers. """
-    def __init__(self, publisher: Publisher) -> None:
-        _MapUnary.__init__(self, publisher, int)
-
-
-class Float(_MapUnary):
-    """ Implementing the functionality of float() for publishers. """
-    def __init__(self, publisher: Publisher) -> None:
-        _MapUnary.__init__(self, publisher, float)
-
-
-class Repr(_MapUnary):
-    """ Implementing the functionality of repr() for publishers. """
-    def __init__(self, publisher: Publisher) -> None:
-        _MapUnary.__init__(self, publisher, repr)
-
-
-class Len(_MapUnary):
-    """ Implementing the functionality of len() for publishers. """
-    def __init__(self, publisher: Publisher) -> None:
-        _MapUnary.__init__(self, publisher, len)
-
-
-def _in(item, container):
-    return item in container
-
-
-class In(CombineLatest):
-    """ Implementing the functionality of ``in`` operator for publishers.
-    :param item: publisher or constant to check for availability in container.
-    :param container: container (publisher or constant)
-    """
-    def __init__(self, item: Any_, container: Any_) -> None:
-        if isinstance(item, Publisher) and isinstance(container, Publisher):
-            CombineLatest.__init__(self, item, container, map_=_in)
-        elif isinstance(item, Publisher):
-            function = partial(_in, container=container)
-            CombineLatest.__init__(self, item, map_=function)
-        else:
-            if not isinstance(container, Publisher):
-                raise TypeError('Item or container has to be a publisher')
-            function = partial(_in, item)
-            CombineLatest.__init__(self, container, map_=function)
-
-
-def _all(*items):
-    return all(items)
-
-
-class All(CombineLatest):
-    """ Implement the functionality of ``all`` operator for publishers.
-    One big difference is that ``all`` takes an iterator and ``All`` take a
-    variable amount of publishers as arguments.
-    :param publishers: Publishers evaluated for all to be True
-    """
-    def __init__(self, *publishers: Any_) -> None:
-        CombineLatest.__init__(self, *publishers, map_=_all)
-
-
-def _any(*items):
-    return any(items)
-
-
-class Any(CombineLatest):
-    """ Implement the functionality of ``any`` operator for publishers.
-    One big difference is that ``any`` takes an iterator and ``Any`` take a
-    variable amount of publishers as arguments.
-    :param publishers: Publishers evaluated for one to be True
-    """
-    def __init__(self, *publishers: Any_) -> None:
-        CombineLatest.__init__(self, *publishers, map_=_any)
-
-
-def _bitwise_or(*items):
-    return reduce(operator.or_, items)
-
-
-class BitwiseOr(CombineLatest):
-    """ Implement the functionality of bitwise or (``|``) operator for
-    publishers.
-    :param publishers: Publishers evaluated for bitwise or
-    """
-    def __init__(self, *publishers: Any_) -> None:
-        CombineLatest.__init__(self, *publishers, map_=_bitwise_or)
-
-
-def _bitwise_and(*items):
-    return reduce(operator.and_, items)
-
-
-class BitwiseAnd(CombineLatest):
-    """ Implement the functionality of bitwise and (``&``) operator for
-    publishers.
-    :param publishers: Publishers evaluated for bitwise and
-    """
-    def __init__(self, *publishers: Any_) -> None:
-        CombineLatest.__init__(self, *publishers, map_=_bitwise_and)

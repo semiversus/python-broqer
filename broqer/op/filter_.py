@@ -30,7 +30,7 @@ from typing import Any, Callable
 
 from broqer import NONE, Publisher
 
-from broqer.op.operator import Operator
+from broqer.operator import Operator
 
 
 class Filter(Operator):

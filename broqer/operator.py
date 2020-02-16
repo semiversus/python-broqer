@@ -3,6 +3,7 @@
 import typing
 from abc import abstractmethod
 
+# pylint: disable=cyclic-import
 from broqer import NONE, Publisher, SubscriptionDisposable, Subscriber
 from broqer.publisher import TValue, TValueNONE
 
@@ -109,30 +110,3 @@ class MultiOperator(Publisher, Subscriber):
         :param value: value to be send
         :param who: reference to which publisher is emitting
         """
-
-
-class OperatorConcat(Operator):
-    """ This class is generator a new operator by concatenation of other
-    operators.
-
-    :param operators: the operators to concatenate
-    """
-    def __init__(self, *operators):
-        Operator.__init__(self)
-        self._operators = operators
-
-    def emit(self, value: typing.Any, who: Publisher) -> None:
-        return Publisher.notify(self, value)
-
-    def apply(self, publisher: Publisher) -> Publisher:
-        # concat each operator in the following step
-        orginator = publisher
-
-        for operator in self._operators:
-            operator.apply(orginator)
-            orginator = operator
-
-        # the source publisher is the last operator in the chain
-        Operator.apply(self, self._operators[-1])
-
-        return self._operators[-1]

@@ -6,19 +6,17 @@ from broqer.op.filter_ import Filter, FilterTrue, FilterFalse, build_filter
 from broqer.op.map_ import Map, build_map
 
 # utils
-from broqer.op.operator import OperatorConcat
+from broqer.op.concat import Concat
 
 # enable operator overloading
-from .operator_overloading import apply_operator_overloading, Str, Bool, Int, \
-    Float, Repr, Len, In, All, Any, BitwiseAnd, BitwiseOr
-
-apply_operator_overloading()
+from .py_operators import Str, Bool, Int, Float, Repr, Len, In, All, Any, \
+                         BitwiseAnd, BitwiseOr
 
 __all__ = [
     'CombineLatest',
     'Filter', 'Map', 'FilterTrue',
     'FilterFalse', 'build_map', 'build_combine_latest',
-    'build_filter', 'OperatorConcat', 'Str', 'Bool', 'Int',
+    'build_filter', 'Concat', 'Str', 'Bool', 'Int',
     'Float', 'Repr',
     'Len', 'In', 'All', 'Any', 'BitwiseAnd', 'BitwiseOr',
 ]

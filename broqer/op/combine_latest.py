@@ -27,7 +27,7 @@ from typing import Any, Dict, MutableSequence, Callable  # noqa: F401
 
 from broqer import Publisher, Subscriber, NONE
 
-from broqer.op.operator import MultiOperator
+from broqer.operator import MultiOperator
 
 
 class CombineLatest(MultiOperator):

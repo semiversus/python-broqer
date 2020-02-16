@@ -6,15 +6,14 @@ from .disposable import Disposable
 from .types import NONE
 from .publisher import Publisher, SubscriptionDisposable, SubscriptionError
 from .subscriber import Subscriber
-from .subscribers import (
-    OnEmitFuture,
-    Sink,
-    Trace,
-    build_sink,
-    build_sink_factory,
-    sink_property,
-)
+from .subscribers import (OnEmitFuture, Sink, Trace, build_sink,
+                          build_sink_factory, sink_property)
 from .value import Value
+
+from .operator_overloading import apply_operator_overloading
+
+apply_operator_overloading()
+
 
 __author__ = "Günther Jena"
 __email__ = "guenther@jena.at"

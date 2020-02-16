@@ -41,7 +41,7 @@ from typing import Any, Callable
 from broqer import Publisher, NONE
 from broqer.publisher import TValue, TValueNONE
 
-from broqer.op.operator import Operator
+from broqer.operator import Operator
 
 
 class Map(Operator):

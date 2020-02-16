@@ -1,11 +1,11 @@
 from unittest import mock
 
 from broqer import Publisher, NONE, Sink
-from broqer.op import OperatorConcat, Map
+from broqer.op import Concat, Map
 
 
 def test_operator_concat():
-    DUT = OperatorConcat(Map(lambda v: v/2), Map(lambda v: v+1))
+    DUT = Concat(Map(lambda v: v/2), Map(lambda v: v+1))
     mock_cb = mock.Mock()
 
     p = Publisher()

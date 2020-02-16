@@ -54,9 +54,16 @@ class Publisher:
     :ivar _dependencies: list with publishers this publisher is (directly or
                          indirectly) dependent on.
     """
-    def __init__(self, init: TValueNONE = NONE):
+    def __init__(self, init: TValueNONE = NONE, type_: Type[TValue] = None):
         self._state = init
-        self._inherited_type = None  # type: Optional[Type]
+
+        if type_:
+            self._inherited_type = type_  # type: Optional[Type]
+        elif init is not NONE:
+            self._inherited_type = type(init)
+        else:
+            self._inherited_type = None
+
         self._subscriptions = list()  # type: List[Subscriber]
         self._on_subscription_cb = None  # type: Optional[SubscriptionCBT]
         self._dependencies = ()  # type: Tuple[Publisher, ...]
@@ -206,6 +213,13 @@ class Publisher:
         :param *publishers: variable argument list with publishers
         """
         self._dependencies = self._dependencies + publishers
+
+    def __dir__(self):
+        """ Extending __dir__ with inherited type """
+        attrs = set(super().__dir__())
+        if self._inherited_type:
+            attrs.update(set(dir(self._inherited_type)))
+        return tuple(attrs)
 
 
 class SubscriptionDisposable(Disposable):
