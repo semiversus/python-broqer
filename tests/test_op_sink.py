@@ -1,8 +1,8 @@
 from unittest import mock
 import pytest
 
-from broqer import Disposable, Publisher, Value
-from broqer.op import Sink, Trace, build_sink, build_sink_factory
+from broqer import Disposable, Publisher, Value, Sink, Trace, build_sink, \
+                   build_sink_factory
 
 
 @pytest.mark.parametrize('operator_cls', [Sink, Trace])

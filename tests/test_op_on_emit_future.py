@@ -1,8 +1,7 @@
 import asyncio
 import pytest
 
-from broqer import Publisher
-from broqer.op import OnEmitFuture
+from broqer import Publisher, OnEmitFuture
 
 from .eventloop import VirtualTimeEventLoop
 

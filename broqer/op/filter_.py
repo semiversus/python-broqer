@@ -3,11 +3,11 @@ Filters values based on a ``predicate`` function
 
 Usage:
 
->>> from broqer import Value, op
+>>> from broqer import Value, op, Sink
 >>> s = Value()
 
 >>> filtered_publisher = s | op.Filter(lambda v:v>0)
->>> _disposable = filtered_publisher.subscribe(op.Sink(print))
+>>> _disposable = filtered_publisher.subscribe(Sink(print))
 
 >>> s.emit(1)
 1
@@ -19,7 +19,7 @@ Also possible with additional args and kwargs:
 
 >>> import operator
 >>> filtered_publisher = s | op.Filter(operator.and_, 0x01)
->>> _disposable = filtered_publisher.subscribe(op.Sink(print))
+>>> _disposable = filtered_publisher.subscribe(Sink(print))
 >>> s.emit(100)
 >>> s.emit(101)
 101
@@ -28,10 +28,9 @@ Also possible with additional args and kwargs:
 from functools import partial, wraps
 from typing import Any, Callable
 
-from broqer import NONE
-from broqer.publisher import Publisher
+from broqer import NONE, Publisher
 
-from .operator import Operator
+from broqer.op.operator import Operator
 
 
 class Filter(Operator):
@@ -71,7 +70,7 @@ class Filter(Operator):
         return None
 
 
-class FilterTrue(Operator):  # pylint: disable=invalid-name
+class FilterTrue(Operator):
     """ Filters all emits which evaluates for True.
 
     This operator can be used in the pipline style (v | True_()) or as
@@ -101,7 +100,7 @@ class FilterTrue(Operator):  # pylint: disable=invalid-name
         return None
 
 
-class FilterFalse(Operator):  # pylint: disable=invalid-name
+class FilterFalse(Operator):
     """ Filters all emits which evaluates for False.
 
     This operator can be used in the pipline style (v | False_()) or as

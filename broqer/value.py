@@ -1,20 +1,22 @@
 """ Implementing Value """
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
-from .publisher import Publisher, TValueNONE
-from .subscriber import Subscriber
-from .types import NONE
+# pylint: disable=cyclic-import
+from broqer import Publisher, Subscriber, NONE
+
+if TYPE_CHECKING:
+    from broqer.publisher import TValueNONE
 
 
 class Value(Publisher, Subscriber):
     """
     Value is a publisher and subscriber.
 
-    >>> from broqer import op
+    >>> from broqer import Sink
 
     >>> s = Value(0)
-    >>> _d = s.subscribe(op.Sink(print))
+    >>> _d = s.subscribe(Sink(print))
     0
     >>> s.emit(1)
     1
@@ -27,7 +29,7 @@ class Value(Publisher, Subscriber):
         raise NotImplementedError('Value doesn\'t support .notify().'
                                   ' Use .emit() instead')
 
-    def reset_state(self, value: TValueNONE = NONE) -> None:
+    def reset_state(self, value: 'TValueNONE' = NONE) -> None:
         raise NotImplementedError('Value doesn\'t support .reset_state()')
 
     def emit(self, value: Any,

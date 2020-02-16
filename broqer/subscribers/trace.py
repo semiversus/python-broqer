@@ -2,11 +2,11 @@
 from time import time
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
-from broqer.publisher import Publisher
-from broqer.op.subscribers.sink import Sink
+from .sink import Sink
 
 if TYPE_CHECKING:
-    from broqer.subscriber import Subscriber  # noqa: F401
+    # pylint: disable=cyclic-import
+    from broqer import Publisher
 
 
 class Trace(Sink):
@@ -25,7 +25,7 @@ class Trace(Sink):
         Sink.__init__(self, function, *args, unpack=unpack, **kwargs)
         self._label = label
 
-    def emit(self, value: Any, who: Publisher):
+    def emit(self, value: Any, who: 'Publisher'):
         self._trace_handler(who, value, label=self._label)
         Sink.emit(self, value, who=who)
 
@@ -37,7 +37,7 @@ class Trace(Sink):
     _timestamp_start = time()
 
     @staticmethod
-    def _trace_handler(publisher, value, label=None):
+    def _trace_handler(publisher: 'Publisher', value, label=None):
         """ Default trace handler is printing the timestamp, the publisher name
         and the emitted value
         """

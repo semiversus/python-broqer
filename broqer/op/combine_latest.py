@@ -1,10 +1,10 @@
 """
->>> from broqer import Value, op
+>>> from broqer import Value, Sink, op
 >>> s1 = Value()
 >>> s2 = Value()
 
 >>> combination = op.CombineLatest(s1, s2)
->>> disposable = combination.subscribe(op.Sink(print))
+>>> disposable = combination.subscribe(Sink(print))
 
 CombineLatest is only emitting, when all values are collected:
 
@@ -17,7 +17,7 @@ CombineLatest is only emitting, when all values are collected:
 Subscribing to a CombineLatest with all values available is emitting the values
 immediate on subscription:
 
->>> combination.subscribe(op.Sink(print, 'Second sink:'))
+>>> combination.subscribe(Sink(print, 'Second sink:'))
 Second sink: (1, 3)
 <...>
 
@@ -25,11 +25,9 @@ Second sink: (1, 3)
 from functools import wraps
 from typing import Any, Dict, MutableSequence, Callable  # noqa: F401
 
-from broqer.publisher import Publisher
-from broqer.subscriber import Subscriber
-from broqer.types import NONE
+from broqer import Publisher, Subscriber, NONE
 
-from .operator import MultiOperator
+from broqer.op.operator import MultiOperator
 
 
 class CombineLatest(MultiOperator):

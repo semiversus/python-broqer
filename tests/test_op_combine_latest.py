@@ -3,7 +3,7 @@ from itertools import product
 
 import pytest
 
-from broqer import Publisher, NONE, op
+from broqer import Publisher, NONE, op, Sink
 from tests.helper_multi import check_get_method, check_subscription, check_dependencies
 
 
@@ -62,7 +62,7 @@ def test_emit_on(factory, flags):
         emit_on = emit_on[0]
 
     operator = factory(*publishers, emit_on=emit_on)
-    operator.subscribe(op.Sink(m))
+    operator.subscribe(Sink(m))
 
     result = [None] * 3
 

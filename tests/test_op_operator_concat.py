@@ -1,7 +1,7 @@
 from unittest import mock
 
-from broqer import Publisher, NONE
-from broqer.op import OperatorConcat, Map, Sink
+from broqer import Publisher, NONE, Sink
+from broqer.op import OperatorConcat, Map
 
 
 def test_operator_concat():

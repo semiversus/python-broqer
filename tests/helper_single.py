@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from broqer import Publisher, NONE, op
+from broqer import Publisher, NONE, op, Sink
 
 
 def check_get_method(operator, input_vector, output_vector):
@@ -17,7 +17,7 @@ def check_get_method(operator, input_vector, output_vector):
 
     assert o.get() == output_value
 
-    disposable = o.subscribe(op.Sink())
+    disposable = o.subscribe(Sink())
 
     if input_value is not NONE:
         o.emit(input_value, who=p)  # simulate emit on subscribe
@@ -49,7 +49,7 @@ def check_subscription(operator, input_vector, output_vector):
         Publisher() | operator
 
     # subscribe operator to publisher
-    disposable = o.subscribe(op.Sink(m))
+    disposable = o.subscribe(Sink(m))
 
     assert p.subscriptions == (o,)  # now it should be subscribed
     assert o.dependencies == (p,)
@@ -74,7 +74,7 @@ def check_subscription(operator, input_vector, output_vector):
     # test input_vector with unsubscriptions between
     disposable.dispose()
     assert o.dependencies == (p,)
-    disposable = o.subscribe(op.Sink(m))
+    disposable = o.subscribe(Sink(m))
 
     for input_value, output_value in zip(input_vector, output_vector):
         if input_value is not NONE:
@@ -98,14 +98,14 @@ def check_dependencies(operator, *_):
     assert o.subscriptions == ()
 
     # subscribe to operator
-    disposable1 = o.subscribe(op.Sink())
+    disposable1 = o.subscribe(Sink())
 
     assert p.subscriptions == (o,)  # operator should now be subscriped
     assert o.dependencies == (p,)
     assert o.subscriptions == (disposable1.subscriber,)
 
     # second subscribe to operator
-    disposable2 = o.subscribe(op.Sink(), prepend=True)
+    disposable2 = o.subscribe(Sink(), prepend=True)
 
     assert p.subscriptions == (o,)
     assert o.dependencies == (p,)

@@ -1,6 +1,6 @@
 """ Module implementing Operator, MultiOperator.
 """
-from typing import Any, Optional
+import typing
 from abc import abstractmethod
 
 from broqer import NONE, Publisher, SubscriptionDisposable, Subscriber
@@ -18,7 +18,7 @@ class Operator(Publisher, Subscriber):
     def __init__(self) -> None:
         Publisher.__init__(self)
         Subscriber.__init__(self)
-        self._orginator = None  # type: Optional[Publisher]
+        self._orginator = None  # type: typing.Optional[Publisher]
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
@@ -60,7 +60,7 @@ class Operator(Publisher, Subscriber):
         return self.apply(publisher)
 
     @abstractmethod
-    def emit(self, value: Any, who: Publisher) -> None:
+    def emit(self, value: typing.Any, who: Publisher) -> None:
         """ Send new value to the operator
         :param value: value to be send
         :param who: reference to which publisher is emitting
@@ -104,7 +104,7 @@ class MultiOperator(Publisher, Subscriber):
         raise ValueError('Operator doesn\'t support .reset_state()')
 
     @abstractmethod
-    def emit(self, value: Any, who: Publisher) -> None:
+    def emit(self, value: typing.Any, who: Publisher) -> None:
         """ Send new value to the operator
         :param value: value to be send
         :param who: reference to which publisher is emitting
@@ -121,7 +121,7 @@ class OperatorConcat(Operator):
         Operator.__init__(self)
         self._operators = operators
 
-    def emit(self, value: Any, who: Publisher) -> None:
+    def emit(self, value: typing.Any, who: Publisher) -> None:
         return Publisher.notify(self, value)
 
     def apply(self, publisher: Publisher) -> Publisher:

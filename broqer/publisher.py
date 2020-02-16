@@ -1,12 +1,14 @@
 """ Implementing Publisher """
 from typing import (TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable,
-                    Optional, List)
+                    Optional)
 
-from .types import NONE
-from .disposable import SubscriptionDisposable
+from broqer import NONE, Disposable
+import broqer
 
 if TYPE_CHECKING:
-    from broqer.subscriber import Subscriber
+    # pylint: disable=cyclic-import
+    from typing import List
+    from broqer import Subscriber
 
 
 class SubscriptionError(ValueError):
@@ -60,7 +62,7 @@ class Publisher:
         self._dependencies = ()  # type: Tuple[Publisher, ...]
 
     def subscribe(self, subscriber: 'Subscriber',
-                  prepend: bool = False) -> SubscriptionDisposable:
+                  prepend: bool = False) -> 'SubscriptionDisposable':
         """ Subscribing the given subscriber.
 
         :param subscriber: subscriber to add
@@ -85,12 +87,12 @@ class Publisher:
         else:
             self._subscriptions.append(subscriber)
 
-        disposable = SubscriptionDisposable(self, subscriber)
+        disposable_obj = SubscriptionDisposable(self, subscriber)
 
         if self._state is not NONE:
             subscriber.emit(self._state, who=self)
 
-        return disposable
+        return disposable_obj
 
     def unsubscribe(self, subscriber: 'Subscriber') -> None:
         """ Unsubscribe the given subscriber
@@ -165,13 +167,10 @@ class Publisher:
         :param loop: asyncio loop to be used
         :returns: a future returning the emitted value
         """
-        from broqer.op import \
-            OnEmitFuture  # pylint: disable=import-outside-toplevel
-
         if self._state is NONE:
             omit_subscription = False
 
-        return OnEmitFuture(self, timeout, omit_subscription, loop)
+        return broqer.OnEmitFuture(self, timeout, omit_subscription, loop)
 
     def __bool__(self):
         """ A new Publisher is the result of a comparision between a publisher
@@ -207,3 +206,27 @@ class Publisher:
         :param *publishers: variable argument list with publishers
         """
         self._dependencies = self._dependencies + publishers
+
+
+class SubscriptionDisposable(Disposable):
+    """ This disposable is returned on Publisher.subscribe(subscriber).
+        :param publisher: publisher the subscription is made to
+        :param subscriber: subscriber used for subscription
+    """
+    def __init__(self, publisher: 'Publisher', subscriber: 'Subscriber') \
+            -> None:
+        self._publisher = publisher
+        self._subscriber = subscriber
+
+    def dispose(self) -> None:
+        self._publisher.unsubscribe(self._subscriber)
+
+    @property
+    def publisher(self) -> 'Publisher':
+        """ Subscripted publisher """
+        return self._publisher
+
+    @property
+    def subscriber(self) -> 'Subscriber':
+        """ Subscriber used in this subscription """
+        return self._subscriber

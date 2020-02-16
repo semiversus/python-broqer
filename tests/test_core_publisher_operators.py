@@ -1,7 +1,7 @@
 from unittest import mock
 import pytest
 
-from broqer import Value, Publisher, op, Subscriber
+from broqer import Value, Publisher, Subscriber, Sink, op
 import operator
 
 def test_operator_with_publishers():
@@ -21,7 +21,7 @@ def test_operator_with_publishers():
 
     mock_sink = mock.Mock()
 
-    o.subscribe(op.Sink(mock_sink))
+    o.subscribe(Sink(mock_sink))
     assert len(o.subscriptions) == 1
     mock_sink.assert_called_once_with(1)
     mock_sink.reset_mock()
@@ -51,7 +51,7 @@ def test_operator_with_constant():
 
     mock_sink = mock.Mock()
 
-    o.subscribe(op.Sink(mock_sink))
+    o.subscribe(Sink(mock_sink))
     assert len(o.subscriptions) == 1
     mock_sink.assert_called_once_with(2)
     mock_sink.reset_mock()
@@ -81,7 +81,7 @@ def test_operator_with_constant_r():
 
     mock_sink = mock.Mock()
 
-    o.subscribe(op.Sink(mock_sink))
+    o.subscribe(Sink(mock_sink))
     assert len(o.subscriptions) == 1
     mock_sink.assert_called_once_with(0)
     mock_sink.reset_mock()
@@ -135,7 +135,7 @@ def test_with_publisher(operator, l_value, r_value, result):
     mock_sink_o3 = mock.Mock()
 
     try:
-        o3.subscribe(op.Sink(mock_sink_o3))
+        o3.subscribe(Sink(mock_sink_o3))
     except Exception as e:
         assert isinstance(e, result)
 
@@ -241,7 +241,7 @@ def test_unary_operators(operator, value, result):
     cb = mock.Mock()
 
     try:
-        operator(v).subscribe(op.Sink(cb))
+        operator(v).subscribe(Sink(cb))
     except Exception as e:
         assert isinstance(e, result)
     else:
@@ -289,9 +289,9 @@ def test_getattr_method():
     mock2 = mock.Mock()
     mock3 = mock.Mock()
 
-    dut1.subscribe(op.Sink(mock1))
-    dut2.subscribe(op.Sink(mock2))
-    dut3.subscribe(op.Sink(mock3))
+    dut1.subscribe(Sink(mock1))
+    dut2.subscribe(Sink(mock2))
+    dut3.subscribe(Sink(mock3))
 
     assert dut1.get() == []
     assert dut2.get() == ['']
@@ -321,7 +321,7 @@ def test_inherit_getattr():
 
     dut = p.lower().split(' ')
     m = mock.Mock()
-    dut.subscribe(op.Sink(m))
+    dut.subscribe(Sink(m))
     m.assert_called_once_with([''])
     m.reset_mock()
 
@@ -334,7 +334,7 @@ def test_inherit_with_operators():
 
     dut = op.Len(('abc' + p + 'ghi').upper())
     m = mock.Mock()
-    dut.subscribe(op.Sink(m))
+    dut.subscribe(Sink(m))
     m.assert_called_once_with(6)
     m.reset_mock()
 
@@ -353,7 +353,7 @@ def test_getattr_attribute():
 
     dut = p.a
     m = mock.Mock()
-    dut.subscribe(op.Sink(m))
+    dut.subscribe(Sink(m))
 
     m.assert_called_once_with(3)
     assert dut.get() == 3

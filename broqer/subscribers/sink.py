@@ -4,12 +4,12 @@ possible to omit ``func`` - in this case it's acting as dummy subscriber
 
 Usage:
 
->>> from broqer import Value, op
+>>> from broqer import Value, op, Sink
 >>> s = Value()
 
 >>> len(s.subscriptions)
 0
->>> _d = s.subscribe(op.Sink(print, 'Sink', sep=':'))
+>>> _d = s.subscribe(Sink(print, 'Sink', sep=':'))
 >>> len(s.subscriptions)
 1
 
@@ -23,10 +23,13 @@ Sink:(1, 2)
 0
 """
 from functools import partial, wraps
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, TYPE_CHECKING
 
-from broqer.publisher import Publisher
-from broqer.subscriber import Subscriber
+from broqer import Subscriber
+
+if TYPE_CHECKING:
+    # pylint: disable=cyclic-import
+    from broqer import Publisher
 
 
 class Sink(Subscriber):  # pylint: disable=too-few-public-methods
@@ -52,7 +55,7 @@ class Sink(Subscriber):  # pylint: disable=too-few-public-methods
 
         self._unpack = unpack
 
-    def emit(self, value: Any, who: Publisher):
+    def emit(self, value: Any, who: 'Publisher'):
         if self._function:
             if self._unpack:
                 self._function(*value)

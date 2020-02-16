@@ -3,11 +3,11 @@ Apply ``function(*args, value, **kwargs)`` to each emitted value
 
 Usage:
 
->>> from broqer import Value, op
+>>> from broqer import Value, op, Sink
 >>> s = Value()
 
 >>> mapped_publisher = s | op.Map(lambda v:v*2)
->>> _disposable = mapped_publisher.subscribe(op.Sink(print))
+>>> _disposable = mapped_publisher.subscribe(Sink(print))
 
 >>> s.emit(1)
 2
@@ -21,14 +21,14 @@ Also possible with additional args and kwargs:
 
 >>> import operator
 >>> mapped_publisher = s | op.Map(operator.add, 3)
->>> _disposable = mapped_publisher.subscribe(op.Sink(print))
+>>> _disposable = mapped_publisher.subscribe(Sink(print))
 3
 >>> s.emit(100)
 103
 >>> _disposable.dispose()
 
 >>> _disposable = (s | op.Map(print, 'Output:')).subscribe(\
-                                                op.Sink(print, 'EMITTED'))
+                                                Sink(print, 'EMITTED'))
 Output: 100
 EMITTED None
 >>> s.emit(1)
@@ -38,10 +38,10 @@ EMITTED None
 from functools import partial, wraps
 from typing import Any, Callable
 
-from broqer.publisher import Publisher, TValue, TValueNONE
-from broqer.types import NONE
+from broqer import Publisher, NONE
+from broqer.publisher import TValue, TValueNONE
 
-from .operator import Operator
+from broqer.op.operator import Operator
 
 
 class Map(Operator):

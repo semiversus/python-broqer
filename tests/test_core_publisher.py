@@ -2,8 +2,7 @@ from unittest import mock
 
 import pytest
 
-from broqer import Publisher, SubscriptionError, Value, NONE
-from broqer.op import Sink
+from broqer import Publisher, SubscriptionError, Value, NONE, Sink
 
 
 def test_subscribe():

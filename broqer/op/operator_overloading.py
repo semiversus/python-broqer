@@ -4,7 +4,7 @@ import operator
 from functools import partial, reduce
 from typing import Any as Any_
 
-from broqer.publisher import Publisher
+from broqer import Publisher
 from broqer.op.combine_latest import CombineLatest
 from broqer.op.operator import Operator
 
