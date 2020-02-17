@@ -163,6 +163,13 @@ class Publisher:
 
         self._on_subscription_cb = callback
 
+    def __await__(self):
+        """ Makes publisher awaitable. When publisher has a state it will
+        immediatly return its state as result. Otherwise it will wait forever
+        until it will change its state.
+        """
+        return self.as_future(timeout=None, omit_subscription=False).__await__()
+
     def as_future(self, timeout: float, omit_subscription: bool = True,
                   loop=None):
         """ Returns a asyncio.Future which will be done on first change of this

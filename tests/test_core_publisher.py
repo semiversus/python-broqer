@@ -66,6 +66,8 @@ async def test_await(event_loop):
     event_loop.call_soon(publisher.notify, 3)
     assert await publisher.as_future(timeout=1, omit_subscription=False) == 2
 
+    assert (await publisher) == 2
+
 
 @pytest.mark.parametrize('init', [0, 'Test', {'a':1}, None, (1,2,3), [1,2,3]])
 def test_get(init):
