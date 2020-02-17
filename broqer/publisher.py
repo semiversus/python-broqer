@@ -168,7 +168,8 @@ class Publisher:
         immediatly return its state as result. Otherwise it will wait forever
         until it will change its state.
         """
-        return self.as_future(timeout=None, omit_subscription=False).__await__()
+        future = self.as_future(timeout=None, omit_subscription=False)
+        return future.__await__()
 
     def as_future(self, timeout: float, omit_subscription: bool = True,
                   loop=None):
