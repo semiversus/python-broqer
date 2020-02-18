@@ -1,12 +1,9 @@
 """ Implementing Value """
 
-from typing import Any, TYPE_CHECKING
+from typing import Any
 
 # pylint: disable=cyclic-import
 from broqer import Publisher, Subscriber, NONE
-
-if TYPE_CHECKING:
-    from broqer.publisher import TValueNONE
 
 
 class Value(Publisher, Subscriber):
