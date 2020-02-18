@@ -29,9 +29,6 @@ class Value(Publisher, Subscriber):
         # .notify on Value will be handled as .emit
         self.emit(value)
 
-    def reset_state(self, value: 'TValueNONE' = NONE) -> None:
-        raise NotImplementedError('Value doesn\'t support .reset_state()')
-
     def emit(self, value: Any,
              who: Publisher = None) -> None:  # pylint: disable=unused-argument
         return Publisher.notify(self, value)
