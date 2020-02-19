@@ -43,7 +43,6 @@ class OnEmitFuture(broqer.Subscriber, asyncio.Future):
         self._publisher = publisher
 
         self._omit_first_emit = omit_first_emit
-        publisher.subscribe(self)
 
         if timeout is not None:
             self._timeout_handle = loop.call_later(
@@ -51,7 +50,9 @@ class OnEmitFuture(broqer.Subscriber, asyncio.Future):
         else:
             self._timeout_handle = None
 
-    def _cleanup(self, _future):
+        publisher.subscribe(self)
+
+    def _cleanup(self, _future=None):
         self._publisher.unsubscribe(self)
 
         if self._timeout_handle is not None:
@@ -67,4 +68,6 @@ class OnEmitFuture(broqer.Subscriber, asyncio.Future):
             return
 
         if not self.done():
+            self.remove_done_callback(self._cleanup)
+            self._cleanup()
             self.set_result(value)
