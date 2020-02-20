@@ -1,6 +1,6 @@
 """ Implementing Publisher """
 from typing import (TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable,
-                    Optional)
+                    Optional, overload)
 
 from broqer import NONE, Disposable
 import broqer
@@ -19,7 +19,6 @@ class SubscriptionError(ValueError):
 
 TInherit = TypeVar('TInherit')  # Type to inherited behavior from
 TValue = TypeVar('TValue')  # Type of publisher state and emitted value
-TValueNONE = Union[TValue, NONE]  # when type can be TValue or NONE
 SubscriptionCBT = Callable[[bool], None]
 
 
@@ -54,7 +53,15 @@ class Publisher:
     :ivar _dependencies: list with publishers this publisher is (directly or
                          indirectly) dependent on.
     """
-    def __init__(self, init: TValueNONE = NONE, type_: Type[TValue] = None):
+    @overload  # noqa: F811
+    def __init__(self, *, type_: Type[TValue] = None):
+        pass
+
+    @overload  # noqa: F811
+    def __init__(self, init: TValue, type_: Type[TValue] = None):
+        pass
+
+    def __init__(self, init=NONE, type_=None):  # noqa: F811
         self._state = init
 
         if type_:
@@ -123,7 +130,7 @@ class Publisher:
 
         raise SubscriptionError('Subscriber is not registered')
 
-    def get(self) -> TValueNONE:
+    def get(self) -> TValue:
         """ Return the state of the publisher. """
         return self._state
 
@@ -136,7 +143,15 @@ class Publisher:
         for subscriber in self._subscriptions:
             subscriber.emit(value, who=self)
 
-    def reset_state(self, value: TValueNONE = NONE) -> None:
+    @overload   # noqa: F811
+    def reset_state(self, value: TValue) -> None:
+        """ Variant for reseting to a specified value """
+
+    @overload    # noqa: F811
+    def reset_state(self) -> None:
+        """ Variant for resetting to NONE """
+
+    def reset_state(self, value=NONE) -> None:  # noqa: F811
         """ Resets the state. Calling this method will not trigger an emit.
 
         :param value: Optional value to set the internal state

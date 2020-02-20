@@ -39,8 +39,7 @@ from functools import partial, wraps
 from typing import Any, Callable
 
 from broqer import Publisher, NONE
-from broqer.publisher import TValue, TValueNONE
-
+from broqer.publisher import TValue
 from broqer.operator import Operator
 
 
@@ -65,16 +64,17 @@ class Map(Operator):
         self._function = partial(function, *args, **kwargs)
         self._unpack = unpack
 
-    def get(self) -> TValueNONE:
+    def get(self) -> TValue:
         assert isinstance(self._orginator, Publisher)
 
         if self._subscriptions:
             return self._state
 
-        value = self._orginator.get()
+        assert isinstance(self._orginator, Publisher)
+        value: TValue = self._orginator.get()
 
         if value is NONE:
-            return NONE
+            return value
 
         if self._unpack:
             assert isinstance(value, (list, tuple))

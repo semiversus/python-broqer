@@ -29,7 +29,6 @@ from functools import partial, wraps
 from typing import Any, Callable
 
 from broqer import NONE, Publisher
-
 from broqer.operator import Operator
 
 
@@ -46,14 +45,20 @@ class Filter(Operator):
         self._predicate = partial(predicate, *args, **kwargs)  # type: Callable
         self._unpack = unpack
 
-    def get(self):
+    def get(self) -> Any:
         if self._subscriptions:
             return self._state
 
-        value = self._orginator.get()
+        assert isinstance(self._orginator, Publisher)
 
-        if (self._unpack and self._predicate(*value)) or \
-                (not self._unpack and self._predicate(value)):
+        value = self._orginator.get()  # type: Any
+
+        if self._unpack:
+            # assert isinstance(value, (list, tuple))
+            if self._predicate(*value):
+                return value
+
+        elif self._predicate(value):
             return value
 
         return NONE
@@ -80,11 +85,13 @@ class FilterTrue(Operator):
         Operator.__init__(self)
         self._orginator = publisher
 
-    def get(self):
+    def get(self) -> Any:
         if self._subscriptions:
             return self._state
 
-        value = self._orginator.get()
+        assert isinstance(self._orginator, Publisher)
+
+        value = self._orginator.get()  # type: Any
 
         if bool(value):
             return value
@@ -109,11 +116,13 @@ class FilterFalse(Operator):
         Operator.__init__(self)
         self._orginator = publisher
 
-    def get(self):
+    def get(self) -> Any:
         if self._subscriptions:
             return self._state
 
-        value = self._orginator.get()
+        assert isinstance(self._orginator, Publisher)
+
+        value = self._orginator.get()  # type: Any
 
         if not bool(value):
             return value

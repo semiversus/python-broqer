@@ -4,8 +4,8 @@ import typing
 from abc import abstractmethod
 
 # pylint: disable=cyclic-import
-from broqer import NONE, Publisher, SubscriptionDisposable, Subscriber
-from broqer.publisher import TValue, TValueNONE
+from broqer import Publisher, SubscriptionDisposable, Subscriber
+from broqer.publisher import TValue
 
 
 class Operator(Publisher, Subscriber):
@@ -54,7 +54,7 @@ class Operator(Publisher, Subscriber):
     def notify(self, value: TValue) -> None:
         raise ValueError('Operator doesn\'t support .notify()')
 
-    def reset_state(self, value: TValueNONE = NONE) -> None:
+    def reset_state(self, value: TValue = None) -> None:
         raise ValueError('Operator doesn\'t support .reset_state()')
 
     def __ror__(self, publisher: Publisher) -> Publisher:
@@ -101,7 +101,7 @@ class MultiOperator(Publisher, Subscriber):
     def notify(self, value: TValue) -> None:
         raise ValueError('Operator doesn\'t support .notify()')
 
-    def reset_state(self, value: TValueNONE = NONE) -> None:
+    def reset_state(self, value: TValue = None) -> None:
         raise ValueError('Operator doesn\'t support .reset_state()')
 
     @abstractmethod
