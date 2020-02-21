@@ -58,7 +58,7 @@ class Publisher:
         pass
 
     @overload  # noqa: F811
-    def __init__(self, init: TValue, type_: Type[TValue] = None):
+    def __init__(self, init: TValue, type_: Type[TValue] = None):  # noqa: F811
         pass
 
     def __init__(self, init=NONE, type_=None):  # noqa: F811
@@ -148,7 +148,7 @@ class Publisher:
         """ Variant for reseting to a specified value """
 
     @overload    # noqa: F811
-    def reset_state(self) -> None:
+    def reset_state(self) -> None:  # noqa: F811
         """ Variant for resetting to NONE """
 
     def reset_state(self, value=NONE) -> None:  # noqa: F811

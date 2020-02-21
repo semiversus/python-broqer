@@ -71,7 +71,7 @@ class Map(Operator):
             return self._state
 
         assert isinstance(self._orginator, Publisher)
-        value: TValue = self._orginator.get()
+        value = self._orginator.get()  # type: TValue
 
         if value is NONE:
             return value
