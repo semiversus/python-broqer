@@ -75,11 +75,11 @@ class Filter(Operator):
         return None
 
 
-class FilterTrue(Operator):
-    """ Filters all emits which evaluates for True.
+class EvalTrue(Operator):
+    """ Emits all values which evaluates for True.
 
-    This operator can be used in the pipline style (v | True_()) or as
-    standalone operation (True_(v)).
+    This operator can be used in the pipline style (v | EvalTrue()) or as
+    standalone operation (EvalTrue(v)).
     """
     def __init__(self, publisher: Publisher = None) -> None:
         Operator.__init__(self)
@@ -107,11 +107,11 @@ class FilterTrue(Operator):
         return None
 
 
-class FilterFalse(Operator):
+class EvalFalse(Operator):
     """ Filters all emits which evaluates for False.
 
-    This operator can be used in the pipline style (v | False_()) or as
-    standalone operation (False_(v))."""
+    This operator can be used in the pipline style (v | EvalFalse()) or as
+    standalone operation (EvalFalse(v))."""
     def __init__(self, publisher: Publisher = None) -> None:
         Operator.__init__(self)
         self._orginator = publisher
