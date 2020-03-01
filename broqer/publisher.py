@@ -197,9 +197,6 @@ class Publisher:
         :param loop: asyncio loop to be used
         :returns: a future returning the emitted value
         """
-        if self._state is NONE:
-            omit_subscription = False
-
         return broqer.OnEmitFuture(self, timeout, omit_subscription, loop)
 
     def __bool__(self):
