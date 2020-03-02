@@ -1,7 +1,7 @@
 """ Module implementing Operator, MultiOperator.
 """
 import typing
-from abc import abstractmethod
+from abc import abstractmethod, ABCMeta
 
 # pylint: disable=cyclic-import
 from broqer import Publisher, SubscriptionDisposable, Subscriber
@@ -16,15 +16,14 @@ class Operator(Publisher, Subscriber):
     On unsubscription of the last subscriber the dependent publisher will also
     be unsubscripted.
     """
-    def __init__(self) -> None:
+    def __init__(self, publisher: Publisher) -> None:
         Publisher.__init__(self)
         Subscriber.__init__(self)
-        self._orginator = None  # type: typing.Optional[Publisher]
+        self._orginator = publisher
+        self.add_dependencies(publisher)
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
-        assert isinstance(self._orginator, Publisher)
-
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if len(self._subscriptions) == 1:  # if this was the first subscription
@@ -33,23 +32,11 @@ class Operator(Publisher, Subscriber):
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
-        assert isinstance(self._orginator, Publisher)
-
         Publisher.unsubscribe(self, subscriber)
 
         if not self._subscriptions:
             self._orginator.unsubscribe(self)
             Publisher.reset_state(self)
-
-    def apply(self, publisher: Publisher) -> Publisher:
-        """ Apply the operator to a publisher """
-        if self._orginator is not None:
-            raise ValueError('Operator can only be connected to one publisher')
-
-        self._orginator = publisher
-        self.add_dependencies(self._orginator)
-
-        return self
 
     def notify(self, value: TValue) -> None:
         raise ValueError('Operator doesn\'t support .notify()')
@@ -57,15 +44,21 @@ class Operator(Publisher, Subscriber):
     def reset_state(self, value: TValue = None) -> None:
         raise ValueError('Operator doesn\'t support .reset_state()')
 
-    def __ror__(self, publisher: Publisher) -> Publisher:
-        return self.apply(publisher)
-
     @abstractmethod
     def emit(self, value: typing.Any, who: Publisher) -> None:
         """ Send new value to the operator
         :param value: value to be send
         :param who: reference to which publisher is emitting
         """
+
+
+class OperatorFactory(metaclass=ABCMeta):
+    @abstractmethod
+    def apply(self, publisher: Publisher) -> Publisher:
+        """ Build a operator applied to the given publisher """
+
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        return self.apply(publisher)
 
 
 class MultiOperator(Publisher, Subscriber):

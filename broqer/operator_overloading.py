@@ -10,12 +10,11 @@ from broqer.operator import Operator
 
 
 class MapConstant(Operator):
-    """ MapConstant TODO """
+    """ MapConstant TODO Docstring """
     def __init__(self, publisher: Publisher, value, operation) -> None:
-        Operator.__init__(self)
+        Operator.__init__(self, publisher)
         self._value = value
         self._operation = operation
-        self._orginator = publisher
 
         if publisher.inherited_type is not None:
             self.inherit_type(publisher.inherited_type)
@@ -35,10 +34,9 @@ class MapConstant(Operator):
 class MapConstantReverse(Operator):
     """ MapConstantReverse TODO """
     def __init__(self, publisher: Publisher, value, operation) -> None:
-        Operator.__init__(self)
+        Operator.__init__(self, publisher)
         self._value = value
         self._operation = operation
-        self._orginator = publisher
 
         if publisher.inherited_type is not None:
             self.inherit_type(publisher.inherited_type)
@@ -58,9 +56,8 @@ class MapConstantReverse(Operator):
 class MapUnary(Operator):
     """ MapUnary TODO """
     def __init__(self, publisher: Publisher, operation) -> None:
-        Operator.__init__(self)
+        Operator.__init__(self, publisher)
         self._operation = operation
-        self._orginator = publisher
 
         if publisher.inherited_type is not None:
             self.inherit_type(publisher.inherited_type)
@@ -79,9 +76,8 @@ class MapUnary(Operator):
 
 class _GetAttr(Operator):
     def __init__(self, publisher: Publisher, attribute_name) -> None:
-        Operator.__init__(self)
+        Operator.__init__(self, publisher)
         self._attribute_name = attribute_name
-        self._orginator = publisher
         self._args = None
         self._kwargs = None
 

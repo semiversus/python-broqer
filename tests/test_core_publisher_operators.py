@@ -59,7 +59,7 @@ def test_operator_with_constant():
     v1.emit(3)
     mock_sink.assert_called_once_with(4)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         Value(1) | o
 
     with pytest.raises(ValueError):
@@ -89,7 +89,7 @@ def test_operator_with_constant_r():
     v2.emit(3)
     mock_sink.assert_called_once_with(-2)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         Value(1) | o
 
     with pytest.raises(ValueError):
@@ -247,7 +247,7 @@ def test_unary_operators(operator, value, result):
     else:
         assert cb.mock_called_once_with(result)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         Value(1) | operator(v)
 
     with pytest.raises(ValueError):

@@ -29,27 +29,19 @@ from functools import partial, wraps
 from typing import Any, Callable
 
 from broqer import NONE, Publisher
-from broqer.operator import Operator
+from broqer.operator import Operator, OperatorFactory
 
 
-class Filter(Operator):
-    """ Filters values based on a ``predicate`` function
-    :param predicate: function to evaluate the filtering
-    :param \\*args: variable arguments to be used for evaluating predicate
-    :param unpack: value from emits will be unpacked (\\*value)
-    :param \\*\\*kwargs: keyword arguments to be used for evaluating predicate
-    """
-    def __init__(self, predicate: Callable[[Any], bool],
-                 *args, unpack: bool = False, **kwargs) -> None:
-        Operator.__init__(self)
-        self._predicate = partial(predicate, *args, **kwargs)  # type: Callable
+class _Filter(Operator):
+    def __init__(self, publisher: Publisher, predicate: Callable[[Any], bool],
+                 unpack: bool = False) -> None:
+        Operator.__init__(self, publisher)
+        self._predicate = predicate
         self._unpack = unpack
 
     def get(self) -> Any:
         if self._subscriptions:
             return self._state
-
-        assert isinstance(self._orginator, Publisher)
 
         value = self._orginator.get()  # type: Any
 
@@ -75,6 +67,22 @@ class Filter(Operator):
         return None
 
 
+class Filter(OperatorFactory):
+    """ Filters values based on a ``predicate`` function
+    :param predicate: function to evaluate the filtering
+    :param \\*args: variable arguments to be used for evaluating predicate
+    :param unpack: value from emits will be unpacked (\\*value)
+    :param \\*\\*kwargs: keyword arguments to be used for evaluating predicate
+    """
+    def __init__(self, predicate: Callable[[Any], bool],
+                 *args, unpack: bool = False, **kwargs) -> None:
+        self._predicate = partial(predicate, *args, **kwargs)  # type: Callable
+        self._unpack = unpack
+
+    def apply(self, publisher: Publisher):
+        return _Filter(publisher, self._predicate, self._unpack)
+
+
 class EvalTrue(Operator):
     """ Emits all values which evaluates for True.
 
@@ -82,8 +90,7 @@ class EvalTrue(Operator):
     standalone operation (EvalTrue(v)).
     """
     def __init__(self, publisher: Publisher = None) -> None:
-        Operator.__init__(self)
-        self._orginator = publisher
+        Operator.__init__(self, publisher)
 
     def get(self) -> Any:
         if self._subscriptions:
@@ -105,6 +112,9 @@ class EvalTrue(Operator):
         if bool(value):
             return Publisher.notify(self, value)
         return None
+
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        return EvalTrue(publisher)
 
 
 class EvalFalse(Operator):
@@ -113,8 +123,7 @@ class EvalFalse(Operator):
     This operator can be used in the pipline style (v | EvalFalse()) or as
     standalone operation (EvalFalse(v))."""
     def __init__(self, publisher: Publisher = None) -> None:
-        Operator.__init__(self)
-        self._orginator = publisher
+        Operator.__init__(self, publisher)
 
     def get(self) -> Any:
         if self._subscriptions:
@@ -136,6 +145,9 @@ class EvalFalse(Operator):
         if not bool(value):
             return Publisher.notify(self, value)
         return None
+
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        return EvalFalse(publisher)
 
 
 def build_filter(predicate: Callable[[Any], bool] = None, *,

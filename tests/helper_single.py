@@ -45,8 +45,7 @@ def check_subscription(operator, input_vector, output_vector):
     p = Publisher(input_vector[0])
     o = p | operator
 
-    with pytest.raises(ValueError):
-        Publisher() | operator
+    o2 = Publisher() | operator
 
     # subscribe operator to publisher
     disposable = o.subscribe(Sink(m))
