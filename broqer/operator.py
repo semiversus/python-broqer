@@ -8,7 +8,15 @@ from broqer import Publisher, SubscriptionDisposable, Subscriber
 from broqer.publisher import TValue
 
 
-class Operator(Publisher, Subscriber):
+class OperatorMeta(ABCMeta):
+    """ Metaclass for operators. Defining __ror__ for operator classes.
+    This is e.g. used for EvalTrue: p | EvalTrue is equal to EvalTrue(p)
+    """
+    def __ror__(cls, publisher: Publisher) -> Publisher:
+        return cls(publisher)  # pylint: disable=no-value-for-parameter
+
+
+class Operator(Publisher, Subscriber, metaclass=OperatorMeta):
     """ Base class for operators depending on a single publisher. This
     publisher will be subscribed as soon as this operator is subscribed the
     first time.
@@ -52,7 +60,11 @@ class Operator(Publisher, Subscriber):
         """
 
 
-class OperatorFactory(metaclass=ABCMeta):
+class OperatorFactory:
+    """ OperatorFactory is returning operator objects applied to a publisher
+    """
+    __metaclass__ = ABCMeta
+
     @abstractmethod
     def apply(self, publisher: Publisher) -> Publisher:
         """ Build a operator applied to the given publisher """

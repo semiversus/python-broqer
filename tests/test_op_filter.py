@@ -29,18 +29,6 @@ test_vector = [
         (2,), {},
         ((0, 2), (0, 3), (-1.0, 1.0)),
         ((0, 2), NONE, (-1.0, 1.0))),
-    (op.EvalTrue, (), {},
-        (1, 2, 0, 0.0, None, False, [1]),
-        (1, 2, NONE, NONE, NONE, NONE, [1])),
-    (op.EvalTrue, (), {},
-        (0, ),
-        (NONE, )),
-    (op.EvalFalse, (), {},
-        (1, 2, 0, 0.0, None, False, [1]),
-        (NONE, NONE, 0, 0.0, None, False, NONE)),
-    (op.EvalFalse, (), {},
-        (0, ),
-        (0, )),
 ]
 
 
@@ -52,3 +40,28 @@ def test_operator(method, o, args, kwargs, input_vector, output_vector):
     operator = o(*args, **kwargs)
 
     method(operator, input_vector, output_vector)
+
+
+test_vector = [
+    # o, input_vector, output_vector
+    (op.EvalTrue,
+        (1, 2, 0, 0.0, None, False, [1]),
+        (1, 2, NONE, NONE, NONE, NONE, [1])),
+    (op.EvalTrue,
+        (0, ),
+        (NONE, )),
+    (op.EvalFalse,
+        (1, 2, 0, 0.0, None, False, [1]),
+        (NONE, NONE, 0, 0.0, None, False, NONE)),
+    (op.EvalFalse,
+        (0, ),
+        (0, )),
+]
+
+
+@pytest.mark.parametrize('method', [check_get_method, check_subscription,
+                                    check_dependencies])
+@pytest.mark.parametrize('o,input_vector,output_vector',
+                         test_vector)
+def test_true_false(method, o, input_vector, output_vector):
+    method(o, input_vector, output_vector)

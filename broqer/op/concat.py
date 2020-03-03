@@ -1,10 +1,13 @@
 """ Concat enables concating operators """
-from typing import TYPE_CHECKING
-
 from broqer.operator import OperatorFactory, Publisher
 
 
-class Concat(OperatorFactory):
+class Concat(OperatorFactory):  # pylint: disable=too-few-public-methods
+    """ This class is generator a new operator by concatenation of other
+    operators.
+
+    :param operators: the operators to concatenate
+    """
     def __init__(self, *operators):
         self._operators = operators
 
@@ -15,5 +18,5 @@ class Concat(OperatorFactory):
         for operator in self._operators:
             orginator = operator.apply(orginator)
 
-        ## the source publisher is the last operator in the chain
+        # the source publisher is the last operator in the chain
         return orginator

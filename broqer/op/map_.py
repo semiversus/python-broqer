@@ -43,7 +43,8 @@ from broqer.publisher import TValue
 from broqer.operator import Operator, OperatorFactory
 
 
-class _Map(Operator):
+class AppliedMap(Operator):
+    """ Map object applied to publisher (see Map) """
     def __init__(self, publisher: Publisher, function: Callable[[Any], Any],
                  unpack: bool = False) -> None:
         """ Special care for return values:
@@ -88,7 +89,7 @@ class _Map(Operator):
         return None
 
 
-class Map(OperatorFactory):
+class Map(OperatorFactory):  # pylint: disable=too-few-public-methods
     """ Apply ``function(*args, value, **kwargs)`` to each emitted value.
 
     :param function: function to be applied for each emit
@@ -102,7 +103,7 @@ class Map(OperatorFactory):
         self._unpack = unpack
 
     def apply(self, publisher: Publisher):
-        return _Map(publisher, self._function, self._unpack)
+        return AppliedMap(publisher, self._function, self._unpack)
 
 
 def build_map(function: Callable[[Any], Any] = None,
