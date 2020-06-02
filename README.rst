@@ -62,9 +62,9 @@ and keyword arguments.
 
 .. code-block:: python3
 
-    >>> from broqer import Value, op
+    >>> from broqer import Value, Sink
     >>> a = Value(5)  # create a value (publisher and subscriber with state)
-    >>> disposable = a.subscribe(op.Sink(print, 'Change:'))  # subscribe a callback
+    >>> disposable = a.subscribe(Sink(print, 'Change:'))  # subscribe a callback
     Change: 5
 
     >>> a.emit(3)  # change the value
@@ -85,7 +85,7 @@ the common operators (like ``+``, ``>``, ``<<``, ...).
     >>> b = Value(3)
 
     >>> c = a * 3 > b  # create a new publisher via operator overloading
-    >>> c.subscribe(op.Sink(print, 'c:'))
+    >>> disposable = c.subscribe(Sink(print, 'c:'))
     c: False
 
     >>> a.emit(2)
@@ -101,7 +101,7 @@ Also fancy stuff like getting item by index or key is possible:
     >>> i = Value('a')
     >>> d = Value({'a':100, 'b':200, 'c':300})
 
-    >>> d[i].subscribe(op.Sink(print, 'r:'))
+    >>> disposable = d[i].subscribe(Sink(print, 'r:'))
     r: 100
 
     >>> i.emit('c')
@@ -122,7 +122,7 @@ mimic - this is done via ``.inherit_type(type)``.
 
     >>> i = Value('Attribute access made REACTIVE')
     >>> i.inherit_type(str)
-    >>> i.lower().split(sep=' ') | op.Sink(print)
+    >>> disposable = i.lower().split(sep=' ').subscribe(Sink(print))
     ['attribute', 'access', 'made', 'reactive']
 
     >>> i.emit('Reactive and pythonic')
@@ -137,12 +137,12 @@ available for ``Accumulate``, ``CombineLatest``, ``Filter``, ``Map``, ``MapAsync
 
 .. code-block:: python3
 
-    >>> @build_map
+    >>> @op.build_map
     ... def count_vowels(s):
     ...     return sum([s.count(v) for v in 'aeiou'])
 
-    >>> msg = Value('Hello World!)
-    >>> (msg | count_vowels).subscribe(op.Sink(print, 'Number of vowels:'))
+    >>> msg = Value('Hello World!')
+    >>> disposable = (msg | count_vowels()).subscribe(Sink(print, 'Number of vowels:'))
     Number of vowels: 3
     >>> msg.emit('Wahuuu')
     Number of vowels: 4
@@ -153,12 +153,12 @@ You can even make configurable ``Map`` s and ``Filter`` s:
 
     >>> import re
 
-    >>> @build_filter_factory
+    >>> @op.build_filter
     ... def filter_pattern(pattern, s):
     ...     return re.search(pattern, s) is not None
 
     >>> msg = Value('Cars passed: 135!')
-    >>> (msg | filter_pattern('[0-9]*')).subscribe(op.Sink(print))
+    >>> disposable = (msg | filter_pattern('[0-9]+')).subscribe(Sink(print))
     Cars passed: 135!
     >>> msg.emit('No cars have passed')
     >>> msg.emit('Only 1 car has passed')

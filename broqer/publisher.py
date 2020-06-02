@@ -214,7 +214,6 @@ class Publisher:
         publisher.
         """
         self._inherited_type = type_cls
-        return self
 
     @property
     def inherited_type(self) -> Optional[Type]:
