@@ -64,7 +64,8 @@ and keyword arguments.
 
     >>> from broqer import Value, Sink
     >>> a = Value(5)  # create a value (publisher and subscriber with state)
-    >>> disposable = a.subscribe(Sink(print, 'Change:'))  # subscribe a callback
+    >>> s = Sink(print, 'Change:')  # create a subscriber
+    >>> disposable = a.subscribe(s)  # subscribe subscriber to publisher
     Change: 5
 
     >>> a.emit(3)  # change the value
