@@ -9,7 +9,15 @@ from .combine_latest import CombineLatest
 
 
 class Str(MapUnary):
-    """ Implementing the functionality of str() for publishers. """
+    """ Implementing the functionality of str() for publishers.
+
+    Usage:
+    >>> from broqer import op, Value
+    >>> num = Value(0)
+    >>> literal = op.Str(num)
+    >>> literal.get()
+    '0'
+    """
     def __init__(self, publisher: Publisher) -> None:
         MapUnary.__init__(self, publisher, str)
 

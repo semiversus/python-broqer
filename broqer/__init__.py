@@ -1,6 +1,7 @@
 """ Broqer is a carefully crafted library to operate with continuous streams
 of data in a reactive style with publish/subscribe and broker functionality.
 """
+
 from .default_error_handler import default_error_handler
 from .disposable import Disposable
 from .types import NONE
@@ -11,7 +12,6 @@ from .subscribers import (OnEmitFuture, Sink, Trace, build_sink,
 from .value import Value
 
 from .operator_overloading import apply_operator_overloading
-from broqer import op
 
 apply_operator_overloading()
 

@@ -1,6 +1,6 @@
 """ Implementing Publisher """
-from typing import (TYPE_CHECKING, Union, TypeVar, Type, Tuple, Callable,
-                    Optional, overload)
+from typing import (TYPE_CHECKING, TypeVar, Type, Tuple, Callable, Optional,
+                    overload)
 
 from broqer import NONE, Disposable
 import broqer
@@ -208,8 +208,7 @@ class Publisher:
         raise ValueError('Evaluation of comparison of publishers is not '
                          'supported')
 
-    def inherit_type(self, type_cls: Optional[Type]) \
-            -> Union[TInherit, 'Publisher']:
+    def inherit_type(self, type_cls: Optional[Type]) -> None:
         """ Enables the usage of method and attribute overloading for this
         publisher.
         """
