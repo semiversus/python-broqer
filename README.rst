@@ -57,7 +57,7 @@ Observer pattern
 ----------------
 
 Subscribing to a publisher is done via the .subscribe() method.
-A simple subscriber is ``op.Sink`` which is calling a function with optional positional
+A simple subscriber is ``Sink`` which is calling a function with optional positional
 and keyword arguments.
 
 .. code-block:: python3
