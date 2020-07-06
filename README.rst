@@ -143,7 +143,7 @@ available for ``Accumulate``, ``CombineLatest``, ``Filter``, ``Map``, ``MapAsync
     ...     return sum([s.count(v) for v in 'aeiou'])
 
     >>> msg = Value('Hello World!')
-    >>> disposable = (msg | count_vowels()).subscribe(Sink(print, 'Number of vowels:'))
+    >>> disposable = (msg | count_vowels).subscribe(Sink(print, 'Number of vowels:'))
     Number of vowels: 3
     >>> msg.emit('Wahuuu')
     Number of vowels: 4
@@ -154,7 +154,7 @@ You can even make configurable ``Map`` s and ``Filter`` s:
 
     >>> import re
 
-    >>> @op.build_filter
+    >>> @op.build_filter_factory
     ... def filter_pattern(pattern, s):
     ...     return re.search(pattern, s) is not None
 

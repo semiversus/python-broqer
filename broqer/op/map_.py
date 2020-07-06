@@ -106,9 +106,25 @@ class Map(OperatorFactory):  # pylint: disable=too-few-public-methods
         return AppliedMap(publisher, self._function, self._unpack)
 
 
-def build_map(function: Callable[[Any], Any] = None,
+def build_map(function: Callable[..., None] = None, *,
               unpack: bool = False):
     """ Decorator to wrap a function to return a Map operator.
+
+    :param function: function to be wrapped
+    :param unpack: value from emits will be unpacked (*value)
+    """
+    def _build_map(function):
+        return Map(function, unpack=unpack)
+
+    if function:
+        return _build_map(function)
+
+    return _build_map
+
+
+def build_map_factory(function: Callable[[Any], Any] = None,
+              unpack: bool = False):
+    """ Decorator to wrap a function to return a factory for Map operators.
 
     :param function: function to be wrapped
     :param unpack: value from emits will be unpacked (*value)

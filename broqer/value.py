@@ -22,10 +22,6 @@ class Value(Publisher, Subscriber):
         Publisher.__init__(self, init)
         Subscriber.__init__(self)
 
-    def notify(self, value: Any) -> None:
-        # .notify on Value will be handled as .emit
-        self.emit(value)
-
     def emit(self, value: Any,
              who: Publisher = None) -> None:  # pylint: disable=unused-argument
         return Publisher.notify(self, value)

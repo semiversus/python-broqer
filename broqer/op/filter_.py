@@ -149,6 +149,22 @@ def build_filter(predicate: Callable[[Any], bool] = None, *,
                  unpack: bool = False):
     """ Decorator to wrap a function to return a Filter operator.
 
+    :param function: function to be wrapped
+    :param unpack: value from emits will be unpacked (*value)
+    """
+    def _build_filter(predicate):
+        return Filter(predicate, unpack=unpack)
+
+    if predicate:
+        return _build_filter(predicate)
+
+    return _build_filter
+
+
+def build_filter_factory(predicate: Callable[[Any], bool] = None, *,
+                         unpack: bool = False):
+    """ Decorator to wrap a function to return a factory for Filter operators.
+
     :param predicate: function to be wrapped
     :param unpack: value from emits will be unpacked (*value)
     """

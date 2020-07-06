@@ -2,8 +2,10 @@
 
 # synchronous operators
 from broqer.op.combine_latest import CombineLatest, build_combine_latest
-from broqer.op.filter_ import Filter, EvalTrue, EvalFalse, build_filter
-from broqer.op.map_ import Map, build_map
+from broqer.op.filter_ import Filter, EvalTrue, EvalFalse, build_filter, build_filter_factory
+from broqer.op.map_ import Map, build_map, build_map_factory
+from broqer.op.map_async import MapAsync, build_map_async, \
+                                build_map_async_factory, AsyncMode
 
 # utils
 from broqer.op.concat import Concat
@@ -14,9 +16,9 @@ from .py_operators import Str, Bool, Int, Float, Repr, Len, In, All, Any, \
 
 __all__ = [
     'CombineLatest',
-    'Filter', 'Map', 'EvalTrue',
-    'EvalFalse', 'build_map', 'build_combine_latest',
-    'build_filter', 'Concat', 'Str', 'Bool', 'Int',
+    'Filter', 'Map', 'EvalTrue', 'MapAsync', 'build_map_async', 'AsyncMode',
+    'EvalFalse', 'build_map', 'build_map_factory', 'build_combine_latest',
+    'build_filter', 'build_filter_factory', 'Concat', 'Str', 'Bool', 'Int',
     'Float', 'Repr',
     'Len', 'In', 'All', 'Any', 'BitwiseAnd', 'BitwiseOr',
 ]
