@@ -28,7 +28,7 @@ Finished with argument 1
 >>> _d.dispose()
 """
 
-from functools import wraps
+from functools import wraps, partial
 from typing import Any
 
 from broqer import Subscriber, Publisher, default_error_handler
@@ -49,9 +49,10 @@ class SinkAsync(Subscriber):  # pylint: disable=too-few-public-methods
                  error_callback=default_error_handler,
                  unpack: bool = False, **kwargs) -> None:
 
-        self._map_async = AppliedMapAsync(None, coro, *args, mode=mode,
+        self._map_async = AppliedMapAsync(None, partial(coro, *args, **kwargs),
+                                          mode=mode,
                                           error_callback=error_callback,
-                                          unpack=unpack, **kwargs)
+                                          unpack=unpack)
 
     def emit(self, value: Any, who: Publisher):
         self._map_async.emit(value, who=None)
