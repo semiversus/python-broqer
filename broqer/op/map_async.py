@@ -265,7 +265,7 @@ def build_map_async(coro=None, *,
                         unpack=unpack)
 
     if coro:
-        return _build_map_async(coro, unpack=unpack)
+        return _build_map_async(coro)
 
     return _build_map_async
 

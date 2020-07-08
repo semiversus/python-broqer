@@ -89,7 +89,7 @@ def build_sink_async_factory(coro = None, *,
     """
     def _build_sink_async(coro):
         @wraps(coro)
-        def _wrapper(*args, **kwargs) -> Sink:
+        def _wrapper(*args, **kwargs) -> SinkAsync:
             if ('unpack' in kwargs) or ('mode' in kwargs) or \
                     ('error_callback' in kwargs):
                 raise TypeError('"unpack", "mode" and "error_callback" has to '

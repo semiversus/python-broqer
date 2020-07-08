@@ -123,7 +123,7 @@ def build_map(function: Callable[..., None] = None, *,
 
 
 def build_map_factory(function: Callable[[Any], Any] = None,
-              unpack: bool = False):
+                      unpack: bool = False):
     """ Decorator to wrap a function to return a factory for Map operators.
 
     :param function: function to be wrapped
