@@ -29,7 +29,7 @@ setup(
     include_package_data=True,
     keywords='broker publisher subscriber reactive frp observable',
     name='broqer',
-    packages=find_packages(include='broqer'),
+    packages=find_packages(include=['broqer*']),
     url='https://github.com/semiversus/python-broqer',
     version='version=2.0.0-rc0',
     zip_safe=False,
