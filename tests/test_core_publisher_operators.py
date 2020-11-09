@@ -225,7 +225,7 @@ import math
     (op.Bool, {}, False), (op.Bool, None, False), (op.Bool, 513.17, True), (op.Bool, 0.0, False),
     (op.Int, 1.99, 1), (op.Int, '123', 123), (op.Int, (1, 2, 3), TypeError), (op.Int, None, TypeError),
     (op.Float, 1, 1.0), (op.Float, '12.34', 12.34), (op.Float, 'abc', ValueError),
-    (op.Repr, 123, '123'), (op.Repr, 'abc', "'abc'"), (op.Repr, int, "<class 'int'>"),
+    (op.Repr, 123, '123'), (op.Repr, 'abc', '\'abc\''), (op.Repr, int, '<class \'int\'>'),
     (op.Len, (), 0), (op.Len, [1,2,3], 3), (op.Len, 'abcde', 5), (op.Len, None, TypeError),
 ])
 def test_unary_operators(operator, value, result):
