@@ -23,12 +23,12 @@ html_theme = 'sphinx_rtd_theme'
 htmlhelp_basename = 'broqer'
 
 html_context = {
-  "display_github": True, # Add 'Edit on Github' link instead of 'View page source'
-  "github_user": "semiversus",
-  "github_repo": project,
-  "github_version": "master",
-  "conf_py_path": "/docs/",
-  "source_suffix": source_suffix,
+  'display_github': True, # Add 'Edit on Github' link instead of 'View page source'
+  'github_user': 'semiversus',
+  'github_repo': project,
+  'github_version': 'master',
+  'conf_py_path': '/docs/',
+  'source_suffix': source_suffix,
 }
 
 latex_documents = [
@@ -39,7 +39,7 @@ latex_documents = [
 from sphinx.ext import autodoc
 
 class ClassDocDocumenter(autodoc.ClassDocumenter):
-    objtype = "classdoc"
+    objtype = 'classdoc'
 
     #do not indent the content
     content_indent = ""

@@ -113,7 +113,7 @@ def apply_operator_overloading():
     # cases:
     # int, float, str - should return appropriate type instead of a Publisher
     # len - should return an integer
-    # "x in y" - is using __bool__ which is not working with Publisher
+    # 'x in y' - is using __bool__ which is not working with Publisher
     for method in (
             '__lt__', '__le__', '__eq__', '__ne__', '__ge__', '__gt__',
             '__add__', '__and__', '__lshift__', '__mod__', '__mul__',

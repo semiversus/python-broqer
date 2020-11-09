@@ -78,7 +78,7 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
         future = asyncio.ensure_future(future, loop=self)
         if new_task:
             # An exception is raised if the future didn't complete, so there
-            # is no need to log the "destroy pending task" message
+            # is no need to log the 'destroy pending task' message
             future._log_destroy_pending = False
 
         future.add_done_callback(_run_until_complete_cb)
@@ -111,7 +111,7 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
         The event loop must not be running.
         """
         if self.is_running():
-            raise RuntimeError("Cannot close a running event loop")
+            raise RuntimeError('Cannot close a running event loop')
         if self._closed:
             return
 
@@ -149,7 +149,7 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
 
     def _call_soon(self, callback, args):
         if (asyncio.iscoroutine(callback) or asyncio.iscoroutinefunction(callback)):
-            raise TypeError("coroutines cannot be used with call_soon()")
+            raise TypeError('coroutines cannot be used with call_soon()')
         self._check_closed()
         handle = asyncio.Handle(callback, args, self)
         if handle._source_traceback:
@@ -242,7 +242,7 @@ class VirtualTimeEventLoop(asyncio.AbstractEventLoop):
             except Exception:
                 # Second protection layer for unexpected errors
                 # in the default implementation, as well as for subclassed
-                # event loops with overloaded "default_exception_handler".
+                # event loops with overloaded 'default_exception_handler'.
                 log.error('Exception in default exception handler', exc_info=True)
         else:
             try:
