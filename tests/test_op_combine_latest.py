@@ -80,3 +80,22 @@ def test_emit_on(factory, flags):
             m.assert_called_once_with(tuple(result))
         else:
             m.assert_not_called()
+
+@pytest.mark.parametrize('subscribe', [True, False])
+def test_unsubscibe(subscribe):
+    m = mock.Mock()
+
+    p1, p2 = Publisher(NONE), Publisher(NONE)
+
+    operator = op.CombineLatest(p1, p2)
+
+    if subscribe:
+        operator.subscribe(Sink())
+
+    assert operator.get() == NONE
+
+    p1.notify(1)
+    assert operator.get() == NONE
+
+    p2.notify(2)
+    assert operator.get() == (1, 2)

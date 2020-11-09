@@ -49,16 +49,18 @@ class SinkAsync(Subscriber):  # pylint: disable=too-few-public-methods
                  error_callback=default_error_handler,
                  unpack: bool = False, **kwargs) -> None:
 
-        self._map_async = AppliedMapAsync(None, partial(coro, *args, **kwargs),
+        self._dummy_publisher = Publisher()
+        self._map_async = AppliedMapAsync(self._dummy_publisher,
+                                          partial(coro, *args, **kwargs),
                                           mode=mode,
                                           error_callback=error_callback,
                                           unpack=unpack)
 
     def emit(self, value: Any, who: Publisher):
-        self._map_async.emit(value, who=None)
+        self._map_async.emit(value, who=self._dummy_publisher)
 
 
-def build_sink_async(coro=None, *, mode: AsyncMode=AsyncMode.CONCURRENT,
+def build_sink_async(coro=None, *, mode: AsyncMode = AsyncMode.CONCURRENT,
                      unpack: bool = False):
     """ Decorator to wrap a coroutine to return a SinkAsync subscriber.
 
@@ -67,7 +69,7 @@ def build_sink_async(coro=None, *, mode: AsyncMode=AsyncMode.CONCURRENT,
     :param unpack: value from emits will be unpacked (*value)
     """
     def _build_sink_async(coro):
-        return SinkAsync(coro, unpack=unpack)
+        return SinkAsync(coro, mode=mode, unpack=unpack)
 
     if coro:
         return _build_sink_async(coro)
@@ -75,8 +77,8 @@ def build_sink_async(coro=None, *, mode: AsyncMode=AsyncMode.CONCURRENT,
     return _build_sink_async
 
 
-def build_sink_async_factory(coro = None, *,
-                             mode: AsyncMode=AsyncMode.CONCURRENT,
+def build_sink_async_factory(coro=None, *,
+                             mode: AsyncMode = AsyncMode.CONCURRENT,
                              error_callback=default_error_handler,
                              unpack: bool = False):
     """ Decorator to wrap a coroutine to return a factory for SinkAsync
@@ -106,10 +108,10 @@ def build_sink_async_factory(coro = None, *,
     return _build_sink_async
 
 
-def sink_async_property(coro = None, *,
-                             mode: AsyncMode=AsyncMode.CONCURRENT,
-                             error_callback=default_error_handler,
-                             unpack: bool = False):
+def sink_async_property(coro=None, *,
+                        mode: AsyncMode = AsyncMode.CONCURRENT,
+                        error_callback=default_error_handler,
+                        unpack: bool = False):
     """ Decorator to build a property returning a SinkAsync subscriber.
 
     :param coro: coroutine to be wrapped

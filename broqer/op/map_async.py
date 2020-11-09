@@ -29,7 +29,8 @@ Finished with argument 1
 AsyncMode: INTERRUPT
 
 >>> s.emit(0)
->>> _d = (s | op.MapAsync(delay_add, mode=op.AsyncMode.INTERRUPT)).subscribe(Sink(print))
+>>> o = (s | op.MapAsync(delay_add, mode=op.AsyncMode.INTERRUPT))
+>>> _d = o.subscribe(Sink(print))
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.005))
 Starting with argument 0
 >>> s.emit(1)
@@ -42,7 +43,8 @@ Finished with argument 1
 AsyncMode: QUEUE
 
 >>> s.emit(0)
->>> _d = (s | op.MapAsync(delay_add, mode=op.AsyncMode.QUEUE)).subscribe(Sink(print))
+>>> o = (s | op.MapAsync(delay_add, mode=op.AsyncMode.QUEUE))
+>>> _d = o.subscribe(Sink(print))
 >>> s.emit(1)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.04))
 Starting with argument 0
@@ -56,7 +58,8 @@ Finished with argument 1
 AsyncMode: LAST
 
 >>> s.emit(0)
->>> _d = (s | op.MapAsync(delay_add, mode=op.AsyncMode.LAST)).subscribe(Sink(print))
+>>> o = (s | op.MapAsync(delay_add, mode=op.AsyncMode.LAST))
+>>> _d = o.subscribe(Sink(print))
 >>> s.emit(1)
 >>> s.emit(2)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.04))
@@ -71,7 +74,8 @@ Finished with argument 2
 AsyncMode: SKIP
 
 >>> s.emit(0)
->>> _d = (s | op.MapAsync(delay_add, mode=op.AsyncMode.SKIP)).subscribe(Sink(print))
+>>> o = (s | op.MapAsync(delay_add, mode=op.AsyncMode.SKIP))
+>>> _d = o.subscribe(Sink(print))
 >>> s.emit(1)
 >>> s.emit(2)
 >>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.04))
@@ -93,11 +97,11 @@ Got error
 >>> _d.dispose()
 """
 import asyncio
-from collections import deque, namedtuple
+from collections import deque
 from enum import Enum
 import sys
 from functools import wraps, partial
-from typing import Any, MutableSequence  # noqa: F401
+from typing import Any, MutableSequence, Optional  # noqa: F401
 
 from broqer import Publisher, default_error_handler, NONE
 
@@ -133,7 +137,7 @@ class AppliedMapAsync(Operator):
         self._unpack = unpack
 
         # ._future is the reference to a running coroutine encapsulated as task
-        self._future = None  # type: asyncio.Future
+        self._future = None  # type: Optional[asyncio.Future]
 
         # ._last_emit is used for LAST_DISTINCT and keeps the last emit from
         # source publisher
@@ -148,12 +152,11 @@ class AppliedMapAsync(Operator):
         # QUEUE                unlimited
         # LAST, LAST_DISTINCT  1
         # all others           no queue used
+        self._queue = None  # type: Optional[MutableSequence]
+
         if mode in (AsyncMode.QUEUE, AsyncMode.LAST, AsyncMode.LAST_DISTINCT):
             maxlen = (None if mode is AsyncMode.QUEUE else 1)
-            self._queue = deque(maxlen=maxlen)  # type: MutableSequence
-        else:  # no queue for CONCURRENT, INTERRUPT and SKIP
-            self._queue = None
-
+            self._queue = deque(maxlen=maxlen)
 
     def emit(self, value: Any, who: Publisher) -> None:
         if who is not self._orginator:
@@ -243,14 +246,14 @@ class MapAsync(OperatorFactory):  # pylint: disable=too-few-public-methods
 
     def apply(self, publisher: Publisher):
         return AppliedMapAsync(publisher,
-                               coro_with_args = self._coro_with_args,
+                               coro_with_args=self._coro_with_args,
                                mode=self._mode,
                                error_callback=self._error_callback,
                                unpack=self._unpack)
 
 
 def build_map_async(coro=None, *,
-                    mode: AsyncMode = AsyncMode.CONCURRENT, \
+                    mode: AsyncMode = AsyncMode.CONCURRENT,
                     error_callback=default_error_handler,
                     unpack: bool = False):
     """ Decorator to wrap a function to return a Map operator.
@@ -271,7 +274,7 @@ def build_map_async(coro=None, *,
 
 
 def build_map_async_factory(coro=None, *,
-                            mode: AsyncMode = AsyncMode.CONCURRENT, \
+                            mode: AsyncMode = AsyncMode.CONCURRENT,
                             error_callback=default_error_handler,
                             unpack: bool = False):
     """ Decorator to wrap a coroutine to return a factory for MapAsync
@@ -292,7 +295,8 @@ def build_map_async_factory(coro=None, *,
                                 'be defined by decorator')
             if mode is None:
                 mode = _mode
-            return MapAsync(coro, *args, mode=mode, unpack=unpack, **kwargs)
+            return MapAsync(coro, *args, mode=mode, unpack=unpack,
+                            error_callback=error_callback, **kwargs)
         return _wrapper
 
     if coro:

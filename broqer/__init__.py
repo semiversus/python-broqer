@@ -2,7 +2,7 @@
 of data in a reactive style with publish/subscribe and broker functionality.
 """
 
-from .default_error_handler import default_error_handler
+from .error_handler import default_error_handler
 from .disposable import Disposable
 from .types import NONE
 from .publisher import Publisher, SubscriptionDisposable, SubscriptionError
