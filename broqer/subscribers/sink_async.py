@@ -28,11 +28,12 @@ Finished with argument 1
 >>> _d.dispose()
 """
 
-from functools import wraps, partial
+from functools import wraps
 from typing import Any
 
+# pylint: disable=cyclic-import
 from broqer import Subscriber, Publisher, default_error_handler
-from broqer.op.map_async import AppliedMapAsync, AsyncMode
+from broqer.op.map_async import AppliedMapAsync, AsyncMode, build_coro
 
 
 class SinkAsync(Subscriber):  # pylint: disable=too-few-public-methods
@@ -50,11 +51,11 @@ class SinkAsync(Subscriber):  # pylint: disable=too-few-public-methods
                  unpack: bool = False, **kwargs) -> None:
 
         self._dummy_publisher = Publisher()
+        _coro = build_coro(coro, unpack, *args, **kwargs)
         self._map_async = AppliedMapAsync(self._dummy_publisher,
-                                          partial(coro, *args, **kwargs),
+                                          _coro,
                                           mode=mode,
-                                          error_callback=error_callback,
-                                          unpack=unpack)
+                                          error_callback=error_callback)
 
     def emit(self, value: Any, who: Publisher):
         self._map_async.emit(value, who=self._dummy_publisher)

@@ -6,6 +6,7 @@ Publisher.
 """
 from typing import Any, Dict  # noqa: F401
 
+# pylint: disable=cyclic-import
 from broqer import Publisher, Subscriber, NONE
 from broqer.op import build_map_factory
 

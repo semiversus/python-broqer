@@ -100,12 +100,26 @@ import asyncio
 from collections import deque
 from enum import Enum
 import sys
-from functools import wraps, partial
+from functools import wraps
 from typing import Any, MutableSequence, Optional  # noqa: F401
 
+# pylint: disable=cyclic-import
+from broqer.operator import Operator, OperatorFactory
 from broqer import Publisher, default_error_handler, NONE
 
-from broqer.operator import Operator, OperatorFactory
+
+def build_coro(coro, unpack, *args, **kwargs):
+    """ building a coroutine receiving one argument and call it curried
+    with *args and **kwargs and unpack it (if unpack is set)
+    """
+    if unpack:
+        async def _coro(value):
+            return await coro(*args, *value, **kwargs)
+    else:
+        async def _coro(value):
+            return await coro(*args, value, **kwargs)
+
+    return _coro
 
 
 class AsyncMode(Enum):
@@ -128,13 +142,12 @@ class AppliedMapAsync(Operator):
     def __init__(self, publisher: Publisher,
                  coro_with_args, mode=AsyncMode.CONCURRENT,
                  error_callback=default_error_handler,
-                 unpack: bool = False) -> None:
+                 ) -> None:
         Operator.__init__(self, publisher)
 
-        self._coro_with_args = coro_with_args
+        self._coro = coro_with_args
         self._mode = mode
         self._error_callback = error_callback
-        self._unpack = unpack
 
         # ._future is the reference to a running coroutine encapsulated as task
         self._future = None  # type: Optional[asyncio.Future]
@@ -217,8 +230,7 @@ class AppliedMapAsync(Operator):
         self.scheduled.notify(value)
 
         # build the coroutine
-        values = value if self._unpack else (value,)
-        coro = self._coro_with_args(*values)
+        coro = self._coro(value)
 
         # create a task out of it and add ._future_done as callback
         self._future = asyncio.ensure_future(coro)
@@ -239,17 +251,17 @@ class MapAsync(OperatorFactory):  # pylint: disable=too-few-public-methods
     def __init__(self, coro, *args, mode=AsyncMode.CONCURRENT,
                  error_callback=default_error_handler,
                  unpack: bool = False, **kwargs) -> None:
-        self._coro_with_args = partial(coro, *args, **kwargs)
+        self._coro = build_coro(coro, unpack, *args, **kwargs)
         self._mode = mode
         self._error_callback = error_callback
         self._unpack = unpack
 
     def apply(self, publisher: Publisher):
         return AppliedMapAsync(publisher,
-                               coro_with_args=self._coro_with_args,
+                               coro_with_args=self._coro,
                                mode=self._mode,
                                error_callback=self._error_callback,
-                               unpack=self._unpack)
+                               )
 
 
 def build_map_async(coro=None, *,
