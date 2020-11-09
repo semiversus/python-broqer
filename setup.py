@@ -30,7 +30,6 @@ setup(
     keywords='broker publisher subscriber reactive frp observable',
     name='broqer',
     packages=find_packages(),
-    test_suite='tests',
     url='https://github.com/semiversus/python-broqer',
     version='version=2.0.0-rc0',
     zip_safe=False,
