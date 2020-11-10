@@ -1,7 +1,8 @@
-from broqer.op.bitwise import BitwiseCombineLatest, map_bit
+from collections import OrderedDict
 
 import pytest
 
+from broqer.op.bitwise import BitwiseCombineLatest, map_bit
 from broqer import Publisher, NONE
 from tests import helper_multi, helper_single
 
@@ -20,7 +21,7 @@ test_vector = [
 @pytest.mark.parametrize('method', [helper_multi.check_get_method, helper_multi.check_subscription, helper_multi.check_dependencies])
 @pytest.mark.parametrize('init,bit_value_map,input_vector,output_vector', test_vector)
 def test_bitwise_combine_latest(method, init, bit_value_map, input_vector, output_vector):
-    publisher_bit_mapping = {Publisher(v): b for b, v in bit_value_map}
+    publisher_bit_mapping = OrderedDict([(Publisher(v), b) for b, v in bit_value_map])
     i_vector = [tuple(v for k, v in bit_value_map)] + input_vector
 
     operator = BitwiseCombineLatest(publisher_bit_mapping, init)
