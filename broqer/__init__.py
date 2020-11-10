@@ -20,7 +20,7 @@ apply_operator_overloading()
 
 __author__ = 'Günther Jena'
 __email__ = 'guenther@jena.at'
-__version__ = '2.0.0-rc0'
+__version__ = '2.0.0-rc1'
 
 __all__ = [
     'default_error_handler', 'Disposable', 'NONE', 'Publisher',
