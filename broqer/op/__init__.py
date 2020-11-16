@@ -14,7 +14,7 @@ from broqer.op.concat import Concat
 
 # enable operator overloading
 from .py_operators import Str, Bool, Int, Float, Repr, Len, In, All, Any, \
-                         BitwiseAnd, BitwiseOr
+                         BitwiseAnd, BitwiseOr, Not
 
 __all__ = [
     'CombineLatest', 'BitwiseCombineLatest',
@@ -22,5 +22,5 @@ __all__ = [
     'EvalFalse', 'build_map', 'build_map_factory', 'build_combine_latest',
     'build_filter', 'build_filter_factory', 'Concat', 'Str', 'Bool', 'Int',
     'Float', 'Repr', 'map_bit', 'build_map_async_factory',
-    'Len', 'In', 'All', 'Any', 'BitwiseAnd', 'BitwiseOr',
+    'Len', 'In', 'All', 'Any', 'BitwiseAnd', 'BitwiseOr', 'Not'
 ]

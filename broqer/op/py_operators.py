@@ -28,6 +28,12 @@ class Bool(MapUnary):
         MapUnary.__init__(self, publisher, bool)
 
 
+class Not(MapUnary):
+    """ Implementing the functionality of not for publishers. """
+    def __init__(self, publisher: Publisher) -> None:
+        MapUnary.__init__(self, publisher, operator.not_)
+
+
 class Int(MapUnary):
     """ Implementing the functionality of int() for publishers. """
     def __init__(self, publisher: Publisher) -> None:
