@@ -140,7 +140,7 @@ class Publisher:
         :param value: value to be emitted to subscribers
         """
         self._state = value
-        for subscriber in self._subscriptions:
+        for subscriber in tuple(self._subscriptions):
             subscriber.emit(value, who=self)
 
     @overload   # noqa: F811
