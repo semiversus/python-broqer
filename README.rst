@@ -110,7 +110,7 @@ Also fancy stuff like getting item by index or key is possible:
     r: 123
 
 Some python built in functions can't return Publishers (e.g. ``len()`` needs to
-return an integer). For this cases special functions are defined in broqer: ``Str``,
+return an integer). For these cases special functions are defined in broqer: ``Str``,
 ``Int``, ``Float``, ``Len`` and ``In`` (for ``x in y``). Also other functions
 for convenience are available: ``All``, ``Any``, ``BitwiseAnd`` and ``BitwiseOr``.
 
