@@ -23,7 +23,7 @@ __email__ = 'guenther@jena.at'
 
 try:
     from ._version import version as __version__
-except ModuleNotFoundError:
+except ImportError:
     __version__ = 'not available'
 
 __all__ = [
