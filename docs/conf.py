@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath('..'))
 project = 'broqer'
 copyright = u'2018, Günther Jena'
 author = u'Günther Jena'
-version = '2.0.0-rc1'
+from broqer import __version__ as version
 github_url = 'https://github.com/semiversus/python-broqer'
 
 extensions = [

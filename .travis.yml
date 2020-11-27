@@ -4,22 +4,23 @@ python:
   - 3.6
   - 3.7
   - 3.8
+  - 3.9
 
 dist: xenial
 sudo: true
 
 install:
-  - pip install -r requirements_dev.txt
+  - pip install -r requirements_dev.txt .
 
 script:
   - flake8 broqer
   - mypy broqer --no-strict-optional
-  - ( pylint broqer --disable=R0401; exit $(($? & 35)) )
+  - pylama
   - rstcheck README.rst
   - pytest
 
 after_success:
-  -  if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then codecov; fi
+  -  if [[ "$TRAVIS_PYTHON_VERSION" == "3.9" ]]; then codecov; fi
 
 deploy:
   provider: pypi

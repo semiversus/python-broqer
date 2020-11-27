@@ -1,3 +1,7 @@
+## 2.0.0
+
+*
+
 ## 2.0.0rc1
 
 * rename `default_error_handler.py` to `error_handler.py`
