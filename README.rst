@@ -1,5 +1,5 @@
 =======================================
-Python Broqer 2.0RC0 (work in progress)
+Python Broqer
 =======================================
 
 .. image:: https://img.shields.io/pypi/v/broqer.svg
@@ -194,7 +194,9 @@ Broqer was inspired by:
 .. _CombineLatest: https://python-broqer.readthedocs.io/en/latest/operators/combine_latest.py
 .. _Filter: https://python-broqer.readthedocs.io/en/latest/operators/filter_.py
 .. _Map: https://python-broqer.readthedocs.io/en/latest/operators/map_.py
+.. _MapAsync: https://python-broqer.readthedocs.io/en/latest/operators/map_async.py
 .. _Sink: https://python-broqer.readthedocs.io/en/latest/operators/subscribers/sink.py
+.. _SinkAsync: https://python-broqer.readthedocs.io/en/latest/operators/subscribers/sink_async.py
 .. _OnEmitFuture: https://python-broqer.readthedocs.io/en/latest/subscribers.html#trace
 .. _Trace: https://python-broqer.readthedocs.io/en/latest/subscribers.html#trace
 
@@ -222,6 +224,8 @@ Operators
 +-------------------------------------+-----------------------------------------------------------------------------+
 | Map_ (map_func, \*args, \*\*kwargs) | Apply ``map_func(*args, value, **kwargs)`` to each emitted value            |
 +-------------------------------------+-----------------------------------------------------------------------------+
+| MapAsync_ (coro, mode, ...)         | Apply ``coro(*args, value, **kwargs)`` to each emitted value                |
++-------------------------------------+-----------------------------------------------------------------------------+
 
 Subscribers
 -----------
@@ -230,6 +234,8 @@ A Subscriber_ is the sink for messages.
 
 +----------------------------------+--------------------------------------------------------------+
 | Sink_ (func, \*args, \*\*kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
++----------------------------------+--------------------------------------------------------------+
+| SinkAsync_ (coro, ...)           | Apply ``coro(*args, value, **kwargs)`` to each emitted value |
 +----------------------------------+--------------------------------------------------------------+
 | OnEmitFuture_ (timeout=None)     | Build a future able to await for                             |
 +----------------------------------+--------------------------------------------------------------+
