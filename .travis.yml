@@ -20,7 +20,7 @@ after_success:
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
-  user: semiversus
+  username: "__token__"
   password:
     secure: RH9y4MZPz6NEYdIxf3UyAQBcuXfapvWrj4d6pw940yArLwSaWQdilHWU2ZJfDOv4dnl5KtTNrHDXYYPsdC+oXW5/Zr/Bq6PEAGeN8R6EzpQixaOyrn3VMUQmEjpIVeAcT1AvF6DBuC6fK+y+q3MCIRr9GwKpj7EYOxYdFHBerec6jPF4HN/6fQbGqx1L6JYSTZvtnqLBGpHp1DcA7DqnTzydi1r8wZbpuQ1ROfxYFKW+7bOxDB+9T2NEAfnQaWHSg93urBbvt87wwJ/buGd2zWecnrmFzKq50G6snj1plhFdjPMzUExaGPCkpIDToFpgzO40/yTJbPc6pVesbuIENw09aF/fLvrHCWoYcjwVDh8X3S/rEfq6AJOEY3aleSCADU4Tt1ZQUDE7S5w396G1hlYHmSE/OWzkQxa1YuViWZXMbR9sIAemJPwqsvsWyx/EYWjMUDM6zD5n/rFupOvVnoNKjN3356/4wJG8eCpjGaKG/SSqT8Z+cgHUh5gP5FXQFA5T7boj+4+1HZcSUty2LLhhAQC2qKbl8f/c6iuiOIkaXtHEhxBeXh+VYnuLZYsy+gV9u/Cqn1QoWray/i1gJOZNfXYvoLjUM4V6cTHGWEVZR0D/8UgLgiSCx1YaHcYzLXP2n5gSEyN+08ztUJc/OsLm5aQUOGADU7FfJFDtcwc=
   on:
