@@ -171,12 +171,18 @@ class Publisher:
         subscription is left, it will be called with False.
 
         :param callback: callback(subscription: bool) to be called.
+                         when `callback` is None the callback will be reset
         :raises ValueError: when a callback is already registrered
         """
+        if callback is None:
+            self._on_subscription_cb = None
+            return
+
         if self._on_subscription_cb is not None:
             raise ValueError('A callback is already registered')
 
         self._on_subscription_cb = callback
+        callback(bool(self._subscriptions))
 
     def __await__(self):
         """ Makes publisher awaitable. When publisher has a state it will

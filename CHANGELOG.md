@@ -1,3 +1,7 @@
+## 2.0.1
+
+* fixed problem in `Publisher.register_on_subscription_callback()` when subscriptions already are available
+
 ## 2.0.0
 
 * replace bumpversion by use_scm_version

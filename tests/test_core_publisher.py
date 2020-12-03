@@ -133,9 +133,11 @@ def test_subscription_callback():
     p = Publisher()
     p.register_on_subscription_callback(m)
 
-    # callback should be called on first subscription (with True as argument)
-    m.assert_not_called()
+    # callback should be immediatly called with `False` when no subscriber is available
+    m.assert_called_once_with(False)
+    m.reset_mock()
 
+    # callback should be called on first subscription (with True as argument)
     d1 = p.subscribe(Sink())
     m.assert_called_once_with(True)
     m.reset_mock()
@@ -152,8 +154,21 @@ def test_subscription_callback():
     m.reset_mock()
 
     # callback should again be called with True as argument on first subscription
-    p.subscribe(Sink())
+    d3 = p.subscribe(Sink())
     m.assert_called_once_with(True)
+    m.reset_mock()
+
+    # after reseting callback it should no be called again
+    p.register_on_subscription_callback(None)
+    d3.dispose()
+    p.subscribe(Sink())
+    m.assert_not_called()
+
+    # check if callback is called when subscriber is already available
+    p.register_on_subscription_callback(m)
+    m.assert_called_once_with(True)
+
+
 
 
 def test_prepend():
