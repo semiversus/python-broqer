@@ -133,10 +133,6 @@ def test_subscription_callback():
     p = Publisher()
     p.register_on_subscription_callback(m)
 
-    # callback should be immediatly called with `False` when no subscriber is available
-    m.assert_called_once_with(False)
-    m.reset_mock()
-
     # callback should be called on first subscription (with True as argument)
     d1 = p.subscribe(Sink())
     m.assert_called_once_with(True)

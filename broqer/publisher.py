@@ -182,7 +182,8 @@ class Publisher:
             raise ValueError('A callback is already registered')
 
         self._on_subscription_cb = callback
-        callback(bool(self._subscriptions))
+        if self._subscriptions:
+            callback(True)
 
     def __await__(self):
         """ Makes publisher awaitable. When publisher has a state it will
