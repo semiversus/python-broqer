@@ -15,8 +15,8 @@ from broqer.operator import MultiOperator
 
 class BitwiseCombineLatest(MultiOperator):
     """ Bitwise combine the latest emit of multiple publishers and emit the
-    combination. If a publisher is not emitting or is not defined for a bit, the
-    init value will be used.
+    combination. If a publisher is not emitting or is not defined for a bit,
+    the init value will be used.
 
     :param bit_publisher_mapping: dictionary with bit index as key and source
                                   publisher as value
