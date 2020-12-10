@@ -7,7 +7,7 @@ Publisher.
 from typing import Any, Dict  # noqa: F401
 
 # pylint: disable=cyclic-import
-from broqer import Publisher, Subscriber, NONE
+from broqer import Publisher, Subscriber, NONE, SubscriptionDisposable
 from broqer.op import build_map_factory
 
 from broqer.operator import MultiOperator
@@ -15,11 +15,12 @@ from broqer.operator import MultiOperator
 
 class BitwiseCombineLatest(MultiOperator):
     """ Bitwise combine the latest emit of multiple publishers and emit the
-    combination
+    combination. If a publisher is not emitting or is not defined for a bit, the
+    init value will be used.
 
     :param bit_publisher_mapping: dictionary with bit index as key and source
-        publisher as value
-    :param init: optional init value used for undefined bits
+                                  publisher as value
+    :param init: optional init value used for undefined bits (or initial state)
     """
     def __init__(self, publisher_bit_mapping: Dict, init: int = 0) -> None:
         MultiOperator.__init__(self, *publisher_bit_mapping)
@@ -27,6 +28,16 @@ class BitwiseCombineLatest(MultiOperator):
         self._init = init
         self._missing = set(self._orginators)
         self._publisher_bit_mapping = publisher_bit_mapping
+
+    def subscribe(self, subscriber: 'Subscriber',
+                  prepend: bool = False) -> SubscriptionDisposable:
+        disposable = MultiOperator.subscribe(self, subscriber, prepend)
+
+        if self._missing:
+            self._missing.clear()
+            Publisher.notify(self, self._state)
+
+        return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
@@ -44,7 +55,7 @@ class BitwiseCombineLatest(MultiOperator):
             value = publisher.get()
 
             if value is NONE:
-                return NONE
+                continue
 
             if value:
                 state |= 1 << bit_index

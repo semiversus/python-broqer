@@ -1,3 +1,7 @@
+## 2.0.2
+
+* fixed behaviour for BitwiseCombineLatest when a Publisher has state NONE
+
 ## 2.0.1
 
 * fixed problem in `Publisher.register_on_subscription_callback()` when subscriptions already are available
