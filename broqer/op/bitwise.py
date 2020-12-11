@@ -35,15 +35,18 @@ class BitwiseCombineLatest(MultiOperator):
 
         if self._missing:
             self._missing.clear()
-            Publisher.notify(self, self._state)
+            if self._state is NONE:
+                Publisher.notify(self, self._init)
+            else:
+                Publisher.notify(self, self._state)
 
         return disposable
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
-            self._missing = set(self._orginators)
-            self._state = self._init
+            self._missing.update(self._orginators)
+            self._state = NONE
 
     def get(self):
         if self._subscriptions:

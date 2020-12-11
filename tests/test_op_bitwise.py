@@ -1,9 +1,10 @@
 from collections import OrderedDict
+from unittest.mock import Mock
 
 import pytest
 
 from broqer.op.bitwise import BitwiseCombineLatest, map_bit
-from broqer import Publisher, NONE
+from broqer import Publisher, NONE, Sink
 from tests import helper_multi, helper_single
 
 test_vector = [
@@ -31,6 +32,13 @@ def test_bitwise_combine_latest(method, init, bit_value_map, input_vector, outpu
 
     method(operator, i_vector, output_vector)
 
+
+def test_bitwise_uninitialized_publishers():
+    m = Mock()
+    p = Publisher()
+    b = BitwiseCombineLatest({p: 0})
+    b.subscribe(Sink(m))
+    m.assert_called_once_with(0)
 
 test_vector = [
     # bit_index, input_vector, output_vector

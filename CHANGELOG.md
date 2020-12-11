@@ -1,6 +1,7 @@
 ## 2.0.3
 
 * prevent iteration over a publisher
+* fix another bug in BitwiseCombineLatest (emitted NONE when no publisher had state)
 
 ## 2.0.2
 
