@@ -215,6 +215,12 @@ class Publisher:
         raise ValueError('Evaluation of comparison of publishers is not '
                          'supported')
 
+    def __iter__(self):
+        """ To prevent iterating over a publisher this method is implemented
+        to throw an exception. Otherwise it will fallback to __getitem__.
+        """
+        raise ValueError('Iteration over a publisher is not possible')
+
     def inherit_type(self, type_cls: Optional[Type]) -> None:
         """ Enables the usage of method and attribute overloading for this
         publisher.
