@@ -143,20 +143,14 @@ class Publisher:
         for subscriber in tuple(self._subscriptions):
             subscriber.emit(value, who=self)
 
-    @overload   # noqa: F811
-    def reset_state(self, value: TValue) -> None:
-        """ Variant for reseting to a specified value """
+    def reset_state(self) -> None:
+        """ Resets the state. Calling this method will not trigger a
+        notification, but will call .reset_state for all subscribers
 
-    @overload    # noqa: F811
-    def reset_state(self) -> None:  # noqa: F811
-        """ Variant for resetting to NONE """
-
-    def reset_state(self, value=NONE) -> None:  # noqa: F811
-        """ Resets the state. Calling this method will not trigger an emit.
-
-        :param value: Optional value to set the internal state
         """
-        self._state = value
+        self._state = NONE
+        for subscriber in tuple(self._subscriptions):
+            subscriber.reset_state()
 
     @property
     def subscriptions(self) -> Tuple['Subscriber', ...]:

@@ -18,3 +18,8 @@ class Subscriber(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
         :param value: value to be send
         :param who: reference to which publisher is emitting
         """
+
+    def reset_state(self) -> None:
+        """ Will be called by assigned publisher, when publisher was called
+        to reset its state
+        """

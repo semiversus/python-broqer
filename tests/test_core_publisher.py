@@ -198,12 +198,12 @@ def test_reset_state():
     m.assert_not_called()
 
     # test .reset_state() before and after subscribing
-    p.reset_state('test')
-    assert p.get() == 'test'
+    p.reset_state()
+    assert p.get() == NONE
 
     p.subscribe(Sink(m, 2))
 
-    m.assert_called_once_with(2, 'test')
+    m.assert_not_called()
 
     m.reset_mock()
 
@@ -214,12 +214,6 @@ def test_reset_state():
     m.reset_mock()
 
     # test no subscribers get notified
-    p.reset_state('test')
-    m.assert_not_called()
-
-    assert p.get() == 'test'
-
-    # test default argument NONE for .reset_state()
     p.reset_state()
     m.assert_not_called()
 

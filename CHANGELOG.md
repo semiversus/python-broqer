@@ -1,3 +1,7 @@
+## 2.1.0
+
+* .reset_state is now calling .reset_state for all subscribers
+
 ## 2.0.3
 
 * prevent iteration over a publisher
