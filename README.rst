@@ -1,5 +1,5 @@
 =======================================
-Python Broqer 2.0RC0 (work in progress)
+Python Broqer
 =======================================
 
 .. image:: https://img.shields.io/pypi/v/broqer.svg
@@ -30,7 +30,7 @@ Synopsis
 - Under MIT license (2018 Günther Jena)
 - Source is hosted on GitHub.com_
 - Documentation is hosted on ReadTheDocs.com_
-- Tested on Python 3.5, 3.6, 3.7 and 3.8
+- Tested on Python 3.5, 3.6, 3.7. 3.8 and 3.9
 - Unit tested with pytest_, coding style checked with Flake8_, static type checked with mypy_, static code checked with Pylint_, documented with Sphinx_
 - Operators known from ReactiveX_ and other streaming frameworks (like Map_, CombineLatest_, ...)
 
@@ -62,13 +62,13 @@ and keyword arguments.
 
 .. code-block:: python3
 
-    >>> from broqer import Value, Sink
-    >>> a = Value(5)  # create a value (publisher and subscriber with state)
+    >>> from broqer import Publisher, Sink
+    >>> a = Publisher(5)  # create a publisher with state `5`
     >>> s = Sink(print, 'Change:')  # create a subscriber
     >>> disposable = a.subscribe(s)  # subscribe subscriber to publisher
     Change: 5
 
-    >>> a.emit(3)  # change the value
+    >>> a.notify(3)  # change the state
     Change: 3
 
     >>> disposable.dispose()  # unsubscribe
@@ -81,37 +81,36 @@ the common operators (like ``+``, ``>``, ``<<``, ...).
 
 .. code-block:: python3
 
-    >>> from broqer import Value, op
-    >>> a = Value(1)
-    >>> b = Value(3)
+    >>> a = Publisher(1)
+    >>> b = Publisher(3)
 
     >>> c = a * 3 > b  # create a new publisher via operator overloading
     >>> disposable = c.subscribe(Sink(print, 'c:'))
     c: False
 
-    >>> a.emit(2)
+    >>> a.notify(2)
     c: True
 
-    >>> b.emit(10)
+    >>> b.notify(10)
     c: False
 
 Also fancy stuff like getting item by index or key is possible:
 
 .. code-block:: python3
 
-    >>> i = Value('a')
-    >>> d = Value({'a':100, 'b':200, 'c':300})
+    >>> i = Publisher('a')
+    >>> d = Publisher({'a':100, 'b':200, 'c':300})
 
     >>> disposable = d[i].subscribe(Sink(print, 'r:'))
     r: 100
 
-    >>> i.emit('c')
+    >>> i.notify('c')
     r: 300
-    >>> d.emit({'c':123})
+    >>> d.notify({'c':123})
     r: 123
 
 Some python built in functions can't return Publishers (e.g. ``len()`` needs to
-return an integer). For this cases special functions are defined in broqer: ``Str``,
+return an integer). For these cases special functions are defined in broqer: ``Str``,
 ``Int``, ``Float``, ``Len`` and ``In`` (for ``x in y``). Also other functions
 for convenience are available: ``All``, ``Any``, ``BitwiseAnd`` and ``BitwiseOr``.
 
@@ -121,12 +120,12 @@ mimic - this is done via ``.inherit_type(type)``.
 
 .. code-block:: python3
 
-    >>> i = Value('Attribute access made REACTIVE')
+    >>> i = Publisher('Attribute access made REACTIVE')
     >>> i.inherit_type(str)
     >>> disposable = i.lower().split(sep=' ').subscribe(Sink(print))
     ['attribute', 'access', 'made', 'reactive']
 
-    >>> i.emit('Reactive and pythonic')
+    >>> i.notify('Reactive and pythonic')
     ['reactive', 'and', 'pythonic']
 
 Function decorators
@@ -138,14 +137,15 @@ available for ``Accumulate``, ``CombineLatest``, ``Filter``, ``Map``, ``MapAsync
 
 .. code-block:: python3
 
+    >>> from broqer import op
     >>> @op.build_map
     ... def count_vowels(s):
     ...     return sum([s.count(v) for v in 'aeiou'])
 
-    >>> msg = Value('Hello World!')
+    >>> msg = Publisher('Hello World!')
     >>> disposable = (msg | count_vowels).subscribe(Sink(print, 'Number of vowels:'))
     Number of vowels: 3
-    >>> msg.emit('Wahuuu')
+    >>> msg.notify('Wahuuu')
     Number of vowels: 4
 
 You can even make configurable ``Map`` s and ``Filter`` s:
@@ -158,11 +158,11 @@ You can even make configurable ``Map`` s and ``Filter`` s:
     ... def filter_pattern(pattern, s):
     ...     return re.search(pattern, s) is not None
 
-    >>> msg = Value('Cars passed: 135!')
+    >>> msg = Publisher('Cars passed: 135!')
     >>> disposable = (msg | filter_pattern('[0-9]+')).subscribe(Sink(print))
     Cars passed: 135!
-    >>> msg.emit('No cars have passed')
-    >>> msg.emit('Only 1 car has passed')
+    >>> msg.notify('No cars have passed')
+    >>> msg.notify('Only 1 car has passed')
     Only 1 car has passed
 
 
@@ -194,7 +194,9 @@ Broqer was inspired by:
 .. _CombineLatest: https://python-broqer.readthedocs.io/en/latest/operators/combine_latest.py
 .. _Filter: https://python-broqer.readthedocs.io/en/latest/operators/filter_.py
 .. _Map: https://python-broqer.readthedocs.io/en/latest/operators/map_.py
+.. _MapAsync: https://python-broqer.readthedocs.io/en/latest/operators/map_async.py
 .. _Sink: https://python-broqer.readthedocs.io/en/latest/operators/subscribers/sink.py
+.. _SinkAsync: https://python-broqer.readthedocs.io/en/latest/operators/subscribers/sink_async.py
 .. _OnEmitFuture: https://python-broqer.readthedocs.io/en/latest/subscribers.html#trace
 .. _Trace: https://python-broqer.readthedocs.io/en/latest/subscribers.html#trace
 
@@ -222,6 +224,8 @@ Operators
 +-------------------------------------+-----------------------------------------------------------------------------+
 | Map_ (map_func, \*args, \*\*kwargs) | Apply ``map_func(*args, value, **kwargs)`` to each emitted value            |
 +-------------------------------------+-----------------------------------------------------------------------------+
+| MapAsync_ (coro, mode, ...)         | Apply ``coro(*args, value, **kwargs)`` to each emitted value                |
++-------------------------------------+-----------------------------------------------------------------------------+
 
 Subscribers
 -----------
@@ -230,6 +234,8 @@ A Subscriber_ is the sink for messages.
 
 +----------------------------------+--------------------------------------------------------------+
 | Sink_ (func, \*args, \*\*kwargs) | Apply ``func(*args, value, **kwargs)`` to each emitted value |
++----------------------------------+--------------------------------------------------------------+
+| SinkAsync_ (coro, ...)           | Apply ``coro(*args, value, **kwargs)`` to each emitted value |
 +----------------------------------+--------------------------------------------------------------+
 | OnEmitFuture_ (timeout=None)     | Build a future able to await for                             |
 +----------------------------------+--------------------------------------------------------------+

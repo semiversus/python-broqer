@@ -5,12 +5,15 @@
 
 from setuptools import find_packages, setup
 
+
 with open('README.rst', 'rb') as readme_file:
     readme = readme_file.read().decode('utf-8')
 
+
 setup(
-    author="Günther Jena",
+    author='Günther Jena',
     author_email='guenther@jena.at',
+    use_scm_version={"write_to": "broqer/_version.py"},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
@@ -21,17 +24,15 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    description="Carefully crafted library to operate with continuous " +
-                "streams of data in a reactive style with publish/subscribe " +
-                "and broker functionality.",
-    license="MIT license",
+    description='Carefully crafted library to operate with continuous ' +
+                'streams of data in a reactive style with publish/subscribe ' +
+                'and broker functionality.',
+    license='MIT license',
     long_description=readme,
     include_package_data=True,
     keywords='broker publisher subscriber reactive frp observable',
     name='broqer',
-    packages=find_packages(),
-    test_suite='tests',
+    packages=find_packages(include=['broqer*']),
     url='https://github.com/semiversus/python-broqer',
-    version='version=2.0.0-rc0',
     zip_safe=False,
 )

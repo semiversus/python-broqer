@@ -4,29 +4,25 @@ python:
   - 3.6
   - 3.7
   - 3.8
-
+  - 3.9
 dist: xenial
 sudo: true
-
 install:
-  - pip install -r requirements_dev.txt
-
+  - pip install -r requirements_dev.txt -e .
 script:
   - flake8 broqer
   - mypy broqer --no-strict-optional
-  - ( pylint broqer --disable=R0401; exit $(($? & 35)) )
+  - pylama
   - rstcheck README.rst
   - pytest
-
 after_success:
-  -  if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then codecov; fi
-
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.9" ]]; then codecov; fi
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
-  user: semiversus
+  username: "__token__"
   password:
-    secure: WBixp3vHoCp6SgrjODUTMf3L5op/NHpLeNqk1Yg6bGBp9bw20FzicrsA57uD4CFDiI3v5yxeALwCOCy8iBVi8l6GR1H4eV2EsBWL+KqISm49pzIMTqxzHIVwYLVoFlzq9DF34YyZpY8fA0inqPxD2+2/EaEANlJnKQPbvTOebdEyKGsxdgNy7CqDb2BYSgoq5BzAThLP8jq/NMVdbgr46Xdi3mmaJMGXivbdPyeBlrShGY4pTiNnF0vtF5nktfEMh08gCcldHRsAyw2JMA+Hd6jeNNVWgkCW1uDWH1094gQiRf09V7HfIdmq67fqxAkmviK6vsqohAMbLf1R1iez7aW8RUTZz34281GDR/+qY+Nagwhe8AcW34XWnTzqcTNF5CTJLGftViFAT0hUlQ+w5bLnPT+/qzbqJumntSEzbJabUYMk7xHUKzSr6uYllRDqwwtDgVfqQT2FTkD8/F8GB6onkgXxCf1j3AwqcCC5w/tJ9LiTBnWPW5tWrRrGdYhmhKAXeeW3fZ5AOPbccMDbUWZWGMFOwCydcic71gx90VwRWegepFc+ORargjvCbJ0yFNefFbDOviZILyMisIuPFe+gvAHcfO3dPXRjXEqq4gzPlOtIFavvLlnH2g76uPol1OJ+Ni68U9+eJEAMn/NnDv10Np9Jjx98nOgliL401SA=
+    secure: RH9y4MZPz6NEYdIxf3UyAQBcuXfapvWrj4d6pw940yArLwSaWQdilHWU2ZJfDOv4dnl5KtTNrHDXYYPsdC+oXW5/Zr/Bq6PEAGeN8R6EzpQixaOyrn3VMUQmEjpIVeAcT1AvF6DBuC6fK+y+q3MCIRr9GwKpj7EYOxYdFHBerec6jPF4HN/6fQbGqx1L6JYSTZvtnqLBGpHp1DcA7DqnTzydi1r8wZbpuQ1ROfxYFKW+7bOxDB+9T2NEAfnQaWHSg93urBbvt87wwJ/buGd2zWecnrmFzKq50G6snj1plhFdjPMzUExaGPCkpIDToFpgzO40/yTJbPc6pVesbuIENw09aF/fLvrHCWoYcjwVDh8X3S/rEfq6AJOEY3aleSCADU4Tt1ZQUDE7S5w396G1hlYHmSE/OWzkQxa1YuViWZXMbR9sIAemJPwqsvsWyx/EYWjMUDM6zD5n/rFupOvVnoNKjN3356/4wJG8eCpjGaKG/SSqT8Z+cgHUh5gP5FXQFA5T7boj+4+1HZcSUty2LLhhAQC2qKbl8f/c6iuiOIkaXtHEhxBeXh+VYnuLZYsy+gV9u/Cqn1QoWray/i1gJOZNfXYvoLjUM4V6cTHGWEVZR0D/8UgLgiSCx1YaHcYzLXP2n5gSEyN+08ztUJc/OsLm5aQUOGADU7FfJFDtcwc=
   on:
     tags: true
     repo: semiversus/python-broqer

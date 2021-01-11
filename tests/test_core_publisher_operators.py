@@ -220,12 +220,14 @@ import math
     (operator.pos, Counter({'a':0, 'b':1}), Counter({'b':1})), (operator.abs, -5, 5),
     (operator.invert, 5, -6), (round, 5.2, 5), (round, 5.8, 6), (math.trunc, -5.2, -5),
     (math.floor, -5.2, -6), (math.ceil, -5.2, -5),
+    (op.Not, 5, False), (op.Not, 0, True), (op.Not, True, False),
+    (op.Not, False, True),
     (op.Str, 123, '123'), (op.Str, (1, 2), '(1, 2)'), (op.Str, 1.23, '1.23'),
     (op.Bool, 0, False), (op.Bool, 1, True), (op.Bool, 'False', True), (op.Bool, (1,2,3), True),
     (op.Bool, {}, False), (op.Bool, None, False), (op.Bool, 513.17, True), (op.Bool, 0.0, False),
     (op.Int, 1.99, 1), (op.Int, '123', 123), (op.Int, (1, 2, 3), TypeError), (op.Int, None, TypeError),
     (op.Float, 1, 1.0), (op.Float, '12.34', 12.34), (op.Float, 'abc', ValueError),
-    (op.Repr, 123, '123'), (op.Repr, 'abc', "'abc'"), (op.Repr, int, "<class 'int'>"),
+    (op.Repr, 123, '123'), (op.Repr, 'abc', '\'abc\''), (op.Repr, int, '<class \'int\'>'),
     (op.Len, (), 0), (op.Len, [1,2,3], 3), (op.Len, 'abcde', 5), (op.Len, None, TypeError),
 ])
 def test_unary_operators(operator, value, result):

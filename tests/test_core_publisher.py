@@ -134,8 +134,6 @@ def test_subscription_callback():
     p.register_on_subscription_callback(m)
 
     # callback should be called on first subscription (with True as argument)
-    m.assert_not_called()
-
     d1 = p.subscribe(Sink())
     m.assert_called_once_with(True)
     m.reset_mock()
@@ -152,8 +150,21 @@ def test_subscription_callback():
     m.reset_mock()
 
     # callback should again be called with True as argument on first subscription
-    p.subscribe(Sink())
+    d3 = p.subscribe(Sink())
     m.assert_called_once_with(True)
+    m.reset_mock()
+
+    # after reseting callback it should no be called again
+    p.register_on_subscription_callback(None)
+    d3.dispose()
+    p.subscribe(Sink())
+    m.assert_not_called()
+
+    # check if callback is called when subscriber is already available
+    p.register_on_subscription_callback(m)
+    m.assert_called_once_with(True)
+
+
 
 
 def test_prepend():
@@ -187,12 +198,12 @@ def test_reset_state():
     m.assert_not_called()
 
     # test .reset_state() before and after subscribing
-    p.reset_state('test')
-    assert p.get() == 'test'
+    p.reset_state()
+    assert p.get() == NONE
 
     p.subscribe(Sink(m, 2))
 
-    m.assert_called_once_with(2, 'test')
+    m.assert_not_called()
 
     m.reset_mock()
 
@@ -203,12 +214,6 @@ def test_reset_state():
     m.reset_mock()
 
     # test no subscribers get notified
-    p.reset_state('test')
-    m.assert_not_called()
-
-    assert p.get() == 'test'
-
-    # test default argument NONE for .reset_state()
     p.reset_state()
     m.assert_not_called()
 

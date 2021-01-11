@@ -140,23 +140,17 @@ class Publisher:
         :param value: value to be emitted to subscribers
         """
         self._state = value
-        for subscriber in self._subscriptions:
+        for subscriber in tuple(self._subscriptions):
             subscriber.emit(value, who=self)
 
-    @overload   # noqa: F811
-    def reset_state(self, value: TValue) -> None:
-        """ Variant for reseting to a specified value """
+    def reset_state(self) -> None:
+        """ Resets the state. Calling this method will not trigger a
+        notification, but will call .reset_state for all subscribers
 
-    @overload    # noqa: F811
-    def reset_state(self) -> None:  # noqa: F811
-        """ Variant for resetting to NONE """
-
-    def reset_state(self, value=NONE) -> None:  # noqa: F811
-        """ Resets the state. Calling this method will not trigger an emit.
-
-        :param value: Optional value to set the internal state
         """
-        self._state = value
+        self._state = NONE
+        for subscriber in tuple(self._subscriptions):
+            subscriber.reset_state()
 
     @property
     def subscriptions(self) -> Tuple['Subscriber', ...]:
@@ -171,12 +165,19 @@ class Publisher:
         subscription is left, it will be called with False.
 
         :param callback: callback(subscription: bool) to be called.
+                         when `callback` is None the callback will be reset
         :raises ValueError: when a callback is already registrered
         """
+        if callback is None:
+            self._on_subscription_cb = None
+            return
+
         if self._on_subscription_cb is not None:
             raise ValueError('A callback is already registered')
 
         self._on_subscription_cb = callback
+        if self._subscriptions:
+            callback(True)
 
     def __await__(self):
         """ Makes publisher awaitable. When publisher has a state it will
@@ -207,6 +208,12 @@ class Publisher:
         """
         raise ValueError('Evaluation of comparison of publishers is not '
                          'supported')
+
+    def __iter__(self):
+        """ To prevent iterating over a publisher this method is implemented
+        to throw an exception. Otherwise it will fallback to __getitem__.
+        """
+        raise ValueError('Iteration over a publisher is not possible')
 
     def inherit_type(self, type_cls: Optional[Type]) -> None:
         """ Enables the usage of method and attribute overloading for this

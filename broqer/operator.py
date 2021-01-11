@@ -49,9 +49,6 @@ class Operator(Publisher, Subscriber, metaclass=OperatorMeta):
     def notify(self, value: TValue) -> None:
         raise ValueError('Operator doesn\'t support .notify()')
 
-    def reset_state(self, value: TValue = None) -> None:
-        raise ValueError('Operator doesn\'t support .reset_state()')
-
     @abstractmethod
     def emit(self, value: typing.Any, who: Publisher) -> None:
         """ Send new value to the operator
@@ -105,9 +102,6 @@ class MultiOperator(Publisher, Subscriber):
 
     def notify(self, value: TValue) -> None:
         raise ValueError('Operator doesn\'t support .notify()')
-
-    def reset_state(self, value: TValue = None) -> None:
-        raise ValueError('Operator doesn\'t support .reset_state()')
 
     @abstractmethod
     def emit(self, value: typing.Any, who: Publisher) -> None:
