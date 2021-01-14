@@ -22,7 +22,7 @@ Usage:
 """
 import asyncio
 import sys
-from typing import Any  # noqa: F401
+from typing import Any, Optional  # noqa: F401
 
 from broqer import Publisher, default_error_handler, NONE
 
@@ -42,7 +42,7 @@ class AppliedThrottle(Operator):
 
         self._duration = duration
         self._loop = loop or asyncio.get_event_loop()
-        self._call_later_handler = None  # type: asyncio.Handle
+        self._call_later_handler = None  # type: Optional[asyncio.Handle]
         self._last_state = NONE  # type: Any
         self._error_callback = error_callback
 

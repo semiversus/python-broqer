@@ -1,3 +1,11 @@
+## 2.3.0
+
+* added `Cache` operator
+
+## 2.2.0
+
+* added `Throttle` operator
+
 ## 2.1.0
 
 * .reset_state is now calling .reset_state for all subscribers
