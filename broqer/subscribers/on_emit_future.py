@@ -29,11 +29,12 @@ if TYPE_CHECKING:
 class OnEmitFuture(broqer.Subscriber, asyncio.Future):
     """ Build a future able to await for.
     :param publisher: source publisher
-    :param timeout: timeout in seconds
+    :param timeout: timeout in seconds, None for no timeout
+    :param omit_subscription: omit any emit while subscription
     :param loop: asyncio loop to be used
     """
     def __init__(self, publisher: 'Publisher', timeout=None,
-                 omit_first_emit=False, loop=None):
+                 omit_subscription=False, loop=None):
         if loop is None:
             loop = asyncio.get_event_loop()
 
@@ -42,7 +43,7 @@ class OnEmitFuture(broqer.Subscriber, asyncio.Future):
 
         self._publisher = publisher
 
-        self._omit_first_emit = omit_first_emit
+        self._omit_subscription = omit_subscription
 
         if timeout is not None:
             self._timeout_handle = loop.call_later(
@@ -51,6 +52,7 @@ class OnEmitFuture(broqer.Subscriber, asyncio.Future):
             self._timeout_handle = None
 
         publisher.subscribe(self)
+        self._omit_subscription = False
 
     def _cleanup(self, _future=None):
         self._publisher.unsubscribe(self)
@@ -63,8 +65,7 @@ class OnEmitFuture(broqer.Subscriber, asyncio.Future):
         if who is not self._publisher:
             raise ValueError('Emit from non assigned publisher')
 
-        if self._omit_first_emit:
-            self._omit_first_emit = False
+        if self._omit_subscription:
             return
 
         if not self.done():
