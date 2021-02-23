@@ -8,7 +8,7 @@
 
 ## 2.2.0
 
-* added `Throttle` operator
+* added `Throttle` operator (thanks to `@flofeurstein <https://github.com/flofeurstein>`)
 
 ## 2.1.0
 
