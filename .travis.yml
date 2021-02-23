@@ -26,4 +26,4 @@ deploy:
   on:
     tags: true
     repo: semiversus/python-broqer
-    python: 3.5
+    python: 3.9
