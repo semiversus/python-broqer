@@ -1,3 +1,7 @@
+## 2.3.1
+
+* fix OnEmitFuture behavior when using `omit_subscription` argument
+
 ## 2.3.0
 
 * added `Cache` operator
