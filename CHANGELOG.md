@@ -1,3 +1,7 @@
+## 2.3.2
+
+* added `PollPublisher`
+
 ## 2.3.1
 
 * fix OnEmitFuture behavior when using `omit_subscription` argument
