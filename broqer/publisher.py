@@ -166,7 +166,7 @@ class Publisher:
 
         :param callback: callback(subscription: bool) to be called.
                          when `callback` is None the callback will be reset
-        :raises ValueError: when a callback is already registrered
+        :raises ValueError: when a callback is already registered
         """
         if callback is None:
             self._on_subscription_cb = None
