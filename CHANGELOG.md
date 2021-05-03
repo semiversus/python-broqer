@@ -1,3 +1,7 @@
+## 2.3.3
+
+* added `broqer.Timer` class and rewrite `op.Throttle` to use that class
+
 ## 2.3.2
 
 * added `PollPublisher`

@@ -22,11 +22,12 @@ Usage:
 """
 import asyncio
 import sys
-from typing import Any, Optional  # noqa: F401
+from typing import Any  # noqa: F401
 
 from broqer import Publisher, default_error_handler, NONE
 
 from broqer.operator import Operator, OperatorFactory
+from broqer.timer import Timer
 
 
 class AppliedThrottle(Operator):
@@ -42,8 +43,7 @@ class AppliedThrottle(Operator):
 
         self._duration = duration
         self._loop = loop or asyncio.get_event_loop()
-        self._call_later_handler = None  # type: Optional[asyncio.Handle]
-        self._last_state = NONE  # type: Any
+        self._timer = Timer(self._delayed_emit_cb, loop=loop)
         self._error_callback = error_callback
 
     def get(self):
@@ -53,29 +53,28 @@ class AppliedThrottle(Operator):
         if who is not self._orginator:
             raise ValueError('Emit from non assigned publisher')
 
-        if self._call_later_handler is None:
-            self._last_state = value
-            self._wait_done_cb()
+        if not self._timer.is_running():
+            self._timer.start(timeout=0, args=(value,))
         else:
-            self._last_state = value
+            self._timer.change_arguments(args=(value,))
 
-    def _wait_done_cb(self):
-        if self._last_state is not NONE:
-            try:
-                Publisher.notify(self, self._last_state)
-            except Exception:  # pylint: disable=broad-except
-                self._error_callback(*sys.exc_info())
-            self._last_state = NONE
-            self._call_later_handler = self._loop.call_later(
-                self._duration, self._wait_done_cb)
-        else:
-            self._call_later_handler = None
+    def _delayed_emit_cb(self, value=NONE):
+        if value is NONE:
+            # since the last emit the given duration has passed without another
+            # emit
+            return
+
+        try:
+            Publisher.notify(self, value)
+        except Exception:  # pylint: disable=broad-except
+            self._error_callback(*sys.exc_info())
+
+        self._timer.start(self._duration)
+
 
     def reset(self):
         """ Reseting duration for throttling """
-        if self._call_later_handler is not None:
-            self._call_later_handler.cancel()
-            self._call_later_handler = None
+        self._timer.cancel()
 
 
 class Throttle(OperatorFactory):  # pylint: disable=too-few-public-methods
