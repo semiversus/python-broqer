@@ -15,14 +15,14 @@ class Timer:
     def __init__(self, callback: Optional[Callable[[], None]] = None,
                  loop: Optional[asyncio.BaseEventLoop] = None):
         self._callback = callback
-        self._handle = None  # type: asyncio.Handle
+        self._handle = None  # type: Optional[asyncio.Handle]
         self._loop = loop or asyncio.get_event_loop()
         self._args = None
 
     def start(self, timeout: float, args=()) -> None:
         """ start the timer with given timeout. Optional arguments for the
-        callback can be provided. When the timer is currently running, the timer
-        will be re-set to the new timeout.
+        callback can be provided. When the timer is currently running, the
+        timer will be re-set to the new timeout.
 
         :param timeout: time in seconds to the end of the timer
         :param args: optional tuple with arguments for the callback
@@ -68,4 +68,3 @@ class Timer:
         self._handle = None
         if self._callback:
             self._callback(*self._args)
-

@@ -71,7 +71,6 @@ class AppliedThrottle(Operator):
 
         self._timer.start(self._duration)
 
-
     def reset(self):
         """ Reseting duration for throttling """
         self._timer.cancel()
