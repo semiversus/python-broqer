@@ -12,15 +12,8 @@ def test_default(capsys):
     except:
         exc = sys.exc_info()
 
-    default_error_handler(*exc)
-
-    captured = capsys.readouterr()
-
-    assert captured.err.startswith('Traceback (most recent call last):')
-    assert 'ZeroDivisionError: division by zero' in captured.err
-    assert __file__ in captured.err
-
-    assert captured.out == ''
+    with pytest.raises(ZeroDivisionError):
+        default_error_handler(*exc)
 
 
 def test_set_errorhandler(capsys):
@@ -44,7 +37,5 @@ def test_set_errorhandler(capsys):
     # reset
     default_error_handler.reset()
 
-    default_error_handler(*exc)
-
-    captured = capsys.readouterr()
-    assert captured.err.startswith('Traceback (most recent call last):')
+    with pytest.raises(ZeroDivisionError):
+        default_error_handler(*exc)

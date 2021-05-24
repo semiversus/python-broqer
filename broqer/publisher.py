@@ -1,8 +1,9 @@
 """ Implementing Publisher """
+import sys
 from typing import (TYPE_CHECKING, TypeVar, Type, Tuple, Callable, Optional,
                     overload)
 
-from broqer import NONE, Disposable
+from broqer import NONE, Disposable, default_error_handler
 import broqer
 
 if TYPE_CHECKING:
@@ -141,7 +142,10 @@ class Publisher:
         """
         self._state = value
         for subscriber in tuple(self._subscriptions):
-            subscriber.emit(value, who=self)
+            try:
+                subscriber.emit(value, who=self)
+            except Exception:  # pylint: disable=broad-except
+                default_error_handler(*sys.exc_info())
 
     def reset_state(self) -> None:
         """ Resets the state. Calling this method will not trigger a
@@ -150,7 +154,10 @@ class Publisher:
         """
         self._state = NONE
         for subscriber in tuple(self._subscriptions):
-            subscriber.reset_state()
+            try:
+                subscriber.reset_state()
+            except Exception:  # pylint: disable=broad-except
+                default_error_handler(*sys.exc_info())
 
     @property
     def subscriptions(self) -> Tuple['Subscriber', ...]:

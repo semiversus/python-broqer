@@ -1,3 +1,7 @@
+## 2.4.0
+
+* changed default behavior of error_handler: now it raises an exception
+
 ## 2.3.3
 
 * added `broqer.Timer` class and rewrite `op.Throttle` to use that class

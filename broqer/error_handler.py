@@ -1,13 +1,12 @@
 """ Implementing DefaultErrorHandler. Object default_error_handler is used
 as global object to register a callbacks for exceptions in asynchronous
 operators, """
-import traceback
 
 
 def _default_error_callback(exc_type, exc_value, exc_traceback):
     """ Default error callback is printing traceback of the exception
     """
-    traceback.print_exception(exc_type, exc_value, exc_traceback)
+    raise exc_value.with_traceback(exc_traceback)
 
 
 class DefaultErrorHandler:
