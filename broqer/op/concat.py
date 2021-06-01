@@ -13,10 +13,10 @@ class Concat(OperatorFactory):  # pylint: disable=too-few-public-methods
 
     def apply(self, publisher: Publisher) -> Publisher:
         # concat each operator in the following step
-        orginator = publisher
+        originator = publisher
 
         for operator in self._operators:
-            orginator = operator.apply(orginator)
+            originator = operator.apply(originator)
 
         # the source publisher is the last operator in the chain
-        return orginator
+        return originator

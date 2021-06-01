@@ -50,7 +50,7 @@ class AppliedThrottle(Operator):
         return Publisher.get(self)
 
     def emit(self, value: Any, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         if not self._timer.is_running():

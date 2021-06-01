@@ -20,10 +20,10 @@ class MapConstant(Operator):
             self.inherit_type(publisher.inherited_type)
 
     def get(self):
-        return self._operation(self._orginator.get(), self._value)
+        return self._operation(self._originator.get(), self._value)
 
     def emit(self, value: Any_, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         result = self._operation(value, self._value)
@@ -42,10 +42,10 @@ class MapConstantReverse(Operator):
             self.inherit_type(publisher.inherited_type)
 
     def get(self):
-        return self._operation(self._value, self._orginator.get())
+        return self._operation(self._value, self._originator.get())
 
     def emit(self, value: Any_, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         result = self._operation(self._value, value)
@@ -63,10 +63,10 @@ class MapUnary(Operator):
             self.inherit_type(publisher.inherited_type)
 
     def get(self):
-        return self._operation(self._orginator.get())
+        return self._operation(self._originator.get())
 
     def emit(self, value: Any_, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         result = self._operation(value)
@@ -84,7 +84,7 @@ class _GetAttr(Operator):
         self.inherit_type(publisher.inherited_type)
 
     def get(self):
-        value = self._orginator.get()  # may raise ValueError
+        value = self._originator.get()  # may raise ValueError
         attribute = getattr(value, self._attribute_name)
         if self._args is None:
             return attribute
@@ -96,7 +96,7 @@ class _GetAttr(Operator):
         return self
 
     def emit(self, value: Any_, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         attribute = getattr(value, self._attribute_name)

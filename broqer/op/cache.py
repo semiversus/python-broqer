@@ -43,10 +43,10 @@ class AppliedCache(Operator):
         self._state = init
 
     def get(self) -> TValue:
-        return self._orginator.get()
+        return self._originator.get()
 
     def emit(self, value: TValue, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         if value != self._state:

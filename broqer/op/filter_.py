@@ -44,7 +44,7 @@ class AppliedFilter(Operator):
         if self._subscriptions:
             return self._state
 
-        value = self._orginator.get()  # type: Any
+        value = self._originator.get()  # type: Any
 
         if self._unpack:
             # assert isinstance(value, (list, tuple))
@@ -57,7 +57,7 @@ class AppliedFilter(Operator):
         return NONE
 
     def emit(self, value: Any, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         if self._unpack:
@@ -97,9 +97,9 @@ class EvalTrue(Operator, metaclass=OperatorMeta):
         if self._subscriptions:
             return self._state
 
-        assert isinstance(self._orginator, Publisher)
+        assert isinstance(self._originator, Publisher)
 
-        value = self._orginator.get()  # type: Any
+        value = self._originator.get()  # type: Any
 
         if bool(value):
             return value
@@ -107,7 +107,7 @@ class EvalTrue(Operator, metaclass=OperatorMeta):
         return NONE
 
     def emit(self, value: Any, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         if bool(value):
@@ -127,9 +127,9 @@ class EvalFalse(Operator, metaclass=OperatorMeta):
         if self._subscriptions:
             return self._state
 
-        assert isinstance(self._orginator, Publisher)
+        assert isinstance(self._originator, Publisher)
 
-        value = self._orginator.get()  # type: Any
+        value = self._originator.get()  # type: Any
 
         if not bool(value):
             return value
@@ -137,7 +137,7 @@ class EvalFalse(Operator, metaclass=OperatorMeta):
         return NONE
 
     def emit(self, value: Any, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         if not bool(value):

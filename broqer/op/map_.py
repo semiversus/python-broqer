@@ -62,7 +62,7 @@ class AppliedMap(Operator):
         if self._subscriptions:
             return self._state
 
-        value = self._orginator.get()  # type: TValue
+        value = self._originator.get()  # type: TValue
 
         if value is NONE:
             return value
@@ -74,7 +74,7 @@ class AppliedMap(Operator):
         return self._function(value)
 
     def emit(self, value: TValue, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         if self._unpack:

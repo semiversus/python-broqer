@@ -1,3 +1,7 @@
+## next version
+
+* fixed typo ("orginator" fixed to "origintator")
+
 ## 2.4.0
 
 * changed default behavior of error_handler: now it raises an exception

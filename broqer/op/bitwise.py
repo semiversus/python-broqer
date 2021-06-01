@@ -26,7 +26,7 @@ class BitwiseCombineLatest(MultiOperator):
         MultiOperator.__init__(self, *publisher_bit_mapping)
 
         self._init = init
-        self._missing = set(self._orginators)
+        self._missing = set(self._originators)
         self._publisher_bit_mapping = publisher_bit_mapping
 
     def subscribe(self, subscriber: 'Subscriber',
@@ -45,7 +45,7 @@ class BitwiseCombineLatest(MultiOperator):
     def unsubscribe(self, subscriber: Subscriber) -> None:
         MultiOperator.unsubscribe(self, subscriber)
         if not self._subscriptions:
-            self._missing.update(self._orginators)
+            self._missing.update(self._originators)
             self._state = NONE
 
     def get(self):
@@ -68,7 +68,7 @@ class BitwiseCombineLatest(MultiOperator):
         return state
 
     def emit(self, value: Any, who: Publisher) -> None:
-        if all(who is not p for p in self._orginators):
+        if all(who is not p for p in self._originators):
             raise ValueError('Emit from non assigned publisher')
 
         # remove source publisher from ._missing

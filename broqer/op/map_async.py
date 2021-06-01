@@ -172,7 +172,7 @@ class AppliedMapAsync(Operator):
             self._queue = deque(maxlen=maxlen)
 
     def emit(self, value: Any, who: Publisher) -> None:
-        if who is not self._orginator:
+        if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
         # check if a coroutine is already running

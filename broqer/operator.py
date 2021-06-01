@@ -27,7 +27,7 @@ class Operator(Publisher, Subscriber, metaclass=OperatorMeta):
     def __init__(self, publisher: Publisher) -> None:
         Publisher.__init__(self)
         Subscriber.__init__(self)
-        self._orginator = publisher
+        self._originator = publisher
         self.add_dependencies(publisher)
 
     def subscribe(self, subscriber: 'Subscriber',
@@ -35,7 +35,7 @@ class Operator(Publisher, Subscriber, metaclass=OperatorMeta):
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if len(self._subscriptions) == 1:  # if this was the first subscription
-            self._orginator.subscribe(self)
+            self._originator.subscribe(self)
 
         return disposable
 
@@ -43,7 +43,7 @@ class Operator(Publisher, Subscriber, metaclass=OperatorMeta):
         Publisher.unsubscribe(self, subscriber)
 
         if not self._subscriptions:
-            self._orginator.unsubscribe(self)
+            self._originator.unsubscribe(self)
             Publisher.reset_state(self)
 
     def notify(self, value: TValue) -> None:
@@ -79,7 +79,7 @@ class MultiOperator(Publisher, Subscriber):
     def __init__(self, *publishers: Publisher) -> None:
         Publisher.__init__(self)
         Subscriber.__init__(self)
-        self._orginators = publishers
+        self._originators = publishers
         self.add_dependencies(*publishers)
 
     def subscribe(self, subscriber: 'Subscriber',
@@ -87,7 +87,7 @@ class MultiOperator(Publisher, Subscriber):
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
         if len(self._subscriptions) == 1:  # if this was the first subscription
-            for publisher in self._orginators:
+            for publisher in self._originators:
                 # subscribe to all dependent publishers
                 publisher.subscribe(self)
 
@@ -96,7 +96,7 @@ class MultiOperator(Publisher, Subscriber):
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Publisher.unsubscribe(self, subscriber)
         if not self._subscriptions:
-            for publisher in self._orginators:
+            for publisher in self._originators:
                 publisher.unsubscribe(self)
             Publisher.reset_state(self)
 
