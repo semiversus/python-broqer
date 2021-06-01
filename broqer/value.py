@@ -25,7 +25,7 @@ class Value(Operator):
 
     def emit(self, value: Any,
              who: Publisher = None) -> None:  # pylint: disable=unused-argument
-        if self._originator is not None and self._originator != who:
+        if self._originator is not None and self._originator is not who:
             raise ValueError('Emit from non assigned publisher')
 
         return Publisher.notify(self, value)
