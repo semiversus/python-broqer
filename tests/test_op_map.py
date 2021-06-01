@@ -1,6 +1,6 @@
 import pytest
 
-from broqer import op, NONE, Value
+from broqer import op, NONE, Value, Publisher
 from tests.helper_single import check_get_method, check_subscription, check_dependencies
 
 
@@ -35,3 +35,10 @@ def test_map_factory_keyword():
     v = Value()
     with pytest.raises(TypeError, message='"unpack" has to be defined by decorator'):
         o = v | m(unpack=True)
+
+def test_two_maps():
+    p = Publisher(1)
+    m1 = op.Map(lambda v: v + 1)
+    m2 = op.Map(lambda v: v * 2)
+    p2 = p | m1 | m2
+    assert p2.get() == 4

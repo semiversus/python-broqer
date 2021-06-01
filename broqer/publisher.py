@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     # pylint: disable=cyclic-import
     from typing import List
     from broqer import Subscriber
+    from broqer.operator import Operator
 
 
 class SubscriptionError(ValueError):
@@ -245,6 +246,10 @@ class Publisher:
         :param *publishers: variable argument list with publishers
         """
         self._dependencies = self._dependencies + publishers
+
+    def __or__(self, operator: 'Operator'):
+        operator.originator = self
+        return operator
 
     def __dir__(self):
         """ Extending __dir__ with inherited type """

@@ -37,12 +37,6 @@ class Operator(Publisher, Subscriber):
         if self._subscriptions:
             self._originator.subscribe(self)
 
-    def __ror__(self, publisher: Publisher) -> Publisher:
-        if self._originator is not None:
-            raise TypeError('operator already applied')
-        self.originator = publisher
-        return self
-
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend)
@@ -69,13 +63,6 @@ class Operator(Publisher, Subscriber):
         :param value: value to be send
         :param who: reference to which publisher is emitting
         """
-
-
-class ClassOperatorMeta(type):
-    """ Metaclass to be used, when class can directly be used as operator
-        e.g. EvalTrue """
-    def __ror__(cls, publisher: Publisher):
-        return cls(publisher)
 
 
 class MultiOperator(Publisher, Subscriber):

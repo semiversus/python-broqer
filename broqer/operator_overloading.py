@@ -31,9 +31,6 @@ class MapConstant(Operator):
 
         return Publisher.notify(self, result)
 
-    def __ror__(self, publisher: Publisher) -> Publisher:
-        raise TypeError('Operator can not be applied')
-
 
 class MapConstantReverse(Operator):
     """ MapConstantReverse TODO """
@@ -57,9 +54,6 @@ class MapConstantReverse(Operator):
 
         return Publisher.notify(self, result)
 
-    def __ror__(self, publisher: Publisher) -> Publisher:
-        raise TypeError('Operator can not be applied')
-
 
 class MapUnary(Operator):
     """ MapUnary TODO """
@@ -81,9 +75,6 @@ class MapUnary(Operator):
         result = self._operation(value)
 
         return Publisher.notify(self, result)
-
-    def __ror__(self, publisher: Publisher) -> Publisher:
-        raise TypeError('Operator can not be applied')
 
 
 class _GetAttr(Operator):

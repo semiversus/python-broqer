@@ -29,7 +29,7 @@ from functools import partial, wraps
 from typing import Any, Callable
 
 from broqer import NONE, Publisher
-from broqer.operator import Operator, ClassOperatorMeta
+from broqer.operator import Operator
 
 
 class Filter(Operator):
@@ -77,16 +77,15 @@ class Filter(Operator):
         return None
 
 
-class EvalTrue(Operator, metaclass=ClassOperatorMeta):
+class EvalTrue(Operator):
     """ Emits all values which evaluates for True.
 
-    This operator can be used in the pipline style (v | EvalTrue) or as
+    This operator can be used in the pipline style (v | EvalTrue()) or as
     standalone operation (EvalTrue(v)).
     """
     def __init__(self, publisher: Publisher = None) -> None:
         Operator.__init__(self)
-        if publisher is not None:
-            self.originator = publisher
+        self._originator = publisher
 
     def get(self) -> Any:
         if self._subscriptions:
@@ -110,15 +109,14 @@ class EvalTrue(Operator, metaclass=ClassOperatorMeta):
         return None
 
 
-class EvalFalse(Operator, metaclass=ClassOperatorMeta):
+class EvalFalse(Operator):
     """ Filters all emits which evaluates for False.
 
-    This operator can be used in the pipline style (v | EvalFalse or as
+    This operator can be used in the pipline style (v | EvalFalse() or as
     standalone operation (EvalFalse(v))."""
-    def __init__(self, publisher: Publisher) -> None:
+    def __init__(self, publisher: Publisher = None) -> None:
         Operator.__init__(self)
-        if publisher is not None:
-            self.originator = publisher
+        self._originator = publisher
 
     def get(self) -> Any:
         if self._subscriptions:

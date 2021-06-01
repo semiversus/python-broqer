@@ -2,7 +2,7 @@ import pytest
 
 from broqer import op, NONE, Value
 from tests.helper_single import check_get_method, check_subscription, \
-                                check_dependencies, check_use_class_as_operator
+                                check_dependencies
 
 
 test_vector = [
@@ -71,11 +71,11 @@ test_vector = [
 
 
 @pytest.mark.parametrize('method', [check_get_method, check_subscription,
-                                    check_dependencies, check_use_class_as_operator])
+                                    check_dependencies])
 @pytest.mark.parametrize('o,input_vector,output_vector',
                          test_vector)
 def test_true_false(method, o, input_vector, output_vector):
-    method(o, input_vector, output_vector)
+    method(o(), input_vector, output_vector)
 
 
 def test_filter_factory_keyword():
