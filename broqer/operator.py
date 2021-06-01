@@ -1,22 +1,14 @@
 """ Module implementing Operator, MultiOperator.
 """
 import typing
-from abc import abstractmethod, ABCMeta
+from abc import abstractmethod
 
 # pylint: disable=cyclic-import
 from broqer import Publisher, SubscriptionDisposable, Subscriber
 from broqer.publisher import TValue
 
 
-class OperatorMeta(ABCMeta):
-    """ Metaclass for operators. Defining __ror__ for operator classes.
-    This is e.g. used for EvalTrue: p | EvalTrue is equal to EvalTrue(p)
-    """
-    def __ror__(cls, publisher: Publisher) -> Publisher:
-        return cls(publisher)  # pylint: disable=no-value-for-parameter
-
-
-class Operator(Publisher, Subscriber, metaclass=OperatorMeta):
+class Operator(Publisher, Subscriber):
     """ Base class for operators depending on a single publisher. This
     publisher will be subscribed as soon as this operator is subscribed the
     first time.
@@ -24,17 +16,40 @@ class Operator(Publisher, Subscriber, metaclass=OperatorMeta):
     On unsubscription of the last subscriber the dependent publisher will also
     be unsubscripted.
     """
-    def __init__(self, publisher: Publisher) -> None:
+    def __init__(self) -> None:
         Publisher.__init__(self)
         Subscriber.__init__(self)
+        self._originator = None  # type: typing.Optional[Publisher]
+
+    @property
+    def originator(self):
+        """ Property returning originator publisher """
+        return self._originator
+
+    @originator.setter
+    def originator(self, publisher: Publisher):
+        """ Setter for originator """
+        if self._originator is not None:
+            raise TypeError('Operator already assigned to originator')
+
         self._originator = publisher
         self.add_dependencies(publisher)
+        if self._subscriptions:
+            self._originator.subscribe(self)
+
+
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        if self._originator is not None:
+            raise TypeError('operator already applied')
+        self.originator = publisher
+        return self
 
     def subscribe(self, subscriber: 'Subscriber',
                   prepend: bool = False) -> SubscriptionDisposable:
         disposable = Publisher.subscribe(self, subscriber, prepend)
 
-        if len(self._subscriptions) == 1:  # if this was the first subscription
+        if len(self._subscriptions) == 1 and self._originator is not None:
+            # if this was the first subscription
             self._originator.subscribe(self)
 
         return disposable
@@ -42,7 +57,7 @@ class Operator(Publisher, Subscriber, metaclass=OperatorMeta):
     def unsubscribe(self, subscriber: Subscriber) -> None:
         Publisher.unsubscribe(self, subscriber)
 
-        if not self._subscriptions:
+        if not self._subscriptions and self._originator is not None:
             self._originator.unsubscribe(self)
             Publisher.reset_state(self)
 
@@ -57,17 +72,11 @@ class Operator(Publisher, Subscriber, metaclass=OperatorMeta):
         """
 
 
-class OperatorFactory:
-    """ OperatorFactory is returning operator objects applied to a publisher
-    """
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def apply(self, publisher: Publisher) -> Publisher:
-        """ Build a operator applied to the given publisher """
-
-    def __ror__(self, publisher: Publisher) -> Publisher:
-        return self.apply(publisher)
+class ClassOperatorMeta(type):
+    """ Metaclass to be used, when class can directly be used as operator
+        e.g. EvalTrue """
+    def __ror__(cls, publisher: Publisher):
+        return cls(publisher)
 
 
 class MultiOperator(Publisher, Subscriber):
@@ -103,9 +112,9 @@ class MultiOperator(Publisher, Subscriber):
     def notify(self, value: TValue) -> None:
         raise ValueError('Operator doesn\'t support .notify()')
 
-    @abstractmethod
     def emit(self, value: typing.Any, who: Publisher) -> None:
         """ Send new value to the operator
         :param value: value to be send
         :param who: reference to which publisher is emitting
         """
+        raise NotImplementedError('.emit not implemented')

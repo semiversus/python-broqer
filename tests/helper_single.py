@@ -45,8 +45,6 @@ def check_subscription(operator, input_vector, output_vector):
     p = Publisher(input_vector[0])
     o = p | operator
 
-    o2 = Publisher() | operator
-
     # subscribe operator to publisher
     disposable = o.subscribe(Sink(m))
 
@@ -83,6 +81,13 @@ def check_subscription(operator, input_vector, output_vector):
                 m.assert_not_called()
             else:
                 m.assert_called_once_with(output_value)
+
+
+def check_use_class_as_operator(operator, input_vector, output_vector):
+    p = Publisher(input_vector[0])
+    o = p | operator  # use operator before testing
+
+    check_subscription(operator, input_vector, output_vector)
 
 
 def check_dependencies(operator, *_):
@@ -123,4 +128,3 @@ def check_dependencies(operator, *_):
     assert p.subscriptions == ()  # operator should now be subscriped
     assert o.dependencies == (p,)
     assert o.subscriptions == ()
-

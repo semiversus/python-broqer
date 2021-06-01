@@ -29,18 +29,27 @@ from functools import partial, wraps
 from typing import Any, Callable
 
 from broqer import NONE, Publisher
-from broqer.operator import Operator, OperatorFactory, OperatorMeta
+from broqer.operator import Operator, ClassOperatorMeta
 
 
-class AppliedFilter(Operator):
-    """ Filter object applied to publisher (see Filter) """
-    def __init__(self, publisher: Publisher, predicate: Callable[[Any], bool],
-                 unpack: bool = False) -> None:
-        Operator.__init__(self, publisher)
-        self._predicate = predicate
+class Filter(Operator):
+    """ Filter object applied to publisher
+
+    :param predicate: function to evaluate the filtering
+    :param \\*args: variable arguments to be used for evaluating predicate
+    :param unpack: value from emits will be unpacked (\\*value)
+    :param \\*\\*kwargs: keyword arguments to be used for evaluating predicate
+    """
+    def __init__(self, predicate: Callable[[Any], bool], *args,
+                 unpack: bool = False, **kwargs) -> None:
+        Operator.__init__(self)
+        self._predicate = partial(predicate, *args, **kwargs)  # type: Callable
         self._unpack = unpack
 
     def get(self) -> Any:
+        if self._originator is None:
+            raise ValueError('Operator is missing originator')
+
         if self._subscriptions:
             return self._state
 
@@ -68,30 +77,16 @@ class AppliedFilter(Operator):
         return None
 
 
-class Filter(OperatorFactory):  # pylint: disable=too-few-public-methods
-    """ Filters values based on a ``predicate`` function
-    :param predicate: function to evaluate the filtering
-    :param \\*args: variable arguments to be used for evaluating predicate
-    :param unpack: value from emits will be unpacked (\\*value)
-    :param \\*\\*kwargs: keyword arguments to be used for evaluating predicate
-    """
-    def __init__(self, predicate: Callable[[Any], bool],
-                 *args, unpack: bool = False, **kwargs) -> None:
-        self._predicate = partial(predicate, *args, **kwargs)  # type: Callable
-        self._unpack = unpack
-
-    def apply(self, publisher: Publisher):
-        return AppliedFilter(publisher, self._predicate, self._unpack)
-
-
-class EvalTrue(Operator, metaclass=OperatorMeta):
+class EvalTrue(Operator, metaclass=ClassOperatorMeta):
     """ Emits all values which evaluates for True.
 
     This operator can be used in the pipline style (v | EvalTrue) or as
     standalone operation (EvalTrue(v)).
     """
-    def __init__(self, publisher: Publisher) -> None:
-        Operator.__init__(self, publisher)
+    def __init__(self, publisher: Publisher = None) -> None:
+        Operator.__init__(self)
+        if publisher is not None:
+            self.originator = publisher
 
     def get(self) -> Any:
         if self._subscriptions:
@@ -115,13 +110,15 @@ class EvalTrue(Operator, metaclass=OperatorMeta):
         return None
 
 
-class EvalFalse(Operator, metaclass=OperatorMeta):
+class EvalFalse(Operator, metaclass=ClassOperatorMeta):
     """ Filters all emits which evaluates for False.
 
     This operator can be used in the pipline style (v | EvalFalse or as
     standalone operation (EvalFalse(v))."""
     def __init__(self, publisher: Publisher) -> None:
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
+        if publisher is not None:
+            self.originator = publisher
 
     def get(self) -> Any:
         if self._subscriptions:

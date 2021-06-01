@@ -33,16 +33,19 @@ from typing import Any
 
 from broqer import Publisher, NONE
 from broqer.publisher import TValue
-from broqer.operator import Operator, OperatorFactory
+from broqer.operator import Operator
 
 
-class AppliedCache(Operator):
+class Cache(Operator):
     """ Cache object applied to publisher (see Map) """
-    def __init__(self, publisher: Publisher, init: Any = NONE) -> None:
-        Operator.__init__(self, publisher)
+    def __init__(self, init: Any = NONE) -> None:
+        Operator.__init__(self)
         self._state = init
 
     def get(self) -> TValue:
+        if self._originator is None:
+            raise ValueError('Operator is missing originator')
+
         return self._originator.get()
 
     def emit(self, value: TValue, who: Publisher) -> None:
@@ -54,15 +57,3 @@ class AppliedCache(Operator):
             return Publisher.notify(self, value)
 
         return None
-
-
-class Cache(OperatorFactory):  # pylint: disable=too-few-public-methods
-    """ Cache emitted values. Suppress duplicated value emits.
-
-    :param init: optional initialization state
-    """
-    def __init__(self, init: Any = NONE) -> None:
-        self._init = init
-
-    def apply(self, publisher: Publisher):
-        return AppliedCache(publisher, self._init)

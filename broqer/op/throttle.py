@@ -26,20 +26,24 @@ from typing import Any  # noqa: F401
 
 from broqer import Publisher, default_error_handler, NONE
 
-from broqer.operator import Operator, OperatorFactory
+from broqer.operator import Operator
 from broqer.timer import Timer
 
 
-class AppliedThrottle(Operator):
+class Throttle(Operator):
     """ Rate limit emits by the given time.
+
     :param duration: time for throttling in seconds
     :param error_callback: the error callback to be registered
     :param loop: asyncio event loop to use
     """
-    def __init__(self, publisher: Publisher, duration: float,
+    def __init__(self, duration: float,
                  error_callback=default_error_handler, loop=None) -> None:
 
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
+
+        if duration < 0:
+            raise ValueError('Duration has to be bigger than zero')
 
         self._duration = duration
         self._loop = loop or asyncio.get_event_loop()
@@ -74,17 +78,3 @@ class AppliedThrottle(Operator):
     def reset(self):
         """ Reseting duration for throttling """
         self._timer.cancel()
-
-
-class Throttle(OperatorFactory):  # pylint: disable=too-few-public-methods
-    """ Apply throttling to each emitted value.
-    :param duration: time for throttling in seconds
-    """
-    def __init__(self, duration: float) -> None:
-        if duration < 0:
-            raise ValueError('Duration has to be bigger than zero')
-
-        self._duration = duration
-
-    def apply(self, publisher: Publisher):
-        return AppliedThrottle(publisher, self._duration)

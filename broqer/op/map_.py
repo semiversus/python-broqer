@@ -40,13 +40,19 @@ from typing import Any, Callable
 
 from broqer import Publisher, NONE
 from broqer.publisher import TValue
-from broqer.operator import Operator, OperatorFactory
+from broqer.operator import Operator
 
 
-class AppliedMap(Operator):
-    """ Map object applied to publisher (see Map) """
-    def __init__(self, publisher: Publisher, function: Callable[[Any], Any],
-                 unpack: bool = False) -> None:
+class Map(Operator):
+    """ Map object applied to publisher
+
+    :param function: function to be applied for each emit
+    :param \\*args: variable arguments to be used for calling function
+    :param unpack: value from emits will be unpacked (\\*value)
+    :param \\*\\*kwargs: keyword arguments to be used for calling function
+    """
+    def __init__(self, function: Callable[[Any], Any], *args,
+                 unpack: bool = False, **kwargs) -> None:
         """ Special care for return values:
               - return `None` (or nothing) if you don't want to return a result
               - return `None, ` if you want to return `None`
@@ -54,13 +60,16 @@ class AppliedMap(Operator):
               - every other return value will be unpacked
         """
 
-        Operator.__init__(self, publisher)
-        self._function = function
+        Operator.__init__(self)
+        self._function = partial(function, *args, **kwargs)
         self._unpack = unpack
 
     def get(self) -> TValue:
         if self._subscriptions:
             return self._state
+
+        if self._originator is None:
+            raise ValueError('Operator is missing originator')
 
         value = self._originator.get()  # type: TValue
 
@@ -87,23 +96,6 @@ class AppliedMap(Operator):
             return Publisher.notify(self, result)
 
         return None
-
-
-class Map(OperatorFactory):  # pylint: disable=too-few-public-methods
-    """ Apply ``function(*args, value, **kwargs)`` to each emitted value.
-
-    :param function: function to be applied for each emit
-    :param \\*args: variable arguments to be used for calling function
-    :param unpack: value from emits will be unpacked (\\*value)
-    :param \\*\\*kwargs: keyword arguments to be used for calling function
-    """
-    def __init__(self, function: Callable[[Any], Any],
-                 *args, unpack: bool = False, **kwargs) -> None:
-        self._function = partial(function, *args, **kwargs)
-        self._unpack = unpack
-
-    def apply(self, publisher: Publisher):
-        return AppliedMap(publisher, self._function, self._unpack)
 
 
 def build_map(function: Callable[..., None] = None, *,

@@ -33,7 +33,7 @@ from typing import Any
 
 # pylint: disable=cyclic-import
 from broqer import Subscriber, Publisher, default_error_handler
-from broqer.op.map_async import AppliedMapAsync, AsyncMode, build_coro
+from broqer.op.map_async import MapAsync, AsyncMode
 
 
 class SinkAsync(Subscriber):  # pylint: disable=too-few-public-methods
@@ -51,11 +51,9 @@ class SinkAsync(Subscriber):  # pylint: disable=too-few-public-methods
                  unpack: bool = False, **kwargs) -> None:
 
         self._dummy_publisher = Publisher()
-        _coro = build_coro(coro, unpack, *args, **kwargs)
-        self._map_async = AppliedMapAsync(self._dummy_publisher,
-                                          _coro,
-                                          mode=mode,
-                                          error_callback=error_callback)
+        self._map_async = MapAsync(coro, *args, mode=mode, unpack=unpack,
+                                   error_callback=error_callback, **kwargs)
+        self._map_async.originator = self._dummy_publisher
 
     def emit(self, value: Any, who: Publisher):
         self._map_async.emit(value, who=self._dummy_publisher)

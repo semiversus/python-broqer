@@ -12,7 +12,8 @@ from broqer.operator import Operator
 class MapConstant(Operator):
     """ MapConstant TODO Docstring """
     def __init__(self, publisher: Publisher, value, operation) -> None:
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
+        self.originator = publisher
         self._value = value
         self._operation = operation
 
@@ -30,11 +31,15 @@ class MapConstant(Operator):
 
         return Publisher.notify(self, result)
 
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        raise TypeError('Operator can not be applied')
+
 
 class MapConstantReverse(Operator):
     """ MapConstantReverse TODO """
     def __init__(self, publisher: Publisher, value, operation) -> None:
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
+        self.originator = publisher
         self._value = value
         self._operation = operation
 
@@ -52,11 +57,15 @@ class MapConstantReverse(Operator):
 
         return Publisher.notify(self, result)
 
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        raise TypeError('Operator can not be applied')
+
 
 class MapUnary(Operator):
     """ MapUnary TODO """
     def __init__(self, publisher: Publisher, operation) -> None:
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
+        self.originator = publisher
         self._operation = operation
 
         if publisher.inherited_type is not None:
@@ -73,10 +82,14 @@ class MapUnary(Operator):
 
         return Publisher.notify(self, result)
 
+    def __ror__(self, publisher: Publisher) -> Publisher:
+        raise TypeError('Operator can not be applied')
+
 
 class _GetAttr(Operator):
     def __init__(self, publisher: Publisher, attribute_name) -> None:
-        Operator.__init__(self, publisher)
+        Operator.__init__(self)
+        self.originator = publisher
         self._attribute_name = attribute_name
         self._args = None
         self._kwargs = None

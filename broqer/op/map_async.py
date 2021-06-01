@@ -104,7 +104,7 @@ from functools import wraps
 from typing import Any, MutableSequence, Optional  # noqa: F401
 
 # pylint: disable=cyclic-import
-from broqer.operator import Operator, OperatorFactory
+from broqer.operator import Operator
 from broqer import Publisher, default_error_handler, NONE
 
 
@@ -133,19 +133,27 @@ class AsyncMode(Enum):
     SKIP = 6  # skip values emitted during coroutine is running
 
 
-class AppliedMapAsync(Operator):
-    """ Apply ``coro`` to each emitted value allowing async processing
+class MapAsync(Operator):  # pylint: disable=too-many-instance-attributes
+    """ Apply ``coro(*args, value, **kwargs)`` to each emitted value allow
+    async processing.
+
+    :param coro: coroutine to be applied on emit
+    :param \\*args: variable arguments to be used for calling coro
+    :param mode: behavior when a value is currently processed
+    :param error_callback: error callback to be registered
+    :param unpack: value from emits will be unpacked as (\\*value)
+    :param \\*\\*kwargs: keyword arguments to be used for calling coro
 
     :ivar scheduled: Publisher emitting the value when coroutine is actually
         started.
     """
-    def __init__(self, publisher: Publisher,
-                 coro_with_args, mode=AsyncMode.CONCURRENT,
-                 error_callback=default_error_handler,
+    def __init__(self,
+                 coro, *args, mode=AsyncMode.CONCURRENT,
+                 error_callback=default_error_handler, unpack: bool = False,
+                 **kwargs
                  ) -> None:
-        Operator.__init__(self, publisher)
-
-        self._coro = coro_with_args
+        Operator.__init__(self)
+        self._coro = build_coro(coro, unpack, *args, **kwargs)
         self._mode = mode
         self._error_callback = error_callback
 
@@ -235,33 +243,6 @@ class AppliedMapAsync(Operator):
         # create a task out of it and add ._future_done as callback
         self._future = asyncio.ensure_future(coro)
         self._future.add_done_callback(self._future_done)
-
-
-class MapAsync(OperatorFactory):  # pylint: disable=too-few-public-methods
-    """ Apply ``coro(*args, value, **kwargs)`` to each emitted value allow
-    async processing.
-
-    :param coro: coroutine to be applied on emit
-    :param \\*args: variable arguments to be used for calling coro
-    :param mode: behavior when a value is currently processed
-    :param error_callback: error callback to be registered
-    :param unpack: value from emits will be unpacked as (\\*value)
-    :param \\*\\*kwargs: keyword arguments to be used for calling coro
-    """
-    def __init__(self, coro, *args, mode=AsyncMode.CONCURRENT,
-                 error_callback=default_error_handler,
-                 unpack: bool = False, **kwargs) -> None:
-        self._coro = build_coro(coro, unpack, *args, **kwargs)
-        self._mode = mode
-        self._error_callback = error_callback
-        self._unpack = unpack
-
-    def apply(self, publisher: Publisher):
-        return AppliedMapAsync(publisher,
-                               coro_with_args=self._coro,
-                               mode=self._mode,
-                               error_callback=self._error_callback,
-                               )
 
 
 def build_map_async(coro=None, *,
