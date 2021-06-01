@@ -37,7 +37,6 @@ class Operator(Publisher, Subscriber):
         if self._subscriptions:
             self._originator.subscribe(self)
 
-
     def __ror__(self, publisher: Publisher) -> Publisher:
         if self._originator is not None:
             raise TypeError('operator already applied')

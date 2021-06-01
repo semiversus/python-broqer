@@ -3,7 +3,7 @@
 from typing import Any
 
 # pylint: disable=cyclic-import
-from broqer import Publisher, Subscriber, NONE
+from broqer import Publisher, NONE
 from broqer.operator import Operator
 
 
@@ -20,9 +20,8 @@ class Value(Operator):
     1
     """
     def __init__(self, init=NONE):
-        Publisher.__init__(self, init)
-        Subscriber.__init__(self)
-        self._originator = None  # type: typing.Optional[Publisher]
+        Operator.__init__(self)
+        self._state = init
 
     def emit(self, value: Any,
              who: Publisher = None) -> None:  # pylint: disable=unused-argument
