@@ -33,7 +33,7 @@ from typing import Any
 
 # pylint: disable=cyclic-import
 from broqer import Subscriber, Publisher, default_error_handler
-from broqer.op.map_async import MapAsync, AsyncMode
+from broqer.coro_queue import CoroQueue, AsyncMode, wrap_coro
 
 
 class SinkAsync(Subscriber):  # pylint: disable=too-few-public-methods
@@ -50,13 +50,12 @@ class SinkAsync(Subscriber):  # pylint: disable=too-few-public-methods
                  error_callback=default_error_handler,
                  unpack: bool = False, **kwargs) -> None:
 
-        self._dummy_publisher = Publisher()
-        self._map_async = MapAsync(coro, *args, mode=mode, unpack=unpack,
-                                   error_callback=error_callback, **kwargs)
-        self._map_async.originator = self._dummy_publisher
+        _coro = wrap_coro(coro, unpack, *args, **kwargs)
+        self._coro_queue = CoroQueue(_coro, mode=mode)
+        self._error_callback = error_callback
 
     def emit(self, value: Any, who: Publisher):
-        self._map_async.emit(value, who=self._dummy_publisher)
+        self._coro_queue.schedule(value)
 
 
 def build_sink_async(coro=None, *, mode: AsyncMode = AsyncMode.CONCURRENT,
