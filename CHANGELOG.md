@@ -1,6 +1,7 @@
 ## next version
 
 * fixed typo ("orginator" fixed to "origintator")
+* add log output for default error_handler
 
 ## 2.4.0
 
