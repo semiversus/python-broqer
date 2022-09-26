@@ -29,3 +29,17 @@ class Value(Operator):
             raise ValueError('Emit from non assigned publisher')
 
         return Publisher.notify(self, value)
+
+
+def dependent_subscribe(publisher: Publisher, value: Value):
+    """ Let `value` subscribe to `publisher` only when `value` itself is subscribed
+    :param publisher: publisher to be subscribed, when value is subscribed
+    :param value: value, which will receive .emit calls from `publisher`
+    """
+    def _on_subscription(existing_subscription: bool):
+        if existing_subscription:
+            publisher.subscribe(value)
+        else:
+            publisher.unsubscribe(value)
+
+    value.register_on_subscription_callback(_on_subscription)
