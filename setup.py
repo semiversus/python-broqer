@@ -24,6 +24,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
     description='Carefully crafted library to operate with continuous ' +
                 'streams of data in a reactive style with publish/subscribe ' +
