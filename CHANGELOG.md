@@ -3,7 +3,9 @@
 * fixed typo ("orginator" fixed to "origintator")
 * add log output for default error_handler
 * add `dependent_subscribe` function for `Values`
-* Remove OperatorFactory logic from operators
+* remove `OperatorFactory` logic from operators
+* remove `Concat` operator
+* add `CoroQueue` to be used in `MapAsync` and `SinkAsync`
 
 ## 2.4.0
 
