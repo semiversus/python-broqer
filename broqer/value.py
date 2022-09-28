@@ -30,6 +30,8 @@ class Value(Operator):
 
         return Publisher.notify(self, value)
 
+    notify = Publisher.notify
+
 
 def dependent_subscribe(publisher: Publisher, value: Value):
     """ Let `value` subscribe to `publisher` only when `value` itself is subscribed
