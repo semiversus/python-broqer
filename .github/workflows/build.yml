@@ -21,17 +21,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements_dev.txt -e .
       - name: Lint with flake8
-        run: |
-          flake8 broqer
+        run: flake8 broqer
       - name: Static type checking
-        run: |
-          mypy broqer --no-strict-optional
+        run: mypy broqer --no-strict-optional
       - name: Check coding style
-        run: |
-          pylama
+        run: pylama
       - name: Check Readme style
-        run: |
-          rstcheck README.rst
+        run: rstcheck README.rst
       - name: Test with pytest
-        run: |
-          pytest
+        run: pytest

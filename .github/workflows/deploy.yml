@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build
+          pip install -r requirements_dev.txt -e .
       - name: Build package
         run: python -m build
       - name: Publish package
