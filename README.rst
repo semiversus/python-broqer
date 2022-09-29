@@ -5,14 +5,8 @@ Python Broqer
 .. image:: https://img.shields.io/pypi/v/broqer.svg
   :target: https://pypi.python.org/pypi/broqer
 
-.. image:: https://img.shields.io/travis/semiversus/python-broqer/master.svg
-  :target: https://travis-ci.org/semiversus/python-broqer
-
 .. image:: https://readthedocs.org/projects/python-broqer/badge/?version=latest
   :target: https://python-broqer.readthedocs.io/en/latest
-
-.. image:: https://codecov.io/gh/semiversus/python-broqer/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/semiversus/python-broqer
 
 .. image:: https://img.shields.io/github/license/semiversus/python-broqer.svg
   :target: https://en.wikipedia.org/wiki/MIT_License
@@ -30,7 +24,7 @@ Synopsis
 - Under MIT license (2018 Günther Jena)
 - Source is hosted on GitHub.com_
 - Documentation is hosted on ReadTheDocs.com_
-- Tested on Python 3.6, 3.7. 3.8 and 3.9
+- Tested on Python 3.6, 3.7. 3.8, 3.9 and 3.10
 - Unit tested with pytest_, coding style checked with Flake8_, static type checked with mypy_, static code checked with Pylint_, documented with Sphinx_
 - Operators known from ReactiveX_ and other streaming frameworks (like Map_, CombineLatest_, ...)
 
