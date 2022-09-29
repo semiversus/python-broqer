@@ -12,7 +12,7 @@ def _default_error_callback(exc_type, exc_value, exc_traceback):
     """ Default error callback is printing traceback of the exception
     """
     exc_info = (exc_type, exc_value, exc_traceback)
-    log.warning('error handler for broqer catched exception', exc_info=exc_info)
+    log.warning('broqer catched exception', exc_info=exc_info)
 
     raise exc_value.with_traceback(exc_traceback)
 

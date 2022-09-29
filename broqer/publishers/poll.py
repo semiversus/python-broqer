@@ -2,7 +2,7 @@
 import asyncio
 from typing import Callable, Type, Any, Optional
 
-from broqer.publisher import Publisher, TValue, SubscriptionDisposable
+from broqer.publisher import Publisher, ValueT, SubscriptionDisposable
 from broqer.subscriber import Subscriber
 
 
@@ -15,7 +15,7 @@ class PollPublisher(Publisher):
     :param interval: Time in seconds between polling calls
     """
     def __init__(self, poll_cb: Callable[[], Any], interval: float, *,
-                 type_: Type[TValue] = None):
+                 type_: Type[ValueT] = None):
         Publisher.__init__(self, type_=type_)
         self.poll_cb = poll_cb
         self.interval = interval
@@ -26,7 +26,7 @@ class PollPublisher(Publisher):
         if not self._subscriptions:
             # call poll_cb once to set internal state and schedule a _poll call
             self._state = self.poll_cb()
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             assert self._poll_handler is None, '_poll_handler already assigned'
             self._poll_handler = loop.call_later(self.interval, self._poll)
 
@@ -46,9 +46,9 @@ class PollPublisher(Publisher):
         value = self.poll_cb()
         Publisher.notify(self, value)
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         self._poll_handler = loop.call_later(self.interval, self._poll)
 
-    def notify(self, value: TValue) -> None:
+    def notify(self, value: ValueT) -> None:
         """ PollPublisher does not support .notify calls """
         raise ValueError(self.notify.__doc__)

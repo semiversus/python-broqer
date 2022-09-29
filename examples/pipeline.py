@@ -23,5 +23,5 @@ async def main():
     adc_raw.emit(50)
     await asyncio.sleep(2)
 
-loop = asyncio.get_event_loop()
+loop = asyncio.get_running_loop()
 loop.run_until_complete(main())

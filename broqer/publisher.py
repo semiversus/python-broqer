@@ -19,8 +19,7 @@ class SubscriptionError(ValueError):
     """
 
 
-TInherit = TypeVar('TInherit')  # Type to inherited behavior from
-TValue = TypeVar('TValue')  # Type of publisher state and emitted value
+ValueT = TypeVar('ValueT')  # Type of publisher state and emitted value
 SubscriptionCBT = Callable[[bool], None]
 
 
@@ -56,11 +55,11 @@ class Publisher:
                          indirectly) dependent on.
     """
     @overload  # noqa: F811
-    def __init__(self, *, type_: Type[TValue] = None):
+    def __init__(self, *, type_: Type[ValueT] = None):
         pass
 
     @overload  # noqa: F811
-    def __init__(self, init: TValue, type_: Type[TValue] = None):  # noqa: F811
+    def __init__(self, init: ValueT, type_: Type[ValueT] = None):  # noqa: F811
         pass
 
     def __init__(self, init=NONE, type_=None):  # noqa: F811
@@ -73,7 +72,7 @@ class Publisher:
         else:
             self._inherited_type = None
 
-        self._subscriptions = list()  # type: List[Subscriber]
+        self._subscriptions = []  # type: List[Subscriber]
         self._on_subscription_cb = None  # type: Optional[SubscriptionCBT]
         self._dependencies = ()  # type: Tuple[Publisher, ...]
 
@@ -132,11 +131,11 @@ class Publisher:
 
         raise SubscriptionError('Subscriber is not registered')
 
-    def get(self) -> TValue:
+    def get(self) -> ValueT:
         """ Return the state of the publisher. """
         return self._state
 
-    def notify(self, value: TValue) -> None:
+    def notify(self, value: ValueT) -> None:
         """ Calling .emit(value) on all subscribers and store state.
 
         :param value: value to be emitted to subscribers

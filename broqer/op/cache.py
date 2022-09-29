@@ -32,7 +32,7 @@ Using the initial value for cache:
 from typing import Any
 
 from broqer import Publisher, NONE
-from broqer.publisher import TValue
+from broqer.publisher import ValueT
 from broqer.operator import Operator
 
 
@@ -42,13 +42,13 @@ class Cache(Operator):
         Operator.__init__(self)
         self._state = init
 
-    def get(self) -> TValue:
+    def get(self) -> ValueT:
         if self._originator is None:
             raise ValueError('Operator is missing originator')
 
         return self._originator.get()
 
-    def emit(self, value: TValue, who: Publisher) -> None:
+    def emit(self, value: ValueT, who: Publisher) -> None:
         if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 

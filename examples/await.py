@@ -11,7 +11,7 @@ async def main():
     print('Value: ', await value)
     print('Number of subscribers: %d' % len(value.subscriptions))
 
-loop = asyncio.get_event_loop()
+loop = asyncio.get_running_loop()
 
 loop.call_later(0.2, value.emit, 1)
 loop.call_later(0.4, value.emit, 2)

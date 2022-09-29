@@ -20,7 +20,7 @@ MODE: CONCURRENT (is default)
 >>> _d = s.subscribe(SinkAsync(delay_add))
 >>> s.emit(0)
 >>> s.emit(1)
->>> asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.02))
+>>> asyncio.run(asyncio.sleep(0.02))
 Starting with argument 0
 Starting with argument 1
 Finished with argument 0

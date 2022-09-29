@@ -16,7 +16,7 @@ class Timer:
                  loop: Optional[asyncio.BaseEventLoop] = None):
         self._callback = callback
         self._handle = None  # type: Optional[asyncio.Handle]
-        self._loop = loop or asyncio.get_event_loop()
+        self._loop = loop or asyncio.get_running_loop()
         self._args = None
 
     def start(self, timeout: float, args=()) -> None:

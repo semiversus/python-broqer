@@ -8,7 +8,7 @@ from broqer.op import Throttle
 from .eventloop import VirtualTimeEventLoop
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def event_loop():
     loop = VirtualTimeEventLoop()
     yield loop
@@ -16,7 +16,7 @@ def event_loop():
 
 
 @pytest.mark.asyncio
-async def test_throttle_errorhandler(event_loop):
+async def test_throttle_errorhandler():
     from broqer import default_error_handler
 
     p = Publisher()
@@ -32,10 +32,10 @@ async def test_throttle_errorhandler(event_loop):
 
     # test error_handler
     p.notify(1)
-    await asyncio.sleep(0.05, loop=event_loop)
+    await asyncio.sleep(0.05)
     mock_sink.assert_called_once_with(1)
     p.notify(2)
-    await asyncio.sleep(0.1, loop=event_loop)
+    await asyncio.sleep(0.1)
     mock_error_handler.assert_called_once_with(ZeroDivisionError, mock.ANY, mock.ANY)
     mock_sink.assert_has_calls((mock.call(1), mock.call(2)))
 
@@ -54,18 +54,18 @@ async def test_throttle_unsubscribe(event_loop):
     p.notify(2)
     mock_sink.assert_called_once_with(2)
 
-    await asyncio.sleep(0.05, loop=event_loop)
+    await asyncio.sleep(0.05)
     mock_sink.reset_mock()
 
     disposable.dispose()
-    await asyncio.sleep(0.1, loop=event_loop)
+    await asyncio.sleep(0.1)
 
     # dispose must not emit anything
     mock_sink.assert_not_called()
 
     p.notify(3)
 
-    await asyncio.sleep(0.1, loop=event_loop)
+    await asyncio.sleep(0.1)
 
     # after dispose was called, p.notify must not emit to mock_sink
     mock_sink.assert_not_called()
@@ -80,26 +80,26 @@ async def test_throttle_reset(event_loop):
     disposable = throttle.subscribe(Sink(mock_sink))
 
     p.notify(1)
-    await asyncio.sleep(0.05, loop=event_loop)
+    await asyncio.sleep(0.05)
     throttle.reset()
     p.notify(3)
 
-    await asyncio.sleep(0.05, loop=event_loop)
+    await asyncio.sleep(0.05)
 
     # reset is called after "1" was emitted
     mock_sink.assert_has_calls((mock.call(1), mock.call(3)))
 
     ## wait until initial state is set and reset mock
-    await asyncio.sleep(0.1, loop=event_loop)
+    await asyncio.sleep(0.1)
     mock_sink.reset_mock()
 
     p.notify(1)
-    await asyncio.sleep(0.05, loop=event_loop)
+    await asyncio.sleep(0.05)
     p.notify(2)
     throttle.reset()
     p.notify(3)
 
-    await asyncio.sleep(0.05, loop=event_loop)
+    await asyncio.sleep(0.05)
 
     # reset is called after "1" was emitted, and while "2" was hold back,
     #   therefore "1" and "3" are emitted, but "2" is ignored
@@ -125,10 +125,10 @@ async def test_throttle(event_loop, emit_sequence, expected_emits):
     mock_sink.assert_not_called()
 
     for item in emit_sequence:
-        await asyncio.sleep(item[0], loop=event_loop)
+        await asyncio.sleep(item[0])
         p.notify(item[1])
 
-    await asyncio.sleep(0.5, loop=event_loop)
+    await asyncio.sleep(0.5)
 
     mock_sink.assert_has_calls(expected_emits)
 

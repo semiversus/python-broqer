@@ -7,13 +7,13 @@ Usage:
 >>> from broqer import Value, op, OnEmitFuture
 >>> s = Value()
 
->>> _ = asyncio.get_event_loop().call_later(0.05, s.emit, 1)
+>>> _ = asyncio.get_running_loop().call_later(0.05, s.emit, 1)
 
->>> asyncio.get_event_loop().run_until_complete(OnEmitFuture(s) )
+>>> asyncio.get_running_loop().run_until_complete(OnEmitFuture(s) )
 1
 
-#>>> _ = asyncio.get_event_loop().call_later(0.05, s.emit, (1, 2))
-#>>> asyncio.get_event_loop().run_until_complete(s)
+#>>> _ = asyncio.get_running_loop().call_later(0.05, s.emit, (1, 2))
+#>>> asyncio.get_running_loop().run_until_complete(s)
 (1, 2)
 """
 import asyncio
@@ -36,7 +36,7 @@ class OnEmitFuture(broqer.Subscriber, asyncio.Future):
     def __init__(self, publisher: 'Publisher', timeout=None,
                  omit_subscription=False, loop=None):
         if loop is None:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
 
         asyncio.Future.__init__(self, loop=loop)
         self.add_done_callback(self._cleanup)

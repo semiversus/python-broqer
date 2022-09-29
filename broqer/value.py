@@ -34,7 +34,8 @@ class Value(Operator):
 
 
 def dependent_subscribe(publisher: Publisher, value: Value):
-    """ Let `value` subscribe to `publisher` only when `value` itself is subscribed
+    """ Let `value` subscribe to `publisher` only when `value` itself is
+        subscribed
     :param publisher: publisher to be subscribed, when value is subscribed
     :param value: value, which will receive .emit calls from `publisher`
     """

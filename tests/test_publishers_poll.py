@@ -8,7 +8,7 @@ from broqer import Sink, NONE
 from .eventloop import VirtualTimeEventLoop
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def event_loop():
     loop = VirtualTimeEventLoop()
     yield loop
@@ -22,13 +22,13 @@ async def test_subscribe(event_loop):
 
     p = PollPublisher(poll_mock, 1)
 
-    await asyncio.sleep(1, loop=event_loop)
+    await asyncio.sleep(1)
     assert p.get() is NONE
 
     p.subscribe(Sink(sink_mock))
     sink_mock.assert_called_once_with(3)
     poll_mock.assert_called_once()
 
-    await asyncio.sleep(2.5, loop=event_loop)
+    await asyncio.sleep(2.5)
     sink_mock.assert_called_with(3)
     assert sink_mock.call_count == 3

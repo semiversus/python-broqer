@@ -5,7 +5,7 @@ from abc import abstractmethod
 
 # pylint: disable=cyclic-import
 from broqer import Publisher, SubscriptionDisposable, Subscriber
-from broqer.publisher import TValue
+from broqer.publisher import ValueT
 
 
 class Operator(Publisher, Subscriber):
@@ -54,7 +54,7 @@ class Operator(Publisher, Subscriber):
             self._originator.unsubscribe(self)
             Publisher.reset_state(self)
 
-    def notify(self, value: TValue) -> None:
+    def notify(self, value: ValueT) -> None:
         raise ValueError('Operator doesn\'t support .notify()')
 
     @abstractmethod
@@ -95,7 +95,7 @@ class MultiOperator(Publisher, Subscriber):
                 publisher.unsubscribe(self)
             Publisher.reset_state(self)
 
-    def notify(self, value: TValue) -> None:
+    def notify(self, value: ValueT) -> None:
         raise ValueError('Operator doesn\'t support .notify()')
 
     def emit(self, value: typing.Any, who: Publisher) -> None:

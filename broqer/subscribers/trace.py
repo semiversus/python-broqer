@@ -41,7 +41,8 @@ class Trace(Sink):
         """ Default trace handler is printing the timestamp, the publisher name
         and the emitted value
         """
-        line = '--- %8.3f: ' % (time() - Trace._timestamp_start)
+        time_diff = time() - Trace._timestamp_start
+        line = f'--- {time_diff:8.3f}: '
         line += repr(publisher) if label is None else label
-        line += ' %r' % (value,)
+        line += f' {value!r}'
         print(line)

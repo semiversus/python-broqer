@@ -82,5 +82,5 @@ def test_filter_factory_keyword():
     m = op.build_filter_factory(lambda v: v)
     v = Value()
 
-    with pytest.raises(TypeError, message='"unpack" has to be defined by decorator'):
+    with pytest.raises(TypeError, match='"unpack" has to be defined by decorator'):
         o = v | m(unpack=True)

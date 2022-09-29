@@ -11,5 +11,5 @@ from broqer import op
  | op.Sink(print)
  )
 
-loop = asyncio.get_event_loop()
+loop = asyncio.get_running_loop()
 loop.run_until_complete(asyncio.sleep(10))

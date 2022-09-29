@@ -5,15 +5,16 @@ from broqer import Publisher, OnEmitFuture
 
 from .eventloop import VirtualTimeEventLoop
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def event_loop():
     loop = VirtualTimeEventLoop()
     yield loop
     loop.close()
 
-def test_publisher():
+@pytest.mark.asyncio
+async def test_publisher():
     p = Publisher(1)
-    future = OnEmitFuture(p, timeout=1, loop=asyncio.get_event_loop())
+    future = OnEmitFuture(p, timeout=1)
 
     assert future.result() == 1
 
@@ -21,16 +22,16 @@ def test_publisher():
     assert future.result() == 1
 
 @pytest.mark.asyncio
-async def test_timeout(event_loop):
+async def test_timeout():
     p = Publisher()
     future = OnEmitFuture(p, timeout=0.01)
-    await asyncio.sleep(0.05, loop=event_loop)
+    await asyncio.sleep(0.05)
 
     with pytest.raises(asyncio.TimeoutError):
         future.result()
 
 @pytest.mark.asyncio
-async def test_cancel(event_loop):
+async def test_cancel():
     p = Publisher()
     future = OnEmitFuture(p, timeout=0.01)
     future.cancel()
@@ -39,7 +40,8 @@ async def test_cancel(event_loop):
     with pytest.raises(asyncio.CancelledError):
         future.result()
 
-def test_wrong_source():
+@pytest.mark.asyncio
+async def test_wrong_source():
     p = Publisher()
     on_emit_future = OnEmitFuture(p)
 

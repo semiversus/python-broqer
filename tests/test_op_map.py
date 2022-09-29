@@ -33,7 +33,7 @@ def test_operator(method, o, args, kwargs, input_vector, output_vector):
 def test_map_factory_keyword():
     m = op.build_map_factory(lambda v: v+1)
     v = Value()
-    with pytest.raises(TypeError, message='"unpack" has to be defined by decorator'):
+    with pytest.raises(TypeError, match='"unpack" has to be defined by decorator'):
         o = v | m(unpack=True)
 
 def test_two_maps():

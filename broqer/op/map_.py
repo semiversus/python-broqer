@@ -39,7 +39,7 @@ from functools import partial, wraps
 from typing import Any, Callable
 
 from broqer import Publisher, NONE
-from broqer.publisher import TValue
+from broqer.publisher import ValueT
 from broqer.operator import Operator
 
 
@@ -64,14 +64,14 @@ class Map(Operator):
         self._function = partial(function, *args, **kwargs)
         self._unpack = unpack
 
-    def get(self) -> TValue:
+    def get(self) -> ValueT:
         if self._subscriptions:
             return self._state
 
         if self._originator is None:
             raise ValueError('Operator is missing originator')
 
-        value = self._originator.get()  # type: TValue
+        value = self._originator.get()  # type: ValueT
 
         if value is NONE:
             return value
@@ -82,7 +82,7 @@ class Map(Operator):
 
         return self._function(value)
 
-    def emit(self, value: TValue, who: Publisher) -> None:
+    def emit(self, value: ValueT, who: Publisher) -> None:
         if who is not self._originator:
             raise ValueError('Emit from non assigned publisher')
 
