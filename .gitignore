@@ -5,3 +5,5 @@ _version.py
 .*_cache
 .venv
 htmlcov
+.coverage
+dist

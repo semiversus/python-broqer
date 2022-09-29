@@ -13,7 +13,6 @@ with open('README.rst', 'rb') as readme_file:
 setup(
     author='Günther Jena',
     author_email='guenther@jena.at',
-    use_scm_version={"write_to": "broqer/_version.py"},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
