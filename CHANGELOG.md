@@ -1,6 +1,6 @@
 ## 3.0.0
 
-* fixed typo ("orginator" fixed to "origintator")
+* fixed typo ("orginator" fixed to "originator")
 * add log output for default error_handler
 * add `dependent_subscribe` function for `Values`
 * remove `OperatorFactory` logic from operators
