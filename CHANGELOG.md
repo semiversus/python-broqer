@@ -1,5 +1,6 @@
 ## 3.0.1
 
+* merge #43: wheel dependency updated
 * fixing #43: fixed wrong reference of internal module
 
 ## 3.0.0
