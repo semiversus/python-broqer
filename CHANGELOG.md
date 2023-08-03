@@ -1,3 +1,7 @@
+## 3.0.1
+
+* fixing #43: fixed wrong reference of internal module
+
 ## 3.0.0
 
 * fixed typo ("orginator" fixed to "originator")
