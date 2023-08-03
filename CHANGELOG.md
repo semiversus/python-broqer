@@ -1,3 +1,7 @@
+## 3.0.2
+
+* fixed liniting errors
+
 ## 3.0.1
 
 * merge #43: wheel dependency updated

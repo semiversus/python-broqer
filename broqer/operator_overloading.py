@@ -4,7 +4,6 @@ import operator
 from typing import Any as Any_
 
 # pylint: disable=cyclic-import
-import broqer
 from broqer import Publisher, op
 from broqer.operator import Operator
 
@@ -126,8 +125,8 @@ def apply_operator_overloading():
         def _op(operand_left, operand_right, operation=method):
             if isinstance(operand_right, Publisher):
                 return op.CombineLatest(operand_left, operand_right,
-                                               map_=getattr(operator,
-                                                            operation))
+                                        map_=getattr(operator,
+                                                     operation))
             return MapConstant(operand_left, operand_right,
                                getattr(operator, operation))
 
