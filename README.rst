@@ -24,7 +24,7 @@ Synopsis
 - Under MIT license (2018 Günther Jena)
 - Source is hosted on GitHub.com_
 - Documentation is hosted on ReadTheDocs.com_
-- Tested on Python 3.7. 3.8, 3.9 and 3.10
+- Tested on Python 3.7. 3.8, 3.9, 3.10 and 3.11
 - Unit tested with pytest_, coding style checked with Flake8_, static type checked with mypy_, static code checked with Pylint_, documented with Sphinx_
 - Operators known from ReactiveX_ and other streaming frameworks (like Map_, CombineLatest_, ...)
 
