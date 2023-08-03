@@ -124,7 +124,7 @@ def apply_operator_overloading():
             '__getitem__', '__floordiv__', '__truediv__'):
         def _op(operand_left, operand_right, operation=method):
             if isinstance(operand_right, Publisher):
-                from broqer import op
+                from broqer import op  # pylint: disable=C0415
                 return op.CombineLatest(operand_left, operand_right,
                                         map_=getattr(operator,
                                                      operation))
