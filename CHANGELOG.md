@@ -1,3 +1,7 @@
+## 3.0.3
+
+* Fix missing error_callback call in SinkAsync (thanks to Patrick Kaulfus)
+
 ## 3.0.2
 
 * fixed liniting errors
