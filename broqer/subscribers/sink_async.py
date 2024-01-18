@@ -28,6 +28,9 @@ Finished with argument 1
 >>> _d.dispose()
 """
 
+import asyncio
+import sys
+
 from functools import wraps
 from typing import Any
 
@@ -55,7 +58,14 @@ class SinkAsync(Subscriber):  # pylint: disable=too-few-public-methods
         self._error_callback = error_callback
 
     def emit(self, value: Any, who: Publisher):
-        self._coro_queue.schedule(value)
+        future = self._coro_queue.schedule(value)
+        future.add_done_callback(self._done)
+
+    def _done(self, future: asyncio.Future):
+        try:
+            future.result()
+        except Exception:  # pylint: disable=broad-except
+            self._error_callback(*sys.exc_info())
 
 
 def build_sink_async(coro=None, *, mode: AsyncMode = AsyncMode.CONCURRENT,
