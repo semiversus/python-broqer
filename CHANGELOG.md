@@ -1,3 +1,7 @@
+## 3.1.0
+
+* added emit_partial argument in CombineLatest (thanks to Florian Feurstein)
+
 ## 3.0.3
 
 * Fix missing error_callback call in SinkAsync (thanks to Patrick Kaulfus)
