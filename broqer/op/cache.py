@@ -42,7 +42,7 @@ class Cache(Operator):
         Operator.__init__(self)
         self._state = init
 
-    def get(self) -> ValueT:
+    def get(self) -> ValueT:  # type:ignore[type-var]
         if self._originator is None:
             raise ValueError('Operator is missing originator')
 
