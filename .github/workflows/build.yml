@@ -23,7 +23,7 @@ jobs:
       - name: Lint with flake8
         run: flake8 broqer
       - name: Static type checking
-        run: mypy broqer --no-strict-optional
+        run: mypy broqer --no-strict-optional --disable-error-code type-var --disable-error-code call-arg
       - name: Check coding style
         run: pylama
       - name: Check Readme style

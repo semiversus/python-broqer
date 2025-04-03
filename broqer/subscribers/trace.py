@@ -42,7 +42,7 @@ class Trace(Sink):
         and the emitted value
         """
         time_diff = time() - Trace._timestamp_start
-        line = f'--- {time_diff:8.3f}: '
+        line = f'--- {time_diff: 8.3f}: '
         line += repr(publisher) if label is None else label
         line += f' {value!r}'
         print(line)

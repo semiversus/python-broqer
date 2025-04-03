@@ -131,7 +131,7 @@ class Publisher:
 
         raise SubscriptionError('Subscriber is not registered')
 
-    def get(self) -> ValueT:  # type:ignore[type-var]
+    def get(self) -> ValueT:
         """ Return the state of the publisher. """
         return self._state
 

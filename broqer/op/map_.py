@@ -64,7 +64,7 @@ class Map(Operator):
         self._function = partial(function, *args, **kwargs)
         self._unpack = unpack
 
-    def get(self) -> ValueT:  # type:ignore[type-var]
+    def get(self) -> ValueT:
         if self._subscriptions:
             return self._state
 
@@ -80,7 +80,7 @@ class Map(Operator):
             assert isinstance(value, (list, tuple))
             return self._function(*value)
 
-        return self._function(value)  # type:ignore[call-arg]
+        return self._function(value)
 
     def emit(self, value: ValueT, who: Publisher) -> None:
         if who is not self._originator:
@@ -90,7 +90,7 @@ class Map(Operator):
             assert isinstance(value, (list, tuple))
             result = self._function(*value)
         else:
-            result = self._function(value)  # type:ignore[call-arg]
+            result = self._function(value)
 
         if result is not NONE:
             return Publisher.notify(self, result)
