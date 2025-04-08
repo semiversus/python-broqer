@@ -1,3 +1,7 @@
+## 3.1.1
+
+* bugfix for emit_partial
+
 ## 3.1.0
 
 * added emit_partial argument in CombineLatest (thanks to Florian Feurstein)
