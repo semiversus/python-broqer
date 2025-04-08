@@ -109,11 +109,11 @@ class CombineLatest(MultiOperator):
         # remember state of this source
         self._partial_state[index] = value
 
-        # if emit_partial is False and emits from publishers are missing 
-        # or source of this emit is not one of emit_on -> don't evaluate 
+        # if emit_partial is False and emits from publishers are missing
+        # or source of this emit is not one of emit_on -> don't evaluate
         # and notify subscribers
 
-        if (self._emit_on is not None and 
+        if (self._emit_on is not None and
                 all(who is not p for p in self._emit_on)) or \
                 (not self._emit_partial and self._missing):
             return None
