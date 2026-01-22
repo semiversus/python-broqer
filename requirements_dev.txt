@@ -9,6 +9,6 @@ flake8==3.7.9
 mypy==1.14.0
 rstcheck==6.1.0
 setuptools_scm==3.3.3
-wheel==0.38.1
+wheel==0.46.2
 pylama==7.7.1
 pylint==2.15.3
