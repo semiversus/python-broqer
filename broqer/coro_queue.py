@@ -23,6 +23,10 @@ def wrap_coro(coro, unpack, *args, **kwargs):
     return _coro
 
 
+class MaxQueueException(Exception):
+    """ Exception raised when max_queue_size is exceeded in CoroQueue """
+
+
 class AsyncMode(Enum):
     """ AyncMode defines how to act when an emit happens while an scheduled
     coroutine is running """
@@ -38,10 +42,19 @@ class CoroQueue:  # pylint: disable=too-few-public-methods
     """ Schedules the running of a coroutine given on a mode
     :param coro: Coroutine to be scheduled
     :param mode: scheduling mode (see AsyncMode)
+    :param max_queue_size: queue len error threshold, used with AsyncMode.QUEUE
     """
-    def __init__(self, coro, mode=AsyncMode.CONCURRENT):
+    def __init__(self, coro, mode=AsyncMode.CONCURRENT,
+                 max_queue_size: int | None = None):
+
+        if max_queue_size is not None and mode != AsyncMode.QUEUE:
+            raise ValueError(
+                "max_queue_size can only be used with mode=AsyncMode.QUEUE"
+            )
+
         self._coro = coro
         self._mode = mode
+        self._max_queue_size = max_queue_size
 
         # ._last_args is used for LAST_DISTINCT and keeps the last arguments
         self._last_args = None  # type: Optional[Tuple]
@@ -111,6 +124,12 @@ class CoroQueue:  # pylint: disable=too-few-public-methods
     def _handle_done(self, result_future: asyncio.Future, task: asyncio.Task):
         try:
             result = task.result()
+            if self._queue and self._max_queue_size is not None and \
+                    len(self._queue) > self._max_queue_size:
+                raise MaxQueueException(
+                    "CoroQueue size is %d and exceeds %d" %
+                    (len(self._queue), self._max_queue_size)
+                )
         except asyncio.CancelledError:  # happend in INTERRUPT mode
             result_future.set_result(NONE)
         except Exception as exception:  # pylint: disable=broad-except

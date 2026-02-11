@@ -1,3 +1,7 @@
+## 3.2.0
+
+* added max queue threshold for CoroQueue (e.g., for `SinkAsync` and `MapAsync`)
+
 ## 3.1.1
 
 * bugfix for emit_partial

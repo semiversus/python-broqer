@@ -3,7 +3,7 @@ import asyncio
 
 import pytest
 
-from broqer.coro_queue import CoroQueue, AsyncMode
+from broqer.coro_queue import CoroQueue, AsyncMode, MaxQueueException
 from broqer import NONE
 
 
@@ -172,6 +172,46 @@ async def test_queue():
     # make a non-concurrent call
     event.set()
     assert (await coro_queue.schedule(3)) == 3
+
+
+@pytest.mark.asyncio
+async def test_queue_threshold():
+
+    async def _coro(index):
+        await asyncio.sleep(0.001)
+        return index + 2
+
+    coro_queue = CoroQueue(coro=_coro, mode=AsyncMode.QUEUE, max_queue_size=10)
+
+    future_0 = coro_queue.schedule(0)
+    future_1 = coro_queue.schedule(40)
+
+    for index in range(10):
+        coro_queue.schedule(index)
+
+    with pytest.raises(MaxQueueException) as exc_info:
+        await future_0
+
+    assert str(exc_info.value) == 'CoroQueue size is 11 and exceeds 10'
+
+    assert await future_1 == 42
+
+
+@pytest.mark.parametrize('mode', AsyncMode)
+@pytest.mark.asyncio
+async def test_queue_threshold_wrong_mode(mode):
+
+    if mode == AsyncMode.QUEUE:
+        return
+
+    async def _coro():
+        await asyncio.sleep(0.001)
+        return 42
+
+    with pytest.raises(ValueError) as exc_info:
+        CoroQueue(coro=_coro, mode=mode, max_queue_size=10)
+
+    assert str(exc_info.value) == 'max_queue_size can only be used with mode=AsyncMode.QUEUE'
 
 
 @pytest.mark.parametrize('distinct', [True, False])
