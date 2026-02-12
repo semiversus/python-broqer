@@ -3,13 +3,6 @@ import pytest
 
 from broqer import Publisher, OnEmitFuture
 
-from .eventloop import VirtualTimeEventLoop
-
-@pytest.fixture()
-def event_loop():
-    loop = VirtualTimeEventLoop()
-    yield loop
-    loop.close()
 
 @pytest.mark.asyncio
 async def test_publisher():

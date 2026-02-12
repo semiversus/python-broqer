@@ -5,15 +5,6 @@ from unittest import mock
 from broqer import NONE, Sink, Publisher, op
 from broqer.op import Throttle
 
-from .eventloop import VirtualTimeEventLoop
-
-
-@pytest.fixture()
-def event_loop():
-    loop = VirtualTimeEventLoop()
-    yield loop
-    loop.close()
-
 
 @pytest.mark.asyncio
 async def test_throttle_errorhandler():
@@ -43,7 +34,7 @@ async def test_throttle_errorhandler():
 
 
 @pytest.mark.asyncio
-async def test_throttle_unsubscribe(event_loop):
+async def test_throttle_unsubscribe():
     p = Publisher()
     mock_sink = mock.Mock()
 
@@ -72,7 +63,7 @@ async def test_throttle_unsubscribe(event_loop):
 
 
 @pytest.mark.asyncio
-async def test_throttle_reset(event_loop):
+async def test_throttle_reset():
     p = Publisher()
     mock_sink = mock.Mock()
 
@@ -115,7 +106,7 @@ async def test_throttle_reset(event_loop):
      (mock.call(0), mock.call(1), mock.call(2), mock.call(4))),
 ])
 @pytest.mark.asyncio
-async def test_throttle(event_loop, emit_sequence, expected_emits):
+async def test_throttle(emit_sequence, expected_emits):
     p = Publisher()
     mock_sink = mock.Mock()
 

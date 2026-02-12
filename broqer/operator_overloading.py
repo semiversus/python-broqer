@@ -162,4 +162,4 @@ def apply_operator_overloading():
             raise AttributeError(f'Attribute {attribute_name!r} not found')
         return _GetAttr(publisher, attribute_name)
 
-    setattr(Publisher, '__getattr__', _getattr)
+    Publisher.__getattr__ = _getattr

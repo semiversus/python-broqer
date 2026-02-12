@@ -1,3 +1,4 @@
+import asyncio
 from unittest import mock
 
 import pytest
@@ -47,9 +48,11 @@ def test_subscribe():
 
 
 @pytest.mark.asyncio
-async def test_await(event_loop):
+async def test_await():
     """ Test .as_future() method """
     publisher = Publisher()
+
+    event_loop = asyncio.get_event_loop()
 
     # test omit_subscription=False when publisher has no state. This should
     # wait for the first state change
