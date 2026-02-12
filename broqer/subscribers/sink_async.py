@@ -47,17 +47,18 @@ class SinkAsync(Subscriber):  # pylint: disable=too-few-public-methods
     :param mode: behavior when a value is currently processed
     :param error_callback: error callback to be registered
     :param unpack: value from emits will be unpacked as (\\*value)
-    :param max_queue_size: queue len error threshold,used with AsyncMode.QUEUE
+    :param max_queue_threshold: queue len error threshold,
+                                used with AsyncMode.QUEUE
     :param \\*\\*kwargs: keyword arguments to be used for calling coro
     """
     def __init__(self, coro, *args, mode=AsyncMode.CONCURRENT,
                  error_callback=default_error_handler,
                  unpack: bool = False,
-                 max_queue_size: int | None = None, **kwargs) -> None:
+                 max_queue_threshold: int | None = None, **kwargs) -> None:
 
         _coro = wrap_coro(coro, unpack, *args, **kwargs)
         self._coro_queue = CoroQueue(
-            _coro, mode=mode, max_queue_size=max_queue_size
+            _coro, mode=mode, max_queue_threshold=max_queue_threshold
         )
         self._error_callback = error_callback
 
@@ -93,7 +94,7 @@ def build_sink_async_factory(coro=None, *,
                              mode: AsyncMode = AsyncMode.CONCURRENT,
                              error_callback=default_error_handler,
                              unpack: bool = False,
-                             max_queue_size: int | None = None):
+                             max_queue_threshold: int | None = None):
     """ Decorator to wrap a coroutine to return a factory for SinkAsync
         subscribers.
 
@@ -101,21 +102,22 @@ def build_sink_async_factory(coro=None, *,
     :param mode: behavior when a value is currently processed
     :param error_callback: error callback to be registered
     :param unpack: value from emits will be unpacked (*value)
-    :param max_queue_size: queue len error threshold, used with AsyncMode.QUEUE
+    :param max_queue_threshold: queue len error threshold,
+                                used with AsyncMode.QUEUE
     """
     def _build_sink_async(coro):
         @wraps(coro)
         def _wrapper(*args, **kwargs) -> SinkAsync:
-            if ('unpack' in kwargs) or ('max_queue_size' in kwargs) or \
+            if ('unpack' in kwargs) or ('max_queue_threshold' in kwargs) or \
                     ('error_callback' in kwargs) or ('mode' in kwargs):
                 raise TypeError(
                     '"unpack", "mode", "error_callback" and '
-                    '"max_queue_size" has to be defined by decorator'
+                    '"max_queue_threshold" has to be defined by decorator'
                 )
 
             return SinkAsync(coro, *args, mode=mode,
                              error_callback=error_callback, unpack=unpack,
-                             max_queue_size=max_queue_size,
+                             max_queue_threshold=max_queue_threshold,
                              **kwargs)
         return _wrapper
 
@@ -129,21 +131,22 @@ def sink_async_property(coro=None, *,
                         mode: AsyncMode = AsyncMode.CONCURRENT,
                         error_callback=default_error_handler,
                         unpack: bool = False,
-                        max_queue_size: int | None = None):
+                        max_queue_threshold: int | None = None):
     """ Decorator to build a property returning a SinkAsync subscriber.
 
     :param coro: coroutine to be wrapped
     :param mode: behavior when a value is currently processed
     :param error_callback: error callback to be registered
     :param unpack: value from emits will be unpacked (*value)
-    :param max_queue_size: queue len error threshold, used with AsyncMode.QUEUE
+    :param max_queue_threshold: queue len error threshold,
+                                used with AsyncMode.QUEUE
     """
     def build_sink_async_property(coro):
         @property
         def _build_sink_async(self):
             return SinkAsync(coro, self, mode=mode,
                              error_callback=error_callback, unpack=unpack,
-                             max_queue_size=max_queue_size)
+                             max_queue_threshold=max_queue_threshold)
         return _build_sink_async
 
     if coro:

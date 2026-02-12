@@ -181,7 +181,7 @@ async def test_queue_threshold():
         await asyncio.sleep(0.001)
         return index + 2
 
-    coro_queue = CoroQueue(coro=_coro, mode=AsyncMode.QUEUE, max_queue_size=10)
+    coro_queue = CoroQueue(coro=_coro, mode=AsyncMode.QUEUE, max_queue_threshold=10)
 
     future_0 = coro_queue.schedule(0)
     future_1 = coro_queue.schedule(40)
@@ -209,9 +209,9 @@ async def test_queue_threshold_wrong_mode(mode):
         return 42
 
     with pytest.raises(ValueError) as exc_info:
-        CoroQueue(coro=_coro, mode=mode, max_queue_size=10)
+        CoroQueue(coro=_coro, mode=mode, max_queue_threshold=10)
 
-    assert str(exc_info.value) == 'max_queue_size can only be used with mode=AsyncMode.QUEUE'
+    assert str(exc_info.value) == 'max_queue_threshold can only be used with mode=AsyncMode.QUEUE'
 
 
 @pytest.mark.parametrize('distinct', [True, False])

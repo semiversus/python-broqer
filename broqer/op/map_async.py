@@ -116,7 +116,8 @@ class MapAsync(Operator):  # pylint: disable=too-many-instance-attributes
     :param mode: behavior when a value is currently processed
     :param error_callback: error callback to be registered
     :param unpack: value from emits will be unpacked as (\\*value)
-    :param max_queue_size: queue len error threshold, used with AsyncMode.QUEUE
+    :param max_queue_threshold: queue len error threshold,
+                                used with AsyncMode.QUEUE
     :param \\*\\*kwargs: keyword arguments to be used for calling coro
 
     :ivar scheduled: Publisher emitting the value when coroutine is actually
@@ -125,11 +126,11 @@ class MapAsync(Operator):  # pylint: disable=too-many-instance-attributes
     def __init__(self,
                  coro, *args, mode=AsyncMode.CONCURRENT,
                  error_callback=default_error_handler, unpack: bool = False,
-                 max_queue_size: int | None = None, **kwargs) -> None:
+                 max_queue_threshold: int | None = None, **kwargs) -> None:
         Operator.__init__(self)
         _coro = wrap_coro(coro, unpack, *args, **kwargs)
         self._coro_queue = CoroQueue(
-            _coro, mode=mode, max_queue_size=max_queue_size
+            _coro, mode=mode, max_queue_threshold=max_queue_threshold
         )
         self._error_callback = error_callback
 
@@ -154,18 +155,19 @@ def build_map_async(coro=None, *,
                     mode: AsyncMode = AsyncMode.CONCURRENT,
                     error_callback=default_error_handler,
                     unpack: bool = False,
-                    max_queue_size: int | None = None):
+                    max_queue_threshold: int | None = None):
     """ Decorator to wrap a function to return a Map operator.
 
     :param coro: coroutine to be wrapped
     :param mode: behavior when a value is currently processed
     :param error_callback: error callback to be registered
     :param unpack: value from emits will be unpacked (*value)
-    :param max_queue_size: queue len error threshold, used with AsyncMode.QUEUE
+    :param max_queue_threshold: queue len error threshold,
+                                used with AsyncMode.QUEUE
     """
     def _build_map_async(coro):
         return MapAsync(coro, mode=mode, error_callback=error_callback,
-                        unpack=unpack, max_queue_size=max_queue_size)
+                        unpack=unpack, max_queue_threshold=max_queue_threshold)
 
     if coro:
         return _build_map_async(coro)
@@ -177,7 +179,7 @@ def build_map_async_factory(coro=None, *,
                             mode: AsyncMode = AsyncMode.CONCURRENT,
                             error_callback=default_error_handler,
                             unpack: bool = False,
-                            max_queue_size: int | None = None):
+                            max_queue_threshold: int | None = None):
     """ Decorator to wrap a coroutine to return a factory for MapAsync
         operators.
 
@@ -185,7 +187,8 @@ def build_map_async_factory(coro=None, *,
     :param mode: behavior when a value is currently processed
     :param error_callback: error callback to be registered
     :param unpack: value from emits will be unpacked (*value)
-    :param max_queue_size: queue len error threshold, used with AsyncMode.QUEUE
+    :param max_queue_threshold: queue len error threshold,
+                                used with AsyncMode.QUEUE
     """
     _mode = mode
 
@@ -193,16 +196,16 @@ def build_map_async_factory(coro=None, *,
         @wraps(coro)
         def _wrapper(*args, mode=None, **kwargs) -> MapAsync:
             if ('unpack' in kwargs) or ('error_callback' in kwargs) or \
-                    ('max_queue_size' in kwargs):
+                    ('max_queue_threshold' in kwargs):
                 raise TypeError(
-                    '"unpack", "error_callback" or "max_queue_size" has to '
-                    'be defined by decorator'
+                    '"unpack", "error_callback" or "max_queue_threshold" '
+                    'has to be defined by decorator'
                 )
             if mode is None:
                 mode = _mode
             return MapAsync(coro, *args, mode=mode, unpack=unpack,
                             error_callback=error_callback,
-                            max_queue_size=max_queue_size, **kwargs)
+                            max_queue_threshold=max_queue_threshold, **kwargs)
         return _wrapper
 
     if coro:
