@@ -10,7 +10,7 @@ from .subscriber import Subscriber
 from .subscribers import (OnEmitFuture, Sink, Trace, build_sink,
                           build_sink_factory, sink_property, SinkAsync,
                           build_sink_async, build_sink_async_factory,
-                          sink_async_property)
+                          sink_async_property, MaxQueueException)
 from .value import Value
 
 from .operator_overloading import apply_operator_overloading
@@ -31,5 +31,5 @@ __all__ = [
     'SubscriptionDisposable', 'SubscriptionError', 'Subscriber',
     'OnEmitFuture', 'Sink', 'Trace', 'build_sink', 'build_sink_factory',
     'sink_property', 'Value', 'op', 'SinkAsync', 'build_sink_async',
-    'build_sink_async_factory', 'sink_async_property'
+    'build_sink_async_factory', 'sink_async_property', 'MaxQueueException'
 ]

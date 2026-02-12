@@ -5,18 +5,9 @@ from unittest import mock
 from broqer.publishers import PollPublisher
 from broqer import Sink, NONE
 
-from .eventloop import VirtualTimeEventLoop
-
-
-@pytest.fixture()
-def event_loop():
-    loop = VirtualTimeEventLoop()
-    yield loop
-    loop.close()
-
 
 @pytest.mark.asyncio
-async def test_subscribe(event_loop):
+async def test_subscribe():
     poll_mock = mock.Mock(return_value=3)
     sink_mock = mock.Mock()
 

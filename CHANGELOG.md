@@ -1,3 +1,10 @@
+## 3.2.0
+
+* added max queue threshold for CoroQueue (e.g., for `SinkAsync` and `MapAsync`)
+* dropped Python 3.8 and 3.9 support
+* added Python 3.12, 3.13 and 3.14
+* dropped `pylama` and `flake8` tests and partially replaced them with `ruff`
+
 ## 3.1.1
 
 * bugfix for emit_partial
