@@ -22,8 +22,6 @@ jobs:
           pip install -r requirements_dev.txt -e .
       - name: Lint and coding style check with ruff
         run: ruff check --output-format=github .
-      - name: Lint with flake8
-        run: flake8 broqer
       - name: Static type checking
         run: mypy broqer --no-strict-optional --disable-error-code type-var --disable-error-code call-arg
       - name: Check Readme style

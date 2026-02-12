@@ -16,7 +16,6 @@ indent-width = 4
 # flake8-builtins (A)
 # flake8-annotations (ANN) not used
 # flake8-quotes (Q) not used
-# We remain at flake8 3.7.9 for compatibility reasons
 # pylint (PLC, PLE, PLR, PLW) not used
 # ...
 [tool.ruff.lint]
