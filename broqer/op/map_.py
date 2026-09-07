@@ -36,7 +36,7 @@ Output: 1
 EMITTED None
 """
 from functools import partial, wraps
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from broqer import Publisher, NONE
 from broqer.publisher import ValueT
@@ -51,7 +51,7 @@ class Map(Operator):
     :param unpack: value from emits will be unpacked (\\*value)
     :param \\*\\*kwargs: keyword arguments to be used for calling function
     """
-    def __init__(self, function: Callable[[Any], Any], *args,
+    def __init__(self, function: Callable[..., Any], *args,
                  unpack: bool = False, **kwargs) -> None:
         """ Special care for return values:
               - return `None` (or nothing) if you don't want to return a result
@@ -114,14 +114,14 @@ def build_map(function: Callable[..., None] = None, *,
     return _build_map
 
 
-def build_map_factory(function: Callable[[Any], Any] = None,
+def build_map_factory(function: Optional[Callable[..., Any]] = None,
                       unpack: bool = False):
     """ Decorator to wrap a function to return a factory for Map operators.
 
     :param function: function to be wrapped
     :param unpack: value from emits will be unpacked (*value)
     """
-    def _build_map(function: Callable[[Any], Any]):
+    def _build_map(function: Callable[..., Any]):
         @wraps(function)
         def _wrapper(*args, **kwargs) -> Map:
             if 'unpack' in kwargs:
