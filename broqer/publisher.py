@@ -165,8 +165,9 @@ class Publisher:
         """ Property returning a tuple with all current subscribers """
         return tuple(self._subscriptions)
 
-    def register_on_subscription_callback(self,
-                                          callback: SubscriptionCBT) -> None:
+    def register_on_subscription_callback(
+        self, callback: Optional[SubscriptionCBT]
+    ) -> None:
         """ This callback will be called, when the subscriptions are changing.
         When a subscription is done and no subscription was present the
         callback is called with True as argument. When after unsubscribe no
