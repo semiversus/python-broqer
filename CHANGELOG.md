@@ -1,3 +1,8 @@
+## 3.3.0
+
+* fixed bug in `Timer.end_early`
+* fixed typing annotations and extend `mypy` checks
+
 ## 3.2.0
 
 * added max queue threshold for CoroQueue (e.g., for `SinkAsync` and `MapAsync`)
