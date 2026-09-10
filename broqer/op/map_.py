@@ -98,7 +98,7 @@ class Map(Operator):
         return None
 
 
-def build_map(function: Callable[..., None] = None, *,
+def build_map(function: Optional[Callable[..., Any]] = None, *,
               unpack: bool = False):
     """ Decorator to wrap a function to return a Map operator.
 
