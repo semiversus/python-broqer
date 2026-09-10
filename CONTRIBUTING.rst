@@ -124,4 +124,4 @@ $ bumpversion patch # possible: major / minor / patch
 $ git push
 $ git push --tags
 
-The Github Action will then deploy to PyPI if tests pass.
+The GitHub Actions workflow will then deploy to PyPI if tests pass.
