@@ -55,11 +55,12 @@ class Publisher:
                          indirectly) dependent on.
     """
     @overload  # noqa: F811
-    def __init__(self, *, type_: Type[ValueT] = None):
+    def __init__(self, *, type_: Optional[Type[ValueT]] = None):
         pass
 
     @overload  # noqa: F811
-    def __init__(self, init: ValueT, type_: Type[ValueT] = None):  # noqa: F811
+    def __init__(self, init: ValueT,  # noqa: F811
+                 type_: Optional[Type[ValueT]] = None):
         pass
 
     def __init__(self, init=NONE, type_=None):  # noqa: F811
