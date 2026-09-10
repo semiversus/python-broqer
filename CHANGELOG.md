@@ -1,7 +1,7 @@
 ## 3.3.0
 
 * fixed bug in `Timer.end_early`
-* fixed typing annotations and extend `mypy` checks
+* fixed typing annotations and extended `mypy` checks
 
 ## 3.2.0
 
