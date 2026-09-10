@@ -12,12 +12,13 @@ class Timer:
                      calling `.end_early()`
     :param loop: optional asyncio event loop
     """
-    def __init__(self, callback: Optional[Callable[[], None]] = None,
-                 loop: Optional[asyncio.BaseEventLoop] = None):
+    def __init__(self, callback: Optional[Callable[..., None]] = None,
+                 loop: Optional[asyncio.AbstractEventLoop] = None):
         self._callback = callback
         self._handle = None  # type: Optional[asyncio.Handle]
         self._loop = loop or asyncio.get_running_loop()
-        self._args = None
+        # `()` and not `None` so the attribute is always a splattable tuple
+        self._args = ()  # type: tuple
 
     def start(self, timeout: float, args=()) -> None:
         """ start the timer with given timeout. Optional arguments for the
