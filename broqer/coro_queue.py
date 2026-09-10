@@ -3,7 +3,8 @@
 import asyncio
 from collections import deque
 from enum import Enum
-from typing import Any, Deque, Optional, Tuple  # noqa: F401
+from typing import (Any, Awaitable, Callable, Deque,  # noqa: F401
+                    Optional, Tuple)
 from functools import partial
 
 from broqer import NONE
@@ -45,7 +46,8 @@ class CoroQueue:  # pylint: disable=too-few-public-methods
     :param max_queue_threshold: queue len error threshold,
                                 used with AsyncMode.QUEUE
     """
-    def __init__(self, coro, mode=AsyncMode.CONCURRENT,
+    def __init__(self, coro: Callable[..., Awaitable[Any]],
+                 mode=AsyncMode.CONCURRENT,
                  max_queue_threshold: int | None = None):
 
         if max_queue_threshold is not None and mode != AsyncMode.QUEUE:
