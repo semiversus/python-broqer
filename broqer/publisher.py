@@ -194,8 +194,8 @@ class Publisher:
         future = self.as_future(timeout=None, omit_subscription=False)
         return future.__await__()
 
-    def as_future(self, timeout: float, omit_subscription: bool = True,
-                  loop=None):
+    def as_future(self, timeout: Optional[float],
+                  omit_subscription: bool = True, loop=None):
         """ Returns a asyncio.Future which will be done on first change of this
         publisher.
 

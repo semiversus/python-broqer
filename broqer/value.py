@@ -1,6 +1,6 @@
 """ Implementing Value """
 
-from typing import Any
+from typing import Any, Optional
 
 # pylint: disable=cyclic-import
 from broqer import Publisher, NONE
@@ -24,7 +24,7 @@ class Value(Operator):
         self._state = init
 
     def emit(self, value: Any,
-             who: Publisher = None) -> None:  # pylint: disable=unused-argument
+             who: Optional[Publisher] = None) -> None:  # pylint: disable=unused-argument
         if self._originator is not None and self._originator is not who:
             raise ValueError('Emit from non assigned publisher')
 

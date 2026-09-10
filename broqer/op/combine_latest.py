@@ -23,7 +23,7 @@ Second sink: (1, 3)
 
 """
 from functools import wraps
-from typing import Any, Dict, MutableSequence, Callable  # noqa: F401
+from typing import Any, Dict, MutableSequence, Callable, Optional  # noqa: F401
 
 from broqer import Publisher, Subscriber, NONE
 
@@ -42,7 +42,8 @@ class CombineLatest(MultiOperator):
         state. emit_partial should only be used if an emit_on publisher is
         defined.
     """
-    def __init__(self, *publishers: Publisher, map_: Callable[..., Any] = None,
+    def __init__(self, *publishers: Publisher,
+                 map_: Optional[Callable[..., Any]] = None,
                  emit_on=None, emit_partial: bool = False) -> None:
         MultiOperator.__init__(self, *publishers)
 
@@ -133,7 +134,8 @@ class CombineLatest(MultiOperator):
         return Publisher.notify(self, state)
 
 
-def build_combine_latest(map_: Callable[..., Any] = None, *, emit_on=None,
+def build_combine_latest(map_: Optional[Callable[..., Any]] = None, *,
+                         emit_on=None,
                          emit_partial: bool = False) -> Callable:
     """ Decorator to wrap a function to return a CombineLatest operator.
 
