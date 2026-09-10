@@ -63,7 +63,7 @@ class Publisher:
                  type_: Optional[Type[ValueT]] = None):
         pass
 
-    def __init__(self, init=NONE, type_=None):  # noqa: F811
+    def __init__(self, init=NONE, type_: Optional[Type] = None):  # noqa: F811
         self._state = init
 
         if type_:
