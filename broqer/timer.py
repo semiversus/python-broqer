@@ -53,8 +53,13 @@ class Timer:
 
     def end_early(self) -> None:
         """ immediate stopping the timer and call optional callback """
-        self._handle = None
-        if self._handle and self._callback:
+
+        if not self._handle:
+            return
+
+        self.cancel()
+
+        if self._callback:
             self._callback(*self._args)
 
     def is_running(self) -> bool:
