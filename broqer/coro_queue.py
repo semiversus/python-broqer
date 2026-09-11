@@ -47,7 +47,7 @@ class CoroQueue:  # pylint: disable=too-few-public-methods
                                 used with AsyncMode.QUEUE
     """
     def __init__(self, coro: Callable[..., Awaitable[Any]],
-                 mode=AsyncMode.CONCURRENT,
+                 mode: AsyncMode = AsyncMode.CONCURRENT,
                  max_queue_threshold: int | None = None):
 
         if max_queue_threshold is not None and mode != AsyncMode.QUEUE:
