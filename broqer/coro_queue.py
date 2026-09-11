@@ -123,6 +123,12 @@ class CoroQueue:  # pylint: disable=too-few-public-methods
 
         # create a task out of it and add ._task_done as callback
         self._task = asyncio.ensure_future(self._coro(*args))
+        try:
+            self._task.set_name(f'CoroQueue({self._coro!r})')
+        except AttributeError:
+            # catch AttributeError if self._coro is a Future not a Coroutine
+            pass
+
         self._task.add_done_callback(partial(self._handle_done, future))
 
     def _handle_done(self, result_future: asyncio.Future, task: asyncio.Task):
