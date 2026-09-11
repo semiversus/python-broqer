@@ -3,7 +3,8 @@
 import asyncio
 from collections import deque
 from enum import Enum
-from typing import Any, Deque, Optional, Tuple  # noqa: F401
+from typing import (Any, Awaitable, Callable, Deque,  # noqa: F401
+                    Optional, Tuple)
 from functools import partial
 
 from broqer import NONE
@@ -45,7 +46,8 @@ class CoroQueue:  # pylint: disable=too-few-public-methods
     :param max_queue_threshold: queue len error threshold,
                                 used with AsyncMode.QUEUE
     """
-    def __init__(self, coro, mode=AsyncMode.CONCURRENT,
+    def __init__(self, coro: Callable[..., Awaitable[Any]],
+                 mode: AsyncMode = AsyncMode.CONCURRENT,
                  max_queue_threshold: int | None = None):
 
         if max_queue_threshold is not None and mode != AsyncMode.QUEUE:
@@ -121,6 +123,12 @@ class CoroQueue:  # pylint: disable=too-few-public-methods
 
         # create a task out of it and add ._task_done as callback
         self._task = asyncio.ensure_future(self._coro(*args))
+        try:
+            self._task.set_name(f'CoroQueue({self._coro!r})')
+        except AttributeError:
+            # catch AttributeError if self._coro is a Future not a Coroutine
+            pass
+
         self._task.add_done_callback(partial(self._handle_done, future))
 
     def _handle_done(self, result_future: asyncio.Future, task: asyncio.Task):

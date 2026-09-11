@@ -15,7 +15,7 @@ class PollPublisher(Publisher):
     :param interval: Time in seconds between polling calls
     """
     def __init__(self, poll_cb: Callable[[], Any], interval: float, *,
-                 type_: Type[ValueT] = None):
+                 type_: Optional[Type[ValueT]] = None):
         Publisher.__init__(self, type_=type_)
         self.poll_cb = poll_cb
         self.interval = interval

@@ -26,7 +26,7 @@ Also possible with additional args and kwargs:
 
 """
 from functools import partial, wraps
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from broqer import NONE, Publisher
 from broqer.operator import Operator
@@ -83,7 +83,7 @@ class EvalTrue(Operator):
     This operator can be used in the pipline style (v | EvalTrue()) or as
     standalone operation (EvalTrue(v)).
     """
-    def __init__(self, publisher: Publisher = None) -> None:
+    def __init__(self, publisher: Optional[Publisher] = None) -> None:
         Operator.__init__(self)
         self._originator = publisher
 
@@ -114,7 +114,7 @@ class EvalFalse(Operator):
 
     This operator can be used in the pipline style (v | EvalFalse() or as
     standalone operation (EvalFalse(v))."""
-    def __init__(self, publisher: Publisher = None) -> None:
+    def __init__(self, publisher: Optional[Publisher] = None) -> None:
         Operator.__init__(self)
         self._originator = publisher
 
@@ -140,7 +140,7 @@ class EvalFalse(Operator):
         return None
 
 
-def build_filter(predicate: Callable[[Any], bool] = None, *,
+def build_filter(predicate: Optional[Callable[[Any], bool]] = None, *,
                  unpack: bool = False):
     """ Decorator to wrap a function to return a Filter operator.
 
@@ -156,7 +156,7 @@ def build_filter(predicate: Callable[[Any], bool] = None, *,
     return _build_filter
 
 
-def build_filter_factory(predicate: Callable[[Any], bool] = None, *,
+def build_filter_factory(predicate: Optional[Callable[[Any], bool]] = None, *,
                          unpack: bool = False):
     """ Decorator to wrap a function to return a factory for Filter operators.
 

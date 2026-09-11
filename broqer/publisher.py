@@ -1,7 +1,7 @@
 """ Implementing Publisher """
 import sys
-from typing import (TYPE_CHECKING, TypeVar, Type, Tuple, Callable, Optional,
-                    overload)
+from typing import (TYPE_CHECKING, Any, TypeVar, Type, Tuple, Callable,
+                    Optional, overload)
 
 from broqer import NONE, Disposable, default_error_handler
 import broqer
@@ -55,14 +55,15 @@ class Publisher:
                          indirectly) dependent on.
     """
     @overload  # noqa: F811
-    def __init__(self, *, type_: Type[ValueT] = None):
+    def __init__(self, *, type_: Optional[Type[ValueT]] = None):
         pass
 
     @overload  # noqa: F811
-    def __init__(self, init: ValueT, type_: Type[ValueT] = None):  # noqa: F811
+    def __init__(self, init: ValueT,  # noqa: F811
+                 type_: Optional[Type[ValueT]] = None):
         pass
 
-    def __init__(self, init=NONE, type_=None):  # noqa: F811
+    def __init__(self, init=NONE, type_: Optional[Type] = None):  # noqa: F811
         self._state = init
 
         if type_:
@@ -164,8 +165,9 @@ class Publisher:
         """ Property returning a tuple with all current subscribers """
         return tuple(self._subscriptions)
 
-    def register_on_subscription_callback(self,
-                                          callback: SubscriptionCBT) -> None:
+    def register_on_subscription_callback(
+        self, callback: Optional[SubscriptionCBT]
+    ) -> None:
         """ This callback will be called, when the subscriptions are changing.
         When a subscription is done and no subscription was present the
         callback is called with True as argument. When after unsubscribe no
@@ -194,8 +196,8 @@ class Publisher:
         future = self.as_future(timeout=None, omit_subscription=False)
         return future.__await__()
 
-    def as_future(self, timeout: float, omit_subscription: bool = True,
-                  loop=None):
+    def as_future(self, timeout: Optional[float],
+                  omit_subscription: bool = True, loop=None):
         """ Returns a asyncio.Future which will be done on first change of this
         publisher.
 
@@ -249,6 +251,67 @@ class Publisher:
     def __or__(self, operator: 'Operator'):
         operator.originator = self
         return operator
+
+    if TYPE_CHECKING:
+        # These are declaration-only and carry no runtime cost. Keep this list
+        # in sync with `apply_operator_overloading()`.
+        #
+        # Deliberately NOT declared here:
+        #   __or__      - statically defined above (operator piping); it is
+        #                 not monkey-patched.
+        #   __getattr__ - installed at runtime, but only succeeds when
+        #                 `inherited_type` is set. Declaring it would type
+        #                 *every* attribute access on a Publisher as valid and
+        #                 silently swallow genuine typos.
+
+        # binary operators
+        def __lt__(self, other: Any) -> 'Publisher': ...
+        def __le__(self, other: Any) -> 'Publisher': ...
+        def __eq__(self, other: Any) -> 'Publisher': ...  # type: ignore[override]
+        def __ne__(self, other: Any) -> 'Publisher': ...  # type: ignore[override]
+        def __ge__(self, other: Any) -> 'Publisher': ...
+        def __gt__(self, other: Any) -> 'Publisher': ...
+        def __add__(self, other: Any) -> 'Publisher': ...
+        def __and__(self, other: Any) -> 'Publisher': ...
+        def __lshift__(self, other: Any) -> 'Publisher': ...
+        def __mod__(self, other: Any) -> 'Publisher': ...
+        def __mul__(self, other: Any) -> 'Publisher': ...
+        def __pow__(self, other: Any) -> 'Publisher': ...
+        def __rshift__(self, other: Any) -> 'Publisher': ...
+        def __sub__(self, other: Any) -> 'Publisher': ...
+        def __xor__(self, other: Any) -> 'Publisher': ...
+        def __concat__(self, other: Any) -> 'Publisher': ...
+        def __getitem__(self, key: Any) -> 'Publisher': ...
+        def __floordiv__(self, other: Any) -> 'Publisher': ...
+        def __truediv__(self, other: Any) -> 'Publisher': ...
+
+        # # reflected binary operators
+        def __radd__(self, other: Any) -> 'Publisher': ...
+        def __rand__(self, other: Any) -> 'Publisher': ...
+        def __rlshift__(self, other: Any) -> 'Publisher': ...
+        def __rmod__(self, other: Any) -> 'Publisher': ...
+        def __rmul__(self, other: Any) -> 'Publisher': ...
+        def __rpow__(self, other: Any) -> 'Publisher': ...
+        def __rrshift__(self, other: Any) -> 'Publisher': ...
+        def __rsub__(self, other: Any) -> 'Publisher': ...
+        def __rxor__(self, other: Any) -> 'Publisher': ...
+        def __rfloordiv__(self, other: Any) -> 'Publisher': ...
+        def __rtruediv__(self, other: Any) -> 'Publisher': ...
+
+        # unary operators
+        def __neg__(self) -> 'Publisher': ...
+        def __pos__(self) -> 'Publisher': ...
+        def __abs__(self) -> 'Publisher': ...
+        def __invert__(self) -> 'Publisher': ...
+        def __round__(self, ndigits: Any = None) -> 'Publisher': ...  # type: ignore[override]
+        def __trunc__(self) -> 'Publisher': ...  # type: ignore[override]
+        def __floor__(self) -> 'Publisher': ...
+        def __ceil__(self) -> 'Publisher': ...
+
+        # Declaring __eq__ in a class body would otherwise set __hash__ to
+        # None. Publisher keeps identity hashing (it is used as a dict key
+        # in CombineLatest._index).
+        __hash__ = object.__hash__
 
     def __dir__(self):
         """ Extending __dir__ with inherited type """

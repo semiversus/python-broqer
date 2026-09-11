@@ -19,11 +19,11 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
     ],
     description='Carefully crafted library to operate with continuous ' +
                 'streams of data in a reactive style with publish/subscribe ' +
@@ -34,6 +34,7 @@ setup(
     keywords='broker publisher subscriber reactive frp observable',
     name='broqer',
     packages=find_packages(include=['broqer*']),
+    python_requires='>=3.10',
     url='https://github.com/semiversus/python-broqer',
     zip_safe=False,
 )

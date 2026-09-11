@@ -23,3 +23,6 @@ select = ["E", "W", "C90", "A", "B", "ASYNC"]
 
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "single"
+
+[tool.mypy]
+disable_error_code = ["type-var"]

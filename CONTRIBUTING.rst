@@ -76,14 +76,13 @@ Ready to contribute? Here's how to set up `broqer` for local development.
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the
-   tests, including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass ruff and the
+   tests, including static typechecking with mypy::
 
-    $ flake8 broqer tests
-    $ python setup.py test or py.test
-    $ tox
+    $ ruff check .
+    $ pytest
+    $ mypy
 
-   To get flake8 and tox, just pip install them into your virtualenv.
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -102,8 +101,8 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 3.6, 3.7, 3.8 and 3.9. Check
-   https://travis-ci.org/semiversus/python-broqer/pull_requests
+3. The pull request should work for Python 3.10, 3.11, 3.12, 3.13 and 3.14. Check
+   https://github.com/semiversus/python-broqer/pulls
    and make sure that the tests pass for all supported Python versions.
 
 Tips
@@ -118,11 +117,11 @@ Deploying
 ---------
 
 A reminder for the maintainers on how to deploy.
-Make sure all your changes are committed (including an entry in HISTORY.rst).
+Make sure all your changes are committed (including an entry in CHANGELOG.md).
 Then run::
 
 $ bumpversion patch # possible: major / minor / patch
 $ git push
 $ git push --tags
 
-Travis will then deploy to PyPI if tests pass.
+The GitHub Actions workflow will then deploy to PyPI if tests pass.

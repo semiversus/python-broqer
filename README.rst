@@ -24,15 +24,15 @@ Synopsis
 - Under MIT license (2018 Günther Jena)
 - Source is hosted on GitHub.com_
 - Documentation is hosted on ReadTheDocs.com_
-- Tested on Python 3.7. 3.8, 3.9, 3.10 and 3.11
-- Unit tested with pytest_, coding style checked with Flake8_, static type checked with mypy_, static code checked with Pylint_, documented with Sphinx_
+- Tested on Python 3.10, 3.11, 3.12, 3.13 and 3.14
+- Unit tested with pytest_, coding style checked with ruff_, static type checked with mypy_, static code checked with Pylint_, documented with Sphinx_
 - Operators known from ReactiveX_ and other streaming frameworks (like Map_, CombineLatest_, ...)
 
   + Centralised object to keep track of publishers and subscribers
   + Starting point to build applications with a microservice architecture
 
 .. _pytest: https://docs.pytest.org/en/latest
-.. _Flake8: http://flake8.pycqa.org/en/latest/
+.. _ruff: https://astral.sh/ruff
 .. _mypy: http://mypy-lang.org/
 .. _Pylint: https://www.pylint.org/
 .. _Sphinx: http://www.sphinx-doc.org

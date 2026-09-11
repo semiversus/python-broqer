@@ -63,7 +63,7 @@ class Sink(Subscriber):  # pylint: disable=too-few-public-methods
                 self._function(value)
 
 
-def build_sink(function: Callable[..., None] = None, *,
+def build_sink(function: Optional[Callable[..., None]] = None, *,
                unpack: bool = False):
     """ Decorator to wrap a function to return a Sink subscriber.
 
@@ -73,13 +73,13 @@ def build_sink(function: Callable[..., None] = None, *,
     def _build_sink(function):
         return Sink(function, unpack=unpack)
 
-    if function:
+    if function is not None:
         return _build_sink(function)
 
     return _build_sink
 
 
-def build_sink_factory(function: Callable[..., None] = None, *,
+def build_sink_factory(function: Optional[Callable[..., None]] = None, *,
                        unpack: bool = False):
     """ Decorator to wrap a function to return a Sink subscriber factory.
     :param function: function to be wrapped
@@ -93,13 +93,14 @@ def build_sink_factory(function: Callable[..., None] = None, *,
             return Sink(function, *args, unpack=unpack, **kwargs)
         return _wrapper
 
-    if function:
+    if function is not None:
         return _build_sink(function)
 
     return _build_sink
 
 
-def sink_property(function: Callable[..., None] = None, unpack: bool = False):
+def sink_property(function: Optional[Callable[..., None]] = None,
+                  unpack: bool = False):
     """ Decorator to build a property returning a Sink subscriber.
     :param function: function to be wrapped
     :param unpack: value from emits will be unpacked (*value)
@@ -110,7 +111,7 @@ def sink_property(function: Callable[..., None] = None, unpack: bool = False):
             return Sink(function, self, unpack=unpack)
         return _build_sink
 
-    if function:
+    if function is not None:
         return build_sink_property(function)
 
     return build_sink_property

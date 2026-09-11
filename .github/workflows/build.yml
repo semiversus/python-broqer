@@ -23,7 +23,7 @@ jobs:
       - name: Lint and coding style check with ruff
         run: ruff check --output-format=github .
       - name: Static type checking
-        run: mypy broqer --no-strict-optional --disable-error-code type-var --disable-error-code call-arg
+        run: mypy broqer
       - name: Check Readme style
         run: rstcheck README.rst
       - name: Test with pytest
