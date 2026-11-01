@@ -9,5 +9,5 @@ mypy==1.14.0
 rstcheck==6.1.0
 setuptools_scm==3.3.3
 wheel==0.38.1
-pylint==2.15.3
+pylint==4.0.9
 ruff==0.15.0
